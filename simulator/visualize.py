@@ -1,5 +1,3 @@
-from email.quoprimime import header_length
-
 import  matplotlib.pyplot as plt
 
 def plot_trajectory(
