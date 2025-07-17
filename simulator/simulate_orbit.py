@@ -49,7 +49,7 @@ def simulate_orbit(
         else:
             thrust = np.array([0.0, 0.0])  #default: no thrust
 
-        total_force = gravity_force + thrust_vector
+        total_force = gravity_force + thrust
         acc = total_force / mass
         vel += acc * dt
         pos += vel * dt
