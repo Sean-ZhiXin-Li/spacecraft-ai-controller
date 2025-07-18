@@ -1,4 +1,5 @@
 import  matplotlib.pyplot as plt
+import  numpy as np
 
 def plot_trajectory(
         trajectory,
@@ -19,7 +20,11 @@ def plot_trajectory(
                     plot_trajectory(traj, target_radius = 100, arrow = True,
                                     others = [(baseline, "No Thrust")])
     """
-    plt.figure(figsize=(6, 6))
+    plt.figure(figsize=(8, 8))
+    max_radius = np.max(np.linalg.norm(trajectory, axis=1))
+    if max_radius > 1e9:
+        plt.xlim(-1.2 * max_radius, 1.2 * max_radius)
+        plt.ylim(-1.2 * max_radius, 1.2 * max_radius)
 
     # Plot main trajectory
     plt.plot(trajectory[:, 0], trajectory[:, 1],
@@ -56,3 +61,24 @@ def plot_trajectory(
     plt.tight_layout()
     plt.show()
 
+
+def plot_radius_vs_time(trajectory, dt, title = "Radius vs Time"):
+    """
+    Plot the radial distance r(t) of the spacecraft over time.
+    :param trajectory: np.array of shape (N, 2), each row id position [x,y].
+    :param dt: time step size used in simulation.
+    :param title: plot title.
+    """
+    time = np.arange(len(trajectory)) * dt  # Time axis
+    radii = np.linalg.norm(trajectory, axis = 1)  # r(t)
+
+    plt.figure(figsize=(8, 4))
+    plt.plot(time, radii, label = "r(t)", color = 'green')
+    plt.axhline(np.mean(radii), color = 'gray', linestyle = '--', label = "Mean rafius")
+    plt.xlabel("Time")
+    plt.ylabel("Radius(Distance from center)")
+    plt.title(title)
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
