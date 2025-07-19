@@ -7,12 +7,13 @@ from simulator.orbit_analysis import evaluate_orbit_error
 from controller.velocity_controller import get_thrust
 from simulator.visualize import plot_radius_vs_time
 from controller.velocity_controller import tangential_controller
-from controller.combined_controller import smart_combined_controller
+from controller.combined_controller import Controller
+from data.thrust_dataset import ThrustDataset
 
 use_voyager = True
 # Simulation Setup
 if use_voyager:
-    steps = 2000  #Simulate 2000 time steps (~83 days)
+    steps = 6000
     dt = 3600  # Each step is 1 hour (3600 seconds)
     G = 6.67430e-11  # Gravitational constant (m^3 kg^-1 s^-2)
     M = 1.989e30   # Mass of the Sun (kg)
@@ -49,6 +50,23 @@ baseline_traj = simulate_orbit(
 )
 
 # Main controlled trajectory(using selected mode)
+controller = Controller(
+    continuous = False,
+    impulse = True,
+    impulse_period = 5.0,
+    impulse_duration = 1.0,
+    enable_radial=  True,
+    enable_tangential = True,
+    alpha = 17,
+    beta = 17,
+    thrust_decay_type = 'exponential',
+    decay_rate = 1e-7,
+    add_noise = True,
+    noise_deg = 10
+)
+
+dataset = ThrustDataset()
+
 main_traj = simulate_orbit(
     steps = steps,
     dt = dt,
@@ -57,20 +75,10 @@ main_traj = simulate_orbit(
     mass = mass,
     pos_init = pos_init,
     vel_init = vel_init,
-    thrust_vector=(
-        lambda t, pos, vel: smart_combined_controller(
-            t, pos, vel,
-            continuous = False,
-            impulse = True,
-            impulse_period = 5.0,
-            impulse_duration = 1.0,
-            enable_radial = True,
-            enable_tangential = True,
-            thrust_decay_type = 'exponential',
-            decay_rate = 1e-6,
-        )
-    )
+    thrust_vector = lambda  t, pos, vel: dataset(t, pos, vel, controller)
 )
+
+dataset.save("radial_decay_with_noise")
 
 # Visualization
 plot_trajectory(
@@ -84,8 +92,8 @@ plot_trajectory(
 # Visualize the r(t) curve graph
 plot_radius_vs_time(main_traj, dt, title=f"r(t) vs Time - Mode: {mode}")
 
-
-
+# save thrust_log
+controller.save_log("radial_noise_decay")
 
 # Save trajectory data
 save_path = f"data/saved_trajectories/{mode}_traj"
