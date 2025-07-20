@@ -22,9 +22,9 @@ def plot_trajectory(
     """
     plt.figure(figsize=(8, 8))
     max_radius = np.max(np.linalg.norm(trajectory, axis=1))
-    if max_radius > 1e9:
-        plt.xlim(-1.2 * max_radius, 1.2 * max_radius)
-        plt.ylim(-1.2 * max_radius, 1.2 * max_radius)
+    buffer = 0.2 * max_radius
+    plt.xlim(-max_radius - buffer, max_radius + buffer)
+    plt.ylim(-max_radius - buffer, max_radius + buffer)
 
     # Plot main trajectory
     plt.plot(trajectory[:, 0], trajectory[:, 1],
