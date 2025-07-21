@@ -1,9 +1,6 @@
 
-
 import numpy as np
 import os
-
-from main import vel_init
 from simulator.simulate_orbit import simulate_orbit
 from controller.expert_controller import ExpertController
 from data.thrust_dataset import ThrustDataset
@@ -49,7 +46,7 @@ for i, angle_deg, in enumerate(angles_deg):
     )
 
     # Save dataset
-    filename = f"expert_dataset_{i + 1: 02d}"
+    filename = f"expert_dataset_{i + 1:02d}"
     dataset.save(filename)
     print(f"Saved: {filename}")
 
