@@ -45,7 +45,7 @@ def train_model(X_train, y_train):
     Output: 2D thrust vector
     """
     model = MLPRegressor(
-        hidden_layer_sizes=(64, 64),   # Two hidden layers with 64 neurons each
+        hidden_layer_sizes=(128, 128),   # Two hidden layers with 128 neurons each
         activation='tanh',             # Nonlinear activation function
         solver='adam',                 # Optimizer
         max_iter=1000,
@@ -64,7 +64,7 @@ def evaluate(model, X_test, y_test):
     """
     y_pred = model.predict(X_test)
     mse = mean_squared_error(y_test, y_pred)
-    print(f" Test MSE (mean squared error): {mse:.6f}")
+    print(f" Test MSE (mean squared error): {mse:.6e}")
 
     # Create plot
     plt.figure(figsize=(10, 8))
@@ -75,19 +75,19 @@ def evaluate(model, X_test, y_test):
         px, py = y_pred[i]
 
         # scale factor to amplify short thrust vectors (for visualization only)
-        scale_factor = 1e11
+        scale_factor = 1e9
 
         # true thrust in green
         plt.quiver(pos_x, pos_y, tx, ty,
-                   angles='xy', scale_units='xy',
-                   scale=1/scale_factor, color='green',
-                   alpha=0.7, label='True' if i == 0 else "")
+                   angles = 'xy', scale_units = 'xy',
+                   scale = None, color = 'green', width = 0.005,
+                   alpha = 0.7, label = 'True' if i == 0 else "")
 
         # predicted thrust in red
         plt.quiver(pos_x, pos_y, px, py,
-                   angles='xy', scale_units='xy',
-                   scale=1/scale_factor, color='red',
-                   alpha=0.5, label='Pred' if i == 0 else "")
+                   angles = 'xy', scale_units = 'xy',
+                   scale = None, color = 'red', width = 0.005,
+                   alpha = 0.5, label = 'Pred' if i == 0 else "")
 
     plt.title("Thrust Vectors on Position Plane: Green=True / Red=Predicted")
     plt.xlabel("Position X")
@@ -109,8 +109,8 @@ def main():
 
     # Optional: save the trained model
     from joblib import dump
-    dump(model, "imitation_policy_model.joblib")
-    print(" Model saved to: imitation_policy_model.joblib")
+    dump(model, "imitation_policy_model_V2.joblib")
+    print(" Model saved to: imitation_policy_model_v2.joblib")
 
 if __name__ == "__main__":
     main()

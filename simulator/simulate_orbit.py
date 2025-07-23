@@ -1,12 +1,12 @@
 import numpy as np
 
 def simulate_orbit(
-    steps = 6000,
-    dt = 0.1,
-    G = 1.0,
-    M = 1000.0,
-    mass = 1.0,
-    pos_init = np.array([100.0,0.0]),
+    steps = 60000,
+    dt = 3600,
+    G = 6.67430e-11,
+    M = 1.989e30,
+    mass = 722,
+    pos_init = np.array([0.0, 1.5e11]),
     vel_init = None,
     thrust_vector = None
 ):
