@@ -81,9 +81,9 @@ The objective today was to **compare the orbital performance** of the learned `I
 
 | Metric                  | Imitation Controller | Expert Controller |
 |-------------------------|----------------------|-------------------|
-| Mean Radial Error (m)   | **4.84 × 10¹²**       | **4.45 × 10¹²**    |
-| Std Radial Error (m)    | 1.59 × 10¹²           | 2.14 × 10¹²        |
-| Max Absolute Error (m)  | **7.35 × 10¹²**       | *[Not evaluated]*  |
+| Mean Radial Error (m)   | **4.84 × 10¹²**      | **4.45 × 10¹²**    |
+| Std Radial Error (m)    | 1.59 × 10¹²          | 2.14 × 10¹²        |
+| Max Absolute Error (m)  | **7.35 × 10¹²**      | *[Not evaluated]*  |
 
 ---
 
