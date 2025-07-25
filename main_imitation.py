@@ -6,6 +6,9 @@ from simulator.simulate_orbit import simulate_orbit
 from simulator.visualize import plot_trajectory, plot_radius_vs_time
 from simulator.orbit_analysis import evaluate_orbit_error
 from controller.imitation_controller import ImitationController
+from simulator.orbit_analysis import (
+    plot_radius_error_with_analysis,
+    plot_error_histogram)
 def run_imitation():
     # Set simulation parameters
     steps = 60000
@@ -18,7 +21,7 @@ def run_imitation():
     vel_init = np.array([20000.0, 0.0])
 
     # Load my imitation-based controller
-    controller = ImitationController("imitation_policy_model_V2.joblib")
+    controller = ImitationController("imitation_policy_model_V3.1.joblib")
 
     # Simulate the orbit under AI control
     trajectory = simulate_orbit(
@@ -47,6 +50,9 @@ def run_imitation():
         dt,
         title="r(t) vs Time – Imitation Controller"
     )
+
+    plot_radius_error_with_analysis(trajectory, target_radius, save_path="enhanced_error_v3.1.png")
+    plot_error_histogram(trajectory, target_radius, save_path="error_hist_v3.1.png")
 
     # Evaluate the orbit error
     mean_error, std_error = evaluate_orbit_error(trajectory, target_radius)

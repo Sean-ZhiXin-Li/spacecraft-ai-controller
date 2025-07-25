@@ -89,3 +89,52 @@ def plot_radius_vs_time(trajectory, dt, title="Radius vs Time"):
     plt.legend()
     plt.tight_layout()
     plt.show()
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_thrust_quiver(data, title="Thrust Vector Field", step=1000, save_path=None):
+    """
+    Plot a quiver diagram of thrust vectors over position.
+
+    :param data: A NumPy array of shape (N, 6) or (N, 7) — each row is:
+                 - [x, y, vx, vy, Tx, Ty]     ← if shape is (N, 6)
+                 - [t, x, y, vx, vy, Tx, Ty]  ← if shape is (N, 7)
+    :param title: Title of the plot.
+    :param step: Sample every 'step' points to avoid overcrowding.
+    :param save_path: Optional path to save the figure as PNG.
+    """
+    if data.ndim != 2:
+        raise ValueError(f"Input data must be 2D, got shape {data.shape}")
+
+    # Automatically handle shape (N, 7) → drop time column
+    if data.shape[1] == 7:
+        data = data[:, 1:]
+
+    if data.shape[1] != 6:
+        raise ValueError(f"Expected shape (N,6) after adjustment, got {data.shape}")
+
+    pos_x = data[::step, 0]
+    pos_y = data[::step, 1]
+    thrust_x = data[::step, 4]
+    thrust_y = data[::step, 5]
+
+    scale = 1e8  # Adjust depending on your thrust magnitude
+
+    plt.figure(figsize=(8, 8))
+    plt.quiver(pos_x, pos_y, thrust_x, thrust_y,
+               angles='xy', scale_units='xy', scale=scale,
+               color='blue', alpha=0.6, width=0.003)
+    plt.xlabel("Position X")
+    plt.ylabel("Position Y")
+    plt.title(title)
+    plt.grid(True)
+    plt.axis("equal")
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path)
+        print(f"[Saved] {save_path}")
+    else:
+        plt.show()

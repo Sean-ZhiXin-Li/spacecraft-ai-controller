@@ -45,11 +45,16 @@ def train_model(X_train, y_train):
     Output: 2D thrust vector
     """
     model = MLPRegressor(
-        hidden_layer_sizes=(128, 128),   # Two hidden layers with 128 neurons each
-        activation='tanh',             # Nonlinear activation function
-        solver='adam',                 # Optimizer
-        max_iter=1000,
-        random_state=42
+        hidden_layer_sizes = (512, 256, 128, 64),
+        activation = 'relu',
+        solver = 'adam',  # Optimizer
+        learning_rate = 'adaptive',
+        alpha = 1e-4,
+        early_stopping = True,
+        validation_fraction = 0.1,
+        max_iter = 2000,
+        random_state = 42,
+        verbose = True
     )
     print(" Training MLP model...")
     model.fit(X_train, y_train)
@@ -109,8 +114,8 @@ def main():
 
     # Optional: save the trained model
     from joblib import dump
-    dump(model, "imitation_policy_model_V2.joblib")
-    print(" Model saved to: imitation_policy_model_v2.joblib")
+    dump(model, "imitation_policy_model_V3.1.joblib")
+    print(" Model saved to: imitation_policy_model_v3.1.joblib")
 
 if __name__ == "__main__":
     main()

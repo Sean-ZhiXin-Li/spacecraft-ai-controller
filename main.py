@@ -10,7 +10,7 @@ from controller.velocity_controller import tangential_controller
 from controller.combined_controller import Controller
 from data.thrust_dataset import ThrustDataset
 from controller.expert_controller import ExpertController
-
+from simulator.visualize import plot_thrust_quiver
 def run_main():
     use_voyager = True
     # Simulation Setup
@@ -88,11 +88,20 @@ def run_main():
         others = [(baseline_traj, "No Thrust")]
     )
 
-    # Visualize the r(t) curve graph
     plot_radius_vs_time(main_traj, dt, title=f"r(t) vs Time - Mode: {mode}")
 
-    # save thrust_log
     controller.save_log("radial_noise_decay")
+
+    data = np.load("data/dataset/radial_decay_with_noise.npy")  # shape: (60000, 6)
+    timesteps = np.arange(data.shape[0]).reshape(-1, 1)
+    data_with_time = np.hstack([timesteps, data])  # shape: (60000, 7)
+
+    plot_thrust_quiver(
+        data_with_time[:, 1:7],
+        title="Thrust Field – V3.1",
+        step=200,
+        save_path="thrust_field_v3.1.png"
+    )
 
     # Save trajectory data
     save_path = f"data/saved_trajectories/{mode}_traj"
