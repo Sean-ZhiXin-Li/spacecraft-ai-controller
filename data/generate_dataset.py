@@ -17,7 +17,7 @@ pos_init = np.array([0.0, 1.5e11])
 speed = 20000.0  # 20 km/s
 
 # Generate N trajectories with varied initial velocity angle
-N = 10
+N = 30
 angles_deg = np.linspace(-30, 30, N)
 
 for i, angle_deg, in enumerate(angles_deg):

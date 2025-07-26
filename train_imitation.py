@@ -114,8 +114,8 @@ def main():
 
     # Optional: save the trained model
     from joblib import dump
-    dump(model, "imitation_policy_model_V3.1.joblib")
-    print(" Model saved to: imitation_policy_model_v3.1.joblib")
+    dump(model, "imitation_policy_model_V4.joblib")
+    print(" Model saved to: imitation_policy_model_v4.joblib")
 
 if __name__ == "__main__":
     main()
