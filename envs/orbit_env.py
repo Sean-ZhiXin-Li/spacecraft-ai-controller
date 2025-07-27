@@ -1,4 +1,3 @@
-
 import gym
 from gym import spaces
 import numpy as np
@@ -102,8 +101,18 @@ class OrbitEnv(gym.Env):
         self.pos += self.vel * self.dt
 
         # Calculate reward: negative normalized distance to target radius
-        radius_error = np.abs(np.linalg.norm(self.pos) - self.target_radius)
+        prev_radius = np.linalg.norm(self.pos)
+
+        total_acc = acc_gravity + acc_thrust
+        self.vel += total_acc * self.dt
+        self.pos += self.vel * self.dt
+
+        curr_radius = np.linalg.norm(self.pos)
+        radius_error = abs(curr_radius - self.target_radius)
+
+        radius_delta = prev_radius - curr_radius
         reward = -radius_error / self.target_radius
+        reward += 0.00000001 * radius_delta  # Reduce the shaping item coefficient
 
         # Check termination conditions
         done = self.steps >= self.max_steps or r > 10 * self.target_radius
