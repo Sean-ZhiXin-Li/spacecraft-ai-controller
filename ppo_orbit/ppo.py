@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.distributions import Normal
 from envs.orbit_env import OrbitEnv
 import numpy as np
 from simulator.visualize import plot_trajectory
@@ -10,141 +11,154 @@ import matplotlib.pyplot as plt
 GAMMA = 0.99
 LAMBDA = 0.95
 LR = 1e-4
-EPOCHS = 10
+EPOCHS = 50
 TRAIN_ITERS = 5
 
-
+# Normalize state
 def normalize_state(state):
     return np.array([
-        state[0] / 1e13,  # x
-        state[1] / 1e13,  # y
-        state[2] / 3e4,  # vx
-        state[3] / 3e4  # vy
+        state[0] / 1e13,
+        state[1] / 1e13,
+        state[2] / 3e4,
+        state[3] / 3e4
     ], dtype=np.float32)
 
-def init_weights(m):
-    if isinstance(m, nn.Linear):
-        nn.init.kaiming_uniform_(m.weight, a=0.1)
-        nn.init.constant_(m.bias, 0)
-
-# Actor-Critic Neural Network
+# Actor-Critic Model
 class ActorCritic(nn.Module):
-
-    def __init__(self):
+    def __init__(self, obs_dim=4, act_dim=2):
         super().__init__()
-        self.shared = nn.Sequential(
-            nn.Linear(4, 64),        # Input: [x, y, vx, vy]
+        self.actor = nn.Sequential(
+            nn.Linear(obs_dim, 64),
             nn.Tanh(),
             nn.Linear(64, 64),
             nn.Tanh(),
+            nn.Linear(64, act_dim)
         )
-        self.policy_head = nn.Linear(64, 2)   # Output: thrust vector [Tx, Ty]
-        self.value_head = nn.Linear(64, 1)    # Output: state value V(s)
+        self.critic = nn.Sequential(
+            nn.Linear(obs_dim, 64),
+            nn.Tanh(),
+            nn.Linear(64, 64),
+            nn.Tanh(),
+            nn.Linear(64, 1)
+        )
+        self.log_std = nn.Parameter(torch.zeros(act_dim))  # Learnable log-std
 
-    def forward(self, x):
-        x = self.shared(x)
-        return self.policy_head(x), self.value_head(x)
+    def act(self, obs):
+        mu = self.actor(obs)
+        std = torch.exp(self.log_std)
+        dist = Normal(mu, std)
+        action = dist.sample()
+        logprob = dist.log_prob(action).sum(axis=-1)
+        value = self.critic(obs).squeeze(-1)
+        return action, logprob, value
 
-# Compute Generalized Advantage Estimation (GAE)
+    def forward(self, obs):
+        mu = self.actor(obs)
+        std = torch.exp(self.log_std)
+        dist = Normal(mu, std)
+        value = self.critic(obs).squeeze(-1)
+        return dist, value
+
+# GAE Advantage Computation
 def compute_advantages(rewards, values, gamma=GAMMA, lam=LAMBDA):
     advantages = []
     gae = 0
-    values = values + [0.0]  # Append dummy value for easier computation
+    values = values + [0.0]
     for t in reversed(range(len(rewards))):
-        delta = rewards[t] + gamma * values[t+1] - values[t]
+        delta = rewards[t] + gamma * values[t + 1] - values[t]
         gae = delta + gamma * lam * gae
         advantages.insert(0, gae)
     return advantages
 
-# PPO Clipped Surrogate Objective
+# PPO Loss
 def ppo_clip_loss(old_logprobs, new_logprobs, advantages, clip=0.2):
     ratio = (new_logprobs - old_logprobs).exp()
     unclipped = ratio * advantages
     clipped = torch.clamp(ratio, 1 - clip, 1 + clip) * advantages
     return -torch.min(unclipped, clipped).mean()
 
-# Rollout a single trajectory using current policy
+# Collect a trajectory from one rollout
 def collect_trajectory(env, model):
-    state, _ = env.reset()  # Unpack observation from reset()
-    states, actions, rewards, values, logprobs = [], [], [], [], []
-
-    positions =[]
-
+    state = env.reset()[0]
     done = False
+
+    states, actions, rewards, values, logprobs, positions = [], [], [], [], [], []
+
     while not done:
-        positions.append(state[:2])
-        s = torch.tensor(normalize_state(state), dtype=torch.float32)
-        logits, value = model(s)
-        tanh_logits = torch.tanh(logits)
-        action = tanh_logits.detach().numpy()
-        action = np.clip(action, -1.0, 1.0)
+        # state normalization if needed
+        norm_state = normalize_state(state)
+        state_tensor = torch.tensor(norm_state, dtype=torch.float32).unsqueeze(0)
 
-        new_state, reward, done, _ = env.step(action)
+        with torch.no_grad():
+            action, logprob, value = model.act(state_tensor)
 
-        logprob = -((tanh_logits - torch.tensor(action)) ** 2).sum()
+        next_state, reward, done, _ = env.step(action.squeeze().numpy())
 
-        states.append(s)
-        actions.append(torch.tensor(action))
-        rewards.append(reward)
-        values.append(value.item())
-        logprobs.append(logprob.detach())
+        states.append(state_tensor.squeeze(0))
+        actions.append(action.squeeze(0))
+        logprobs.append(logprob)
+        values.append(value)
+        rewards.append(torch.tensor(reward, dtype=torch.float32))
+        positions.append(env.pos.copy())
 
-        state = new_state
+        state = next_state
 
     return states, actions, rewards, values, logprobs, positions
-
-# Main PPO Training Loop
+# Main Training Loop
 def train():
     env = OrbitEnv()
+    env = OrbitEnv(max_steps=10000)
     model = ActorCritic()
-    model.apply(init_weights)
     optimizer = optim.Adam(model.parameters(), lr=LR)
     reward_sums = []
 
     for epoch in range(EPOCHS):
-        # Rollout a trajectory
-        states, actions, rewards, values, logprobs, positions = collect_trajectory(env, model)
-        advantages = compute_advantages(rewards, values)
-        returns = [a + v for a, v in zip(advantages, values)]
+        result = collect_trajectory(env, model)
+        if len(result[0]) == 0:
+            print(f" Epoch {epoch+1}: No valid trajectory collected. Skipping.")
+            continue
+
+        states, actions, rewards, values, logprobs, positions = result
+        advantages = compute_advantages(rewards, [v.item() for v in values])
+        returns = [a + v.item() for a, v in zip(advantages, values)]
 
         # Convert to tensors
         states = torch.stack(states)
         actions = torch.stack(actions)
-        old_logprobs = torch.stack(logprobs)
+        logprobs = torch.stack(logprobs)
         advantages = torch.tensor(advantages, dtype=torch.float32)
         returns = torch.tensor(returns, dtype=torch.float32)
 
-        # PPO Optimization
         for _ in range(TRAIN_ITERS):
-            logits, values = model(states)
-            new_logprobs = -((logits - actions) ** 2).sum(dim=1)
+            dist, values_pred = model(states)
+            new_logprobs = dist.log_prob(actions).sum(axis=-1)
 
-            loss_pi = ppo_clip_loss(old_logprobs, new_logprobs, advantages)
-            loss_v = ((returns - values.squeeze()) ** 2).mean()
-
+            loss_pi = ppo_clip_loss(logprobs, new_logprobs, advantages)
+            loss_v = ((returns - values_pred) ** 2).mean()
             loss = loss_pi + 0.5 * loss_v
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-        print(f"Epoch {epoch+1}: Return Sum = {sum(rewards):.2f}, Loss_pi = {loss_pi.item():.4f}, Loss_v = {loss_v.item():.4f}")
-        reward_sums.append(sum(rewards))
-    torch.save(model.state_dict(), "ppo_controller.pth")
+        total_return = sum([r.item() for r in rewards])
+        reward_sums.append(total_return)
+        print(f"Epoch {epoch+1}: Return = {total_return:.2f}, Loss_pi = {loss_pi.item():.4f}, Loss_v = {loss_v.item():.4f}")
+
+    # Save Results
+    torch.save(model.state_dict(), "ppo_controller_gaussian.pth")
     plt.figure(figsize=(8, 5))
     plt.plot(reward_sums, marker='o', linestyle='-', color='royalblue')
     plt.xlabel("Epoch")
-    plt.ylabel("Return Sum")
-    plt.title("PPO Training Return Curve")
+    plt.ylabel("Return")
+    plt.title("PPO (Gaussian) Return Curve")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("ppo_reward_curve.png", dpi=300)
+    plt.savefig("ppo_reward_curve_gaussian.png", dpi=300)
     plt.show()
 
-    print("PPO model saved to ppo_controller.pth")
-    # Visualize final trajectory
     trajectory = np.array(positions)
-    plot_trajectory(trajectory, title="Final PPO Trajectory", target_radius=env.target_radius)
+    plot_trajectory(trajectory, title="Final PPO (Gaussian) Trajectory", target_radius=env.target_radius)
+
 if __name__ == "__main__":
     train()
-

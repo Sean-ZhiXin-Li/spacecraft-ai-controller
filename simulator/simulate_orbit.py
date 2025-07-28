@@ -1,7 +1,7 @@
 import numpy as np
 
 def simulate_orbit(
-    steps = 60000,
+    steps = 120000,
     dt = 3600,
     G = 6.67430e-11,
     M = 1.989e30,

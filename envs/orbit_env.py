@@ -15,7 +15,7 @@ class OrbitEnv(gym.Env):
                  M=1.989e30,              # Mass of the central body (e.g., Sun)
                  mass=722,                # Spacecraft mass in kg
                  dt=3600,                 # Time step in seconds (1 hour)
-                 max_steps=60000,         # Maximum simulation steps per episode
+                 max_steps=120000,         # Maximum simulation steps per episode
                  target_radius=7.5e12,    # Target orbital radius (meters)
                  thrust_scale=0.2):       # Scaling factor for thrust magnitude
         super().__init__()
@@ -50,12 +50,10 @@ class OrbitEnv(gym.Env):
         super().reset(seed=seed)
         self.steps = 0
 
-        # Start at the target radius directly "above" the Sun (positive y-axis)
-        self.pos = np.array([0.0, self.target_radius], dtype=np.float64)
+        self.pos = np.array([0.0, 2.0e12], dtype=np.float64)
 
-        # Initial tangential velocity (to the right)
-        speed = 20000.0  # in m/s
-        self.vel = speed * np.array([1.0, 0.0], dtype=np.float64)
+        v_orbit = np.sqrt(self.G * self.M / np.linalg.norm(self.pos))
+        self.vel = np.array([v_orbit * 0.95, 0.0])
 
         # Return initial observation
         return self._get_obs(), {}
@@ -83,39 +81,48 @@ class OrbitEnv(gym.Env):
             info (dict): Additional debug info
         """
         self.steps += 1
+        done = False
 
-        # Convert normalized action to physical thrust
         thrust = self.thrust_scale * np.clip(action, -1.0, 1.0)
-        acc_thrust = thrust / self.mass  # F = ma → a = F / m
+        acc_thrust = thrust / self.mass
 
-        # Calculate gravitational acceleration
         r = np.linalg.norm(self.pos)
-        if r == 0:
-            acc_gravity = np.zeros(2)
-        else:
-            acc_gravity = -self.G * self.M * self.pos / r**3  # Central gravitational force
+        acc_gravity = -self.G * self.M * self.pos / r ** 3 if r != 0 else np.zeros(2)
 
-        # Update velocity and position using Euler integration
-        total_acc = acc_gravity + acc_thrust
-        self.vel += total_acc * self.dt
-        self.pos += self.vel * self.dt
-
-        # Calculate reward: negative normalized distance to target radius
-        prev_radius = np.linalg.norm(self.pos)
-
-        total_acc = acc_gravity + acc_thrust
-        self.vel += total_acc * self.dt
+        self.vel += (acc_gravity + acc_thrust) * self.dt
         self.pos += self.vel * self.dt
 
         curr_radius = np.linalg.norm(self.pos)
         radius_error = abs(curr_radius - self.target_radius)
 
-        radius_delta = prev_radius - curr_radius
-        reward = -radius_error / self.target_radius
-        reward += 0.00000001 * radius_delta  # Reduce the shaping item coefficient
+        v_actual = np.linalg.norm(self.vel)
+        v_circular = np.sqrt(self.G * self.M / curr_radius)
+        speed_error = abs(v_actual - v_circular)
 
-        # Check termination conditions
-        done = self.steps >= self.max_steps or r > 10 * self.target_radius
+        reward = 0.0
+        reward -= 1.5 * (radius_error / self.target_radius)
+        reward -= 0.3 * (speed_error / v_circular)
+        reward += 0.01  # time bonus
 
-        # Return observation, reward, done flag, and empty info
+        if radius_error < 2e10 and speed_error < 1000:
+            reward += 10.0  # close to target
+
+        escape_speed = np.sqrt(2 * self.G * self.M / self.target_radius)
+        if curr_radius > 2.0 * self.target_radius:
+            reward -= 50.0  # too far
+        if v_actual > escape_speed:
+            reward -= 80.0  # likely escaping
+
+        if self.steps == self.max_steps and radius_error < 5e10:
+            reward += 30.0  # bonus for stable ending
+
+        # cosine alignment
+        cos_theta = np.dot(self.pos, self.vel) / (np.linalg.norm(self.pos) * np.linalg.norm(self.vel) + 1e-8)
+        reward += 2.0 * cos_theta
+
+        # 👇 debug print (optional)
+        if self.steps % 1000 == 0:
+            print(f"[Step {self.steps}] Radius = {curr_radius:.2e}, Speed = {v_actual:.2e}, Reward = {reward:.3f}")
+
+        done = self.steps >= self.max_steps
         return self._get_obs(), reward, done, {}
