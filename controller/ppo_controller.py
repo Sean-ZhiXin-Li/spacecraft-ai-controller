@@ -64,11 +64,14 @@ class PPOController:
         state_tensor = torch.tensor(state, dtype=torch.float32).unsqueeze(0).to(self.device)
 
         with torch.no_grad():
-            action_mean, _ = self.model(state_tensor)  # Gaussian mean only
+            dist, _ = self.model(state_tensor)
+            action = dist.sample()
+            thrust = action.squeeze().cpu().numpy()
 
-        thrust = action_mean.squeeze().cpu().numpy()
+            print(f"[DEBUG] t={t:.2f}, pos={pos}, vel={vel}, thrust={thrust}")
 
         if self.verbose:
             print(f"[PPOController] t={t:.1f}, pos={pos}, vel={vel} → thrust={thrust}")
 
         return thrust
+

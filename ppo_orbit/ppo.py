@@ -1,29 +1,25 @@
+import os
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.distributions import Normal
-from envs.orbit_env import OrbitEnv
-import numpy as np
-from simulator.visualize import plot_trajectory
 import matplotlib.pyplot as plt
-import csv
-import os
+from envs.orbit_env import OrbitEnv
 
-# PPO Hyperparameters
-GAMMA = 0.99           # Discount factor
-LAMBDA = 0.90          # GAE lambda
-LR = 5e-5              # Learning rate
-EPOCHS = 1000          # Total training epochs
-TRAIN_ITERS = 20       # Policy update iterations per epoch
-THRUST_SCALE = 8.0     # Scaling factor for thrust magnitude
-CHECKPOINT_EVERY = 50  # Save model every N epochs
-ENTROPY_COEF = 0.003
-
-# Use float32 and configure GPU/CPU device
-torch.set_default_dtype(torch.float32)
+# Enable CUDA memory expansion
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Normalize state for better PPO performance
+# Hyperparameters
+GAMMA = 0.99
+LAMBDA = 0.95
+LR = 1e-5
+EPOCHS = 300
+TRAIN_ITERS = 10
+THRUST_SCALE = 3000
+
+# Normalize observation
 def normalize_state(state):
     pos_scale = 7.5e12
     vel_scale = 3e4
@@ -34,199 +30,141 @@ def normalize_state(state):
         state[3] / vel_scale
     ], dtype=np.float32)
 
-# PPO Actor-Critic model with Gaussian policy
+# PPO Actor-Critic with Gaussian policy
 class ActorCritic(nn.Module):
-    def __init__(self, obs_dim=4, act_dim=2):
+    def __init__(self):
         super().__init__()
+        self.shared = nn.Sequential(
+            nn.Linear(4, 128),
+            nn.Tanh()
+        )
         self.actor = nn.Sequential(
-            nn.Linear(obs_dim, 256),
-            nn.LayerNorm(256),
+            nn.Linear(128, 64),
             nn.Tanh(),
-            nn.Linear(256, 256),
-            nn.Tanh(),
-            nn.Linear(256, act_dim)
+            nn.Linear(64, 2)
         )
         self.critic = nn.Sequential(
-            nn.Linear(obs_dim, 256),
+            nn.Linear(128, 64),
             nn.Tanh(),
-            nn.Linear(256, 256),
-            nn.Tanh(),
-            nn.Linear(256, 1)
+            nn.Linear(64, 1)
         )
-        self.log_std = nn.Parameter(torch.ones(act_dim) * 0.0)  # Log standard deviation for Gaussian
+        self.log_std = nn.Parameter(torch.zeros(2))
 
-    def act(self, obs):
-        mu = self.actor(obs)
-        std = torch.exp(self.log_std)
+    def forward(self, x):
+        x = self.shared(x)
+        return self.actor(x), self.critic(x)
+
+    def get_action(self, state):
+        state = torch.tensor(state, dtype=torch.float32).to(device)
+        with torch.no_grad():
+            mu, _ = self.forward(state)
+        std = self.log_std.exp()
         dist = Normal(mu, std)
         action = dist.sample()
-        logprob = dist.log_prob(action).sum(axis=-1)
-        value = self.critic(obs).squeeze(-1)
-        return action, logprob, value
+        return action.cpu().numpy(), dist.log_prob(action).sum()
 
-    def forward(self, obs):
-        mu = self.actor(obs)
-        std = torch.exp(self.log_std)
+    def evaluate(self, states, actions):
+        mu, value = self.forward(states)
+        std = self.log_std.exp().expand_as(mu)
         dist = Normal(mu, std)
-        value = self.critic(obs).squeeze(-1)
-        return dist, value
+        log_probs = dist.log_prob(actions).sum(dim=1)
+        entropy = dist.entropy().sum(dim=1)
+        return log_probs, entropy, value.squeeze()
 
-# Compute GAE Advantage
-def compute_advantages(rewards, values, gamma=GAMMA, lam=LAMBDA):
-    advantages = []
+# Generalized Advantage Estimation
+def compute_gae(rewards, values, masks, gamma=GAMMA, lam=LAMBDA):
     gae = 0
-    values = values + [0.0]  # Append final value estimate
-    for t in reversed(range(len(rewards))):
-        delta = rewards[t] + gamma * values[t + 1] - values[t]
-        gae = delta + gamma * lam * gae
-        advantages.insert(0, gae)
-    return advantages
+    returns = []
+    values = values + [0]
+    for i in reversed(range(len(rewards))):
+        delta = rewards[i] + gamma * values[i + 1] * masks[i] - values[i]
+        gae = delta + gamma * lam * masks[i] * gae
+        returns.insert(0, gae + values[i])
+    return returns
 
-# PPO Clip Loss Function
-def ppo_clip_loss(old_logprobs, new_logprobs, advantages, clip=0.2):
-    ratio = (new_logprobs - old_logprobs).exp()
-    unclipped = ratio * advantages
-    clipped = torch.clamp(ratio, 1 - clip, 1 + clip) * advantages
-    return -torch.min(unclipped, clipped).mean()
-
-# Collect one episode (trajectory)
-def collect_trajectory(env, model):
-    state = env.reset()[0]
-    done = False
-    states, actions, rewards, values, logprobs, positions = [], [], [], [], [], []
-
-    while not done:
-        norm_state = normalize_state(state)
-        state_tensor = torch.tensor(norm_state, dtype=torch.float32, device=device).unsqueeze(0)
-
-        with torch.no_grad():
-            action, logprob, value = model.act(state_tensor)
-
-        next_state, reward, done, _ = env.step(action.squeeze().cpu().numpy())
-
-        # Save trajectory data
-        states.append(state_tensor.squeeze(0))
-        actions.append(action.squeeze(0))
-        logprobs.append(logprob)
-        values.append(value)
-        rewards.append(torch.tensor(reward, dtype=torch.float32))
-        positions.append(env.pos.copy())
-
-        state = next_state
-
-    return states, actions, rewards, values, logprobs, positions
-
-# === Evaluate and visualize PPO trajectory ===
-def evaluate_and_plot(model, thrust_scale=THRUST_SCALE):
-    env = OrbitEnv(max_steps=8000, thrust_scale=thrust_scale)
-    state = env.reset()[0]
-    done = False
-    trajectory = []
-
-    while not done:
-        norm_state = normalize_state(state)
-        state_tensor = torch.tensor(norm_state, dtype=torch.float32, device=device).unsqueeze(0)
-
-        with torch.no_grad():
-            action, _, _ = model.act(state_tensor)
-
-        state, _, done, _ = env.step(action.squeeze().cpu().numpy())
-        trajectory.append(env.pos.copy())
-
-    trajectory = np.array(trajectory)
-    plot_trajectory(trajectory, title="Final PPO Trajectory", target_radius=env.target_radius)
-    plt.show()
-
-# PPO Training Loop
+# PPO Main Training Loop
 def train():
-    best_return = -np.inf
-    env = OrbitEnv(max_steps=8000, thrust_scale=THRUST_SCALE)
+    env = OrbitEnv()
     model = ActorCritic().to(device)
     optimizer = optim.Adam(model.parameters(), lr=LR)
-    reward_sums = []
 
-    os.makedirs("checkpoints", exist_ok=True)
-    with open("loss_log.csv", "w", newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(["Epoch", "Return", "Loss_pi", "Loss_v"])
+    all_rewards = []
+    trajectory_data = []
 
     for epoch in range(EPOCHS):
-        result = collect_trajectory(env, model)
-        if len(result[0]) == 0:
-            print(f"Epoch {epoch + 1}: Empty trajectory.")
-            continue
+        obs, _ = env.reset()
+        state = normalize_state(obs)
 
-        states, actions, rewards, values, logprobs, _ = result
-        advantages = compute_advantages(rewards, [v.item() for v in values])
-        returns = [a + v.item() for a, v in zip(advantages, values)]
+        log_probs, values, states, actions, rewards, masks = [], [], [], [], [], []
+        total_reward = 0
+        traj = []
 
-        advantages = (torch.tensor(advantages) - torch.mean(torch.tensor(advantages))) / \
-                     (torch.std(torch.tensor(advantages)) + 1e-8)
+        for _ in range(2048):
+            action, log_prob = model.get_action(state)
+            next_obs, reward, done, info = env.step(action * THRUST_SCALE)
+            norm_next_state = normalize_state(next_obs)
 
-        try:
-            # Convert to tensors
-            states = torch.stack(states).to(device)
-            actions = torch.stack(actions).to(device)
-            logprobs = torch.stack(logprobs).to(device)
-            returns = torch.tensor(returns, dtype=torch.float32).to(device)
-            advantages = advantages.to(device)
+            states.append(state)
+            actions.append(action)
+            rewards.append(reward)
+            masks.append(0 if done else 1)
+            log_probs.append(log_prob)
 
-            # Update policy and value network
-            for _ in range(TRAIN_ITERS):
-                dist, values_pred = model(states)
-                new_logprobs = dist.log_prob(actions).sum(axis=-1)
+            with torch.no_grad():
+                _, value = model.forward(torch.tensor(state, dtype=torch.float32).to(device))
+                values.append(value.item())
 
-                loss_pi = ppo_clip_loss(logprobs, new_logprobs, advantages)
-                loss_v = ((returns - values_pred) ** 2).mean()
-                loss = loss_pi + 0.5 * loss_v
+            traj.append(env.pos.copy())
+            state = norm_next_state
+            total_reward += reward
 
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
+            if done:
+                break
 
-            total_return = sum([r.item() for r in rewards])
-            reward_sums.append(total_return)
-            print(f"[Epoch {epoch + 1}] Return = {total_return:.2f}, Loss_pi = {loss_pi.item():.4f}, Loss_v = {loss_v.item():.4f}")
+        all_rewards.append(total_reward)
+        trajectory_data.append(np.array(traj))
 
-            if total_return > best_return:
-                best_return = total_return
-                torch.save(model.state_dict(), "ppo_best_model.pth")
-                print(f"[Model Saved] Best Return: {best_return:.2f} at Epoch {epoch + 1}")
+        # Convert to tensors
+        states = torch.tensor(np.array(states), dtype=torch.float32).to(device)
+        actions = torch.tensor(np.array(actions), dtype=torch.float32).to(device)
+        old_log_probs = torch.stack(log_probs).detach().to(device)
+        returns = compute_gae(rewards, values, masks)
+        returns = torch.tensor(returns, dtype=torch.float32).to(device)
 
-            with open("loss_log.csv", "a", newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow([epoch + 1, total_return, loss_pi.item(), loss_v.item()])
+        # PPO update
+        for _ in range(TRAIN_ITERS):
+            new_log_probs, entropy, value = model.evaluate(states, actions)
+            advantage = returns - value.detach()
+            ratio = torch.exp(new_log_probs - old_log_probs)
+            surr1 = ratio * advantage
+            surr2 = torch.clamp(ratio, 0.8, 1.2) * advantage
+            actor_loss = -torch.min(surr1, surr2).mean()
+            critic_loss = (returns - value).pow(2).mean()
+            loss = actor_loss + 0.5 * critic_loss - 0.01 * entropy.mean()
 
-            if (epoch + 1) % CHECKPOINT_EVERY == 0:
-                torch.save(model.state_dict(), f"checkpoints/ppo_epoch_{epoch + 1}.pth")
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-        except Exception as e:
-            print(f"Epoch {epoch + 1}: Error {e}. Skipping.")
+        print(f"Epoch {epoch + 1}/{EPOCHS} | Reward: {total_reward:.2f}")
 
-    torch.save(model.state_dict(), "ppo_controller_gaussian.pth")
+        torch.cuda.empty_cache()
+        torch.cuda.ipc_collect()
 
-    # Plot training reward curve
-    plt.figure(figsize=(8, 5))
-    plt.plot(reward_sums, marker='o', color='royalblue')
+    # Save reward curve
+    plt.plot(all_rewards)
     plt.xlabel("Epoch")
-    plt.ylabel("Total Return")
-    plt.title("PPO Training Reward Curve")
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig("ppo_reward_curve_gaussian.png", dpi=300)
+    plt.ylabel("Total Reward")
+    plt.title("PPO Training Curve")
+    plt.grid()
+    plt.savefig("training_curve.png")
     plt.show()
 
-    try:
-        print("\n[Evaluation] Loading best model and generating trajectory...\n")
-        model.load_state_dict(torch.load("ppo_best_model.pth", weights_only=True))
-        torch.save(model.state_dict(), "ppo_orbit.pth")
-        print(" Best model weights loaded and saved to ppo_orbit.pth")
-
-        evaluate_and_plot(model)
-    except Exception as e:
-        print(f"[️Evaluation Error] Failed to evaluate or plot: {e}")
-
+    # Save last trajectory
+    if trajectory_data:
+        np.save("ppo_traj.npy", trajectory_data[-1])
 
 if __name__ == "__main__":
     train()
+
 

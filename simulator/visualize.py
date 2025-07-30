@@ -94,7 +94,7 @@ def plot_radius_vs_time(trajectory, dt, title="Radius vs Time"):
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_thrust_quiver(data, title="Thrust Vector Field", step=1000, save_path=None):
+def plot_thrust_quiver(data, title="Thrust Vector Field", interval=1000, save_path=None):
     """
     Plot a quiver diagram of thrust vectors over position.
 
@@ -115,10 +115,10 @@ def plot_thrust_quiver(data, title="Thrust Vector Field", step=1000, save_path=N
     if data.shape[1] != 6:
         raise ValueError(f"Expected shape (N,6) after adjustment, got {data.shape}")
 
-    pos_x = data[::step, 0]
-    pos_y = data[::step, 1]
-    thrust_x = data[::step, 4]
-    thrust_y = data[::step, 5]
+    pos_x = data[::interval, 0]
+    pos_y = data[::interval, 1]
+    thrust_x = data[::interval, 4]
+    thrust_y = data[::interval, 5]
 
     scale = 1e8  # Adjust depending on your thrust magnitude
 

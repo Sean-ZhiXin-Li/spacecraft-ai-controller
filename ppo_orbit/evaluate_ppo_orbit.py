@@ -1,68 +1,82 @@
 import torch
+import torch.nn as nn
 import numpy as np
-import matplotlib.pyplot as plt
-from envs.orbit_env import OrbitEnv
-from simulator.visualize import (
-    plot_trajectory,
-    plot_radius_vs_time,
-    plot_thrust_quiver
-)
-from simulator.orbit_analysis import evaluate_orbit_error
-from ppo_orbit.ppo import ActorCritic
 
-# Load trained PPO model
-model = ActorCritic()
-model.load_state_dict(torch.load("ppo_best_model.pth", weights_only=True))
-model.eval()
-print("PPO model loaded successfully.")
+class PPOActor(nn.Module):
+    def __init__(self, input_dim=4, hidden_dim=128, output_dim=2):
+        super(PPOActor, self).__init__()
+        self.net = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.Tanh(),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.Tanh(),
+            nn.Linear(hidden_dim, output_dim)
+        )
 
-# Initialize orbital simulation environment
-env = OrbitEnv()
-state, _ = env.reset()  # Correct unpacking
-state = np.array(state)  # Ensure it’s a flat array
-state_tensor = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
+    def forward(self, x):
+        return self.net(x)
 
-# Run simulation with PPO controller
-states = []  # To record full states [x, y, vx, vy, Tx, Ty]
-for _ in range(8000):  # Match simulation length (steps)
-    state_tensor = torch.tensor(state, dtype=torch.float32).unsqueeze(0)  # Add batch dimension
-    with torch.no_grad():
-        dist, _ = model(state_tensor)
-        action = dist.sample().squeeze().numpy()
-    next_state, reward, done, _ = env.step(action)
+class PPOController:
+    """
+    PPOController uses a trained PPO policy network to generate thrust vectors
+    for spacecraft orbital control.
+    """
 
-    # Record current state + action (used for visualization)
-    full_state = np.concatenate([state, action])  # [x, y, vx, vy, Tx, Ty]
-    states.append(full_state)
+    def __init__(self, model_path, normalize=True, device="cpu", verbose=False):
+        """
+        Initialize the PPO controller.
 
-    state = next_state
-    if done:
-        break
+        Args:
+            model_path (str): Path to the trained PPO model (.pth file).
+            normalize (bool): Whether to normalize input state.
+            device (str): Device to load the model on ("cpu" or "cuda").
+            verbose (bool): Whether to print debug info.
+        """
+        self.normalize = normalize
+        self.device = device
+        self.verbose = verbose
 
-states = np.array(states)
-trajectory = states[:, :2]  # Extract positions [x, y]
+        # Load model
+        self.model = PPOActor()
+        try:
+            # Use safe loading with weights_only=True (requires PyTorch ≥ 2.2)
+            state_dict = torch.load(model_path, map_location=self.device, weights_only=True)
+        except TypeError:
+            # Fallback for older PyTorch versions
+            state_dict = torch.load(model_path, map_location=self.device)
+        self.model.load_state_dict(state_dict)
+        self.model.to(self.device)
+        self.model.eval()
 
-# Plot orbital trajectory
-plot_trajectory(
-    trajectory,
-    title="PPO-Controlled Orbit",
-    target_radius=env.target_radius,
-    arrows=True
-)
+    def __call__(self, t, pos, vel):
+        """
+        Compute thrust based on current state.
 
-# Plot radius over time (r(t))
-plot_radius_vs_time(
-    trajectory,
-    dt=env.dt,
-    title="Radius vs Time (PPO)"
-)
+        Args:
+            t (float): Current time (not used).
+            pos (np.ndarray): Position vector [x, y].
+            vel (np.ndarray): Velocity vector [vx, vy].
 
-# === Step 6: Visualize thrust vector field ===
-plot_thrust_quiver(
-    states,
-    title="Thrust Vector Field (PPO)",
-    step=200  # Plot every N-th step for clarity
-)
+        Returns:
+            np.ndarray: Thrust vector in 2D space, range [-1, 1].
+        """
+        state = np.concatenate([pos, vel]).astype(np.float32)
 
-# Evaluate orbital performance (mean error, std deviation)
-evaluate_orbit_error(trajectory, env.target_radius)
+        if self.normalize:
+            pos_scale = 7.5e12
+            vel_scale = 3e4
+            state = np.array([
+                state[0] / pos_scale,
+                state[1] / pos_scale,
+                state[2] / vel_scale,
+                state[3] / vel_scale
+            ], dtype=np.float32)
+
+        state_tensor = torch.tensor(state, dtype=torch.float32).unsqueeze(0).to(self.device)
+        with torch.no_grad():
+            action = self.model(state_tensor).squeeze(0).cpu().numpy()
+
+        if self.verbose:
+            print(f"[PPO] t={t:.1f}, pos={pos}, vel={vel}, action={action}")
+
+        return np.clip(action, -1.0, 1.0)

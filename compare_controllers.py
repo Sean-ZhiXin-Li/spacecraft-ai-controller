@@ -27,7 +27,11 @@ vel_init = np.array([20000.0, 0.0])
 imitation_traj = np.load("data/logs/imitation_traj.npy")
 
 # Generate expert trajectory
-expert_controller = ExpertController(target_radius=target_radius)
+expert_controller = ExpertController(
+    target_radius=target_radius,
+    G=G,
+    M=M
+)
 expert_traj = simulate_orbit(
     steps=steps,
     dt=dt,
