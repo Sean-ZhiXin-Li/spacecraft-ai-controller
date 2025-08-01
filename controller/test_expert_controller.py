@@ -6,25 +6,29 @@ import matplotlib.pyplot as plt
 G = 6.67430e-11  #
 M = 1.989e30
 target_radius = 7.5e12
-dt = 1000
-steps = 600000
+dt = 2000
+steps = 10000000
 mass = 721.9
-
-
 pos_init = np.array([0.0, target_radius * (1/3)])
 r0 = np.linalg.norm(pos_init)
 v_circular = np.sqrt(G * M / r0)
-vel_init = np.array([v_circular, 0.0])
+angle_deg = 30
+angle_rad = np.deg2rad(angle_deg)
+vel_direction = np.array([np.cos(angle_rad), np.sin(angle_rad)])
+boost_factor = 1.2
+vel_init = boost_factor * v_circular * vel_direction
+
+
 
 controller = ExpertController(
     target_radius=7.5e12,
     G=6.67430e-11,
     M=1.989e30,
-    mass=1000,
-    radial_gain=12.0,
-    tangential_gain=8.0,
-    damping_gain=4.0,
-    thrust_limit=1.0,
+    mass=722,
+    radial_gain=4.0,
+    tangential_gain=5.0,
+    damping_gain=6.0,
+    thrust_limit=20.0,
     enable_damping=True
 )
 

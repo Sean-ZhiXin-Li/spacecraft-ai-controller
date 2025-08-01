@@ -14,10 +14,10 @@ class ExpertController:
                  G=6.67430e-11,
                  M=1.989e30,
                  mass=1000,
-                 radial_gain=12.0,
-                 tangential_gain=8.0,
-                 damping_gain=4.0,
-                 thrust_limit=1.0,
+                 radial_gain=4.0,
+                 tangential_gain=5.0,
+                 damping_gain=6.0,
+                 thrust_limit=20.0,
                  enable_damping=True):
         """
         Initialize the expert controller.
@@ -61,39 +61,41 @@ class ExpertController:
         r = np.linalg.norm(r_vec)
         v = np.linalg.norm(v_vec)
 
-        # === Compute unit vectors ===
+        # Compute unit vectors
         radial_dir = r_vec / (r + 1e-12)
         tangential_dir = np.array([-radial_dir[1], radial_dir[0]])
 
-        # === Desired circular orbit speed ===
+        # Desired circular orbit speed
         v_circular = np.sqrt(self.G * self.M / self.target_radius)
 
-        # === Component along tangential only (for more realistic speed control) ===
+        # Component along tangential only (for more realistic speed control)
         v_tangential = np.dot(v_vec, tangential_dir)
         delta_v = v_circular - v_tangential
 
-        # === Radial error ===
+        # Radial error
         radial_error = r - self.target_radius
 
-        # === Tangential control: accelerate/decelerate into circular speed ===
+        # Tangential control: accelerate/decelerate into circular speed
         thrust_t = self.tangential_gain * np.tanh(delta_v / v_circular)
 
-        # === Radial control: bring r to target radius ===
-        thrust_r = -self.radial_gain * np.tanh(radial_error / (0.1 * self.target_radius))
+        # Radial control: bring r to target radius
+        thrust_r = -self.radial_gain * np.tanh(radial_error / (0.05 * self.target_radius))
 
-        # === Damping: suppress radial oscillation ===
+        # Damping: suppress radial oscillation
         if self.enable_damping:
             radial_velocity = np.dot(v_vec, radial_dir)
-            thrust_r += -self.damping_gain * radial_velocity
+            radial_error = r - self.target_radius
+            proximity = 1.0 - np.clip(abs(radial_error) / self.target_radius, 0.0, 1.0)  # 越接近，越强
+            thrust_r += -self.damping_gain * proximity * np.tanh(radial_velocity / 1e4)
 
-        # === Stop thrust when orbit is stable ===
-        if abs(radial_error) < 0.01 * self.target_radius and abs(delta_v) < 0.01 * v_circular:
-            return np.zeros(2)  # Turn off thrust – considered captured
+        # Stop thrust when orbit is stable
+        if abs(radial_error) < 0.001 * self.target_radius and abs(delta_v) < 0.005 * v_circular:
+            return np.zeros(2)
 
-        # === Final thrust vector ===
+        # Final thrust vector
         thrust_vec = thrust_r * radial_dir + thrust_t * tangential_dir
 
-        # === Clip to max thrust limit ===
+        # Clip to max thrust limit
         norm = np.linalg.norm(thrust_vec)
         if norm > self.thrust_limit:
             thrust_vec = thrust_vec / norm * self.thrust_limit
