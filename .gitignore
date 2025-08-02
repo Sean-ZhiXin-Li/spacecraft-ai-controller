@@ -205,3 +205,63 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+
+# ==== DATASETS & LOGS ====
+# === DATA ===
+data/dataset/*.npy
+data/dataset/*.csv
+data/logs/
+*.csv
+*.npy
+*.pt
+*.pkl
+*.log
+*.gif                       # Animated visualizations
+
+# ==== SYSTEM FILES ====
+.DS_Store                   # macOS
+Thumbs.db                  # Windows
+desktop.ini                # Windows
+
+# ==== IDE FILES ====
+.vscode/
+.idea/                     # JetBrains (PyCharm, CLion)
+*.iml
+
+# ==== ENVIRONMENTS ====
+.venv/
+env/
+*.env
+
+# ==== MISC ====
+logs/
+*.log
+
+
+# Expert + imitation datasets
+data/data/dataset/*.npy
+data/data/dataset/*.csv
+
+# Generated logs and trajectories
+data/data/logs/
+data/data/saved_trajectories/
+
+# PPO checkpoints and models
+ppo_orbit/checkpoints/
+ppo_orbit/*.pth
+ppo_orbit/*.csv
+ppo_orbit/*.png
+
+# Datasets and simulation logs
+*.csv
+*.npy
+--name*
+*.csv
+*.npy
+*.pth
+*.png
+*.pyc
+__pycache__/
+checkpoints/
