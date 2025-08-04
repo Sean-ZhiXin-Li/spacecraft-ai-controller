@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class ExpertController:
     """
     Expert Controller v3.1 – Physically realistic orbit insertion controller.
@@ -9,11 +10,12 @@ class ExpertController:
     - Capture detection to stop thrust when orbit is reached
     - Clean single-pass entry without spiral loops
     """
+
     def __init__(self,
                  target_radius,
                  G=6.67430e-11,
                  M=1.989e30,
-                 mass=1000,
+                 mass=721.9,
                  radial_gain=4.0,
                  tangential_gain=5.0,
                  damping_gain=6.0,

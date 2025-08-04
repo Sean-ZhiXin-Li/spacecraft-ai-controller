@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 G = 6.67430e-11  #
 M = 1.989e30
 target_radius = 7.5e12
-dt = 2000
+dt = 200
 steps = 10000000
 mass = 721.9
 pos_init = np.array([0.0, target_radius * (1/3)])

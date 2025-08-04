@@ -3,55 +3,47 @@ import numpy as np
 
 class ImitationController:
     """
-    Imitation Controller using a pre-trained MLP model to generate thrust vector
-    based on the current orbital state (position and velocity).
-
-    This class is compatible with the common controller interface: __call__(t, pos, vel).
+    Imitation Controller using a pre-trained MLP model + scaler
+    to generate thrust vector based on the normalized orbital state.
     """
 
     def __init__(self,
-                 model_path="imitation_policy_model.joblib",
+                 model_path="imitation_policy_model_V5.joblib",
+                 scaler_path="state_scaler_V5.joblib",
                  clip=True,
                  verbose=False):
         """
-        Initialize the imitation controller.
-
         Args:
-            model_path (str): Path to the saved joblib model file.
-            clip (bool): Whether to clip the predicted thrust to [-1, 1].
-            verbose (bool): If True, prints debug information when called.
+            model_path (str): Path to trained MLP model.
+            scaler_path (str): Path to StandardScaler for input normalization.
+            clip (bool): Whether to clip output thrust.
+            verbose (bool): Print debug info.
         """
-        self.model_path = model_path
         self.model = joblib.load(model_path)
+        self.scaler = joblib.load(scaler_path)
         self.clip = clip
         self.verbose = verbose
 
     def __call__(self, t, pos, vel):
         """
-        Closed-loop control interface. Given the current time, position, and velocity,
-        returns a thrust vector [Tx, Ty] predicted by the model.
-
+        Closed-loop control interface.
         Args:
-            t (float): Current simulation time (not used but kept for compatibility).
-            pos (np.ndarray): Current position vector [x, y].
-            vel (np.ndarray): Current velocity vector [vx, vy].
-
+            t (float): current time (not used)
+            pos (np.ndarray): [x, y]
+            vel (np.ndarray): [vx, vy]
         Returns:
-            np.ndarray: Predicted thrust vector [Tx, Ty], clipped to [-1, 1] range.
+            np.ndarray: [thrust_x, thrust_y]
         """
-        # Concatenate position and velocity into a 4D input vector
-        obs = np.array([*pos, *vel]).reshape(1, -1)
+        state = np.array([pos[0], pos[1], vel[0], vel[1]])
+        scaled = self.scaler.transform([state])[0]
+        thrust = self.model.predict([scaled])[0]
 
-        # Predict the thrust using the loaded MLP model
-        action = self.model.predict(obs).flatten()
-
-        # Optionally clip action values to match environment's action space
         if self.clip:
-            action = np.clip(action, -1.0, 1.0)
+            thrust = np.clip(thrust, -1.0, 1.0)
 
-        # If verbose mode is enabled, print debugging information
         if self.verbose:
-            print(f"[ImitationController] t={t:.2f}, pos={pos}, vel={vel}, thrust={action}")
+            print(f"[V5] t={t:.1f}, pos={pos}, vel={vel}, thrust={thrust}")
 
-        return action
+        return thrust
+
 
