@@ -8,9 +8,17 @@ from sklearn.preprocessing import StandardScaler
 from joblib import dump
 import matplotlib.pyplot as plt
 
-# Load all expert dataset files
+# === Feature engineering ===
 
-def load_all_datasets(folder="data/dataset"):
+def compute_additional_features(pos, vel):
+    r = np.linalg.norm(pos, axis=1).reshape(-1, 1)
+    v = np.linalg.norm(vel, axis=1).reshape(-1, 1)
+    cos_theta = np.sum(pos * vel, axis=1).reshape(-1, 1) / (r * v + 1e-8)
+    return r, v, cos_theta
+
+# === Load expert dataset ===
+
+def load_all_datasets(folder="data/data/dataset"):
     folder = os.path.abspath(folder)
     files = sorted(glob.glob(os.path.join(folder, "expert_dataset_*.npy")))
     print("Matched files:", files)
@@ -21,34 +29,39 @@ def load_all_datasets(folder="data/dataset"):
         all_data.append(data)
     return np.vstack(all_data)
 
-# Prepare training input and output
+# === Prepare input/output ===
 
 def prepare_data(data):
-    X = data[:, :4]  # [pos_x, pos_y, vel_x, vel_y]
-    y = data[:, 4:]  # [thrust_x, thrust_y]
+    pos = data[:, :2]
+    vel = data[:, 2:4]
+    thrust = data[:, 4:]
+
+    r, v, cos_theta = compute_additional_features(pos, vel)
+    X = np.hstack([pos, vel, r, v, cos_theta])
+    y = thrust
     return train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Train the neural network
+# === Train model ===
 
 def train_model(X_train, y_train):
     model = MLPRegressor(
-        hidden_layer_sizes=(128, 64, 32),
+        hidden_layer_sizes=(128, 64),
         activation='tanh',
         solver='adam',
         learning_rate='adaptive',
         alpha=1e-4,
         early_stopping=True,
         validation_fraction=0.1,
-        max_iter=2000,
+        max_iter=3000,
         random_state=42,
         verbose=True
     )
-    print(" Training MLP model...")
+    print(" Training MLP model (V6)...")
     model.fit(X_train, y_train)
     print(" Training complete!")
     return model
 
-#  Evaluate and visualize
+# === Evaluation ===
 
 def evaluate(model, X_test, y_test):
     y_pred = model.predict(X_test)
@@ -60,18 +73,12 @@ def evaluate(model, X_test, y_test):
         pos_x, pos_y = X_test[i][:2]
         tx, ty = y_test[i]
         px, py = y_pred[i]
+        plt.quiver(pos_x, pos_y, tx, ty, angles='xy', scale_units='xy',
+                   color='green', width=0.004, alpha=0.6, label='True' if i == 0 else "")
+        plt.quiver(pos_x, pos_y, px, py, angles='xy', scale_units='xy',
+                   color='red', width=0.004, alpha=0.4, label='Predicted' if i == 0 else "")
 
-        # Green = true, Red = predicted
-        plt.quiver(pos_x, pos_y, tx, ty,
-                   angles='xy', scale_units='xy',
-                   color='green', width=0.004,
-                   alpha=0.6, label='True' if i == 0 else "")
-        plt.quiver(pos_x, pos_y, px, py,
-                   angles='xy', scale_units='xy',
-                   color='red', width=0.004,
-                   alpha=0.4, label='Predicted' if i == 0 else "")
-
-    plt.title("Thrust Vectors – Green: True, Red: Predicted")
+    plt.title("Thrust Vectors – Green: True, Red: Predicted (V6)")
     plt.xlabel("Position X")
     plt.ylabel("Position Y")
     plt.legend()
@@ -80,7 +87,7 @@ def evaluate(model, X_test, y_test):
     plt.tight_layout()
     plt.show()
 
-# Main training pipeline
+# === Main ===
 
 def main():
     print(" Loading data...")
@@ -95,12 +102,12 @@ def main():
     model = train_model(X_train_scaled, y_train)
     evaluate(model, X_test_scaled, y_test)
 
-    # === Save model and scaler ===
     os.makedirs("controller", exist_ok=True)
-    dump(model, "imitation_policy_model_V5.joblib")
-    dump(scaler, "controller/state_scaler_V5.joblib")
-    print(" Model saved to: imitation_policy_model_V5.joblib")
-    print(" Scaler saved to: controller/state_scaler_V5.joblib")
+    dump(model, "controller/imitation_policy_model_V6.joblib")
+    dump(scaler, "controller/state_scaler_V6.joblib")
+    print("V6 model saved to controller/")
+    print("Model: imitation_policy_model_V6.joblib")
+    print("Scaler: state_scaler_V6.joblib")
 
 if __name__ == "__main__":
     main()
