@@ -13,9 +13,9 @@ M = 1.989e30                   # Mass of the Sun (kg)
 target_radius = 7.5e12        # Target circular orbit radius (m)
 mass = 721.9                  # Mass of spacecraft (Voyager 1 approx., kg)
 dt = 2000                     # Simulation time step (seconds)
-steps = 10000000             # Total simulation steps
+steps = 8000000             # Total simulation steps
 
-# Initial position: 1/3 of target orbit
+# Initial position: 1/3 of target orbit Q2AQA5仍然
 pos_init = np.array([0.0, target_radius * (1 / 3)])
 r0 = np.linalg.norm(pos_init)
 v_circular = np.sqrt(G * M / r0)  # Circular orbital velocity at initial radius
