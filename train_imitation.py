@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from joblib import dump
 import matplotlib.pyplot as plt
 
-# === Feature engineering ===
+# Feature engineering
 
 def compute_additional_features(pos, vel):
     r = np.linalg.norm(pos, axis=1).reshape(-1, 1)
@@ -16,7 +16,7 @@ def compute_additional_features(pos, vel):
     cos_theta = np.sum(pos * vel, axis=1).reshape(-1, 1) / (r * v + 1e-8)
     return r, v, cos_theta
 
-# === Load expert dataset ===
+# Load expert dataset
 
 def load_all_datasets(folder="data/data/dataset"):
     folder = os.path.abspath(folder)
@@ -29,7 +29,7 @@ def load_all_datasets(folder="data/data/dataset"):
         all_data.append(data)
     return np.vstack(all_data)
 
-# === Prepare input/output ===
+# Prepare input/output
 
 def prepare_data(data):
     pos = data[:, :2]
@@ -41,7 +41,7 @@ def prepare_data(data):
     y = thrust
     return train_test_split(X, y, test_size=0.2, random_state=42)
 
-# === Train model ===
+# Train model
 
 def train_model(X_train, y_train):
     model = MLPRegressor(
@@ -61,12 +61,17 @@ def train_model(X_train, y_train):
     print(" Training complete!")
     return model
 
-# === Evaluation ===
+# Evaluation
 
 def evaluate(model, X_test, y_test):
     y_pred = model.predict(X_test)
     mse = mean_squared_error(y_test, y_pred)
     print(f" Test MSE: {mse:.6e}")
+
+    valid = np.linalg.norm(y_test, axis=1) > 1e-6
+    X_test = X_test[valid]
+    y_test = y_test[valid]
+    y_pred = y_pred[valid]
 
     plt.figure(figsize=(10, 8))
     for i in range(min(100, len(X_test))):
@@ -87,7 +92,7 @@ def evaluate(model, X_test, y_test):
     plt.tight_layout()
     plt.show()
 
-# === Main ===
+# Main
 
 def main():
     print(" Loading data...")
