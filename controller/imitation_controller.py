@@ -26,7 +26,7 @@ class ImitationController:
 
     def __call__(self, t, pos, vel):
         """
-        Closed-loop control interface.
+        Closed-loop control interface for V6 model (7 input features).
         Args:
             t (float): current time (not used)
             pos (np.ndarray): [x, y]
@@ -34,7 +34,12 @@ class ImitationController:
         Returns:
             np.ndarray: [thrust_x, thrust_y]
         """
-        state = np.array([pos[0], pos[1], vel[0], vel[1]])
+        r = np.linalg.norm(pos)
+        v = np.linalg.norm(vel)
+        cos_theta = np.dot(pos, vel) / (r * v + 1e-8)
+
+        # Assemble 7D input vector
+        state = np.array([*pos, *vel, r, v, cos_theta], dtype=np.float32)
         scaled = self.scaler.transform([state])[0]
         thrust = self.model.predict([scaled])[0]
 
@@ -42,8 +47,7 @@ class ImitationController:
             thrust = np.clip(thrust, -1.0, 1.0)
 
         if self.verbose:
-            print(f"[V5] t={t:.1f}, pos={pos}, vel={vel}, thrust={thrust}")
+            print(f"[V6] t={t:.1f}, pos={pos}, vel={vel}, thrust={thrust}")
 
         return thrust
-
 
