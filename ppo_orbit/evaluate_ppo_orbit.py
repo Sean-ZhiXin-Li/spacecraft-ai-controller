@@ -52,7 +52,7 @@ class PPOController:
         """
         Compute thrust based on current state.
 
-        Args:
+        Args:   
             t (float): Current time (not used).
             pos (np.ndarray): Position vector [x, y].
             vel (np.ndarray): Velocity vector [vx, vy].
