@@ -27,7 +27,7 @@ def run_imitation():
 
     # Load imitation controller
     controller = ImitationController(
-        model_path="controller/mimic_model_V6_1.pth",
+        model_path="controller/mimic_model_V6_2.pth",
     )
 
     # Simulate orbit
@@ -44,35 +44,35 @@ def run_imitation():
 
     # Save trajectory
     os.makedirs("data/logs", exist_ok=True)
-    np.save("data/logs/imitation_traj_V6.1_long.npy", trajectory)
+    np.save("data/logs/imitation_traj_V6.2_long.npy", trajectory)
 
     # Visualizations
     plot_trajectory(
         trajectory,
-        title="V6.1 Controller – Long Simulation (Spiral Transfer)",
+        title="V6.2 Controller – Long Simulation (Spiral Transfer)",
         target_radius=target_radius
     )
     plot_radius_vs_time(
         trajectory,
         dt,
-        title="r(t) vs Time – V6.1 Imitation Controller"
+        title="r(t) vs Time – V6.2 Imitation Controller"
     )
 
     os.makedirs("plots", exist_ok=True)
     plot_radius_error_with_analysis(
         trajectory,
         target_radius,
-        save_path="plots/error_v6.1_long.png"
+        save_path="plots/error_v6.2_long.png"
     )
     plot_error_histogram(
         trajectory,
         target_radius,
-        save_path="plots/hist_v6.1_long.png"
+        save_path="plots/hist_v6.2_long.png"
     )
 
     # Evaluate final performance
     mean_error, std_error = evaluate_orbit_error(trajectory, target_radius)
-    print(f"[V6.1 Long Run] Mean radial error: {mean_error:.2e} m, Std: {std_error:.2e} m")
+    print(f"[V6.2 Long Run] Mean radial error: {mean_error:.2e} m, Std: {std_error:.2e} m")
 
 if __name__ == "__main__":
     run_imitation()

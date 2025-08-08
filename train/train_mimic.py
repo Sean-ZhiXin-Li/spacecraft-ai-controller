@@ -12,10 +12,6 @@ class ThrustDataset(Dataset):
     def __init__(self, file_paths, downsample=40):
         """
         Load multiple expert trajectory files, merge, downsample, and normalize them.
-
-        Args:
-            file_paths (list): List of .npy file paths.
-            downsample (int): Step size to sample (e.g. 10 = take 1 every 10 steps).
         """
         self.data = []
         for path in file_paths:
@@ -46,8 +42,7 @@ class ThrustDataset(Dataset):
         thrust = self.normalize_thrust(sample[4:])
         return torch.tensor(state, dtype=torch.float32), torch.tensor(thrust, dtype=torch.float32)
 
-
-# Define a simple MLP model
+# MLP model (MimicNet)
 class MimicNet(nn.Module):
     def __init__(self):
         """
@@ -71,48 +66,36 @@ class MimicNet(nn.Module):
 def train(model, dataloader, epochs=20, lr=1e-3):
     """
     Train the MLP model on expert data.
-
-    Args:
-        model:       MimicNet instance
-        dataloader:  PyTorch DataLoader
-        epochs:      Number of training epochs
-        lr:          Learning rate
     """
-    criterion = nn.MSELoss()  # Mean Squared Error loss for regression
+    criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     for epoch in range(epochs):
         total_loss = 0.0
         pbar = tqdm(dataloader, desc=f"Epoch {epoch + 1}/{epochs}", leave=False)
         for x_batch, y_batch in dataloader:
-            optimizer.zero_grad()       # Reset gradients
-            output = model(x_batch)     # Forward pass
-            loss = criterion(output, y_batch)  # Compute loss
-            loss.backward()             # Backpropagation
-            optimizer.step()            # Update weights
-            total_loss += loss.item()   # Track epoch loss
-
+            optimizer.zero_grad()
+            output = model(x_batch)
+            loss = criterion(output, y_batch)
+            loss.backward()
+            optimizer.step()
+            total_loss += loss.item()
             pbar.set_postfix(loss=loss.item())
 
         print(f"Epoch {epoch + 1}/{epochs}, Loss: {total_loss:.6f}")
 
 # Main execution block
 if __name__ == "__main__":
-    # List the merge expert dataset
-    file_paths = glob.glob("E:/spacecraft_ai_project/data/data/preprocessed/merged_expert_dataset.npy")
+    # Load dataset
+    file_paths = glob.glob("data/data/preprocessed/merged_expert_dataset.npy")
     print("Matched files:", file_paths)
 
-    # Initialize dataset and data loader
-    dataset = ThrustDataset(file_paths)
+    dataset = ThrustDataset(file_paths, downsample=40)
     dataloader = DataLoader(dataset, batch_size=128, shuffle=True)
 
-    # Initialize model
     model = MimicNet()
-
-    # Train model
     train(model, dataloader, epochs=20, lr=1e-3)
 
-    # Save model weights
     os.makedirs("controller", exist_ok=True)
-    torch.save(model.state_dict(), "controller/mimic_model_V6_1.pth")
-    print("Model saved to controller/mimic_model_V6_1.pth")
+    torch.save(model.state_dict(), "controller/mimic_model_V6_2.pth")
+    print("Model saved to controller/mimic_model_V6_2.pth")
