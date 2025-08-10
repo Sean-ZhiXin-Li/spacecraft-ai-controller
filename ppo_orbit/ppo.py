@@ -17,40 +17,52 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 torch.backends.cudnn.benchmark = True
 
 # ==========================================================
+# Switches (optional knobs)
+# ==========================================================
+USE_WIDE_NET   = True   # Wider hidden sizes for actor/critic
+HIGH_VF_COEF   = True   # If True -> VF_COEF=1.0 else 0.5
+HIGH_LR_CRITIC = True   # If True -> LR_CRITIC=5e-4 else 2e-4
+WIDE_CRITIC = True
+
+# ==========================================================
 # Hyperparameters (stability-oriented defaults)
 # ==========================================================
-GAMMA = 0.995                  # reward discount
-LAMBDA = 0.97                  # GAE lambda
-EPOCHS = 800                   # total PPO epochs
-TRAIN_ITERS = 20               # PPO update iters per epoch (minibatch)
-THRUST_SCALE = 5000.0          # maps [-1,1] action to physical thrust
-BATCH_STEPS = 4096             # rollout steps per epoch
+GAMMA       = 0.995
+LAMBDA      = 0.97
+EPOCHS      = 800
+TRAIN_ITERS = 20
+THRUST_SCALE = 3000.0          # << per your request
+
+BATCH_STEPS = 4096
 
 # PPO specifics
-CLIP_EPS = 0.30                # PPO clip epsilon (can tune later)
-VF_COEF = 0.5                  # value loss coefficient
-ENT_COEF = 0.001               # entropy off initially; enable later if needed (0.001~0.002)
-MAX_GRAD_NORM = 0.5            # gradient clipping
-VAL_CLIP_RANGE = 0.2           # value function clipping range
-MB_SIZE = 128                  # PPO minibatch size
+CLIP_EPS   = 0.25              # slightly larger step size
+VF_COEF    = 1.0
+ENT_COEF_0 = 0.005             # early exploration
+ENT_COEF_1 = 0.001             # later reduced entropy
+ENT_SWITCH_EPOCH = 250         # epoch to switch ENT_COEF
+MAX_GRAD_NORM  = 0.5
+VAL_CLIP_RANGE = 1.0
+MB_SIZE   = 128
 
 # Optimizer learning rates (parameter groups)
-LR_ACTOR = 5e-5
-LR_CRITIC = 2e-4
+LR_ACTOR  = 5e-5
+LR_CRITIC = 5e-4
 
 # Logging / I/O
 LOG_DIR = "ppo_orbit"
 os.makedirs(LOG_DIR, exist_ok=True)
-CSV_PATH = os.path.join(LOG_DIR, "loss_log.csv")
+CSV_PATH   = os.path.join(LOG_DIR, "loss_log.csv")
 FINAL_CKPT = os.path.join(LOG_DIR, f"ppo_epoch_{EPOCHS}.pth")
 
-# === Your dataset path (set to your file) ===
+# Dataset path
 DATASET_PATH = os.path.join("data", "data", "preprocessed", "merged_expert_dataset.npy")
 
 # ==========================================================
-# State normalization (scales position and velocity to ~[-1,1])
+# Helpers
 # ==========================================================
 def normalize_state(state):
+    """Scale position/velocity to ~[-1, 1]."""
     pos_scale = 7.5e12
     vel_scale = 3e4
     return np.array([
@@ -60,9 +72,6 @@ def normalize_state(state):
         state[3] / vel_scale
     ], dtype=np.float32)
 
-# ==========================================================
-# CSV logging helper
-# ==========================================================
 def log_to_csv(path, row_dict, header_order):
     """Append a row to CSV; create header if file is new."""
     exists = os.path.exists(path)
@@ -72,53 +81,78 @@ def log_to_csv(path, row_dict, header_order):
             w.writeheader()
         w.writerow(row_dict)
 
+def current_ent_coef(epoch:int)->float:
+    """Piecewise entropy schedule."""
+    return ENT_COEF_0 if epoch <= ENT_SWITCH_EPOCH else ENT_COEF_1
+
 # ==========================================================
-# Evaluation with mean action (deterministic)
+# Evaluation (deterministic & stochastic)
 # ==========================================================
 @torch.no_grad()
-def evaluate_policy(env, model, episodes=2):
-    """Run episodes using mean action; return average return."""
-    rewards = []
+def evaluate_policy(env, model, episodes=2, max_steps=20000):
+    totals, lens = [], []
     for _ in range(episodes):
         obs, _ = env.reset()
         s = normalize_state(obs)
         done = False
-        ep_ret = 0.0
-        while not done:
+        ep_ret, steps = 0.0, 0
+        while not done and steps < max_steps:
             st = torch.tensor(s, dtype=torch.float32, device=device).unsqueeze(0)
-            mu, _ = model.forward(st)           # mean action
-            a = np.clip(mu.squeeze(0).cpu().numpy(), -1.0, 1.0)
-            next_obs, r, done, _ = env.step(a * THRUST_SCALE)
+            mu, _ = model.forward(st)
+            a_env = np.clip(mu.squeeze(0).cpu().numpy(), -1.0, 1.0)
+            next_obs, r, done, _ = env.step(a_env * THRUST_SCALE)
             s = normalize_state(next_obs)
             ep_ret += r
-        rewards.append(ep_ret)
-    return float(np.mean(rewards))
+            steps += 1
+        totals.append(ep_ret); lens.append(steps)
+    mean_ret = float(np.mean(totals))
+    mean_len = float(np.mean(lens))
+    print(f"[Eval] mean_return={mean_ret:.2f} | mean_len={mean_len:.0f} | per_step={mean_ret/max(1,mean_len):.6f}")
+    return mean_ret
+
+@torch.no_grad()
+def evaluate_stochastic(env, model, episodes=2, max_steps=20000):
+    totals = []
+    for _ in range(episodes):
+        obs, _ = env.reset()
+        s = normalize_state(obs)
+        done, ep_ret, steps = False, 0.0, 0
+        while not done and steps < max_steps:
+            st = torch.tensor(s, dtype=torch.float32, device=device).unsqueeze(0)
+            mu, _ = model.forward(st)
+            std = model.log_std.exp()
+            a_raw = Normal(mu, std).sample().squeeze(0).cpu().numpy()
+            a_env = np.clip(a_raw, -1.0, 1.0)
+            obs, r, done, _ = env.step(a_env * THRUST_SCALE)
+            s = normalize_state(obs); ep_ret += r; steps += 1
+        totals.append(ep_ret)
+    print(f"[Eval/Stoch] mean_return={float(np.mean(totals)):.2f}")
 
 # ==========================================================
-# Actor-Critic with a shared trunk
+# Actor-Critic
 # ==========================================================
 class ActorCritic(nn.Module):
     def __init__(self):
         super().__init__()
-        # Shared feature extractor
+        h1 = 256 if USE_WIDE_NET else 128
+        h2 = 128 if USE_WIDE_NET else 64
+
         self.shared = nn.Sequential(
-            nn.Linear(4, 128),
+            nn.Linear(4, h1),
             nn.Tanh()
         )
-        # Actor head -> mean action (size 2)
         self.actor = nn.Sequential(
-            nn.Linear(128, 64),
+            nn.Linear(h1, h2),
             nn.Tanh(),
-            nn.Linear(64, 2)
+            nn.Linear(h2, 2)
         )
-        # Critic head -> state value
         self.critic = nn.Sequential(
-            nn.Linear(128, 64),
+            nn.Linear(h1, h2),
             nn.Tanh(),
-            nn.Linear(64, 1)
+            nn.Linear(h2, 1)
         )
-        # Conservative initial std (~0.1) to stabilize early training
-        self.log_std = nn.Parameter(torch.log(torch.ones(2) * 0.1))
+        # Stronger initial exploration
+        self.log_std = nn.Parameter(torch.log(torch.ones(2, device=device) * 0.2))
 
     def forward(self, x):
         x = self.shared(x)
@@ -126,24 +160,20 @@ class ActorCritic(nn.Module):
 
     @torch.no_grad()
     def get_action(self, state):
-        """
-        Sample an action and return (action_np, log_prob_tensor).
-        Sampling is used for exploration during rollout collection.
-        """
-        st = torch.tensor(state, dtype=torch.float32, device=device)
+        """Return (raw_sample_np, clamped_env_np, log_prob_tensor)."""
+        st = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
         mu, _ = self.forward(st)
         std = self.log_std.exp()
         dist = Normal(mu, std)
-        a = dist.sample()
-        logp = dist.log_prob(a).sum()
-        a_np = np.clip(a.cpu().numpy(), -1.0, 1.0)  # safety clamp before env.step
-        return a_np, logp
+        a_raw = dist.rsample()
+        logp  = dist.log_prob(a_raw).sum(dim=-1)
+        a_env = torch.clamp(a_raw, -1.0, 1.0)
+        return (a_raw.squeeze(0).cpu().numpy(),
+                a_env.squeeze(0).cpu().numpy(),
+                logp.squeeze(0))
 
     def evaluate(self, states, actions):
-        """
-        Compute log_probs, entropy, and value for given (state, action) batch.
-        Used in PPO loss.
-        """
+        """Log-probs/entropy/value for PPO on the *raw* actions sampled at rollout."""
         mu, value = self.forward(states)
         std = self.log_std.exp()
         dist = Normal(mu, std)
@@ -152,19 +182,10 @@ class ActorCritic(nn.Module):
         return log_probs, entropy, value.squeeze(-1)
 
 # ==========================================================
-# GAE with bootstrap using the last state's value
+# GAE
 # ==========================================================
 def compute_gae(rewards, values, masks, gamma=GAMMA, lam=LAMBDA, last_value=0.0):
-    """
-    Args:
-        rewards: list[float], r_t
-        values:  list[float], V(s_t) for t=0..T-1
-        masks:   list[int], 1 if not done else 0
-        last_value: float, V(s_T) for bootstrap
-    Returns:
-        returns: list[float], target returns for critic
-    """
-    masks = [float(m) for m in masks]  # ensure float math
+    masks = [float(m) for m in masks]
     gae = 0.0
     returns = []
     values_t = values + [last_value]
@@ -175,16 +196,10 @@ def compute_gae(rewards, values, masks, gamma=GAMMA, lam=LAMBDA, last_value=0.0)
     return returns
 
 # ==========================================================
-# Expert warm start from .npy (streamed mini-batch -> avoids CUDA OOM)
+# Expert warm start (from .npy)
 # ==========================================================
-def load_expert_from_npy(model, npy_path, epochs=1, batch_size=4096, shuffle=True,
-                         max_samples=200_000, progress_every=20):
-    """
-    Memory-safe expert pretraining from .npy with visible progress:
-      - Supports dict or [N,6+] array
-      - Optional uniform subsampling (max_samples) to avoid long warmup
-      - Streams mini-batches to GPU; prints progress every few batches
-    """
+def load_expert_from_npy(model, npy_path, epochs=2, batch_size=4096,
+                         shuffle=True, max_samples=1_000_000, progress_every=20):
     import torch.utils.data as tud
     import time
 
@@ -193,22 +208,17 @@ def load_expert_from_npy(model, npy_path, epochs=1, batch_size=4096, shuffle=Tru
         print(f"[Warn] Dataset not found: {npy_path}. Fallback to online expert.", flush=True)
         return False
 
-    # ---- Quick peek (structure & shape) ----
     try:
         data = np.load(npy_path, allow_pickle=True)
         if isinstance(data, np.ndarray) and data.dtype == object:
             d = data.item()
             print(f"[Init] Detected dict with keys: {list(d.keys())}", flush=True)
-            k0 = next(iter(d))
-            print(f"[Init] Example value shape for '{k0}': {np.array(d[k0]).shape}", flush=True)
         else:
             print(f"[Init] Detected array with shape: {np.array(data).shape}", flush=True)
     except Exception as e:
         print(f"[Init] Peek failed: {e}", flush=True)
-        data = np.load(npy_path, allow_pickle=True)  # fallback
+        data = np.load(npy_path, allow_pickle=True)
 
-    # ---- Parse states/actions ----
-    states_np, actions_np = None, None
     if isinstance(data, np.ndarray) and data.dtype == object:
         d = data.item()
         keys = {k.lower(): k for k in d.keys()}
@@ -224,37 +234,29 @@ def load_expert_from_npy(model, npy_path, epochs=1, batch_size=4096, shuffle=Tru
         if arr.ndim != 2 or arr.shape[1] < 6:
             print(f"[Error] Unsupported array shape {arr.shape}. Expect [N,6+] with first4=state last2=action.", flush=True)
             return False
-        states_np = arr[:, :4]
+        states_np  = arr[:, :4]
         actions_np = arr[:, -2:]
 
     N = len(states_np)
     print(f"[Init] Raw dataset size: {N}", flush=True)
 
-    # ---- Optional subsample for fast warmstart ----
     if (max_samples is not None) and (N > max_samples):
-        np.random.seed(0)  # reproducible subsampling
+        np.random.seed(0)
         idx = np.random.choice(N, size=max_samples, replace=False)
-        states_np = states_np[idx]
+        states_np  = states_np[idx]
         actions_np = actions_np[idx]
         N = max_samples
         print(f"[Init] Subsampled to {N} samples for faster warmstart.", flush=True)
 
-    # ---- Normalize states if needed ----
-    if np.max(np.abs(states_np[:, :2])) > 10 or np.max(np.abs(states_np[:, 2:])) > 1.0:
-        states_np = np.stack([normalize_state(s) for s in states_np], axis=0).astype(np.float32)
-    else:
-        states_np = states_np.astype(np.float32)
-
-    # ---- Scale actions to [-1,1] if not already ----
+    # normalize states and scale actions
+    states_np = np.stack([normalize_state(s) for s in states_np], axis=0).astype(np.float32)
     if np.max(np.abs(actions_np)) > 1.5:
         actions_np = (actions_np / THRUST_SCALE).astype(np.float32)
     actions_np = np.clip(actions_np, -1.0, 1.0).astype(np.float32)
 
-    # ---- DataLoader on CPU; move batch-by-batch to GPU ----
     ds = tud.TensorDataset(torch.from_numpy(states_np), torch.from_numpy(actions_np))
     dl = tud.DataLoader(ds, batch_size=batch_size, shuffle=shuffle, pin_memory=True, num_workers=0)
 
-    # Train only Actor (shared + actor + log_std)
     actor_params = list(model.shared.parameters()) + list(model.actor.parameters()) + [model.log_std]
     opt = torch.optim.Adam(actor_params, lr=1e-4)
     mse = nn.MSELoss()
@@ -290,7 +292,7 @@ def load_expert_from_npy(model, npy_path, epochs=1, batch_size=4096, shuffle=Tru
     return True
 
 # ==========================================================
-# Fallback online expert warm start (if dataset missing)
+# Online expert fallback
 # ==========================================================
 def load_expert_online(model, expert_controller, env, samples=10000):
     states, targets = [], []
@@ -308,50 +310,14 @@ def load_expert_online(model, expert_controller, env, samples=10000):
     for _ in range(500):
         mu, _ = model.forward(states)
         loss = mse(mu, targets)
-        opt.zero_grad()
-        loss.backward()
-        opt.step()
+        opt.zero_grad(); loss.backward(); opt.step()
     print("[Init] Actor initialized from ExpertController (online).")
-    w = model.actor[0].weight[:2, :6].detach().cpu().numpy()
-    b = model.actor[0].bias[:2].detach().cpu().numpy()
-    print("[Sanity] Actor first layer W[:2,:6]:", np.round(w, 4))
-    print("[Sanity] Actor first layer b[:2]:", np.round(b, 4))
 
 # ==========================================================
-# Quick expert-match report
-# ==========================================================
-@torch.no_grad()
-def expert_match_report(env, model, expert, n=256):
-    """
-    Compare Actor mean vs Expert action on n reset states.
-    Lower MSE & higher cosine mean better imitation.
-    """
-    from numpy.linalg import norm
-    expert_a, actor_mu = [], []
-    for _ in range(n):
-        obs, _ = env.reset()
-        s = normalize_state(obs)
-        pos, vel = obs[:2], obs[2:]
-        a_exp = expert(0, pos, vel) / THRUST_SCALE
-        s_t = torch.tensor(s, dtype=torch.float32, device=device).unsqueeze(0)
-        mu, _ = model.forward(s_t)
-        a_mu = mu.squeeze(0).cpu().numpy()
-        expert_a.append(np.clip(a_exp, -1, 1))
-        actor_mu.append(a_mu)
-    expert_a = np.array(expert_a, dtype=np.float32)
-    actor_mu = np.array(actor_mu, dtype=np.float32)
-    mse = float(np.mean((expert_a - actor_mu) ** 2))
-    cos = float(np.mean([
-        np.dot(expert_a[i], actor_mu[i]) / ((norm(expert_a[i])+1e-8) * (norm(actor_mu[i])+1e-8))
-        for i in range(n)
-    ]))
-    print(f"[Expert-Match] MSE={mse:.6f}  Cosine={cos:.4f}  (n={n})")
-
-# ==========================================================
-# Plot helpers (reward & loss curves)
+# Diagnostics / plots
 # ==========================================================
 def plot_curves(reward_hist, csv_path, out_dir):
-    # Reward curve
+    # reward curve
     plt.figure()
     plt.plot(reward_hist)
     plt.xlabel("Epoch"); plt.ylabel("Total Reward")
@@ -360,7 +326,7 @@ def plot_curves(reward_hist, csv_path, out_dir):
     plt.savefig(os.path.join(out_dir, "reward_curve.png"), dpi=150)
     plt.close()
 
-    # Loss curves from CSV
+    # loss curves
     try:
         import pandas as pd
         df = pd.read_csv(csv_path)
@@ -374,79 +340,116 @@ def plot_curves(reward_hist, csv_path, out_dir):
     except Exception as e:
         print("Plot loss curves skipped:", e)
 
-# ==========================================================
-# Orbit visualization (after training)
-# ==========================================================
 @torch.no_grad()
-def evaluate_and_plot_orbit(env, model, out_path=os.path.join(LOG_DIR, "orbit_trajectory.png")):
-    """
-    Runs one episode with mean action and plots the XY position trajectory.
-    Saves to out_path and prints that episode return.
-    """
+def evaluate_and_plot_orbit(env, model, out_path=os.path.join(LOG_DIR, "orbit_trajectory.png"), max_steps=20000):
+    """Run one episode with mean action and plot XY trajectory."""
     obs, _ = env.reset()
     s = normalize_state(obs)
     done = False
     ep_ret = 0.0
     xs, ys = [], []
-    while not done:
+    steps = 0
+    while not done and steps < max_steps:
         xs.append(obs[0]); ys.append(obs[1])
         st = torch.tensor(s, dtype=torch.float32, device=device).unsqueeze(0)
         mu, _ = model.forward(st)
-        a = np.clip(mu.squeeze(0).cpu().numpy(), -1.0, 1.0)
-        obs, r, done, _ = env.step(a * THRUST_SCALE)
-        s = normalize_state(obs); ep_ret += r
+        a_env = np.clip(mu.squeeze(0).cpu().numpy(), -1.0, 1.0)
+        obs, r, done, _ = env.step(a_env * THRUST_SCALE)
+        s = normalize_state(obs); ep_ret += r; steps += 1
     plt.figure()
     plt.plot(np.array(xs), np.array(ys))
     plt.scatter([xs[0]],[ys[0]], marker="o", label="start")
     plt.scatter([xs[-1]],[ys[-1]], marker="x", label="end")
-    plt.xlabel("x position"); plt.ylabel("y position")
+    plt.xlabel("x position (m)"); plt.ylabel("y position (m)")
     plt.title("Orbit Trajectory (mean action)")
     plt.legend(); plt.grid(True)
-    plt.savefig(out_path, dpi=160)
-    plt.close()
-    print(f"[Evaluate] One-episode return (mean action): {ep_ret:.2f}")
+    plt.savefig(out_path, dpi=160); plt.close()
+    print(f"[Evaluate] One-episode return (mean action): {ep_ret:.2f} | steps={steps}")
     print(f"[Plot] Saved orbit trajectory to {out_path}")
 
+@torch.no_grad()
+def plot_state_timeseries(env, model, out_path=os.path.join(LOG_DIR, "state_timeseries.png"), max_steps=20000):
+    """Plot r(t), v(t), |cos(angle)| for a single evaluation rollout."""
+    obs, _ = env.reset()
+    s = normalize_state(obs)
+    done = False
+    rs, vs, coss, ts = [], [], [], []
+    t = 0.0
+    while not done and len(ts) < max_steps:
+        pos = obs[:2]; vel = obs[2:]
+        r = float(np.linalg.norm(pos))
+        v = float(np.linalg.norm(vel))
+        ur = pos / (r + 1e-8); uv = vel / (v + 1e-8)
+        c = float(abs(np.dot(ur, uv)))
+        rs.append(r); vs.append(v); coss.append(c); ts.append(t)
+
+        st = torch.tensor(s, dtype=torch.float32, device=device).unsqueeze(0)
+        mu, _ = model.forward(st)
+        a_env = np.clip(mu.squeeze(0).cpu().numpy(), -1.0, 1.0)
+        obs, _, done, _ = env.step(a_env * THRUST_SCALE)
+        s = normalize_state(obs); t += env.dt
+
+    # Make three separate plots (clear and simple)
+    # r(t)
+    plt.figure()
+    plt.plot(ts, rs)
+    plt.xlabel("time (s)"); plt.ylabel("radius r (m)")
+    plt.title("Radius over time")
+    plt.grid(True)
+    plt.savefig(out_path.replace(".png", "_r.png"), dpi=150)
+    plt.close()
+
+    # v(t)
+    plt.figure()
+    plt.plot(ts, vs)
+    plt.xlabel("time (s)"); plt.ylabel("speed v (m/s)")
+    plt.title("Speed over time")
+    plt.grid(True)
+    plt.savefig(out_path.replace(".png", "_v.png"), dpi=150)
+    plt.close()
+
+    # |cos(angle)| (angle between r and v)
+    plt.figure()
+    plt.plot(ts, coss)
+    plt.xlabel("time (s)"); plt.ylabel("|cos(angle)|")
+    plt.title("Alignment over time")
+    plt.grid(True)
+    plt.savefig(out_path.replace(".png", "_cos.png"), dpi=150)
+    plt.close()
+    print(f"[Plot] Saved state timeseries to {out_path.replace('.png','_{r,v,cos}.png')}")
+
+def explained_variance(y_true_t, y_pred_t):
+    y_true = y_true_t.detach().cpu().numpy()
+    y_pred = y_pred_t.detach().cpu().numpy()
+    var_y = np.var(y_true)
+    return float(1 - np.var(y_true - y_pred) / (var_y + 1e-8))
+
 # ==========================================================
-# Train loop (minibatch PPO, value clipping, diagnostics, logging)
+# Train
 # ==========================================================
 def train():
-    global TRAIN_ITERS  # allow adaptive tuning of PPO update iters
+    global TRAIN_ITERS
 
     env = OrbitEnv()
     model = ActorCritic().to(device)
 
-    # One optimizer with parameter groups:
-    #   group 0: shared trunk + actor head + log_std (LR_ACTOR)
-    #   group 1: critic head (LR_CRITIC)
     optimizer = optim.Adam([
         {"params": list(model.shared.parameters()) + list(model.actor.parameters()) + [model.log_std], "lr": LR_ACTOR},
         {"params": list(model.critic.parameters()), "lr": LR_CRITIC},
     ])
 
-    # ===== Expert warm start: dataset first, fallback to online expert =====
+    # Warm start
     print(f"[Init] Using dataset at {DATASET_PATH}", flush=True)
     expert = ExpertController(target_radius=7.5e12)
-
-    # More saturated warm start: 2 epochs, 1,000,000 samples per epoch
     ok = load_expert_from_npy(
-        model,
-        DATASET_PATH,
-        epochs=2,             # was 1 -> 2
-        batch_size=4096,      # safe for ~12GB GPUs; tune if needed
-        max_samples=1_000_000,# was 200_000 -> 1,000,000 per epoch
-        progress_every=20
+        model, DATASET_PATH, epochs=2, batch_size=4096,
+        max_samples=1_000_000, progress_every=20
     )
     if not ok:
-        # Fallback to online expert imitation if dataset missing or malformed
         load_expert_online(model, expert, env)
 
-    # Quick imitation report (Actor mean vs Expert on reset states)
-    expert_match_report(env, model, expert, n=256)
-
-    # Pre-evaluation with mean action
-    pre_eval = evaluate_policy(env, model, episodes=2)
-    print(f"[Pre-Eval] Avg return: {pre_eval:.2f}")
+    # Quick imitation check
+    evaluate_policy(env, model, episodes=1)
 
     all_rewards = []
     header = ["epoch", "reward", "actor_loss", "critic_loss"]
@@ -457,60 +460,68 @@ def train():
 
         log_probs, values, states, actions, rewards, masks = [], [], [], [], [], []
         total_reward = 0.0
+        ep_steps = 0
 
-        # -------- Rollout collection --------
+        # Rollout
         for _ in range(BATCH_STEPS):
-            action, log_prob = model.get_action(state)
-            next_obs, reward, done, _ = env.step(action * THRUST_SCALE)
+            a_raw_np, a_env_np, log_prob = model.get_action(state)
+            next_obs, reward, done, _ = env.step(a_env_np * THRUST_SCALE)
             ns = normalize_state(next_obs)
 
             states.append(state)
-            actions.append(action)
+            actions.append(a_raw_np)   # raw actions for PPO math
             rewards.append(reward)
             masks.append(0 if done else 1)
-            log_probs.append(log_prob.detach().to(device))
+            log_probs.append(log_prob.detach())
 
             with torch.no_grad():
-                _, v = model.forward(torch.tensor(state, dtype=torch.float32, device=device))
+                _, v = model.forward(torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0))
                 values.append(float(v.item()))
 
             state = ns
             total_reward += reward
+            ep_steps += 1
             if done:
                 break
 
         all_rewards.append(total_reward)
-        print(f"Epoch {epoch}/{EPOCHS} | Reward: {total_reward:.2f}")
+        print(f"Epoch {epoch}/{EPOCHS} | Reward: {total_reward:.2f} | Steps: {ep_steps}")
 
-        # -------- Bootstrap value for the last state --------
+        # Bootstrap
         with torch.no_grad():
-            _, last_v_t = model.forward(torch.tensor(state, dtype=torch.float32, device=device))
+            _, last_v_t = model.forward(torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0))
             last_v = float(last_v_t.item())
 
-        # -------- Tensorize batch --------
+        # Tensors
         states_t   = torch.tensor(np.array(states),  dtype=torch.float32, device=device)
         actions_t  = torch.tensor(np.array(actions), dtype=torch.float32, device=device)
         old_logp_t = torch.stack(log_probs).detach()
         returns_np = compute_gae(rewards, values, masks, last_value=last_v)
         returns_t  = torch.tensor(returns_np, dtype=torch.float32, device=device)
 
-        # -------- Advantage (normalize) --------
+        # Advantage
         with torch.no_grad():
             _, v_pred = model.forward(states_t)
             v_pred = v_pred.squeeze(-1)
             adv = returns_t - v_pred
             adv = (adv - adv.mean()) / (adv.std() + 1e-8)
-            v_old = v_pred.clone()  # cache for value clipping
+            v_old = v_pred.clone()
 
-        # -------- PPO updates (minibatch + value clipping + KL/clip_frac) --------
+        # PPO update
         idx_all = np.arange(len(states_t))
         last_actor_loss, last_critic_loss = 0.0, 0.0
         clip_fracs, kls = [], []
 
+        ENT_COEF = current_ent_coef(epoch)
+
         for _ in range(TRAIN_ITERS):
+            if len(idx_all) == 0:
+                break
             np.random.shuffle(idx_all)
             for start in range(0, len(idx_all), MB_SIZE):
                 mb_idx = idx_all[start:start + MB_SIZE]
+                if len(mb_idx) == 0:
+                    continue
                 mb = torch.tensor(mb_idx, dtype=torch.long, device=device)
 
                 mb_states   = states_t[mb]
@@ -526,21 +537,19 @@ def train():
                 surr2  = torch.clamp(ratio, 1.0 - CLIP_EPS, 1.0 + CLIP_EPS) * mb_adv
                 actor_loss  = -torch.min(surr1, surr2).mean()
 
-                # Value clipping for critic
                 v_clip = mb_v_old + (v_pred_mb - mb_v_old).clamp(-VAL_CLIP_RANGE, VAL_CLIP_RANGE)
                 critic_loss = 0.5 * torch.mean((mb_returns - v_clip) ** 2)
 
-                # Total loss
-                total_loss = actor_loss + critic_loss - ENT_COEF * entropy.mean()
+                total_loss = actor_loss + VF_COEF * critic_loss - ENT_COEF * entropy.mean()
 
                 optimizer.zero_grad(set_to_none=True)
                 total_loss.backward()
                 nn.utils.clip_grad_norm_(model.parameters(), MAX_GRAD_NORM)
                 optimizer.step()
 
-                # Keep policy std within a reasonable range
                 with torch.no_grad():
-                    model.log_std.data.clamp_(min=np.log(0.05), max=np.log(1.0))
+                    # keep std in a healthy range
+                    model.log_std.data.clamp_(min=np.log(0.08), max=np.log(1.5))
                     approx_kl = (mb_old_logp - new_logp).mean().item()
                     clip_frac = (torch.abs(ratio - 1.0) > CLIP_EPS).float().mean().item()
                 kls.append(approx_kl)
@@ -549,14 +558,12 @@ def train():
                 last_actor_loss = float(actor_loss.item())
                 last_critic_loss = float(critic_loss.item())
 
-        # -------- Diagnostics --------
+        EV = explained_variance(returns_t, v_pred)
         if epoch % 10 == 0:
-            print(f"[Diag] clip_frac={np.mean(clip_fracs):.3f}  KL={np.mean(kls):.4f}")
+            print(f"[Diag] clip_frac={np.mean(clip_fracs):.3f}  KL={np.mean(kls):.4f}  EV={EV:.3f}")
 
-        # -------- NEW: Adaptive PPO iters based on KL (per-epoch) --------
-        # If KL is too small: updates are too conservative -> increase TRAIN_ITERS slightly (up to 25)
-        # If KL is too large: updates are too aggressive   -> decrease TRAIN_ITERS slightly (down to 10)
-        target_kl = 0.015
+        # Adaptive train iters (slightly higher target KL)
+        target_kl = 0.02
         mean_kl = float(np.mean(kls)) if len(kls) else 0.0
         if mean_kl < 0.5 * target_kl:
             TRAIN_ITERS = min(TRAIN_ITERS + 1, 25)
@@ -564,7 +571,9 @@ def train():
             TRAIN_ITERS = max(TRAIN_ITERS - 1, 10)
         print(f"[Adapt] mean_KL={mean_kl:.4f} -> next TRAIN_ITERS={TRAIN_ITERS}")
 
-        # -------- CSV logging --------
+        if mean_kl > 1.5 * target_kl:
+            print(f"[EarlyStop] KL {mean_kl:.4f} > {1.5*target_kl:.4f} (epoch {epoch})")
+
         log_to_csv(CSV_PATH, {
             "epoch": epoch,
             "reward": total_reward,
@@ -572,7 +581,6 @@ def train():
             "critic_loss": last_critic_loss
         }, header)
 
-        # -------- Periodic checkpoint (every 100 epochs) --------
         if epoch % 100 == 0:
             ckpt_path = os.path.join(LOG_DIR, f"ppo_epoch_{epoch}.pth")
             torch.save({
@@ -582,16 +590,15 @@ def train():
                 "config": {
                     "GAMMA": GAMMA, "LAMBDA": LAMBDA,
                     "CLIP_EPS": CLIP_EPS, "VF_COEF": VF_COEF,
-                    "ENT_COEF": ENT_COEF, "THRUST_SCALE": THRUST_SCALE
+                    "THRUST_SCALE": THRUST_SCALE
                 }
             }, ckpt_path)
             print(f"[Checkpoint] Saved to {ckpt_path}")
 
-        # -------- Plot every 10 epochs --------
         if epoch % 10 == 0:
             plot_curves(all_rewards, CSV_PATH, LOG_DIR)
 
-    # -------- Final checkpoint --------
+    # Final checkpoint + plots
     torch.save({
         "epoch": EPOCHS,
         "model_state": model.state_dict(),
@@ -599,16 +606,15 @@ def train():
         "config": {
             "GAMMA": GAMMA, "LAMBDA": LAMBDA,
             "CLIP_EPS": CLIP_EPS, "VF_COEF": VF_COEF,
-            "ENT_COEF": ENT_COEF, "THRUST_SCALE": THRUST_SCALE
+            "THRUST_SCALE": THRUST_SCALE
         }
     }, FINAL_CKPT)
     print(f"[Checkpoint] Saved final model to {FINAL_CKPT}")
 
-    # -------- Final plots & orbit visualization --------
     plot_curves(all_rewards, CSV_PATH, LOG_DIR)
     evaluate_and_plot_orbit(env, model, out_path=os.path.join(LOG_DIR, "orbit_trajectory.png"))
+    plot_state_timeseries(env, model, out_path=os.path.join(LOG_DIR, "state_timeseries.png"))
     print("Training finished.")
-
 
 if __name__ == "__main__":
     train()

@@ -1,17 +1,16 @@
 import numpy as np
 
-
 def compute_reward(pos, vel, thrust, target_radius, fuel_used, G, M, step_count=None, done=False):
     """
-    PPO-optimized reward function with smooth shaping and structured components.
+    PPO-friendly shaped reward for orbit control.
 
     Returns:
-        reward (float): Total reward.
-        shaping (float): Orbital deviation shaping.
-        bonus (float): Near-target smooth bonus.
-        penalty (float): Fuel usage penalty.
-        r_error (float): Relative radial error.
-        v_error (float): Relative velocity error.
+        reward (float): total reward
+        shaping (float): main shaping term (radius, speed, angle)
+        bonus (float): smooth near-target bonus
+        penalty (float): fuel penalty
+        r_error (float): relative radial error
+        v_error (float): relative velocity error
     """
     r = np.linalg.norm(pos)
     v = np.linalg.norm(vel)
@@ -22,19 +21,23 @@ def compute_reward(pos, vel, thrust, target_radius, fuel_used, G, M, step_count=
 
     unit_r = pos / (r + 1e-8)
     unit_v = vel / (v + 1e-8)
-    angle_cos = np.dot(unit_r, unit_v)
+    angle_cos = np.dot(unit_r, unit_v)  # want near 0 for circular
 
-    r_term = -5.0 * np.tanh(r_error * 5)
-    v_term = -5.0 * np.tanh(v_error * 5)
-    angle_term = -3.0 * abs(angle_cos) ** 1.5
+    # Soft shaping (bounded by tanh)
+    r_term    = -5.0 * np.tanh(r_error * 5.0)
+    v_term    = -5.0 * np.tanh(v_error * 5.0)
+    angle_term= -2.5 * abs(angle_cos) ** 1.2
 
     shaping = r_term + v_term + angle_term
-    penalty = -0.001 * fuel_used
 
-    bonus_r = np.exp(-20 * r_error ** 2)
-    bonus_v = np.exp(-20 * v_error ** 2)
-    bonus_ang = np.exp(-10 * angle_cos ** 2)
-    bonus = 3.0 * bonus_r * bonus_v * bonus_ang
+    # Fuel penalty (small)
+    penalty = -0.001 * float(fuel_used)
+
+    # Stronger smooth bonus near the target configuration
+    bonus_r   = np.exp(-20.0 * r_error ** 2)
+    bonus_v   = np.exp(-20.0 * v_error ** 2)
+    bonus_ang = np.exp(-10.0 * angle_cos ** 2)
+    bonus = float(12.0 * bonus_r * bonus_v * bonus_ang)  # << increased from 6 -> 10
 
     reward = shaping + penalty + bonus
     return reward, shaping, bonus, penalty, r_error, v_error
