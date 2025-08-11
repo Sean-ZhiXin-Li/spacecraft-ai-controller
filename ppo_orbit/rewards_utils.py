@@ -24,9 +24,9 @@ def compute_reward(pos, vel, thrust, target_radius, fuel_used, G, M, step_count=
     angle_cos = np.dot(unit_r, unit_v)  # want near 0 for circular
 
     # Soft shaping (bounded by tanh)
-    r_term    = -5.0 * np.tanh(r_error * 5.0)
-    v_term    = -5.0 * np.tanh(v_error * 5.0)
-    angle_term= -2.5 * abs(angle_cos) ** 1.2
+    r_term     = -5.0 * np.tanh(r_error * 5.0)
+    v_term     = -5.0 * np.tanh(v_error * 5.0)
+    angle_term = -2.5 * abs(angle_cos) ** 1.2
 
     shaping = r_term + v_term + angle_term
 
@@ -37,7 +37,7 @@ def compute_reward(pos, vel, thrust, target_radius, fuel_used, G, M, step_count=
     bonus_r   = np.exp(-20.0 * r_error ** 2)
     bonus_v   = np.exp(-20.0 * v_error ** 2)
     bonus_ang = np.exp(-10.0 * angle_cos ** 2)
-    bonus = float(12.0 * bonus_r * bonus_v * bonus_ang)  # << increased from 6 -> 10
+    bonus = float(12.0 * bonus_r * bonus_v * bonus_ang)
 
     reward = shaping + penalty + bonus
     return reward, shaping, bonus, penalty, r_error, v_error
