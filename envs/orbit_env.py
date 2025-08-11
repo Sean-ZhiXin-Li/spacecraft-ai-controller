@@ -3,7 +3,9 @@ from gym import spaces
 import numpy as np
 from typing import Optional, Tuple
 from gym.core import ObsType
-from ppo_orbit.rewards_utils import compute_reward  # adjust path if needed
+
+# 与同目录 rewards_utils.py 对齐
+from rewards_utils import compute_reward
 
 class OrbitEnv(gym.Env):
     """
