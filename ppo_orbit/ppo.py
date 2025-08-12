@@ -23,25 +23,25 @@ torch.backends.cudnn.benchmark = True
 GAMMA        = 0.995
 LAMBDA       = 0.97
 EPOCHS       = 800
-TRAIN_ITERS  = 20
+TRAIN_ITERS  = 20            # adapted per-epoch by KL feedback (cap can rise to 32)
 THRUST_SCALE = 3000.0
 BATCH_STEPS  = 4096
 
-# PPO specifics (stabilized & slightly more aggressive)
-CLIP_EPS         = 0.20       # ↑ from 0.18
-VF_COEF          = 1.2        # base; will be scheduled by current_vf_coef()
-ENT_COEF_0       = 0.010      # ↑ from 0.008
+# PPO specifics
+CLIP_EPS         = 0.25      # baseline PPO clip; we keep it bold overall (won't go below ~0.24 later)
+VF_COEF          = 1.2       # scheduled by current_vf_coef()
+ENT_COEF_0       = 0.012     # slightly more early exploration
 ENT_COEF_1       = 0.001
-ENT_SWITCH_EPOCH = 200        # ↓ from 300
+ENT_SWITCH_EPOCH = 200
 MAX_GRAD_NORM    = 0.5
 MB_SIZE          = 128
 
 # Optimizer learning rates
 LR_ACTOR   = 3e-5
-LR_CRITIC  = 1e-3
+LR_CRITIC  = 5e-4            # lowered (was 1e-3) to reduce EV wobble; paired with value clipping
 
-# KL target (for adapt)
-TARGET_KL_BASE = 0.017
+# KL target (for adaptation) — slightly higher so the "bold lane" triggers a bit more
+TARGET_KL_BASE = 0.024
 
 # Logging / I/O
 LOG_DIR   = "ppo_orbit"
@@ -49,7 +49,7 @@ PLOTS_DIR = LOG_DIR
 os.makedirs(LOG_DIR, exist_ok=True)
 CSV_PATH  = os.path.join(LOG_DIR, "loss_log.csv")
 
-# Optional offline dataset (skipped if near-zero actions)
+# Optional offline dataset (skipped if actions are near-zero)
 DATASET_PATH = os.path.join("data", "data", "preprocessed", "merged_expert_dataset.npy")
 
 
@@ -65,7 +65,7 @@ def reset_env(env, **kwargs):
 
 def step_env(env, action):
     """
-    Unify step return:
+    Unified step:
       - New Gym: (obs, reward, terminated, truncated, info) -> done = terminated or truncated
       - Legacy/custom: (obs, reward, done, info)
     Returns (obs, reward, done, info).
@@ -96,7 +96,7 @@ def set_seed(seed: int):
 
 
 def normalize_state(state):
-    """Roughly scale position/velocity to [-1, 1] for PPO stability."""
+    """Roughly scale position/velocity to ~[-1, 1] for more stable PPO updates."""
     pos_scale = 7.5e12
     vel_scale = 3e4
     return np.array([
@@ -122,14 +122,14 @@ def current_ent_coef(epoch:int)->float:
     return ENT_COEF_0 if epoch <= ENT_SWITCH_EPOCH else ENT_COEF_1
 
 def current_vf_coef(epoch:int)->float:
-    """Slightly reduce value loss weight later to let policy step bigger."""
-    return 1.2 if epoch <= 200 else 1.0
+    """Make value loss strong early, weaker later to favor policy improvement."""
+    return 1.2 if epoch <= 150 else 0.8
 
 
 def dataset_action_stats(npy_path, thrust_scale, sample=500_000):
     """
     Inspect action distribution in the offline dataset after scaling to [-1,1].
-    If actions are nearly zero (std and 95th percentile tiny), skip warmstart.
+    If actions are nearly zero, skip warm start.
     """
     if not os.path.exists(npy_path):
         print(f"[Dataset] Not found: {npy_path}")
@@ -163,7 +163,7 @@ def dataset_action_stats(npy_path, thrust_scale, sample=500_000):
         idx = np.random.choice(N, size=n, replace=False)
         acts = arr[idx, -2:].astype(np.float32)
 
-    # Scale to [-1,1] if raw actions are likely in Newtons
+    # Scale to [-1,1] if raw actions look like Newtons
     if np.max(np.abs(acts)) > 1.5:
         acts_scaled = acts / float(thrust_scale)
     else:
@@ -184,6 +184,7 @@ def dataset_action_stats(npy_path, thrust_scale, sample=500_000):
 # ==========================================================
 @torch.no_grad()
 def evaluate_policy(env, model, thrust_scale, episodes=2, max_steps=20000):
+    """Deterministic eval with mean action."""
     totals, lens = [], []
     for _ in range(episodes):
         obs = reset_env(env)
@@ -207,6 +208,7 @@ def evaluate_policy(env, model, thrust_scale, episodes=2, max_steps=20000):
 
 @torch.no_grad()
 def evaluate_stochastic(env, model, thrust_scale, episodes=2, max_steps=20000):
+    """Stochastic eval (samples from current policy)."""
     totals = []
     for _ in range(episodes):
         obs = reset_env(env)
@@ -244,7 +246,7 @@ class ActorCritic(nn.Module):
             nn.Tanh(),
             nn.Linear(hidden2, 1)
         )
-        # initial exploration std
+        # Initial exploration std
         self.log_std = nn.Parameter(torch.log(torch.ones(2, device=device) * 0.2))
 
     def forward(self, x):
@@ -253,7 +255,7 @@ class ActorCritic(nn.Module):
 
     @torch.no_grad()
     def get_action(self, state):
-        """Return (raw_sample_np, clamped_env_np, log_prob_tensor)."""
+        """Return (raw_action_np, clipped_action_np, log_prob_tensor)."""
         st = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
         mu, _ = self.forward(st)
         std = self.log_std.exp()
@@ -266,7 +268,10 @@ class ActorCritic(nn.Module):
                 logp.squeeze(0))
 
     def evaluate(self, states, actions):
-        """Return (log_probs, entropy, value) given states and *raw* sampled actions."""
+        """
+        Compute log probs, entropy, and value for given states and *raw* actions
+        (raw = pre-clipping/pre-scaling actions used in PPO ratios).
+        """
         mu, value = self.forward(states)
         std = self.log_std.exp()
         dist = Normal(mu, std)
@@ -336,7 +341,7 @@ def compute_gae(rewards, values, masks, gamma=GAMMA, lam=LAMBDA, last_value=0.0)
 def load_expert_from_npy(model, npy_path, thrust_scale, epochs=2, batch_size=4096,
                          shuffle=True, max_samples=1_000_000, progress_every=20):
     """
-    Supervised warmstart of the actor from an offline (state, action) dataset.
+    Supervised warm start from an offline (state, action) dataset.
     Skips if dataset actions are near-zero after scaling.
     """
     import torch.utils.data as tud
@@ -348,11 +353,11 @@ def load_expert_from_npy(model, npy_path, thrust_scale, epochs=2, batch_size=409
     stats = dataset_action_stats(npy_path, thrust_scale)
     if stats is not None:
         if (np.max(stats["std"]) < 0.02) and (np.max(stats["p95"]) < 0.05):
-            print("[Init] Actions in dataset are too small (near-zero). Skip offline warmstart.")
+            print("[Init] Actions in dataset are too small (near-zero). Skip offline warm start.")
             return False
 
     if not os.path.exists(npy_path):
-        print(f"[Warn] Dataset not found: {npy_path}. Skip offline warmstart.", flush=True)
+        print(f"[Warn] Dataset not found: {npy_path}. Skip offline warm start.", flush=True)
         return False
 
     # Peek shape/keys
@@ -395,7 +400,7 @@ def load_expert_from_npy(model, npy_path, thrust_scale, epochs=2, batch_size=409
         states_np  = states_np[idx]
         actions_np = actions_np[idx]
         N = max_samples
-        print(f"[Init] Subsampled to {N} samples for faster warmstart.", flush=True)
+        print(f"[Init] Subsampled to {N} samples for faster warm start.", flush=True)
 
     # Normalize states and scale actions
     states_np = np.stack([normalize_state(s) for s in states_np], axis=0).astype(np.float32)
@@ -469,7 +474,7 @@ def _basic_expert_action(pos: np.ndarray, vel: np.ndarray, target_radius: float,
 def load_expert_online(model, env, thrust_scale, samples=20000):
     """
     Generate (state → action) pairs from the basic physics expert
-    and fit actor with a small supervised warmstart.
+    and fit actor with a small supervised warm start.
     """
     states, targets = [], []
     for _ in range(samples):
@@ -630,7 +635,7 @@ def train(args):
         {"params": list(model.critic.parameters()), "lr": LR_CRITIC},
     ])
 
-    # Critic loss (Huber) is a bit more stable than MSE under reward scale drift
+    # Critic loss: SmoothL1 (Huber) pairs well with ValueNorm
     huber = nn.SmoothL1Loss()
     value_norm = ValueNorm()
 
@@ -649,13 +654,13 @@ def train(args):
     # Optional but stabilizing: one-epoch TD(lambda) critic bootstrap
     # ------------------------------------------------------------------
     critic_opt = optim.Adam(model.critic.parameters(), lr=LR_CRITIC)
-    for _bootstrap_epoch in range(1):  # 1 quick epoch
+    for _bootstrap_epoch in range(1):  # quick 1-epoch warmup
         states, rewards, masks, values = [], [], [], []
         obs = reset_env(env)
         state = normalize_state(obs)
         steps = 0
         while steps < BATCH_STEPS:
-            # rollout with mean action (less noisy for value fitting)
+            # rollout with mean action (less noisy target for value fitting)
             st = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
             with torch.no_grad():
                 mu, v = model.forward(st)
@@ -692,12 +697,20 @@ def train(args):
     all_rewards = []
     header = ["epoch", "reward", "actor_loss", "critic_loss"]
 
+    # For next-epoch dynamic clip/entropy based on this epoch's KL
+    clip_eps_next = CLIP_EPS
+    ent_coef_boost_next = 1.0
+
     for epoch in range(1, EPOCHS + 1):
-        # === Rollout: collect exactly BATCH_STEPS across multiple episodes ===
+        # === Epoch-level dynamic knobs (based on last epoch's KL) ===
+        clip_eps_epoch = clip_eps_next
+        ENT_COEF = current_ent_coef(epoch) * ent_coef_boost_next
+
+        # === Rollout: collect exactly BATCH_STEPS across episodes ===
         states, actions, rewards, masks, log_probs, values = [], [], [], [], [], []
         total_reward = 0.0
 
-        # Curriculum (same逻辑，延长前期探索比例可通过 ENT 调整)
+        # Light curriculum: more "spiral" starts early
         def pick_mode(ep):
             if ep <= 300 and np.random.rand() < 0.6:
                 return "spiral"
@@ -713,7 +726,7 @@ def train(args):
             ns = normalize_state(next_obs)
 
             states.append(state)
-            actions.append(a_raw_np)   # raw actions for PPO math
+            actions.append(a_raw_np)   # keep RAW actions for PPO ratios
             rewards.append(reward)
             masks.append(0 if done else 1)
             log_probs.append(log_prob.detach())
@@ -745,7 +758,7 @@ def train(args):
         returns_np = compute_gae(rewards, values, masks, last_value=last_v)
         returns_t  = torch.tensor(returns_np, dtype=torch.float32, device=device)
 
-        # ---- Update running stats & get normalized returns for critic training
+        # ---- Normalize returns for critic training
         value_norm.update(returns_t)
         returns_norm = value_norm.normalize(returns_t.detach())
 
@@ -753,7 +766,7 @@ def train(args):
         with torch.no_grad():
             _, v_pred_full = model.forward(states_t)
             v_pred_full = v_pred_full.squeeze(-1)
-            # For EV reporting, de-normalize predictions
+            # De-normalized pred for EV reporting
             v_pred_eval = value_norm.denormalize(v_pred_full.detach())
 
         adv = returns_norm - v_pred_full
@@ -764,8 +777,6 @@ def train(args):
         idx_all = np.arange(len(states_t))
         last_actor_loss, last_critic_loss = 0.0, 0.0
         clip_fracs, kls = [], []
-
-        ENT_COEF = current_ent_coef(epoch)
 
         for _ in range(TRAIN_ITERS):
             if len(idx_all) == 0:
@@ -788,13 +799,17 @@ def train(args):
                 new_logp, entropy, v_pred_mb = model.evaluate(mb_states, mb_actions)
                 ratio  = torch.exp(new_logp - mb_old_logp)
                 surr1  = ratio * mb_adv
-                surr2  = torch.clamp(ratio, 1.0 - CLIP_EPS, 1.0 + CLIP_EPS) * mb_adv
+                surr2  = torch.clamp(ratio, 1.0 - clip_eps_epoch, 1.0 + clip_eps_epoch) * mb_adv
                 actor_loss  = -torch.min(surr1, surr2).mean()
 
-                # Unclipped value loss in normalized space (more stable with ValueNorm)
-                critic_loss = huber(mb_returns_norm, v_pred_mb)
+                # Value clipping (±0.25) to stabilize EV w/ lowered critic LR
+                v_clipped = mb_v_old + (v_pred_mb - mb_v_old).clamp(-0.25, 0.25)
+                critic_loss = torch.max(
+                    huber(mb_returns_norm, v_pred_mb),
+                    huber(mb_returns_norm, v_clipped)
+                )
 
-                # ---- joint step (actor + critic) ----
+                # Joint update
                 vf_coef = current_vf_coef(epoch)
                 total_loss = actor_loss + vf_coef * critic_loss - ENT_COEF * entropy.mean()
                 optimizer.zero_grad(set_to_none=True)
@@ -803,44 +818,58 @@ def train(args):
                 optimizer.step()
 
                 with torch.no_grad():
-                    # keep std in a healthy range (upper bound tightened)
-                    model.log_std.data.clamp_(min=np.log(0.08), max=np.log(1.2))
+                    # Keep std within a healthy band; extend higher min σ to 200 epochs
+                    low_sigma = 0.10 if epoch <= 200 else 0.08
+                    model.log_std.data.clamp_(min=np.log(low_sigma), max=np.log(1.2))
                     approx_kl = (mb_old_logp - new_logp).mean().item()
                     ratio_now = torch.exp(new_logp - mb_old_logp)
-                    clip_frac = (torch.abs(ratio_now - 1.0) > CLIP_EPS).float().mean().item()
+                    clip_frac = (torch.abs(ratio_now - 1.0) > clip_eps_epoch).float().mean().item()
                 kls.append(approx_kl)
                 clip_fracs.append(clip_frac)
 
                 last_actor_loss  = float(actor_loss.item())
                 last_critic_loss = float(critic_loss.item())
 
-        # Report EVs: raw-scale (denorm) & normalized-scale (training space)
+        # Diagnostics (normalized-space vs raw-space EV)
         EV_raw  = explained_variance(returns_t, v_pred_eval)
         EV_norm = explained_variance(value_norm.normalize(returns_t), v_pred_full.detach())
         if epoch % 10 == 0:
             print(f"[Diag] clip_frac={np.mean(clip_fracs):.3f}  KL={np.mean(kls):.4f}  EV_raw={EV_raw:.3f}  EV_norm={EV_norm:.3f}")
 
-        # ===== KL-driven adaptation: iters + actor LR (more permissive ceiling) =====
+        # ===== KL-driven adaptation: iters + actor LR + next-epoch clip/entropy =====
         target_kl = TARGET_KL_BASE
         mean_kl = float(np.mean(kls)) if len(kls) else 0.0
 
-        # 1) adjust iters
-        if mean_kl < 0.5 * target_kl:
-            TRAIN_ITERS = min(TRAIN_ITERS + 1, 25)
+        # 1) Adjust TRAIN_ITERS (cap widened to 32; super-low KL gets +3)
+        if mean_kl < 0.35 * target_kl:
+            TRAIN_ITERS = min(TRAIN_ITERS + 3, 32)
+        elif mean_kl < 0.5 * target_kl:
+            TRAIN_ITERS = min(TRAIN_ITERS + 2, 32)
         elif mean_kl > 1.5 * target_kl:
             TRAIN_ITERS = max(TRAIN_ITERS - 1, 10)
 
-        # 2) adjust actor LR (param_group 0), ↑ ceiling to 8e-5, ↑ growth to 1.03x
+        # 2) Adjust actor LR (param_group 0). Ceiling stays 1.5e-4.
         actor_pg = optimizer.param_groups[0]
         old_lr = actor_pg["lr"]
-        if mean_kl < 0.5 * target_kl:
-            actor_pg["lr"] = min(old_lr * 1.03, 8e-5)   # gentle increase
+        if mean_kl < 0.35 * target_kl:
+            actor_pg["lr"] = min(old_lr * 1.05, 1.5e-4)
+            # prepare a bolder lane for next epoch when KL is very low
+            clip_eps_next = 0.30
+            ent_coef_boost_next = 1.25
+        elif mean_kl < 0.5 * target_kl:
+            actor_pg["lr"] = min(old_lr * 1.03, 1.5e-4)
+            clip_eps_next = 0.26
+            ent_coef_boost_next = 1.0
         elif mean_kl > 1.5 * target_kl:
-            actor_pg["lr"] = max(old_lr * 0.90, 1e-5)   # gentle decrease
+            actor_pg["lr"] = max(old_lr * 0.90, 1e-5)
+            clip_eps_next = 0.24   # keep a relatively bold floor
+            ent_coef_boost_next = 1.0
+        else:
+            # Default lane for next epoch
+            clip_eps_next = 0.25
+            ent_coef_boost_next = 1.0
 
-        print(f"[Adapt] mean_KL={mean_kl:.4f} -> next TRAIN_ITERS={TRAIN_ITERS} | actor_lr={actor_pg['lr']:.2e}")
-        if mean_kl > 1.5 * target_kl:
-            print(f"[EarlyStop] KL {mean_kl:.4f} > {1.5*target_kl:.4f} (epoch {epoch})")
+        print(f"[Adapt] mean_KL={mean_kl:.4f} -> next TRAIN_ITERS={TRAIN_ITERS} | actor_lr={actor_pg['lr']:.2e} | next_clip={clip_eps_next:.2f}")
 
         log_to_csv(CSV_PATH, {
             "epoch": epoch,
@@ -888,7 +917,7 @@ def train(args):
 
 
 def parse_args():
-    p = argparse.ArgumentParser(description="Day27 PPO (Hybrid Init + Conservative→Faster) [Gym>=0.26]")
+    p = argparse.ArgumentParser(description="Day28 PPO (Hybrid Init + Faster Lane v3.1) [Gym>=0.26]")
     p.add_argument("--epochs", type=int, default=EPOCHS, help="training epochs")
     p.add_argument("--train-iters", type=int, default=TRAIN_ITERS, help="PPO update iters per epoch")
     p.add_argument("--thrust-scale", type=float, default=THRUST_SCALE, help="env/PPO thrust scaling")
