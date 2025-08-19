@@ -1,20 +1,21 @@
-# eval_battery.py
 import os
 import csv
 import numpy as np
+
 from envs.orbit_env_mt import OrbitEnvMT
 from baselines.zero_thrust import ZeroThrustController
 from baselines.greedy_energy_rt import GreedyEnergyRTController  # Energy-shaping baseline
 from tools.ab_tools import BatteryRecord, run_ab_compare
+from controller.expert_controller import ExpertController  # Expert core
 
 
-# ----------------------------- paths -----------------------------
+# paths
 RESULTS_DIR = "results"
 os.makedirs(RESULTS_DIR, exist_ok=True)
 CSV_PATH = os.path.join(RESULTS_DIR, "battery_day31.csv")
 
 
-# ------------------------ fixed benchmark ------------------------
+# fixed benchmark
 def fixed_tasks():
     """5 deterministic tasks for reproducible comparisons."""
     return [
@@ -26,9 +27,14 @@ def fixed_tasks():
     ]
 
 
-# --------------------------- rollout -----------------------------
+# rollout
 def rollout(env: OrbitEnvMT, controller, max_episodes=1, seed=123, pre_reset=False, initial_obs=None):
-    """Run episodes and return success rate + per-ep totals."""
+    """
+    Run episodes and return success rate + per-episode totals.
+
+    NOTE: We also call controller.bind_env(env) if available, so adapters that
+    need env metadata (e.g., mu, target_radius, thresholds) can access it.
+    """
     sr = 0
     totals = []
     for ep in range(max_episodes):
@@ -39,6 +45,12 @@ def rollout(env: OrbitEnvMT, controller, max_episodes=1, seed=123, pre_reset=Fal
             obs = env.reset(seed=seed + ep)
             if hasattr(controller, "set_task"):
                 controller.set_task(env.task)
+
+        if hasattr(controller, "bind_env"):
+            try:
+                controller.bind_env(env)
+            except Exception:
+                pass
 
         done = False
         ep_reward = 0.0
@@ -54,12 +66,15 @@ def rollout(env: OrbitEnvMT, controller, max_episodes=1, seed=123, pre_reset=Fal
     return sr / max_episodes, totals
 
 
-# --------------------------- evaluate ----------------------------
+# evaluate
 def eval_controller(name, controller, env: OrbitEnvMT, tasks, randN=20, seed=999):
-    """Evaluate controller on fixed battery and N random tasks."""
+    """
+    Evaluate a controller on both the fixed task battery and N random tasks.
+    Returns a list of rows to be written to CSV.
+    """
     rows = []
 
-    # fixed
+    # Fixed tasks
     for i, t in enumerate(tasks):
         obs0 = env.reset(task=t, seed=seed + i)
         if hasattr(controller, "set_task"):
@@ -76,7 +91,7 @@ def eval_controller(name, controller, env: OrbitEnvMT, tasks, randN=20, seed=999
             env.task["target_radius"], env.task["e"], env.task["mass"], env.task["thrust_limit"]
         ])
 
-    # random
+    # Random tasks
     rng = np.random.default_rng(seed + 777)
     for j in range(randN):
         obs0 = env.reset(task=None, seed=int(rng.integers(0, 10_000_000)))
@@ -96,11 +111,17 @@ def eval_controller(name, controller, env: OrbitEnvMT, tasks, randN=20, seed=999
     return rows
 
 
-# ------------------------ ExpertAdapter --------------------------
+# ExpertAdapter
 class ExpertAdapter:
     """
-    Glue layer that feeds *physical* (pos, vel) to your ExpertController.
-    Also adds "stop-in-band with hysteresis" (env-band-aware) to save fuel.
+    Glue layer that feeds *physical* (pos, vel) to ExpertController.
+    Adds:
+      - stop-in-band with hysteresis for fuel saving
+      - hard clamp on thrust magnitude
+      - firing gate to zero-out tiny thrust
+      - optional bang-bang (snap to cap when firing)
+      - pacing: minimum coasting/burst steps to avoid chatter
+
     Priority to obtain (pos, vel):
       1) env.get_raw_rv() / get_state_vectors() / raw_rv()
       2) env.pos/env.vel (or r/v, position/velocity, etc.)
@@ -108,26 +129,38 @@ class ExpertAdapter:
       4) Fallback: raw obs indices (last resort)
     """
     def __init__(self, expert_ctrl, pos_idx=(0, 1), vel_idx=(2, 3), quiet=True,
-                 stop_in_band=True, band_in_scale=1.0, band_out_scale=1.2):
+                 stop_in_band=True, band_in_scale=1.35, band_out_scale=2.00,
+                 a_cap=None, fire_frac=0.65, bang_bang=False,
+                 min_coast_steps=2, min_burst_steps=2):
         self.ctrl = expert_ctrl
         self.env = None
         self.pos_idx = tuple(pos_idx)
         self.vel_idx = tuple(vel_idx)
         self.quiet = quiet
         self._warned = False
-        # stop-in-band
+        # Hysteresis band
         self.stop_in_band = bool(stop_in_band)
-        self.band_in_scale = float(band_in_scale)   # e.g., 1.0 × env thresholds
-        self.band_out_scale = float(band_out_scale) # >1.0 to add hysteresis
+        self.band_in_scale = float(band_in_scale)
+        self.band_out_scale = float(band_out_scale)
         self._captured = False
+        # Thrust moderation
+        self.a_cap = None if a_cap is None else float(a_cap)
+        self.fire_frac = float(fire_frac)
+        self.bang_bang = bool(bang_bang)
+        # Pacing (anti-chatter)
+        self.min_coast_steps = int(min_coast_steps)
+        self.min_burst_steps = int(min_burst_steps)
+        self._coast_ctr = 0
+        self._burst_ctr = 0
 
     def bind_env(self, env):
         self.env = env
 
     def get_action(self, state):
-        """Return action from expert; optionally zero when inside success band."""
+        """Return action from expert; optionally zero when inside the success band."""
         r, v = self._extract_rv(state)
 
+        # Hysteresis-based coasting (fuel saving)
         if self.stop_in_band and (self.env is not None):
             mu = self._get_mu()
             rt = self._get_target_radius()
@@ -143,22 +176,63 @@ class ExpertAdapter:
                 vout = getattr(self.env, "verr_thr", 0.030) * self.band_out_scale
 
                 if self._captured:
-                    # leave silent mode only if we drift out of outer band
+                    # leave coasting only if we drift out of the outer band
                     if (rerr >= rout) or (verr >= vout):
                         self._captured = False
                 else:
-                    # enter silent mode once inside inner band
+                    # enter coasting once inside the inner band
                     if (rerr <= rin) and (verr <= vin):
                         self._captured = True
 
                 if self._captured:
+                    # pacing: once coasting, enforce minimum coasting duration
+                    self._coast_ctr = max(self._coast_ctr, self.min_coast_steps)
+                    self._burst_ctr = 0
+                    self._coast_ctr -= 1
                     return np.zeros(2, dtype=float)
 
-        return self.ctrl(0.0, r, v)
+        # If not force-returning zeros, still honor pacing if in coasting window
+        if self._coast_ctr > 0:
+            self._coast_ctr -= 1
+            return np.zeros(2, dtype=float)
+
+        # Raw expert output (in accel space)
+        a = self.ctrl(0.0, r, v)
+        a = np.asarray(a, dtype=float).reshape(-1)
+
+        # Firing gate + hard clamp + optional bang-bang
+        firing = False
+        if self.a_cap is not None:
+            n = np.linalg.norm(a) + 1e-12
+            if n < self.fire_frac * self.a_cap:
+                a[:] = 0.0
+                firing = False
+            else:
+                if n > self.a_cap:  # hard clamp
+                    a *= (self.a_cap / n)
+                if self.bang_bang:  # snap to cap if enabled
+                    a *= (self.a_cap / (np.linalg.norm(a) + 1e-12))
+                firing = True
+        else:
+            firing = (np.linalg.norm(a) > 0.0)
+
+        # Pacing: ensure minimum burst/coast durations to avoid chatter
+        if firing:
+            if self._burst_ctr <= 0:
+                self._burst_ctr = self.min_burst_steps
+            else:
+                self._burst_ctr -= 1
+            self._coast_ctr = self.min_coast_steps
+        else:
+            if self._coast_ctr <= 0:
+                self._coast_ctr = self.min_coast_steps
+            a[:] = 0.0
+
+        return a[:2]
 
     # --- helpers ---
     def _vt(self, v_vec, r_vec):
-        """Tangential component of velocity wrt current radius direction."""
+        """Tangential component of velocity wrt the current radius direction."""
         r = np.linalg.norm(r_vec) + 1e-12
         er = r_vec / r
         et = np.array([-er[1], er[0]])
@@ -184,12 +258,12 @@ class ExpertAdapter:
             if hasattr(self.env, "state"):
                 st = getattr(self.env, "state")
                 if isinstance(st, dict):
-                    for pa, va in pairs:
+                    for pa, va in [("pos","vel"),("r","v"),("position","velocity"),("x","v"),("x","xdot"),("r_vec","v_vec")]:
                         if pa in st and va in st:
                             r = _np.asarray(st[pa]).reshape(-1)[:2]
                             v = _np.asarray(st[va]).reshape(-1)[:2]
                             return r, v
-            # denormalize from obs
+            # Denormalize from obs using (mu, rt)
             mu = self._get_mu()
             rt = self._get_target_radius()
             if (mu is not None) and (rt is not None):
@@ -202,7 +276,7 @@ class ExpertAdapter:
                     self._warned = True
                 return r.astype(float), v.astype(float)
 
-        # fallback: raw obs indices
+        # Fallback: slice raw obs
         obs = _np.asarray(state).reshape(-1)
         try:
             r = obs[list(self.pos_idx)]
@@ -242,13 +316,17 @@ class ExpertAdapter:
         return None
 
 
-# -------------------- thrust mapping (glue only) -----------------
-EXPERT_THRUST_MAP = "linear"   # "identity" to keep your original feel
+# thrust mapping (glue only)
+# Base accel cap mapping; per-controller scaling can be applied on top.
+EXPERT_THRUST_MAP = "linear"   # set to "identity" to pass-through env thrust_limit
 _T_LO, _T_HI = 100.0, 150.0
-_A_LO, _A_HI = 0.05, 0.45
+_A_LO, _A_HI = 0.03, 0.09     # eco uses this as-is; fast will scale slightly
 
 def _map_env_thrust_to_expert(thrust):
-    """Map env thrust_limit to Expert's accel cap; switch to identity to pass-through."""
+    """
+    Map env thrust_limit (N) to Expert's accel cap.
+    Switch EXPERT_THRUST_MAP="identity" to keep your original feel.
+    """
     t = float(thrust)
     if EXPERT_THRUST_MAP == "identity":
         return t
@@ -257,7 +335,88 @@ def _map_env_thrust_to_expert(thrust):
     return _A_LO + u * (_A_HI - _A_LO)
 
 
-# ------------------------------ main -----------------------------
+# Expert baseline wrapper
+class ExpertBaseline:
+    """
+    Rebuilds ExpertController per task and delegates actions to ExpertAdapter.
+
+    - set_task(task): build ExpertController based on current task config
+    - bind_env(env): pass environment to Adapter (needed for denormalization)
+    - act(obs): call Adapter.get_action(obs)
+    """
+    def __init__(self,
+                 radial_gain=3.4,
+                 tangential_gain=3.6,
+                 damping_gain=9.2,
+                 band_in=1.35, band_out=2.00,
+                 stop_in_band=True,
+                 fire_frac=0.65,
+                 bang_bang=False,
+                 min_coast_steps=2,
+                 min_burst_steps=2,
+                 a_cap_scale=1.00,
+                 label="expert"):
+        self.radial_gain = radial_gain
+        self.tangential_gain = tangential_gain
+        self.damping_gain = damping_gain
+        self.band_in = band_in
+        self.band_out = band_out
+        self.stop_in_band = stop_in_band
+        self.fire_frac = fire_frac
+        self.bang_bang = bang_bang
+        self.min_coast_steps = int(min_coast_steps)
+        self.min_burst_steps = int(min_burst_steps)
+        self.a_cap_scale = float(a_cap_scale)
+        self.label = str(label)
+        self._adapter = None
+        self._env = None
+
+    def set_task(self, task: dict):
+        rt = float(task.get("target_radius", task.get("rt")))
+        mass = float(task.get("mass", 721.9))
+        thrust = float(task.get("thrust_limit", task.get("thrust", 125.0)))
+
+        a_cap = _map_env_thrust_to_expert(thrust) * self.a_cap_scale
+
+        expert_core = ExpertController(
+            target_radius=rt,
+            mass=mass,
+            thrust_limit=a_cap,
+            radial_gain=self.radial_gain,
+            tangential_gain=self.tangential_gain,
+            damping_gain=self.damping_gain,
+            enable_damping=True,
+        )
+        self._adapter = ExpertAdapter(
+            expert_core,
+            pos_idx=(0, 1),
+            vel_idx=(2, 3),
+            quiet=True,
+            stop_in_band=self.stop_in_band,
+            band_in_scale=self.band_in,
+            band_out_scale=self.band_out,
+            a_cap=a_cap,
+            fire_frac=self.fire_frac,
+            bang_bang=self.bang_bang,
+            min_coast_steps=self.min_coast_steps,
+            min_burst_steps=self.min_burst_steps,
+        )
+        if self._env is not None and hasattr(self._adapter, "bind_env"):
+            self._adapter.bind_env(self._env)
+
+    def bind_env(self, env):
+        self._env = env
+        if self._adapter is not None and hasattr(self._adapter, "bind_env"):
+            self._adapter.bind_env(env)
+
+    def act(self, obs):
+        if self._adapter is None:
+            import numpy as _np
+            return _np.zeros(2, dtype=float)
+        return self._adapter.get_action(obs)
+
+
+# main
 def main():
     env = OrbitEnvMT(
         rerr_thr=0.015, verr_thr=0.030, align_thr=0.97, stable_steps=160,
@@ -276,7 +435,25 @@ def main():
             dead_r_in=0.020, dead_r_out=0.017,
             dead_v_in=0.040, dead_v_out=0.033,
             v_des_min=0.82, v_des_max=1.19
-        ))
+        )),
+        # ECO upper bound (fuel-aware)
+        ("expert_eco", ExpertBaseline(
+            radial_gain=3.4, tangential_gain=3.6, damping_gain=9.2,
+            band_in=1.35, band_out=2.00,
+            stop_in_band=True, fire_frac=0.65, bang_bang=False,
+            min_coast_steps=2, min_burst_steps=2,
+            a_cap_scale=1.00, label="expert_eco"
+        )),
+        # FAST upper bound (tiny fuel trim to flip return positive while keeping SR)
+        ("expert_fast", ExpertBaseline(
+            radial_gain=3.7, tangential_gain=3.9, damping_gain=9.2,
+            band_in=1.38, band_out=2.08,           # widened band to reduce chatter
+            stop_in_band=True, fire_frac=0.76,     # higher firing gate to save fuel
+            bang_bang=False,
+            min_coast_steps=2, min_burst_steps=1,  # short bursts retained
+            a_cap_scale=1.14,                      # cap scaled to preserve SR
+            label="expert_fast"
+        )),
     ]
 
     headers = [
@@ -288,13 +465,18 @@ def main():
     ]
     all_rows = []
 
+    # Evaluate all controllers
     for name, ctrl in controllers:
         rows = eval_controller(name, ctrl, env, tasks, randN=20, seed=999)
         all_rows.extend(rows)
 
+    # Save CSV
     with open(CSV_PATH, "w", newline="") as f:
-        writer = csv.writer(f); writer.writerow(headers); writer.writerows(all_rows)
+        writer = csv.writer(f)
+        writer.writerow(headers)
+        writer.writerows(all_rows)
 
+    # Aggregate + console summary
     by_name = {}
     for r in all_rows:
         by_name.setdefault(r[0], []).append(r)
@@ -337,7 +519,7 @@ def main():
         ])
         print(f"  worst tasks: {worst_list}")
 
-    # ---------------------- AB compare (Agent vs Expert) ----------------------
+    # AB compare (Agent vs Experts)
     target_agent_name = "greedy_energy_rt"
     target_rows = by_name.get(target_agent_name, [])
     if not target_rows:
@@ -372,38 +554,69 @@ def main():
             thrust_scale_range=(100.0, 150.0),
         )
 
-    def make_expert_fn(task_cfg):
-        """Build original ExpertController (unchanged), only scale thrust cap + adapter."""
-        from controller.expert_controller import ExpertController
+    # ECO variant for AB curves
+    def make_expert_fn_eco(task_cfg):
         env_T = task_cfg.get("thrust", task_cfg.get("thrust_limit", 125.0))
-        a_cap = _map_env_thrust_to_expert(env_T)   # "identity" to pass-through
+        a_cap = _map_env_thrust_to_expert(env_T) * 1.00
         expert_ctrl = ExpertController(
             target_radius=task_cfg["rt"],
             mass=task_cfg.get("mass", 721.9),
             thrust_limit=a_cap,
-            radial_gain=4.0,
-            tangential_gain=5.0,
-            damping_gain=6.0,
+            radial_gain=3.4, tangential_gain=3.6, damping_gain=9.2,
             enable_damping=True
         )
-        # Stop-in-band enabled + hysteresis to save fuel
         return ExpertAdapter(expert_ctrl, pos_idx=(0, 1), vel_idx=(2, 3),
                              quiet=True, stop_in_band=True,
-                             band_in_scale=1.0, band_out_scale=1.2)
+                             band_in_scale=1.35, band_out_scale=2.00,
+                             a_cap=a_cap, fire_frac=0.65, bang_bang=False,
+                             min_coast_steps=2, min_burst_steps=2)
 
-    ab_out = run_ab_compare(
+    # FAST variant for AB curves (synced with controllers)
+    def make_expert_fn_fast(task_cfg):
+        env_T = task_cfg.get("thrust", task_cfg.get("thrust_limit", 125.0))
+        a_cap = _map_env_thrust_to_expert(env_T) * 1.14
+        expert_ctrl = ExpertController(
+            target_radius=task_cfg["rt"],
+            mass=task_cfg.get("mass", 721.9),
+            thrust_limit=a_cap,
+            radial_gain=3.7, tangential_gain=3.9, damping_gain=9.2,
+            enable_damping=True
+        )
+        return ExpertAdapter(expert_ctrl, pos_idx=(0, 1), vel_idx=(2, 3),
+                             quiet=True, stop_in_band=True,
+                             band_in_scale=1.38, band_out_scale=2.08,   # synced
+                             a_cap=a_cap, fire_frac=0.76,               # synced
+                             bang_bang=False,
+                             min_coast_steps=2, min_burst_steps=1)
+
+    # Run AB for ECO
+    ab_out_eco = run_ab_compare(
         agent_records=agent_records,
         task_list=task_list,
         make_env_fn=make_env_fn,
-        make_expert_fn=make_expert_fn,
+        make_expert_fn=make_expert_fn_eco,
         export_k=3,
         worst_by="ret",
-        out_root="ab/day32",
+        out_root="ab/day32_eco",
         metrics_for_curve=("ret", "r_err"),
     )
+    print("[AB][eco] Saved plots:", ab_out_eco["plots"])
+    print("[AB][eco] Worst-3 (by ret):", [w.name for w in ab_out_eco["worst"]])
 
-    print("[AB] Saved plots:", ab_out["plots"])
-    print("[AB] Worst-3 (by ret):", [w.name for w in ab_out["worst"]])
+    # Run AB for FAST
+    ab_out_fast = run_ab_compare(
+        agent_records=agent_records,
+        task_list=task_list,
+        make_env_fn=make_env_fn,
+        make_expert_fn=make_expert_fn_fast,
+        export_k=3,
+        worst_by="ret",
+        out_root="ab/day32_fast",
+        metrics_for_curve=("ret", "r_err"),
+    )
+    print("[AB][fast] Saved plots:", ab_out_fast["plots"])
+    print("[AB][fast] Worst-3 (by ret):", [w.name for w in ab_out_fast["worst"]])
+
     print(f"CSV saved -> {CSV_PATH}")
 
 

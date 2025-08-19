@@ -1,0 +1,61 @@
+seed: 999
+randN: 20
+env:
+  rerr_thr: 0.015
+  verr_thr: 0.030
+  align_thr: 0.97
+  stable_steps: 160
+  w_fuel: 2.0e-4
+  w_align: 0.2
+  dt: 6000.0
+  max_steps: 30000
+  thrust_scale_range: [100.0, 150.0]
+
+controllers:
+  zero: {}
+
+  greedy_energy_rt:
+    k_e: 0.9
+    k_rp: 0.10
+    k_rd: 0.60
+    t_clip: 0.41
+    a_max_lo: 0.048
+    a_max_hi: 0.43
+    dead_r_in: 0.020
+    dead_r_out: 0.017
+    dead_v_in: 0.040
+    dead_v_out: 0.033
+    v_des_min: 0.82
+    v_des_max: 1.19
+
+  expert_eco:
+    radial_gain: 3.4
+    tangential_gain: 3.6
+    damping_gain: 9.2
+    band_in: 1.35
+    band_out: 2.00
+    stop_in_band: true
+    fire_frac: 0.65
+    bang_bang: false
+    min_coast_steps: 2
+    min_burst_steps: 2
+    a_cap_scale: 1.00
+    thrust_map: linear
+    T_range: [100.0, 150.0]
+    A_range: [0.03, 0.09]
+
+  expert_fast:
+    radial_gain: 3.7
+    tangential_gain: 3.9
+    damping_gain: 9.2
+    band_in: 1.38
+    band_out: 2.08
+    stop_in_band: true
+    fire_frac: 0.76
+    bang_bang: false
+    min_coast_steps: 2
+    min_burst_steps: 1
+    a_cap_scale: 1.14
+    thrust_map: linear
+    T_range: [100.0, 150.0]
+    A_range: [0.03, 0.09]
