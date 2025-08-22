@@ -1,8 +1,7 @@
-# script/run_baseline_complex.py
 """
 Baseline runner for orbit tasks.
 
-Chinese note:
+ note:
 - This script scans a tasks directory, derives task_ids from filenames,
   runs a set of "controllers" (lightweight policy stubs) for each task,
   evaluates results with eval_orbit.score, prints logs, and writes a CSV.
@@ -14,7 +13,6 @@ How to run (PowerShell example):
     --controllers expert:elliptic expert:elliptic_strong expert:elliptic_ecc expert:transfer expert:transfer_2phase random
 
 Important:
-- Code and comments are in ENGLISH as requested.
 - This runner does NOT depend on any external simulator. It synthesizes
   plausible final states from the task_id (circular/elliptic/transfer),
   then adds small controller-dependent noise so that evaluation produces
@@ -42,14 +40,14 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 
-# ----- import the scoring function (keep both relative and absolute paths) -----
+# import the scoring function (keep both relative and absolute paths)
 try:
     from .eval_orbit import score as score_orbit
 except ImportError:
     from eval_orbit import score as score_orbit
 
 
-# --------------------------- task id parsing helpers ---------------------------
+# task id parsing helpers
 
 _NUM = r"[0-9]+(?:p[0-9]+)?(?:e[+\-]?[0-9]+)?|[0-9]+(?:\.[0-9]+)?(?:e[+\-]?[0-9]+)?"
 _RX_CIRC = re.compile(r"(?:^|_)c(?:irc|ircular)_r_(" + _NUM + ")", re.IGNORECASE)
@@ -83,7 +81,7 @@ def parse_transfer_r1_r2(task_id: str) -> Optional[Tuple[float, float]]:
     return _to_float(m.group(1)), _to_float(m.group(2))
 
 
-# ------------------------------ math utilities --------------------------------
+# math utilities
 
 def circ_vel(mu: float, r: float) -> float:
     """Orbital speed for a circular orbit at radius r."""
@@ -94,7 +92,7 @@ def vis_viva(mu: float, r: float, a: float) -> float:
     return math.sqrt(mu * (2.0 / r - 1.0 / a))
 
 
-# ----------------------------- controller config ------------------------------
+# controller config
 
 @dataclass(frozen=True)
 class ControllerSpec:
@@ -116,7 +114,7 @@ def normalize_controller_list(ctrls: Iterable[str]) -> List[ControllerSpec]:
     return out
 
 
-# -------------------------- synthetic rollout (stub) ---------------------------
+# synthetic rollout (stub)
 
 def seed_from(task_id: str, controller: ControllerSpec) -> int:
     """Deterministic seed from task_id + controller for reproducible noise."""
@@ -261,7 +259,7 @@ def simulate_with_controller(task_id: str, mu: float, controller: ControllerSpec
     return r_end, v_end, ret
 
 
-# ------------------------------- task discovery --------------------------------
+# task discovery
 
 def discover_task_ids(tasks_dir: Path) -> List[str]:
     """
@@ -284,7 +282,7 @@ def discover_task_ids(tasks_dir: Path) -> List[str]:
     return task_ids
 
 
-# --------------------------------- main runner ---------------------------------
+# main runner
 
 def print_wire_lines(controller: ControllerSpec):
     """Emit 'wire' lines matching your previous logs when applicable."""
@@ -354,7 +352,7 @@ def main(args: argparse.Namespace) -> int:
     return 0
 
 
-# --------------------------------- CLI parsing ---------------------------------
+# CLI parsing
 
 def build_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Baseline complex orbit runner (code in English).")
