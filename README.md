@@ -1,4 +1,4 @@
-# 🚀 AI-Controlled Spacecraft Orbital Simulator
+# AI-Controlled Spacecraft Orbital Simulator
 
 An open-source project exploring **AI-driven thrust control for orbital dynamics**.  
 The system integrates a custom 2-D orbital environment, multiple controllers (expert, imitation, PPO),  
@@ -6,7 +6,7 @@ and a baseline benchmarking pipeline designed for long-term reproducibility and 
 
 ---
 
-## 📌 Project Overview
+## Project Overview
 - **Goal:** Develop and benchmark AI controllers for spacecraft thrust control under realistic orbital dynamics.  
 - **Features:**
   - Custom `OrbitEnv` (Gymnasium-compatible) with solar-scale orbits.
@@ -16,7 +16,7 @@ and a baseline benchmarking pipeline designed for long-term reproducibility and 
 
 ---
 
-## 🏗️ Repository Structure
+## Repository Structure
 
 ```text
 spacecraft_ai_project/
@@ -50,7 +50,7 @@ pip install numpy matplotlib torch scikit-learn gymnasium
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 Run a baseline evaluation with expert controllers:
 
@@ -70,7 +70,7 @@ python tools/day39_quickrun.py \
 
 ---
 
-## 📊 Results & Figures
+## Results & Figures
 
 ### Example Outputs
 ```markdown
@@ -84,7 +84,7 @@ python tools/day39_quickrun.py \
 
 ---
 
-## 📖 Project History
+## Project History
 
 This project has been developed over a 40-day logbook, gradually evolving from basic orbit simulation to complex multi-task controllers with expert and baseline comparisons. Key milestones:
 
@@ -127,7 +127,7 @@ This project has been developed over a 40-day logbook, gradually evolving from b
 
 ---
 
-## 🔮 Next Steps
+## Next Steps
 - Hybrid **Imitation + PPO** initialization for faster RL convergence.
 - Curriculum training with multi-orbit and higher eccentricity tasks.
 - Robustness experiments under fuel faults and attitude noise.
@@ -135,5 +135,5 @@ This project has been developed over a 40-day logbook, gradually evolving from b
 
 ---
 
-## 📜 License
+## License
 This project is licensed under the terms of the [MIT License](LICENSE).
