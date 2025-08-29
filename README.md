@@ -35,7 +35,7 @@ spacecraft_ai_project/
 
 ---
 
-## ⚙️ Installation
+## Installation
 
 ### Requirements
 - Python 3.10+
