@@ -1,20 +1,53 @@
 # Weekday smoke check runner (no logs/commits)
 # - Treat pytest exit code 0 (success) and 5 (no tests collected) as pass.
 # - Fallback prefers simulator.MultiOrbitEnv + SimConfig; gracefully degrades to envs.* if present.
-# - Headless-safe (forces MPLBACKEND=Agg) and doesn't write files or show plots.
+# - Headless-safe (forces MPLBACKEND=Agg). Does not write files or show plots.
+# - Injects pytest warning filters to silence common matplotlib warnings seen in CI.
+
+from __future__ import annotations
 
 import os
 import sys
 import subprocess
+from typing import List, Optional
 
-def run(cmd: list[str]) -> int:
+
+# Common matplotlib warnings seen in headless/CI runs
+# We pass these as -W filters to pytest via PYTEST_ADDOPTS so they apply inside the subprocess.
+PYTEST_WARNING_FILTERS: List[str] = [
+    # FigureCanvasAgg is non-interactive warning when plt.show() is called under Agg
+    'ignore:.*FigureCanvasAgg is non-interactive.*:UserWarning',
+    # Legend "best" placement can be slow warning
+    'ignore:.*Creating legend with loc="best" can be slow.*:UserWarning',
+]
+
+
+def ensure_headless_env(env: Optional[dict] = None) -> dict:
+    """Return a copy of os.environ with headless-safe settings and pytest warning filters."""
+    new_env = dict(os.environ if env is None else env)
+
+    # Force headless backend for matplotlib
+    new_env.setdefault("MPLBACKEND", "Agg")
+
+    # Build PYTEST_ADDOPTS with our warning filters while preserving user-provided flags
+    existing_opts = new_env.get("PYTEST_ADDOPTS", "").strip()
+    filters = " ".join(f'-W "{f}"' for f in PYTEST_WARNING_FILTERS)
+    combined = f"{existing_opts} {filters}".strip() if existing_opts else filters
+    if combined:
+        new_env["PYTEST_ADDOPTS"] = combined
+
+    return new_env
+
+
+def run(cmd: List[str], env: Optional[dict] = None) -> int:
     """Run a command and return its exit code."""
     print(f"[SMOKE] $ {' '.join(cmd)}")
     try:
-        return subprocess.call(cmd)
+        return subprocess.call(cmd, env=env)
     except FileNotFoundError:
         # Python -m pytest not available or venv broken
         return 127
+
 
 def make_zero_action(env):
     """Build a zero action compatible with the env if possible."""
@@ -32,7 +65,8 @@ def make_zero_action(env):
     # Fallback: 2-D thrust vector
     return np.array([0.0, 0.0], dtype=np.float32)
 
-def fallback_simulator_path():
+
+def fallback_simulator_path() -> int:
     """
     Try to construct MultiOrbitEnv from the 'simulator' package first (our new layout),
     then gracefully fall back to 'envs' if needed.
@@ -45,9 +79,12 @@ def fallback_simulator_path():
         from simulator.config import SimConfig
         from envs.multi_orbit_env import MultiOrbitEnv
         cfg = SimConfig(mu=3.986e14, dt=1.0, max_steps=8, render_debug=False)
-        env = MultiOrbitEnv(cfg)  # default TaskSampler inside
+        env = MultiOrbitEnv(cfg)  # default TaskSampler inside (if your ctor does this)
         # Prefer legacy-compatible reset to cover old tests
-        env.reset_to_circular(r0=1.0e7, mass=720.0)
+        if hasattr(env, "reset_to_circular"):
+            env.reset_to_circular(r0=1.0e7, mass=720.0)
+        else:
+            env.reset()
         action = make_zero_action(env)
         _ = env.step(action)
         print("[SMOKE] fallback (simulator.*) quick check passed ✓")
@@ -91,17 +128,15 @@ def fallback_simulator_path():
 
         # Reset and step in a robust way
         try:
-            obs = env.reset()
+            _ = env.reset()
         except Exception:
             # Some legacy tests expect reset_to_circular
             if hasattr(env, "reset_to_circular"):
-                obs = env.reset_to_circular(r0=1.0e7, mass=720.0)
+                _ = env.reset_to_circular(r0=1.0e7, mass=720.0)
+            elif hasattr(env, "reset_circular"):
+                _ = env.reset_circular(1.0e7, 720.0)
             else:
-                # Try a method named reset_circular or similar
-                if hasattr(env, "reset_circular"):
-                    obs = env.reset_circular(1.0e7, 720.0)
-                else:
-                    raise
+                raise
 
         action = make_zero_action(env)
         _ = env.step(action)
@@ -111,9 +146,12 @@ def fallback_simulator_path():
         print(f"[SMOKE] envs.* path failed: {e_legacy}")
         return 1
 
-def main():
+
+def main() -> None:
+    env = ensure_headless_env()
+
     # 1) Try pytest -q if available
-    code = run([sys.executable, "-m", "pytest", "-q"])
+    code = run([sys.executable, "-m", "pytest", "-q"], env=env)
 
     # Pytest exit codes of interest:
     # 0 = all tests passed, 5 = no tests collected (acceptable for smoke)
@@ -130,6 +168,7 @@ def main():
     else:
         print("[SMOKE] fallback quick check failed ✗")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
