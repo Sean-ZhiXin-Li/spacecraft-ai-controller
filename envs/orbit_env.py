@@ -189,26 +189,59 @@ class OrbitEnv(gym.Env):
         self.steps = 0
         self.success_counter = 0
 
-    # --------------------------------------------------------------------------
     # GYM API
-    # --------------------------------------------------------------------------
+
     def reset(self,
               *,
               seed: Optional[int] = None,
               options: Optional[dict] = None,
-              start_mode: str = "default") -> Tuple[ObsType, dict]:
+              start_mode: str = "default",
+              **cfg) -> Tuple[ObsType, dict]:
         """
         Reset the environment state.
 
-        Args:
-            seed: optional seed forwarded to Gym base reset (does not seed NumPy here).
-            options: reserved for future use.
-            start_mode: "default" or "spiral" (demo presets). For task-driven setups,
-                        prefer calling set_initial_state() and then reset().
-
-        Returns:
-            observation (np.ndarray), info (dict)
+        Day48 compatibility:
+        - Accept extra keys (mu, body_radius, sc_mass, r0, v0, ecc, inc, name, notes).
+        - Map them onto this env's parameters (G, M, mass, target_radius, etc.).
+          * mu        -> overrides GM (and M accordingly)
+          * sc_mass   -> mass
+          * r0        -> target_radius (used by tolerance window and v_circ references)
+          * others    -> ignored for now (safe)
+        - We DO NOT force-init pos/vel from v0 here; you keep your start_mode logic.
         """
+        # ---------- Day48 param mapping (safe, optional) ----------
+        # mu (GM) override: if provided, recompute M = mu / G and cache mu as well
+        if "mu" in cfg and cfg["mu"] is not None:
+            try:
+                self.mu = float(cfg["mu"])
+                # keep M consistent with mu and G for your reward/diagnostics
+                self.M = float(self.mu / self.G) if self.G != 0.0 else self.M
+            except Exception:
+                pass
+
+        # body_radius is not used in this env's physics; ignore safely
+        # if "body_radius" in cfg: _ = cfg["body_radius"]
+
+        # spacecraft mass
+        if "sc_mass" in cfg and cfg["sc_mass"] is not None:
+            try:
+                self.mass = float(cfg["sc_mass"])
+            except Exception:
+                pass
+
+        # target orbit radius (used by tolerance and v_circ references)
+        if "r0" in cfg and cfg["r0"] is not None:
+            try:
+                self.target_radius = float(cfg["r0"])
+            except Exception:
+                pass
+
+        # v0/ecc/inc/name/notes are ignored here (you can wire them later if needed)
+        # -----------------------------------------------------------
+
+        # Keep mu consistent in case user changed G or M elsewhere
+        self.mu = self.G * self.M if not hasattr(self, "mu") else (self.mu if self.mu == self.G * self.M else self.mu)
+
         super().reset(seed=seed)
         self.steps = 0
         self.success_counter = 0
@@ -231,6 +264,43 @@ class OrbitEnv(gym.Env):
             raise ValueError(f"Unknown start_mode: {start_mode}")
 
         return self._get_obs(), {}
+
+    def apply_delta_v(self, dv: float) -> None:
+        """
+        Apply an instantaneous tangential impulse of magnitude `dv` [m/s] at the current state.
+        - Direction: perpendicular to the radial vector, aligned with current tangential motion.
+        - This is a minimal, physically reasonable implementation for Day48.
+          (Later you can extend it to support arbitrary impulse directions.)
+        """
+        # Need a valid state
+        r_vec = self.pos.astype(float)
+        v_vec = self.vel.astype(float)
+        r = np.linalg.norm(r_vec)
+        if r < 1e-12:
+            return  # undefined tangential direction at the origin
+
+        # Unit radial vector
+        ur = r_vec / r
+
+        # Two perpendicular tangential directions: [-ur_y, ur_x] and its negative
+        t = np.array([-ur[1], ur[0]], dtype=float)
+
+        # Choose the direction aligned with current tangential velocity component
+        if np.dot(v_vec, t) < 0.0:
+            t = -t
+
+        # Instantaneous velocity change
+        self.vel = self.vel + float(dv) * t
+
+    def action_space_sample(self) -> np.ndarray:
+        """
+        Convenience helper so wrappers can derive a zero-like action safely.
+        """
+        try:
+            a = self.action_space.sample()
+            return np.zeros_like(a)
+        except Exception:
+            return np.zeros(2, dtype=np.float32)
 
     def _get_obs(self) -> np.ndarray:
         """Return observation as [x, y, vx, vy]."""
