@@ -2,28 +2,47 @@ from dataclasses import asdict
 from typing import Dict, Any, Optional, Tuple
 import math
 import numpy as np
+from typing import Any, Dict, Optional, Union
+import inspect
 
 from .orbit_presets import PRESET_MAP, OrbitParams, v_circ
 from .orbit_env import OrbitEnv  # your existing env
 
 class MultiOrbitEnv:
     def __init__(self,
-                 scenario: str = "circular",
+                 scenario: Union[str, Any] = "circular",
                  preset_overrides: Optional[Dict[str, Any]] = None):
         """
-        Wrapper that selects a scenario preset and configures the inner OrbitEnv.
-        - scenario: 'circular' | 'elliptic' | 'transfer'
-        - preset_overrides: shallow dict to override fields in the preset
+        Accept either:
+        - scenario name string (e.g., "circular"), or
+        - a config object/dict (e.g., SimConfig) carrying fields like mu/dt/max_steps.
+        In the latter case, we convert it to (scenario_name + overrides) and continue.
         """
-        if scenario not in PRESET_MAP:
-            raise ValueError(f"Unknown scenario: {scenario}")
-        self.scenario_name = scenario
-        params = PRESET_MAP[scenario]
-        if preset_overrides:
-            params = OrbitParams(**{**asdict(params), **preset_overrides})
-        self.params = params
-        self.env = OrbitEnv()
-        self.episode_stats: Dict[str, Any] = {}
+        # Normalize overrides dict
+        overrides: Dict[str, Any] = dict(preset_overrides or {})
+
+        # If a config object/dict is passed instead of a scenario string, extract fields.
+        if not isinstance(scenario, str):
+            cfg_obj = scenario
+            # 1) pick a scenario name if provided; else default to "circular"
+            scenario_name = getattr(cfg_obj, "scenario", "circular")
+
+            # 2) collect known fields from cfg (either dataclass-like or dict)
+            known_keys = ("mu", "dt", "max_steps", "target_radius", "seed")
+            if isinstance(cfg_obj, dict):
+                for k in known_keys:
+                    if k in cfg_obj and cfg_obj[k] is not None:
+                        overrides[k] = cfg_obj[k]
+            else:
+                for k in known_keys:
+                    if hasattr(cfg_obj, k):
+                        v = getattr(cfg_obj, k)
+                        if v is not None:
+                            overrides[k] = v
+
+            # replace incoming `scenario` with normalized string; carry merged overrides
+            scenario = scenario_name
+            preset_overrides = overrides
 
     # --- Hohmann transfer helper (Δv1 at r1) ---
     def _hohmann_delta_v1(self, mu: float, r1: float, r2: float) -> float:
