@@ -1,0 +1,13 @@
+﻿python.exe : usage: replay_recorder.py [-h] --env-factory ENV_FACTORY [--policy POLICY]
+所在位置 行:16 字符: 10
++   $out = & python @args 2>&1
++          ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (usage: replay_r...-policy POLICY]:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                          [--preset PRESET] [--scene SCENE] [--steps STEPS]
+                          [--seed SEED] --out OUT [--scenario SCENARIO]
+                          [--extra-kv EXTRA_KV] [--extra EXTRA]
+                          [--record-info-keys RECORD_INFO_KEYS]
+                          [--dtype {float32,float64}]
+replay_recorder.py: error: the following arguments are required: --out
