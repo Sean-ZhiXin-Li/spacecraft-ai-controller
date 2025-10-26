@@ -1,0 +1,19 @@
+{
+  "created_at": "2025-10-10 13:59:24",
+  "commit": "225ac7d",
+  "seed": 54,
+  "preset": null,
+  "scene": null,
+  "steps_recorded": 200,
+  "env_factory": "envs.multi_orbit_env:MultiOrbitEnv",
+  "policy": "controller.expert_controller:policy",
+  "dtype": "float64",
+  "info_keys": [],
+  "extra": {
+    "scenario": "spiral_in",
+    "preset_overrides": {
+      "family": "spiral_in"
+    }
+  },
+  "format_version": "day51.v1"
+}
