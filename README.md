@@ -127,6 +127,19 @@ This project has been developed over a 40-day logbook, gradually evolving from b
 
 ---
 
+## Naming Convention (since NEW_WEEK_0)
+
+- All research stages are named as `NEW_WEEK_X` (e.g., NEW_WEEK_0, NEW_WEEK_1, NEW_WEEK_2),
+  representing distinct development phases of the spacecraft AI controller project.
+- Each stage includes:
+  - `/docs/NEW_WEEK_X_*.md` — formal report
+  - `/analysis/NEW_WEEK_X_*.md` — mapping or supporting tables
+  - `/logs/new_week_X/` — experimental data (may contain DayXX runs)
+- "DayXX" is used only to tag experimental runs inside `/logs/` or `ProjectLog.md`.
+  It does **not** represent a new research stage.
+
+---
+
 ## Next Steps
 - Hybrid **Imitation + PPO** initialization for faster RL convergence.
 - Curriculum training with multi-orbit and higher eccentricity tasks.
