@@ -118,7 +118,7 @@ This project has been developed over a 40-day logbook, gradually evolving from b
 ### Phase 5 – Complex Environment & Quickruns (Day 36–39)
 
 
-## 🚀 Extended Development Phases (Phase 6–10)
+## Extended Development Phases (Phase 6–10)
 
 ### **Phase 6 — Multi-Orbit Integration**
 Developed `MultiOrbitEnv` supporting *Circular*, *Elliptic*, *Transfer*, and *Two-Phase Transfer* tasks. Unified interfaces and failure logging for cross-task comparison.
@@ -161,7 +161,7 @@ Derived energy-based metrics and angular momentum efficiency. Built `energy_view
 
 ---
 
-## 🚀 Next Steps
+## Next Steps
 
 ### Immediate Objectives (Phase 1–2)
 - **Hybrid Imitation + PPO Initialization**
@@ -258,7 +258,7 @@ This project integrates insights from **global research institutions and aerospa
 
 ---
 
-## 📊 Quantitative Results
+## Quantitative Results
 
 | Scenario | Controller | Reward | Final Orbit Error | Δv₁ (m/s) | Notes |
 |-----------|-------------|--------|------------------|-----------|-------|
@@ -269,7 +269,7 @@ This project integrates insights from **global research institutions and aerospa
 
 ---
 
-### 🧠 Interpretation
+### Interpretation
 
 - Expert controller achieved **100% stable convergence** in circular and elliptic orbits.  
 - Transfer and spiral-in tasks show delayed convergence due to **thrust-energy conversion inefficiency** and **angular momentum misalignment**.  
