@@ -116,6 +116,27 @@ This project has been developed over a 40-day logbook, gradually evolving from b
 - Day 35: baseline phase consolidated → Zero (lower bound), Greedy (mid-baseline), Expert (upper bound).
 
 ### Phase 5 – Complex Environment & Quickruns (Day 36–39)
+
+
+## 🚀 Extended Development Phases (Phase 6–10)
+
+### **Phase 6 — Multi-Orbit Integration**
+Developed `MultiOrbitEnv` supporting *Circular*, *Elliptic*, *Transfer*, and *Two-Phase Transfer* tasks. Unified interfaces and failure logging for cross-task comparison.
+
+### **Phase 7 — Replay & Quickrun Validation**
+Implemented record/replay pipeline and “quickrun” mode for rapid verification. Established reproducible evaluation and debugging baselines.
+
+### **Phase 8 — Robustness Experiments**
+Performed multi-orbit comparative tests with expert controller under fuel faults and attitude noise. Built a fault-case library for robustness benchmarking.
+
+### **Phase 9 — Metric Baseline (Week 0)**
+Created the first quantitative metric framework: steady-state error, convergence speed, oscillation index, and thrust saturation.  
+Implemented `metrics_core.py` and `compute_metrics.py` with statistical aggregation.
+
+### **Phase 10 — Energy & Momentum Analysis (Week 1)**
+Derived energy-based metrics and angular momentum efficiency. Built `energy_view.py` for trajectory-level energy flow visualization and physical interpretability.
+
+
 - Generated **fast task bundles** (circular, elliptic, transfer).
 - Verified expert families (`elliptic_strong`, `transfer_2phase`, `spiral_in`) on large radii:
   - Circular: consistently solved.
@@ -237,6 +258,85 @@ This project integrates insights from **global research institutions and aerospa
 
 ---
 
+## 📊 Quantitative Results
+
+| Scenario | Controller | Reward | Final Orbit Error | Δv₁ (m/s) | Notes |
+|-----------|-------------|--------|------------------|-----------|-------|
+| Circular | Expert v3.1 | −1541.7 | 0.25 | 0 | Stable baseline |
+| Elliptic | Expert v3.1 | −1541.7 | 0.25 | 0 | Stable circular-like performance |
+| Transfer (2-Phase) | Expert v3.1 | −2769.1 | 0.25↑ | ≈563 | Δv₁ matches Hohmann transfer theory |
+| Spiral-In | Expert v3.1 | −1503 | 0.31 | – | Energy deviation +38.9% |
+
+---
+
+### 🧠 Interpretation
+
+- Expert controller achieved **100% stable convergence** in circular and elliptic orbits.  
+- Transfer and spiral-in tasks show delayed convergence due to **thrust-energy conversion inefficiency** and **angular momentum misalignment**.  
+- Week 0 metrics indicate **~23% thrust saturation**, suggesting sufficient but not overpowered actuation.  
+- Week 1 analysis found **energy convergence efficiency η ≈ 2.8%**, motivating reward redesign for faster orbit capture.
+
+---
+
+## Research Vision / Scientific Outlook
+
+- **Energy-Based Reward Shaping** — Dynamically adjust reward terms based on instantaneous energy deviation to balance fuel efficiency and stability.  
+- **Hybrid Imitation + PPO Curriculum** — Pre-train with expert trajectories, then fine-tune using reinforcement learning for adaptive thrust modulation.  
+- **3D Inclination & Multi-Agent Formation** — Introduce multi-satellite cooperation and distributed thrust coordination, aligning with SLAB’s formation-flying vision.  
+- **Hardware-in-the-Loop Testing** — Deploy control policies onto embedded platforms (Arduino / ROS2) for real-world thrust simulation.
+
+---
+
+## References
+
+- Stanford Space Rendezvous Laboratory (SLAB) — *Distributed Space Systems, Formation-Flying, and Docking*  
+- ESA Advanced Concepts Team — *AI for Autonomous Exploration and GN&C*  
+- New Frontier Aerospace — *Full-flow staged combustion Mjölnir engine*  
+- “Towards Robust Spacecraft Trajectory Optimization via Transformers” (arXiv 2024)  
+- “On Scaling of Hall-Effect Thrusters Using Neural Nets” (arXiv 2022)  
+- “Photonic Lightsails: Fast and Stable Propulsion for Interstellar Travel” (arXiv 2025)
+
+---
+
+## Inspirations
+
+This project draws conceptual influence from:
+- **Stanford University — SLAB (Space Rendezvous Lab)** for formation flying and distributed autonomy.  
+- **NASA JPL Autonomous Systems Division** for deep-space fault-tolerant navigation.  
+- **ESA ACT** for theoretical work on AI-enabled trajectory optimization.  
+- **New Frontier Aerospace (NFAero)** for propulsion innovation inspiring future “hybrid thrust” simulation modes.
+
+---
+
+## How to Cite
+
+```bibtex
+@misc{li2025spacecraft,
+  title  = {AI-Controlled Spacecraft Propulsion and Orbital Dynamics Simulator},
+  author = {Li, Zhixin (Sean)},
+  year   = {2025},
+  note   = {GitHub repository: https://github.com/Sean-ZhiXin-Li/spacecraft-ai-controller}
+}
+```
+
+---
+
+## Collaboration & Contact
+
+This project is continuously evolving.  
+If you are working on **AI propulsion, orbital control, or spacecraft autonomy**, collaboration and academic exchange are warmly welcomed.
+
+ **Contact:** [GitHub Issues](https://github.com/Sean-ZhiXin-Li/spacecraft-ai-controller/issues)
+
+---
+
+### Acknowledgment
+
+Inspired by Stanford Engineering’s pursuit of *“Intelligence Beyond Earth.”*  
+This repository represents a continuous journey toward understanding how **AI can extend the reach of spacecraft long after contact is lost**.
+
+---
+
 > *This repository embodies a cross-disciplinary exploration — combining physics, control theory, and artificial intelligence —
 >  to prototype the next generation of intelligent spacecraft propulsion systems.*
 
@@ -247,3 +347,5 @@ This project integrates insights from **global research institutions and aerospa
 
 ## License
 This project is licensed under the terms of the [MIT License](LICENSE).
+
+---
