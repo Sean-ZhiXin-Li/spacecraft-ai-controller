@@ -332,7 +332,7 @@ If you are working on **AI propulsion, orbital control, or spacecraft autonomy**
 
 ### Acknowledgment
 
-Inspired by Stanford Engineering’s pursuit of *“Intelligence Beyond Earth.”*  
+Inspired by Stanford Engineering’s vision of enabling “Intelligence Beyond Earth” through autonomous spacecraft and AI-driven control systems.
 This repository represents a continuous journey toward understanding how **AI can extend the reach of spacecraft long after contact is lost**.
 
 ---
