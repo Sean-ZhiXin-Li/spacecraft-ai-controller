@@ -80,8 +80,6 @@ python tools/day39_quickrun.py \
 ![Example Trajectory](plots/example_trajectory.png)
 ```
 
-(Replace paths with actual available figures in your repo.)
-
 ---
 
 ## Project History
@@ -324,7 +322,7 @@ This project draws conceptual influence from:
 ## Collaboration & Contact
 
 This project is continuously evolving.  
-If you are working on **AI propulsion, orbital control, or spacecraft autonomy**, collaboration and academic exchange are warmly welcomed.
+If you are working on **AI propulsion, orbital control, or spacecraft autonomy**, academic exchange are warmly welcomed.
 
  **Contact:** [GitHub Issues](https://github.com/Sean-ZhiXin-Li/spacecraft-ai-controller/issues)
 
