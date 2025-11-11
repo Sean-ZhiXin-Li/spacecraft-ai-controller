@@ -175,6 +175,12 @@ This vision synthesizes reinforcement learning, astrodynamics, and control theor
 
 ---
 
+## Related Document
+
+For a detailed philosophical and technical vision behind this project, see  
+ [Inspiration Log — From Autonomous Propulsion to Cosmic Intelligence](project_log/inspiration_2025_11_11.md)
+
+
 ## References & Inspirations
 
 * **Stanford University** — Space Rendezvous Laboratory (SLAB) and CAESAR, research on distributed autonomy and AI-guided control.
