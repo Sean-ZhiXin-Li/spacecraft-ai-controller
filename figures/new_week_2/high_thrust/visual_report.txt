@@ -1,0 +1,10 @@
+Title: NEW_WEEK_1 high_thrust
+Replay: logs/new_week_1/spiral_in/high_thrust/replay.npz
+Metrics: logs/new_week_1/spiral_in/high_thrust/metrics_energy.json
+Outputs:
+- figures/new_week_2/high_thrust\orbit_xy.png
+- figures/new_week_2/high_thrust\radial_error.png
+- figures/new_week_2/high_thrust\thrust_hist.png
+- figures/new_week_2/high_thrust\energy_summary.png
+
+Visual Verdict: FAIL (slow/unstable or drifted)
