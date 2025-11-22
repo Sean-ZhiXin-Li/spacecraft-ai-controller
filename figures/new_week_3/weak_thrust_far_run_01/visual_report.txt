@@ -1,0 +1,10 @@
+Title: NEW_WEEK_3 weak_thrust_far run_01
+Replay: logs/new_week_3/weak_thrust_far/run_01/replay.npz
+Metrics: logs/new_week_3/weak_thrust_far/run_01/metrics_energy.json
+Outputs:
+- figures/new_week_3/weak_thrust_far_run_01\orbit_xy.png
+- figures/new_week_3/weak_thrust_far_run_01\radial_error.png
+- figures/new_week_3/weak_thrust_far_run_01\thrust_hist.png
+- figures/new_week_3/weak_thrust_far_run_01\energy_summary.png
+
+Visual Verdict: FAIL (slow/unstable or drifted)

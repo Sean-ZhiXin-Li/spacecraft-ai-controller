@@ -5,14 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/analysis/NEW_WEEK_2_visual_criteria.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/diagnostics/diag_orbit.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/diagnostics/fig_helpers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/spacecraft_ai_project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/spacecraft_ai_project.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/analysis/NEW_WEEK_3_failure_catalog.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools/testing/stress_battery.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -47,20 +41,24 @@
   &quot;associatedIndex&quot;: 8
 }</component>
   <component name="ProjectId" id="35YC2m3o5OzZWqWLS2KAyAQqPeI" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.diag_orbit.executor&quot;: &quot;Run&quot;,
-    &quot;Python.fig_helpers.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.diag_orbit.executor": "Run",
+    "Python.fig_helpers.executor": "Run",
+    "Python.stress_battery.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main"
   }
-}</component>
-  <component name="RunManager" selected="Python.diag_orbit">
+}]]></component>
+  <component name="RunManager" selected="Python.stress_battery">
     <configuration name="diag_orbit" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
@@ -105,12 +103,36 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="stress_battery" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="spacecraft_ai_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/testing/stress_battery.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <list>
+      <item itemvalue="Python.stress_battery" />
       <item itemvalue="Python.diag_orbit" />
       <item itemvalue="Python.fig_helpers" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.stress_battery" />
         <item itemvalue="Python.diag_orbit" />
         <item itemvalue="Python.fig_helpers" />
       </list>
