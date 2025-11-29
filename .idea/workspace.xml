@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/analysis/NEW_WEEK_3_failure_catalog.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/testing/stress_battery.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/analysis/WEEK4_controller_notes.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/controller/expert_controller_improved.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/project_log/NEW_WEEK_PROJECT_LOG_04.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/quick_compare_v3_v4.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/smoke_test_v4.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -51,14 +54,23 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Python.diag_orbit.executor": "Run",
+    "Python.expert_controller_improved.executor": "Run",
     "Python.fig_helpers.executor": "Run",
+    "Python.quick_compare_v3_v4.executor": "Run",
+    "Python.smoke_test_v4.executor": "Run",
     "Python.stress_battery.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main"
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "E:/spacecraft_ai_project/controller"
   }
 }]]></component>
-  <component name="RunManager" selected="Python.stress_battery">
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\spacecraft_ai_project\controller" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.quick_compare_v3_v4">
     <configuration name="diag_orbit" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
@@ -81,6 +93,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="expert_controller_improved" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="spacecraft_ai_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/controller/expert_controller_improved.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="fig_helpers" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
@@ -95,6 +129,50 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/diagnostics/fig_helpers.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="quick_compare_v3_v4" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="spacecraft_ai_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/quick_compare_v3_v4.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="smoke_test_v4" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="spacecraft_ai_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/smoke_test_v4.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -126,12 +204,16 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.stress_battery" />
+      <item itemvalue="Python.smoke_test_v4" />
+      <item itemvalue="Python.expert_controller_improved" />
+      <item itemvalue="Python.quick_compare_v3_v4" />
       <item itemvalue="Python.diag_orbit" />
       <item itemvalue="Python.fig_helpers" />
+      <item itemvalue="Python.stress_battery" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.quick_compare_v3_v4" />
         <item itemvalue="Python.stress_battery" />
         <item itemvalue="Python.diag_orbit" />
         <item itemvalue="Python.fig_helpers" />
