@@ -5,11 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/analysis/WEEK4_controller_notes.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controller/expert_controller_improved.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/project_log/NEW_WEEK_PROJECT_LOG_04.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/quick_compare_v3_v4.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/smoke_test_v4.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/analysis/CONTROLLER_HISTORY.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/analysis/WEEK5_comparison_table.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools/plots/batch_plot_all.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tools/plots/plot_radius_vs_time.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -53,9 +54,11 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.batch_plot_all.executor": "Run",
     "Python.diag_orbit.executor": "Run",
     "Python.expert_controller_improved.executor": "Run",
     "Python.fig_helpers.executor": "Run",
+    "Python.plot_radius_vs_time.executor": "Run",
     "Python.quick_compare_v3_v4.executor": "Run",
     "Python.smoke_test_v4.executor": "Run",
     "Python.stress_battery.executor": "Run",
@@ -70,7 +73,29 @@
       <recent name="E:\spacecraft_ai_project\controller" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.quick_compare_v3_v4">
+  <component name="RunManager" selected="Python.batch_plot_all">
+    <configuration name="batch_plot_all" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="spacecraft_ai_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/plots/batch_plot_all.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="diag_orbit" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
@@ -115,7 +140,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="fig_helpers" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="plot_radius_vs_time" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -128,7 +153,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/diagnostics/fig_helpers.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/plots/plot_radius_vs_time.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -204,19 +229,21 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.smoke_test_v4" />
       <item itemvalue="Python.expert_controller_improved" />
-      <item itemvalue="Python.quick_compare_v3_v4" />
+      <item itemvalue="Python.smoke_test_v4" />
+      <item itemvalue="Python.batch_plot_all" />
+      <item itemvalue="Python.plot_radius_vs_time" />
       <item itemvalue="Python.diag_orbit" />
-      <item itemvalue="Python.fig_helpers" />
+      <item itemvalue="Python.quick_compare_v3_v4" />
       <item itemvalue="Python.stress_battery" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.batch_plot_all" />
+        <item itemvalue="Python.plot_radius_vs_time" />
         <item itemvalue="Python.quick_compare_v3_v4" />
         <item itemvalue="Python.stress_battery" />
         <item itemvalue="Python.diag_orbit" />
-        <item itemvalue="Python.fig_helpers" />
       </list>
     </recent_temporary>
   </component>
