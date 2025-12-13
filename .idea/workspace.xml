@@ -5,13 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/analysis/CONTROLLER_HISTORY.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/analysis/WEEK5_comparison_table.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/plots/batch_plot_all.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tools/plots/plot_radius_vs_time.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/analysis/WEEK6_benchmark_summary.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/default.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/expert_controller_improved.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/project_log/NEW_WEEK_PROJECT_LOG_06.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/smoke_test_full_system.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/load_config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/envs/orbit_env.py" beforeDir="false" afterPath="$PROJECT_DIR$/envs/orbit_env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/quick_compare_v3_v4.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/quick_compare_v3_v4.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,8 +60,10 @@
     "Python.diag_orbit.executor": "Run",
     "Python.expert_controller_improved.executor": "Run",
     "Python.fig_helpers.executor": "Run",
+    "Python.load_config.executor": "Run",
     "Python.plot_radius_vs_time.executor": "Run",
     "Python.quick_compare_v3_v4.executor": "Run",
+    "Python.smoke_test_full_system.executor": "Run",
     "Python.smoke_test_v4.executor": "Run",
     "Python.stress_battery.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -73,7 +77,7 @@
       <recent name="E:\spacecraft_ai_project\controller" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.batch_plot_all">
+  <component name="RunManager" selected="Python.smoke_test_full_system">
     <configuration name="batch_plot_all" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
@@ -96,28 +100,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="diag_orbit" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="spacecraft_ai_project" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/diagnostics/diag_orbit.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="expert_controller_improved" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
@@ -132,6 +114,28 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/controller/expert_controller_improved.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="load_config" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="spacecraft_ai_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/utils/load_config.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -184,6 +188,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="smoke_test_full_system" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="spacecraft_ai_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/smoke_test_full_system.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="smoke_test_v4" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
@@ -206,44 +232,22 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="stress_battery" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="spacecraft_ai_project" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/testing/stress_battery.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <list>
       <item itemvalue="Python.expert_controller_improved" />
       <item itemvalue="Python.smoke_test_v4" />
+      <item itemvalue="Python.smoke_test_full_system" />
+      <item itemvalue="Python.load_config" />
       <item itemvalue="Python.batch_plot_all" />
       <item itemvalue="Python.plot_radius_vs_time" />
-      <item itemvalue="Python.diag_orbit" />
       <item itemvalue="Python.quick_compare_v3_v4" />
-      <item itemvalue="Python.stress_battery" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.smoke_test_full_system" />
+        <item itemvalue="Python.load_config" />
         <item itemvalue="Python.batch_plot_all" />
         <item itemvalue="Python.plot_radius_vs_time" />
         <item itemvalue="Python.quick_compare_v3_v4" />
-        <item itemvalue="Python.stress_battery" />
-        <item itemvalue="Python.diag_orbit" />
       </list>
     </recent_temporary>
   </component>

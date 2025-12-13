@@ -302,6 +302,109 @@ class OrbitEnv(gym.Env):
         except Exception:
             return np.zeros(2, dtype=np.float32)
 
+    # STATE SNAPSHOT (for shadow-step / determinism debug)
+    def get_state(self) -> dict:
+        """
+        Return a snapshot of env internal state so we can do a fair
+        A/B test: step(action) vs step(0) from the exact same state.
+
+        NOTE:
+        - Must include everything that can affect dynamics, termination, and reward.
+        - Keep arrays copied to avoid aliasing.
+        """
+        return {
+            # counters
+            "steps": int(self.steps),
+            "success_counter": int(self.success_counter),
+
+            # kinematics
+            "pos": self.pos.copy(),
+            "vel": self.vel.copy(),
+
+            # core physical/task params (affect dynamics + reward)
+            "G": float(self.G),
+            "M": float(self.M),
+            "mu": float(self.mu),  # mu may be overridden independently of G*M
+            "mass": float(self.mass),
+            "dt": float(self.dt),
+            "max_steps": int(self.max_steps),
+            "target_radius": float(self.target_radius),
+            "thrust_scale": float(self.thrust_scale),
+
+            # success/termination params (affect done)
+            "success_threshold": int(self.success_threshold),
+            "tol_r": float(self.tol_r),
+            "tol_v": float(self.tol_v),
+            "tol_ang": float(self.tol_ang),
+
+            # terminal reward params (affect reward)
+            "term_reward_success": float(self.term_reward_success),
+            "term_reward_fail": float(self.term_reward_fail),
+
+            # misc
+            "verbose": bool(self.verbose),
+
+            # derived/diagnostic (optional, but keep it for strict restore)
+            "a_cap": float(self.a_cap) if self.a_cap is not None else None,
+        }
+
+    def set_state(self, state: dict) -> None:
+        """
+        Restore a snapshot produced by get_state().
+        Must restore counters + dynamics + termination + reward-related params.
+        """
+        if not isinstance(state, dict):
+            return
+
+        # counters
+        self.steps = int(state.get("steps", self.steps))
+        self.success_counter = int(state.get("success_counter", self.success_counter))
+
+        # kinematics
+        pos = state.get("pos", None)
+        vel = state.get("vel", None)
+        if pos is not None:
+            self.pos = np.array(pos, dtype=np.float64, copy=True)
+        if vel is not None:
+            self.vel = np.array(vel, dtype=np.float64, copy=True)
+
+        # core physical/task params
+        self.G = float(state.get("G", self.G))
+        self.M = float(state.get("M", self.M))
+        self.mu = float(state.get("mu", self.mu))  # do NOT force mu=G*M here
+        self.mass = float(state.get("mass", self.mass))
+        self.dt = float(state.get("dt", self.dt))
+        self.max_steps = int(state.get("max_steps", self.max_steps))
+        self.target_radius = float(state.get("target_radius", self.target_radius))
+        self.thrust_scale = float(state.get("thrust_scale", self.thrust_scale))
+
+        # success/termination params
+        self.success_threshold = int(state.get("success_threshold", self.success_threshold))
+        self.tol_r = float(state.get("tol_r", self.tol_r))
+        self.tol_v = float(state.get("tol_v", self.tol_v))
+        self.tol_ang = float(state.get("tol_ang", self.tol_ang))
+
+        # terminal reward params
+        self.term_reward_success = float(state.get("term_reward_success", self.term_reward_success))
+        self.term_reward_fail = float(state.get("term_reward_fail", self.term_reward_fail))
+
+        # misc
+        self.verbose = bool(state.get("verbose", self.verbose))
+
+        # derived cap: prefer restoring exact value if provided; otherwise recompute
+        a_cap_saved = state.get("a_cap", None)
+        if a_cap_saved is not None:
+            try:
+                self.a_cap = float(a_cap_saved)
+            except Exception:
+                self.a_cap = None
+        else:
+            try:
+                self.a_cap = self.thrust_scale / self.mass if self.mass > 0.0 else None
+            except Exception:
+                self.a_cap = None
+
+
     def _get_obs(self) -> np.ndarray:
         """Return observation as [x, y, vx, vy]."""
         return np.concatenate([self.pos, self.vel]).astype(np.float32)
@@ -404,6 +507,11 @@ class OrbitEnv(gym.Env):
             "mass": float(self.mass),
             "thrust_scale": float(self.thrust_scale),
             "dt": float(self.dt),
+            "action_clipped": action.astype(np.float32),
+            "thrust_vec": thrust.astype(np.float64),
+            "acc_thrust": acc_thrust.astype(np.float64),
+            "acc_gravity": acc_gravity.astype(np.float64),
+            "acc_total": (acc_gravity + acc_thrust).astype(np.float64)
         }
 
         return self._get_obs(), float(reward), bool(done), info

@@ -1,0 +1,9 @@
+# Global default configuration for OrbitEnv experiments
+
+target_radius: 7.5e12
+spacecraft_mass: 721.9
+thrust_limit: 20.0
+
+simulation:
+  max_steps: 2000
+  dt: 1.0
