@@ -1,0 +1,17 @@
+{
+  "frame": "heliocentric-ecliptic-ish (poliastro default)",
+  "units": {
+    "r": "m",
+    "v": "m/s"
+  },
+  "r_m": [
+    150293570700.00003,
+    0.0,
+    0.0
+  ],
+  "v_m_s": [
+    0.0,
+    29715.676321076153,
+    0.0
+  ]
+}

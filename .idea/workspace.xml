@@ -4,7 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="" />
+    <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/analysis/smoke_full_system.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/ENGINEERING_AND_REPRODUCIBILITY_STATUS.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/spacecraft_ai_project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/spacecraft_ai_project.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/Activate.ps1" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/activate" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/activate.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/deactivate.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/f2py.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/numpy-config.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/pip.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/pip3.10.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/pip3.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/python.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/pythonw.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.venv_orekit/pyvenv.cfg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/envs/orbit_env.py" beforeDir="false" afterPath="$PROJECT_DIR$/envs/orbit_env.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -44,24 +63,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.batch_plot_all.executor&quot;: &quot;Run&quot;,
-    &quot;Python.diag_orbit.executor&quot;: &quot;Run&quot;,
-    &quot;Python.expert_controller_improved.executor&quot;: &quot;Run&quot;,
-    &quot;Python.fig_helpers.executor&quot;: &quot;Run&quot;,
-    &quot;Python.load_config.executor&quot;: &quot;Run&quot;,
-    &quot;Python.plot_radius_vs_time.executor&quot;: &quot;Run&quot;,
-    &quot;Python.quick_compare_v3_v4.executor&quot;: &quot;Run&quot;,
-    &quot;Python.smoke_test_full_system.executor&quot;: &quot;Run&quot;,
-    &quot;Python.smoke_test_v4.executor&quot;: &quot;Run&quot;,
-    &quot;Python.stress_battery.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/spacecraft_ai_project/controller&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.batch_plot_all.executor": "Run",
+    "Python.diag_orbit.executor": "Run",
+    "Python.expert_controller_improved.executor": "Run",
+    "Python.fig_helpers.executor": "Run",
+    "Python.load_config.executor": "Run",
+    "Python.plot_radius_vs_time.executor": "Run",
+    "Python.quick_compare_v3_v4.executor": "Run",
+    "Python.smoke_test_full_system.executor": "Run",
+    "Python.smoke_test_v4.executor": "Run",
+    "Python.stress_battery.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "E:/spacecraft_ai_project/controller",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\spacecraft_ai_project\controller" />
