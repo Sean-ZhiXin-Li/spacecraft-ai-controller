@@ -2,8 +2,16 @@
 
 target_radius: 7.5e12
 spacecraft_mass: 721.9
-thrust_limit: 20.0
+thrust_limit: 20.0   # controller-side thrust magnitude cap (N)
 
 simulation:
   max_steps: 2000
   dt: 1.0
+
+# NEW: actuator mapping (env-side)
+actuation:
+  thrust_scale: 3.0   # N per axis when action=1.0
+
+# NEW: Day2 independent variable (interface-side)
+action_interface:
+  mode: prescale            # raw | prescale

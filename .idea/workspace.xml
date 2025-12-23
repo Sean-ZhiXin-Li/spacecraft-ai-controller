@@ -5,24 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/analysis/smoke_full_system.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/ENGINEERING_AND_REPRODUCIBILITY_STATUS.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/spacecraft_ai_project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/spacecraft_ai_project.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/project_log/CM_LOG_O2.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/action_interface.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/Activate.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/activate" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/activate.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/deactivate.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/f2py.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/numpy-config.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/pip.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/pip3.10.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/pip3.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/python.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.venv_orekit/Scripts/pythonw.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.venv_orekit/pyvenv.cfg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/envs/orbit_env.py" beforeDir="false" afterPath="$PROJECT_DIR$/envs/orbit_env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/default.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/default.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/quick_compare_v3_v4.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/quick_compare_v3_v4.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,6 +52,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.action_interface.executor": "Run",
     "Python.batch_plot_all.executor": "Run",
     "Python.diag_orbit.executor": "Run",
     "Python.expert_controller_improved.executor": "Run",
@@ -87,7 +75,29 @@
       <recent name="E:\spacecraft_ai_project\controller" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.smoke_test_full_system">
+  <component name="RunManager" selected="Python.action_interface">
+    <configuration name="action_interface" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="spacecraft_ai_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/utils/action_interface.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="batch_plot_all" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
@@ -176,28 +186,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="quick_compare_v3_v4" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="spacecraft_ai_project" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/quick_compare_v3_v4.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="smoke_test_full_system" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
@@ -245,19 +233,19 @@
     <list>
       <item itemvalue="Python.expert_controller_improved" />
       <item itemvalue="Python.smoke_test_v4" />
+      <item itemvalue="Python.action_interface" />
       <item itemvalue="Python.smoke_test_full_system" />
       <item itemvalue="Python.load_config" />
       <item itemvalue="Python.batch_plot_all" />
       <item itemvalue="Python.plot_radius_vs_time" />
-      <item itemvalue="Python.quick_compare_v3_v4" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.action_interface" />
         <item itemvalue="Python.smoke_test_full_system" />
         <item itemvalue="Python.load_config" />
         <item itemvalue="Python.batch_plot_all" />
         <item itemvalue="Python.plot_radius_vs_time" />
-        <item itemvalue="Python.quick_compare_v3_v4" />
       </list>
     </recent_temporary>
   </component>

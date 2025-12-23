@@ -3,17 +3,31 @@ import sys
 import numpy as np
 import inspect
 
-# Make project root importable so we can import envs/, controller/
+# Make project root importable so we can import envs/, controller/, utils/
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(THIS_DIR)
 
 if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
 
+from utils.action_interface import thrust_to_action, ActionInterfaceConfig
+
 from envs.orbit_env import OrbitEnv
 from controller.expert_controller import ExpertController as ExpertV3
 from controller.expert_controller_improved import ExpertController as ExpertV4
 
+import yaml
+
+def load_cfg(path: str) -> dict:
+    with open(path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+def get_ai_mode(cfg: dict) -> str:
+    return (cfg.get("action_interface", {}) or {}).get("mode", "raw")
+
+def get_thrust_scale(cfg: dict, env: OrbitEnv) -> float:
+    # config wins; fallback to env default
+    return float((cfg.get("actuation", {}) or {}).get("thrust_scale", getattr(env, "thrust_scale", 1.0)))
 
 def build_controller(ControllerCls, env, obs):
     """
@@ -28,13 +42,15 @@ def build_controller(ControllerCls, env, obs):
     return ControllerCls(target_radius=float(tr))
 
 
-def make_env_for_scenario(scenario_name=None):
+def make_env_for_scenario(scenario_name=None, cfg=None):
     """
     Emulate scenarios via:
     - reset(start_mode=...)
     - set_physical_params(...)
     """
     env = OrbitEnv()
+    if cfg is not None:
+        env.thrust_scale = get_thrust_scale(cfg, env)
 
     start_mode = "default"
     physical_kwargs = {}
@@ -63,6 +79,7 @@ def make_env_for_scenario(scenario_name=None):
 
 
 def clip_action_to_env(action, env):
+    # NOTE: kept for legacy quick-check; CM Day2 uses action_interface instead.
     a = np.asarray(action, dtype=float)
 
     lo, hi = -1.0, 1.0
@@ -75,9 +92,9 @@ def clip_action_to_env(action, env):
 
     a_clip = np.clip(a, lo, hi)
 
-    # optional: overflow diagnostics
     overflow = float(np.mean((a < lo) | (a > hi)))
     return a_clip, lo, hi
+
 
 def _obs_signature(obs, k=8):
     x = np.asarray(obs, dtype=float).ravel()
@@ -147,8 +164,9 @@ def _try_shadow_step(env, action, atol_obs=1e-9, atol_reward=1e-9):
         env.set_state(saved)
 
 
-def run_episode(scenario, label, ControllerCls, max_steps=2000):
-    env = make_env_for_scenario(scenario)
+def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000):
+    env = make_env_for_scenario(scenario, cfg=cfg)
+
     start_mode = getattr(env, "_qc_start_mode", "default")
 
     reset_result = env.reset(start_mode=start_mode)
@@ -188,46 +206,34 @@ def run_episode(scenario, label, ControllerCls, max_steps=2000):
     jitter_terms = []
     prev_action_dir = None
 
-    sat_count = 0
-    sat_total = 0
-    raw_norms = []
-    clip_norms = []
+    raw_norms = []   # ||thrust_intent|| (N)
+    clip_norms = []  # ||action|| (dimensionless)
+    sat_rates = []  # saturation_rate from action_interface (single source of truth)
 
     do_shadow_step = True
     steps = 0
 
     for _ in range(max_steps):
-        raw_action = controller.act(obs)
-        action, lo, hi = clip_action_to_env(raw_action, env)
+        # 1) Controller outputs thrust intent in Newtons
+        thrust_intent = controller.act(obs)
 
-        ra = np.asarray(raw_action, dtype=float).ravel()
+        # 2) Day2: Action interface is the independent variable
+        cfg_ai = ActionInterfaceConfig(mode=get_ai_mode(cfg))
+        action, ainfo = thrust_to_action(thrust_intent, env.thrust_scale, cfg_ai)
+        sat_rates.append(float(ainfo.get("saturation_rate", 0.0)))
+
+        # 3) Stats
+        ra = np.asarray(thrust_intent, dtype=float).ravel()
         aa_print = np.asarray(action, dtype=float).ravel()
 
         raw_norms.append(float(np.linalg.norm(ra)))
         clip_norms.append(float(np.linalg.norm(aa_print)))
 
-        sat_total += aa_print.size
-        sat_count += int(np.sum(np.abs(aa_print) > 0.99))
-
-        if steps < 5 and isinstance(info, dict) and "thrust_vec" in info:
-            x = np.asarray(obs, dtype=float)
-            n = x.size // 2
-            pos = x[:n]
-            vel = x[n:]
-
-            r_hat = pos / (np.linalg.norm(pos) + 1e-12)
-            v_hat = vel / (np.linalg.norm(vel) + 1e-12)
-
-            thrust = np.asarray(info["thrust_vec"], dtype=float)
-            t_rad = float(np.dot(thrust, r_hat))
-            t_tan = float(np.dot(thrust, v_hat))
-
-            print(f"[SELF-CHECK] thrust_rad={t_rad:.3e} N | thrust_tan={t_tan:.3e} N")
-
         if do_shadow_step:
             do_shadow_step = False
             _try_shadow_step(env, action)
 
+        # Step environment
         step_result = env.step(action)
         if len(step_result) == 5:
             obs, reward, terminated, truncated, info = step_result
@@ -235,12 +241,16 @@ def run_episode(scenario, label, ControllerCls, max_steps=2000):
         else:
             obs, reward, done, info = step_result
 
+        # Day2: attach interface metrics to info
+        if isinstance(info, dict):
+            info.update(ainfo)
+
         total_reward += float(reward)
 
         if steps < 5:
-            ts = info.get("thrust_scale", None)
-            m = info.get("mass", None)
-            dt = info.get("dt", None)
+            ts = info.get("thrust_scale", None) if isinstance(info, dict) else None
+            m = info.get("mass", None) if isinstance(info, dict) else None
+            dt = info.get("dt", None) if isinstance(info, dict) else None
             if ts is not None and m is not None and dt is not None:
                 ts = float(ts)
                 m = float(m)
@@ -293,8 +303,12 @@ def run_episode(scenario, label, ControllerCls, max_steps=2000):
         rmean = float(np.mean(radius_errors))
         print(f"[SELF-CHECK] radius_error stats ({label}/{scenario or 'default'}): min={rmin:.3e}, mean={rmean:.3e}, max={rmax:.3e}")
 
-    sat_rate = sat_count / max(1, sat_total)
-    print(f"[SELF-CHECK] saturation_rate={sat_rate:.3f} | raw_norm_mean={np.mean(raw_norms):.3e} | clip_norm_mean={np.mean(clip_norms):.3e}")
+    sat_rate_mean = float(np.mean(sat_rates)) if sat_rates else 0.0
+    print(
+        f"[SELF-CHECK] saturation_rate_mean={sat_rate_mean:.3f} | "
+        f"raw_norm_mean={np.mean(raw_norms):.3e} | "
+        f"clip_norm_mean={np.mean(clip_norms):.3e}"
+    )
 
     print(
         f"[{scenario or 'default'}] {label} | "
@@ -316,6 +330,9 @@ def run_episode(scenario, label, ControllerCls, max_steps=2000):
 
 
 def main():
+    CFG_PATH = os.environ.get("CFG_PATH", os.path.join(PROJECT_ROOT, "configs", "default.yaml"))
+    cfg = load_cfg(CFG_PATH)
+
     scenarios = [
         "weak_thrust_far",
         "oscillation_noise",
@@ -325,8 +342,8 @@ def main():
 
     results = []
     for s in scenarios:
-        results.append(run_episode(s, "ExpertV3", ExpertV3))
-        results.append(run_episode(s, "ExpertImproved", ExpertV4))
+        results.append(run_episode(s, "ExpertV3", ExpertV3, cfg))
+        results.append(run_episode(s, "ExpertImproved", ExpertV4, cfg))
 
     key_fields = ["steps", "total_reward", "final_r", "avg_radius_error", "avg_jitter"]
     for label in ["ExpertV3", "ExpertImproved"]:
