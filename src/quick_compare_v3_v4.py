@@ -330,7 +330,7 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000):
 
 
 def main():
-    CFG_PATH = os.environ.get("CFG_PATH", os.path.join(PROJECT_ROOT, "configs", "default.yaml"))
+    CFG_PATH = os.environ.get("CFG_PATH", os.path.join(PROJECT_ROOT, "config", "default.yaml"))
     cfg = load_cfg(CFG_PATH)
 
     scenarios = [

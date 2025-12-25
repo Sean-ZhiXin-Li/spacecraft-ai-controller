@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "date": "2025-12-25",
+    "script": "src/quick_compare_v3_v4.py",
+    "scenario": "default",
+    "steps": 2000,
+    "notes": "Raw vs prescale ablation. Metrics copied from existing summary/log lines. No env/controller/reward changes."
+  },
+  "results": {
+    "raw": {
+      "ExpertV3": { "saturation_rate": 0.5, "avg_radius_error": 1.875e12, "total_reward": -1.553e04 },
+      "ExpertImproved": { "saturation_rate": 0.5, "avg_radius_error": 1.875e12, "total_reward": -1.553e04 }
+    },
+    "prescale": {
+      "ExpertV3": { "saturation_rate": 0.5, "avg_radius_error": 1.875e12, "total_reward": -1.553e04 },
+      "ExpertImproved": { "saturation_rate": 0.5, "avg_radius_error": 1.875e12, "total_reward": -1.553e04 }
+    }
+  }
+}
