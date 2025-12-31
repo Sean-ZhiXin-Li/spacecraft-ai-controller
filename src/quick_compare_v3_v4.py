@@ -2,6 +2,7 @@ import os
 import sys
 import numpy as np
 import inspect
+import json
 
 # Make project root importable so we can import envs/, controller/, utils/
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -11,28 +12,33 @@ if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
 
 from utils.action_interface import thrust_to_action, ActionInterfaceConfig
-
 from envs.orbit_env import OrbitEnv
 from controller.expert_controller import ExpertController as ExpertV3
 from controller.expert_controller_improved import ExpertController as ExpertV4
 
 import yaml
 
+
 def load_cfg(path: str) -> dict:
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
+
 def get_ai_mode(cfg: dict) -> str:
+    # Env override wins (used by ablation scripts)
+    env_mode = os.environ.get("ACTION_IF_MODE", "").strip()
+    if env_mode:
+        return env_mode
     return (cfg.get("action_interface", {}) or {}).get("mode", "raw")
+
 
 def get_thrust_scale(cfg: dict, env: OrbitEnv) -> float:
     # config wins; fallback to env default
     return float((cfg.get("actuation", {}) or {}).get("thrust_scale", getattr(env, "thrust_scale", 1.0)))
 
+
 def build_controller(ControllerCls, env, obs):
-    """
-    Build controller using env.target_radius if available.
-    """
+    """Build controller using env.target_radius if available."""
     tr = getattr(env, "target_radius", None)
     if tr is None:
         x = np.asarray(obs, dtype=float)
@@ -42,15 +48,20 @@ def build_controller(ControllerCls, env, obs):
     return ControllerCls(target_radius=float(tr))
 
 
-def make_env_for_scenario(scenario_name=None, cfg=None):
-    """
-    Emulate scenarios via:
+def make_env_for_scenario(scenario_name=None, cfg=None, physical_override=None):
+    """Emulate scenarios via:
     - reset(start_mode=...)
     - set_physical_params(...)
+
+    Adds explicit scenario support metadata so we never "claim" effects that don't exist.
     """
     env = OrbitEnv()
     if cfg is not None:
         env.thrust_scale = get_thrust_scale(cfg, env)
+
+    requested = (scenario_name or "default")
+    effective = requested
+    supported = True
 
     start_mode = "default"
     physical_kwargs = {}
@@ -60,40 +71,39 @@ def make_env_for_scenario(scenario_name=None, cfg=None):
     elif scenario_name == "spiral":
         start_mode = "spiral"
     elif scenario_name == "weak_thrust_far":
+        # Base scenario uses a physical override to be "weak thrust".
         physical_kwargs["thrust_newton"] = 800.0
     elif scenario_name == "misaligned_entry":
+        # Currently implemented as a distinct scenario label but same start_mode.
+        # Keep it supported, but do not pretend it changes anything if OrbitEnv doesn't.
         start_mode = "default"
     elif scenario_name == "oscillation_noise":
+        # OrbitEnv has no noise API -> explicitly mark unsupported and force default.
         print("[SELF-CHECK][WARN] 'oscillation_noise' not supported by OrbitEnv (no noise API). Using default.")
+        supported = False
+        effective = "default"
         start_mode = "default"
     else:
         print(f"[SELF-CHECK][WARN] Unknown scenario '{scenario_name}'. Using default.")
+        supported = False
+        effective = "default"
         start_mode = "default"
+
+    # Optional explicit physical overrides (e.g., thrust sweep)
+    if physical_override:
+        for k, v in dict(physical_override).items():
+            physical_kwargs[k] = v
 
     if physical_kwargs and hasattr(env, "set_physical_params"):
         env.set_physical_params(**physical_kwargs)
 
+    # Attach metadata for downstream logging
+    env._qc_scenario_requested = requested
+    env._qc_scenario_effective = effective
+    env._qc_scenario_supported = bool(supported)
     env._qc_start_mode = start_mode
     env._qc_physical_kwargs = physical_kwargs
     return env
-
-
-def clip_action_to_env(action, env):
-    # NOTE: kept for legacy quick-check; CM Day2 uses action_interface instead.
-    a = np.asarray(action, dtype=float)
-
-    lo, hi = -1.0, 1.0
-    if hasattr(env, "action_space") and env.action_space is not None:
-        try:
-            lo = float(np.min(env.action_space.low))
-            hi = float(np.max(env.action_space.high))
-        except Exception:
-            pass
-
-    a_clip = np.clip(a, lo, hi)
-
-    overflow = float(np.mean((a < lo) | (a > hi)))
-    return a_clip, lo, hi
 
 
 def _obs_signature(obs, k=8):
@@ -102,9 +112,7 @@ def _obs_signature(obs, k=8):
 
 
 def _unpack_step(step_out):
-    """
-    Gym (obs, reward, done, info) or Gymnasium (obs, reward, terminated, truncated, info)
-    """
+    """Gym (obs, reward, done, info) or Gymnasium (obs, reward, terminated, truncated, info)"""
     if isinstance(step_out, tuple) and len(step_out) == 5:
         obs, reward, terminated, truncated, info = step_out
         done = bool(terminated or truncated)
@@ -115,8 +123,7 @@ def _unpack_step(step_out):
 
 
 def _try_shadow_step(env, action, atol_obs=1e-9, atol_reward=1e-9):
-    """
-    Compare step(action) vs step(0) from the exact same state using get_state/set_state.
+    """Compare step(action) vs step(0) from the exact same state using get_state/set_state.
 
     Restores env to the original state before returning.
     """
@@ -150,11 +157,15 @@ def _try_shadow_step(env, action, atol_obs=1e-9, atol_reward=1e-9):
         d_reward = float(abs(rew_a - rew_z))
         d_done = (done_a != done_z)
 
-        print(f"[SELF-CHECK] shadow_step | ||obs(a)-obs(0)||={dr:.6e} | |rew(a)-rew(0)|={d_reward:.6e} | done_diff={d_done}")
+        print(
+            f"[SELF-CHECK] shadow_step | ||obs(a)-obs(0)||={dr:.6e} | |rew(a)-rew(0)|={d_reward:.6e} | done_diff={d_done}"
+        )
 
         if dr < atol_obs and d_reward < atol_reward and (not d_done):
-            print("[SELF-CHECK][WARN] shadow_step diffs are ~0 (obs/reward/done). "
-                  "Strong evidence action is not affecting dynamics/reward at this state.")
+            print(
+                "[SELF-CHECK][WARN] shadow_step diffs are ~0 (obs/reward/done). "
+                "Strong evidence action is not affecting dynamics/reward at this state."
+            )
 
         for k in ["thrust_vec", "acc_thrust", "acc_total"]:
             if isinstance(info_a, dict) and isinstance(info_z, dict) and (k in info_a or k in info_z):
@@ -164,8 +175,8 @@ def _try_shadow_step(env, action, atol_obs=1e-9, atol_reward=1e-9):
         env.set_state(saved)
 
 
-def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000):
-    env = make_env_for_scenario(scenario, cfg=cfg)
+def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_override=None, lambda_sat=0.10):
+    env = make_env_for_scenario(scenario, cfg=cfg, physical_override=physical_override)
 
     start_mode = getattr(env, "_qc_start_mode", "default")
 
@@ -186,8 +197,15 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000):
         pos0 = x0[:n]
         target_radius = float(np.linalg.norm(pos0))
 
+    requested = getattr(env, "_qc_scenario_requested", scenario or "default")
+    effective = getattr(env, "_qc_scenario_effective", requested)
+    supported = bool(getattr(env, "_qc_scenario_supported", True))
     phys = getattr(env, "_qc_physical_kwargs", {})
-    print(f"[SELF-CHECK] scenario={scenario or 'default'} | start_mode={start_mode} | phys={phys} | target_r={target_radius:.6e}")
+
+    print(
+        f"[SELF-CHECK] scenario_requested={requested} | scenario_effective={effective} | scenario_supported={supported} | "
+        f"start_mode={start_mode} | phys={phys} | target_r={target_radius:.6e}"
+    )
 
     ctrl_tr = getattr(controller, "target_radius", None)
     if ctrl_tr is not None:
@@ -195,8 +213,10 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000):
             ctrl_tr = float(ctrl_tr)
             rel = abs(ctrl_tr - target_radius) / max(1e-12, abs(target_radius))
             if rel > 1e-6:
-                print(f"[SELF-CHECK][WARN] controller.target_radius != env.target_radius "
-                      f"({ctrl_tr:.6e} vs {target_radius:.6e}, rel_diff={rel:.3e})")
+                print(
+                    "[SELF-CHECK][WARN] controller.target_radius != env.target_radius "
+                    f"({ctrl_tr:.6e} vs {target_radius:.6e}, rel_diff={rel:.3e})"
+                )
         except Exception:
             pass
 
@@ -208,17 +228,19 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000):
 
     raw_norms = []   # ||thrust_intent|| (N)
     clip_norms = []  # ||action|| (dimensionless)
-    sat_rates = []  # saturation_rate from action_interface (single source of truth)
+    sat_rates = []   # saturation_rate from action_interface (single source of truth)
 
     do_shadow_step = True
     steps = 0
+
+    # Cache config for action interface
+    cfg_ai = ActionInterfaceConfig(mode=get_ai_mode(cfg))
 
     for _ in range(max_steps):
         # 1) Controller outputs thrust intent in Newtons
         thrust_intent = controller.act(obs)
 
-        # 2) Day2: Action interface is the independent variable
-        cfg_ai = ActionInterfaceConfig(mode=get_ai_mode(cfg))
+        # 2) Action interface: convert thrust intent -> normalized action
         action, ainfo = thrust_to_action(thrust_intent, env.thrust_scale, cfg_ai)
         sat_rates.append(float(ainfo.get("saturation_rate", 0.0)))
 
@@ -241,7 +263,7 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000):
         else:
             obs, reward, done, info = step_result
 
-        # Day2: attach interface metrics to info
+        # Attach interface metrics to info
         if isinstance(info, dict):
             info.update(ainfo)
 
@@ -301,17 +323,29 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000):
         rmin = float(np.min(radius_errors))
         rmax = float(np.max(radius_errors))
         rmean = float(np.mean(radius_errors))
-        print(f"[SELF-CHECK] radius_error stats ({label}/{scenario or 'default'}): min={rmin:.3e}, mean={rmean:.3e}, max={rmax:.3e}")
+        print(f"[SELF-CHECK] radius_error stats ({label}/{requested}): min={rmin:.3e}, mean={rmean:.3e}, max={rmax:.3e}")
 
     sat_rate_mean = float(np.mean(sat_rates)) if sat_rates else 0.0
+
+    # Saturation penalty metric (monotone, continuous, interpretable):
+    # reward_minus_lambda_sat = total_reward - lambda_sat * sat_rate_mean * (|total_reward| + 1)
+    # - sat_rate_mean up -> score strictly decreases
+    # - does NOT collapse information to 0 even when sat_rate_mean -> 1
+    penalty = float(lambda_sat) * float(np.clip(sat_rate_mean, 0.0, 1.0)) * (abs(float(total_reward)) + 1.0)
+    reward_minus_lambda_sat = float(total_reward) - float(penalty)
+
+    # Keep a legacy name, but now it means "saturation-penalized reward" (not scaling-to-zero).
+    sat_adjusted_score = float(reward_minus_lambda_sat)
+
     print(
         f"[SELF-CHECK] saturation_rate_mean={sat_rate_mean:.3f} | "
+        f"reward_minus_lambda_sat={reward_minus_lambda_sat:.3e} (lambda_sat={lambda_sat:.3f}) | "
         f"raw_norm_mean={np.mean(raw_norms):.3e} | "
         f"clip_norm_mean={np.mean(clip_norms):.3e}"
     )
 
     print(
-        f"[{scenario or 'default'}] {label} | "
+        f"[{requested}] {label} | "
         f"steps={steps}, total_reward={total_reward:.3e}, "
         f"final_r={final_radius:.3e}, "
         f"avg_radius_error={avg_radius_error:.3e}, "
@@ -319,13 +353,20 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000):
     )
 
     return {
-        "scenario": scenario or "default",
+        "scenario_requested": requested,
+        "scenario_effective": effective,
+        "scenario_supported": bool(supported),
+        "phys": dict(phys) if isinstance(phys, dict) else {},
         "label": label,
-        "steps": steps,
+        "steps": int(steps),
         "total_reward": float(total_reward),
         "final_r": float(final_radius) if final_radius is not None else None,
         "avg_radius_error": float(avg_radius_error),
         "avg_jitter": float(avg_jitter),
+        "saturation_rate_mean": float(sat_rate_mean),
+        "lambda_sat": float(lambda_sat),
+        "reward_minus_lambda_sat": float(reward_minus_lambda_sat),
+        "sat_adjusted_score": float(sat_adjusted_score),
     }
 
 
@@ -333,25 +374,60 @@ def main():
     CFG_PATH = os.environ.get("CFG_PATH", os.path.join(PROJECT_ROOT, "config", "default.yaml"))
     cfg = load_cfg(CFG_PATH)
 
-    scenarios = [
-        "weak_thrust_far",
-        "oscillation_noise",
-        "misaligned_entry",
-        None,
+    # One place to tune the saturation penalty.
+    # Keep it small; we only want to punish saturation without deleting reward scale.
+    LAMBDA_SAT = float(os.environ.get("LAMBDA_SAT", "0.10"))
+
+    # Controlled contrast: same scenario, sweep thrust levels.
+    thrust_sweep = [200.0, 800.0, 2000.0]
+
+    scenarios = []
+    for t in thrust_sweep:
+        scenarios.append(("weak_thrust_far", {"thrust_newton": float(t)}))
+
+    # Keep other scenarios for diagnostics, but now with explicit support state.
+    scenarios += [
+        ("oscillation_noise", None),
+        ("misaligned_entry", None),
+        (None, None),
     ]
 
     results = []
-    for s in scenarios:
-        results.append(run_episode(s, "ExpertV3", ExpertV3, cfg))
-        results.append(run_episode(s, "ExpertImproved", ExpertV4, cfg))
+    for s, phys_override in scenarios:
+        results.append(run_episode(s, "ExpertV3", ExpertV3, cfg, physical_override=phys_override, lambda_sat=LAMBDA_SAT))
+        results.append(run_episode(s, "ExpertImproved", ExpertV4, cfg, physical_override=phys_override, lambda_sat=LAMBDA_SAT))
 
-    key_fields = ["steps", "total_reward", "final_r", "avg_radius_error", "avg_jitter"]
+    # Sanity check: if everything is identical, something is wrong.
+    key_fields = [
+        "steps",
+        "total_reward",
+        "final_r",
+        "avg_radius_error",
+        "avg_jitter",
+        "saturation_rate_mean",
+        "reward_minus_lambda_sat",
+    ]
+
     for label in ["ExpertV3", "ExpertImproved"]:
         subset = [r for r in results if r["label"] == label]
-        sigs = {tuple(round(r[k], 12) if isinstance(r[k], float) else r[k] for k in key_fields) for r in subset}
+        sigs = {
+            tuple(
+                round(r[k], 12) if isinstance(r.get(k, None), float) else r.get(k, None)
+                for k in key_fields
+            )
+            for r in subset
+        }
         if len(sigs) == 1 and len(subset) >= 2:
-            print(f"[SELF-CHECK][WARN] All scenarios produced identical metrics for {label}. "
-                  f"This suggests scenario switching is not applied in OrbitEnv (or scenarios are equivalent).")
+            print(
+                f"[SELF-CHECK][WARN] All scenarios produced identical metrics for {label}. "
+                "This suggests scenario switching is not applied in OrbitEnv (or scenarios are equivalent)."
+            )
+
+    out_path = os.path.join(PROJECT_ROOT, "analysis", "SESSION6_metrics_upgrade.json")
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump({"meta": {"cfg_path": CFG_PATH, "lambda_sat": LAMBDA_SAT}, "results": results}, f, indent=2)
+    print(f"[SELF-CHECK] wrote: {out_path}")
 
 
 if __name__ == "__main__":

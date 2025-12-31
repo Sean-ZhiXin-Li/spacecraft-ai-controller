@@ -1,0 +1,212 @@
+{
+  "meta": {
+    "cfg_path": "config/default.yaml",
+    "lambda_sat": 0.1
+  },
+  "results": [
+    {
+      "scenario_requested": "weak_thrust_far",
+      "scenario_effective": "weak_thrust_far",
+      "scenario_supported": true,
+      "phys": {
+        "thrust_newton": 200.0
+      },
+      "label": "ExpertV3",
+      "steps": 2000,
+      "total_reward": -15806.53426630437,
+      "final_r": 9375035949273.568,
+      "avg_radius_error": 1875018378665.5774,
+      "avg_jitter": 2.201877555278727e-12,
+      "saturation_rate_mean": 0.0,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -15806.53426630437,
+      "sat_adjusted_score": -15806.53426630437
+    },
+    {
+      "scenario_requested": "weak_thrust_far",
+      "scenario_effective": "weak_thrust_far",
+      "scenario_supported": true,
+      "phys": {
+        "thrust_newton": 200.0
+      },
+      "label": "ExpertImproved",
+      "steps": 2000,
+      "total_reward": -15806.517872601991,
+      "final_r": 9375035949273.57,
+      "avg_radius_error": 1875018378665.5774,
+      "avg_jitter": 2.170529222422479e-12,
+      "saturation_rate_mean": 0.0,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -15806.517872601991,
+      "sat_adjusted_score": -15806.517872601991
+    },
+    {
+      "scenario_requested": "weak_thrust_far",
+      "scenario_effective": "weak_thrust_far",
+      "scenario_supported": true,
+      "phys": {
+        "thrust_newton": 800.0
+      },
+      "label": "ExpertV3",
+      "steps": 2000,
+      "total_reward": -15806.53426630437,
+      "final_r": 9375035949273.568,
+      "avg_radius_error": 1875018378665.5774,
+      "avg_jitter": 2.201877555278727e-12,
+      "saturation_rate_mean": 0.0,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -15806.53426630437,
+      "sat_adjusted_score": -15806.53426630437
+    },
+    {
+      "scenario_requested": "weak_thrust_far",
+      "scenario_effective": "weak_thrust_far",
+      "scenario_supported": true,
+      "phys": {
+        "thrust_newton": 800.0
+      },
+      "label": "ExpertImproved",
+      "steps": 2000,
+      "total_reward": -15806.517872601991,
+      "final_r": 9375035949273.57,
+      "avg_radius_error": 1875018378665.5774,
+      "avg_jitter": 2.170529222422479e-12,
+      "saturation_rate_mean": 0.0,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -15806.517872601991,
+      "sat_adjusted_score": -15806.517872601991
+    },
+    {
+      "scenario_requested": "weak_thrust_far",
+      "scenario_effective": "weak_thrust_far",
+      "scenario_supported": true,
+      "phys": {
+        "thrust_newton": 2000.0
+      },
+      "label": "ExpertV3",
+      "steps": 2000,
+      "total_reward": -15806.534267993626,
+      "final_r": 9375035949273.568,
+      "avg_radius_error": 1875018378665.5774,
+      "avg_jitter": 2.202136922038357e-12,
+      "saturation_rate_mean": 0.0,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -15806.534267993626,
+      "sat_adjusted_score": -15806.534267993626
+    },
+    {
+      "scenario_requested": "weak_thrust_far",
+      "scenario_effective": "weak_thrust_far",
+      "scenario_supported": true,
+      "phys": {
+        "thrust_newton": 2000.0
+      },
+      "label": "ExpertImproved",
+      "steps": 2000,
+      "total_reward": -15806.517871212649,
+      "final_r": 9375035949273.57,
+      "avg_radius_error": 1875018378665.5774,
+      "avg_jitter": 2.170821856995603e-12,
+      "saturation_rate_mean": 0.0,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -15806.517871212649,
+      "sat_adjusted_score": -15806.517871212649
+    },
+    {
+      "scenario_requested": "oscillation_noise",
+      "scenario_effective": "default",
+      "scenario_supported": false,
+      "phys": {},
+      "label": "ExpertV3",
+      "steps": 2000,
+      "total_reward": -15532.117423112197,
+      "final_r": 9375036997852.945,
+      "avg_radius_error": 1875018547487.1626,
+      "avg_jitter": 8.614923015413339e-13,
+      "saturation_rate_mean": 0.5,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -16308.773294267807,
+      "sat_adjusted_score": -16308.773294267807
+    },
+    {
+      "scenario_requested": "oscillation_noise",
+      "scenario_effective": "default",
+      "scenario_supported": false,
+      "phys": {},
+      "label": "ExpertImproved",
+      "steps": 2000,
+      "total_reward": -15532.099789567346,
+      "final_r": 9375036997852.945,
+      "avg_radius_error": 1875018547487.1626,
+      "avg_jitter": 8.490162050139341e-13,
+      "saturation_rate_mean": 0.5,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -16308.754779045714,
+      "sat_adjusted_score": -16308.754779045714
+    },
+    {
+      "scenario_requested": "misaligned_entry",
+      "scenario_effective": "misaligned_entry",
+      "scenario_supported": true,
+      "phys": {},
+      "label": "ExpertV3",
+      "steps": 2000,
+      "total_reward": -15532.117423112197,
+      "final_r": 9375036997852.945,
+      "avg_radius_error": 1875018547487.1626,
+      "avg_jitter": 8.614923015413339e-13,
+      "saturation_rate_mean": 0.5,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -16308.773294267807,
+      "sat_adjusted_score": -16308.773294267807
+    },
+    {
+      "scenario_requested": "misaligned_entry",
+      "scenario_effective": "misaligned_entry",
+      "scenario_supported": true,
+      "phys": {},
+      "label": "ExpertImproved",
+      "steps": 2000,
+      "total_reward": -15532.099789567346,
+      "final_r": 9375036997852.945,
+      "avg_radius_error": 1875018547487.1626,
+      "avg_jitter": 8.490162050139341e-13,
+      "saturation_rate_mean": 0.5,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -16308.754779045714,
+      "sat_adjusted_score": -16308.754779045714
+    },
+    {
+      "scenario_requested": "default",
+      "scenario_effective": "default",
+      "scenario_supported": true,
+      "phys": {},
+      "label": "ExpertV3",
+      "steps": 2000,
+      "total_reward": -15532.117423112197,
+      "final_r": 9375036997852.945,
+      "avg_radius_error": 1875018547487.1626,
+      "avg_jitter": 8.614923015413339e-13,
+      "saturation_rate_mean": 0.5,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -16308.773294267807,
+      "sat_adjusted_score": -16308.773294267807
+    },
+    {
+      "scenario_requested": "default",
+      "scenario_effective": "default",
+      "scenario_supported": true,
+      "phys": {},
+      "label": "ExpertImproved",
+      "steps": 2000,
+      "total_reward": -15532.099789567346,
+      "final_r": 9375036997852.945,
+      "avg_radius_error": 1875018547487.1626,
+      "avg_jitter": 8.490162050139341e-13,
+      "saturation_rate_mean": 0.5,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -16308.754779045714,
+      "sat_adjusted_score": -16308.754779045714
+    }
+  ]
+}
