@@ -35,7 +35,7 @@ This was the physical origin of the entire project.
 
 At the time, I believed that once the simulation was correct and AI was connected, the problem would naturally be “solved.”
 
-In hindsight, that belief was naive — but necessary. It pushed me into the real problem space quickly, instead of keeping me at the level of abstractions.
+In hindsight, that belief was naive, but necessary. It pushed me into the real problem space quickly, instead of keeping me at the level of abstractions.
 
 ---
 
@@ -170,7 +170,7 @@ All extensions remain subordinate to understanding, not scale.
 
 If you are reading this years later, remember:
 
-> **2025 was not the year you were strongest — it was the year you first learned how to judge.**
+> **2025 was not the year you were strongest, it was the year you first learned how to judge.**
 
 If you ever doubt whether you truly understand a system, return to the 2025 failure catalog and energy diagnostics. That was the first stable ground.
 
@@ -189,4 +189,4 @@ This was not the finish line.
 It was the first moment of standing firmly on my own reasoning.
 
 —  
-**2026: move forward, but with clarity.**
+**2026: moving forward with structure, evidence, and intent.**
