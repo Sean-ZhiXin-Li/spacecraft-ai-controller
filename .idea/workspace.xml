@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="analysis: add Session6 metrics upgrade (raw vs prescale) and scenario support warnings">
-      <change afterPath="$PROJECT_DIR$/project_log/2025 Annual Summary.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="docs: add 2025 Annual Summary" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -271,11 +267,20 @@
       <option name="project" value="LOCAL" />
       <updated>1767163222197</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="docs: add 2025 Annual Summary">
+      <option name="closed" value="true" />
+      <created>1767254255068</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1767254255068</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="analysis: add Session6 metrics upgrade (raw vs prescale) and scenario support warnings" />
-    <option name="LAST_COMMIT_MESSAGE" value="analysis: add Session6 metrics upgrade (raw vs prescale) and scenario support warnings" />
+    <MESSAGE value="docs: add 2025 Annual Summary" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: add 2025 Annual Summary" />
   </component>
 </project>
