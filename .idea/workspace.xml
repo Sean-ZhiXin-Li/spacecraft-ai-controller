@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="docs: add contest positioning and evaluation framing">
+      <change afterPath="$PROJECT_DIR$/analysis/SPRINT_RETROSPECTIVE.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project_log/2025 Annual Summary.md" beforeDir="false" afterPath="$PROJECT_DIR$/project_log/2025 Annual Summary.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -286,7 +286,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767335370563</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="docs: add contest positioning and evaluation framing">
+      <option name="closed" value="true" />
+      <created>1767336061246</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1767336061246</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
