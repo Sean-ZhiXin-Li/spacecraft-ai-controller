@@ -1,4 +1,4 @@
-    # Inspiration Log: From Autonomous Propulsion to Cosmic Intelligence
+# Inspiration Log: From Autonomous Propulsion to Cosmic Intelligence
 
 *A personal vision document reflecting the philosophical and technical direction of the spacecraft AI controller and Tech Foundations projects.*
 

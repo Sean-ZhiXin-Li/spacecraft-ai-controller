@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="docs: sprint retrospective and phase freeze (Session 8)">
+      <change afterPath="$PROJECT_DIR$/project_log/PROJECT_LOG_2026-02-01_RESTART.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project_log/inspiration_2025_11_11.md" beforeDir="false" afterPath="$PROJECT_DIR$/project_log/inspiration_2025_11_11.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -231,10 +233,10 @@
       <item itemvalue="Python.expert_controller_improved" />
       <item itemvalue="Python.smoke_test_v4" />
       <item itemvalue="Python.action_interface" />
-      <item itemvalue="Python.smoke_test_full_system" />
-      <item itemvalue="Python.load_config" />
       <item itemvalue="Python.batch_plot_all" />
+      <item itemvalue="Python.load_config" />
       <item itemvalue="Python.plot_radius_vs_time" />
+      <item itemvalue="Python.smoke_test_full_system" />
     </list>
     <recent_temporary>
       <list>
