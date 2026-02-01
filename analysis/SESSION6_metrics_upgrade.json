@@ -1,6 +1,6 @@
 {
   "meta": {
-    "cfg_path": "config/default.yaml",
+    "cfg_path": "E:\\spacecraft_ai_project\\config\\default.yaml",
     "lambda_sat": 0.1
   },
   "results": [
