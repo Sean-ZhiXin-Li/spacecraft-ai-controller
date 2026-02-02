@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spacecraft-ai-project"
+version = "0.1.0"
+description = "Spacecraft orbital environment and controllers"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "gymnasium",
+]
+
+[tool.setuptools]
+# We will only package these folders as importable modules
+packages = ["envs", "ppo_orbit"]

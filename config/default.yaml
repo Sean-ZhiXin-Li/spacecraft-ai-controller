@@ -15,3 +15,5 @@ actuation:
 # NEW: Day2 independent variable (interface-side)
 action_interface:
   mode: prescale            # raw | prescale
+  thrust_scale_ref: 10.0    # (N) for quick sanity; later tune
+

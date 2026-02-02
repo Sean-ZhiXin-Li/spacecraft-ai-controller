@@ -4,6 +4,19 @@ import numpy as np
 import inspect
 import json
 
+import os
+
+def _parse_env_float(name: str):
+    """Parse env var as float. Return None if missing/empty/invalid."""
+    v = os.getenv(name, "").strip()
+    if not v:
+        return None
+    try:
+        return float(v)
+    except ValueError:
+        return None
+
+
 # Make project root importable so we can import envs/, controller/, utils/
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(THIS_DIR)
@@ -241,7 +254,9 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
         thrust_intent = controller.act(obs)
 
         # 2) Action interface: convert thrust intent -> normalized action
-        action, ainfo = thrust_to_action(thrust_intent, env.thrust_scale, cfg_ai)
+        # Use a fixed reference scale to decouple action normalization from engine strength
+        REF_THRUST_SCALE = float((cfg.get("action_interface", {}) or {}).get("thrust_scale_ref", 3000.0))
+        action, ainfo = thrust_to_action(thrust_intent, REF_THRUST_SCALE, cfg_ai)
         sat_rates.append(float(ainfo.get("saturation_rate", 0.0)))
 
         # 3) Stats
@@ -379,7 +394,14 @@ def main():
     LAMBDA_SAT = float(os.environ.get("LAMBDA_SAT", "0.10"))
 
     # Controlled contrast: same scenario, sweep thrust levels.
-    thrust_sweep = [200.0, 800.0, 2000.0]
+    env_ts = _parse_env_float("THRUST_NEWTON")
+
+    if env_ts is not None:
+        thrust_sweep = [env_ts]
+        print(f"[SELF-CHECK] env override: THRUST_NEWTON={env_ts} (single-run)")
+    else:
+        thrust_sweep = [200.0, 800.0, 2000.0]
+        print(f"[SELF-CHECK] env override: none (default sweep={thrust_sweep})")
 
     scenarios = []
     for t in thrust_sweep:

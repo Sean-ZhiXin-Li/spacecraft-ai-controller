@@ -4,11 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="docs: sprint retrospective and phase freeze (Session 8)">
-      <change afterPath="$PROJECT_DIR$/project_log/PROJECT_LOG_2026-02-01_RESTART.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project_log/inspiration_2025_11_11.md" beforeDir="false" afterPath="$PROJECT_DIR$/project_log/inspiration_2025_11_11.md" afterDir="false" />
+    <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="restart day: validate thrust sensitivity + log scaling cancellation">
+      <change afterPath="$PROJECT_DIR$/project_log/WHPL_01.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/debug_scaling_unfreeze.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/SESSION6_metrics_upgrade.json" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/SESSION6_metrics_upgrade.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/default.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/default.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/envs/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/envs/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/quick_compare_v3_v4.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/quick_compare_v3_v4.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,32 +53,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.action_interface.executor&quot;: &quot;Run&quot;,
-    &quot;Python.batch_plot_all.executor&quot;: &quot;Run&quot;,
-    &quot;Python.diag_orbit.executor&quot;: &quot;Run&quot;,
-    &quot;Python.expert_controller_improved.executor&quot;: &quot;Run&quot;,
-    &quot;Python.fig_helpers.executor&quot;: &quot;Run&quot;,
-    &quot;Python.load_config.executor&quot;: &quot;Run&quot;,
-    &quot;Python.plot_radius_vs_time.executor&quot;: &quot;Run&quot;,
-    &quot;Python.quick_compare_v3_v4.executor&quot;: &quot;Run&quot;,
-    &quot;Python.smoke_test_full_system.executor&quot;: &quot;Run&quot;,
-    &quot;Python.smoke_test_v4.executor&quot;: &quot;Run&quot;,
-    &quot;Python.stress_battery.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/spacecraft_ai_project/controller&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.action_interface.executor": "Run",
+    "Python.batch_plot_all.executor": "Run",
+    "Python.debug_scaling_unfreeze.executor": "Run",
+    "Python.diag_orbit.executor": "Run",
+    "Python.expert_controller_improved.executor": "Run",
+    "Python.fig_helpers.executor": "Run",
+    "Python.load_config.executor": "Run",
+    "Python.plot_radius_vs_time.executor": "Run",
+    "Python.quick_compare_v3_v4.executor": "Run",
+    "Python.smoke_test_full_system.executor": "Run",
+    "Python.smoke_test_v4.executor": "Run",
+    "Python.stress_battery.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "E:/spacecraft_ai_project/controller",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\spacecraft_ai_project\controller" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.action_interface">
+  <component name="RunManager" selected="Python.debug_scaling_unfreeze">
     <configuration name="action_interface" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
@@ -119,6 +124,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="debug_scaling_unfreeze" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="spacecraft_ai_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/debug_scaling_unfreeze.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="expert_controller_improved" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
@@ -155,28 +182,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/utils/load_config.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="plot_radius_vs_time" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="spacecraft_ai_project" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/plots/plot_radius_vs_time.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -232,19 +237,19 @@
     <list>
       <item itemvalue="Python.expert_controller_improved" />
       <item itemvalue="Python.smoke_test_v4" />
+      <item itemvalue="Python.debug_scaling_unfreeze" />
       <item itemvalue="Python.action_interface" />
       <item itemvalue="Python.batch_plot_all" />
       <item itemvalue="Python.load_config" />
-      <item itemvalue="Python.plot_radius_vs_time" />
       <item itemvalue="Python.smoke_test_full_system" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.debug_scaling_unfreeze" />
         <item itemvalue="Python.action_interface" />
         <item itemvalue="Python.smoke_test_full_system" />
         <item itemvalue="Python.load_config" />
         <item itemvalue="Python.batch_plot_all" />
-        <item itemvalue="Python.plot_radius_vs_time" />
       </list>
     </recent_temporary>
   </component>
@@ -304,7 +309,23 @@
       <option name="project" value="LOCAL" />
       <updated>1767508159645</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="docs: Restart note">
+      <option name="closed" value="true" />
+      <created>1769869503053</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1769869503053</updated>
+    </task>
+    <task id="LOCAL-00007" summary="restart day: validate thrust sensitivity + log scaling cancellation">
+      <option name="closed" value="true" />
+      <created>1769928640935</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1769928640935</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -323,6 +344,8 @@
     <MESSAGE value="docs: add 2025 Annual Summary" />
     <MESSAGE value="docs: add contest positioning and evaluation framing" />
     <MESSAGE value="docs: sprint retrospective and phase freeze (Session 8)" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs: sprint retrospective and phase freeze (Session 8)" />
+    <MESSAGE value="docs: Restart note" />
+    <MESSAGE value="restart day: validate thrust sensitivity + log scaling cancellation" />
+    <option name="LAST_COMMIT_MESSAGE" value="restart day: validate thrust sensitivity + log scaling cancellation" />
   </component>
 </project>
