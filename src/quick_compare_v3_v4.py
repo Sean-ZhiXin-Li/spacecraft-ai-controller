@@ -3,8 +3,38 @@ import sys
 import numpy as np
 import inspect
 import json
+import argparse
 
-import os
+def dir_variation_unit(vecs: np.ndarray, eps: float = 1e-12) -> float:
+    """
+    vecs: (T, D)
+    Returns mean(1 - cos(u_t, u_{t-1})) over valid consecutive pairs.
+    0 means direction hardly changes; larger means more turning.
+    """
+    if vecs.shape[0] < 2:
+        return 0.0
+
+    v = vecs.astype(np.float64)
+    n = np.linalg.norm(v, axis=1, keepdims=True)
+
+    cos_list = []
+    for t in range(1, v.shape[0]):
+        if (n[t, 0] <= eps) or (n[t-1, 0] <= eps):
+            continue
+        u_t = v[t] / n[t, 0]
+        u_p = v[t-1] / n[t-1, 0]
+        c = float(np.clip(np.dot(u_t, u_p), -1.0, 1.0))
+        cos_list.append(c)
+
+    if len(cos_list) == 0:
+        return 0.0
+
+    cos_arr = np.array(cos_list, dtype=np.float64)
+    return float(np.mean(1.0 - cos_arr))
+
+def norm_mean(vecs: np.ndarray) -> float:
+    return float(np.mean(np.linalg.norm(vecs.astype(np.float64), axis=1)))
+
 
 def _parse_env_float(name: str):
     """Parse env var as float. Return None if missing/empty/invalid."""
@@ -188,6 +218,43 @@ def _try_shadow_step(env, action, atol_obs=1e-9, atol_reward=1e-9):
         env.set_state(saved)
 
 
+def _get_mu(env):
+    """
+    Try to obtain gravitational parameter mu (GM).
+    Return None if not available.
+    """
+    for name in ["mu", "GM", "gm", "gravitational_parameter"]:
+        if hasattr(env, name):
+            try:
+                return float(getattr(env, name))
+            except Exception:
+                pass
+
+    # Fallback patterns
+    # e.g., env may store G and central mass M
+    if hasattr(env, "G") and hasattr(env, "M"):
+        try:
+            return float(env.G) * float(env.M)
+        except Exception:
+            return None
+    if hasattr(env, "G") and hasattr(env, "central_mass"):
+        try:
+            return float(env.G) * float(env.central_mass)
+        except Exception:
+            return None
+
+    return None
+
+
+def _safe_unit(v, eps=1e-12):
+    """Return (unit_vector_or_None, norm). If norm too small -> (None, norm)."""
+    v = np.asarray(v, dtype=np.float64).ravel()
+    n = float(np.linalg.norm(v))
+    if n <= eps:
+        return None, n
+    return (v / n), n
+
+
 def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_override=None, lambda_sat=0.10):
     env = make_env_for_scenario(scenario, cfg=cfg, physical_override=physical_override)
 
@@ -249,6 +316,11 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
     # Cache config for action interface
     cfg_ai = ActionInterfaceConfig(mode=get_ai_mode(cfg))
 
+    # WHPL_02: statistics buffers
+    thrust_intents = []
+    actions = []
+    a_effs = []
+
     for _ in range(max_steps):
         # 1) Controller outputs thrust intent in Newtons
         thrust_intent = controller.act(obs)
@@ -262,6 +334,9 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
         # 3) Stats
         ra = np.asarray(thrust_intent, dtype=float).ravel()
         aa_print = np.asarray(action, dtype=float).ravel()
+        # WHPL_02: record sequences for interface-compression diagnosis
+        thrust_intents.append(ra.astype(np.float64).copy())
+        actions.append(aa_print.astype(np.float64).copy())
 
         raw_norms.append(float(np.linalg.norm(ra)))
         clip_norms.append(float(np.linalg.norm(aa_print)))
@@ -271,16 +346,13 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
             _try_shadow_step(env, action)
 
         # Step environment
-        step_result = env.step(action)
-        if len(step_result) == 5:
-            obs, reward, terminated, truncated, info = step_result
-            done = terminated or truncated
-        else:
-            obs, reward, done, info = step_result
+        obs, reward, done, info = _unpack_step(env.step(action))
 
-        # Attach interface metrics to info
+        # Attach interface metrics to info (avoid key collisions)
         if isinstance(info, dict):
-            info.update(ainfo)
+            info["action_if"] = dict(ainfo)
+        if isinstance(info, dict) and ("a_eff" in info):
+            a_effs.append(float(info["a_eff"]))
 
         total_reward += float(reward)
 
@@ -317,7 +389,50 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
 
         if steps % 200 == 0:
             rel_err = r_err / max(1e-12, target_radius)
-            print(f"[SELF-CHECK] step={steps} r={r:.12e} r_err={r_err:.12e} rel_err={rel_err:.6e}")
+
+            x2 = np.asarray(obs, dtype=np.float64).ravel()
+            n2 = x2.size // 2
+            r_vec = x2[:n2]
+            v_vec = x2[n2:]
+
+            r_unit, r_norm = _safe_unit(r_vec)
+            v_unit, v_norm = _safe_unit(v_vec)
+
+            # Prefer env-provided thrust_vec; fallback to controller thrust_intent
+            if isinstance(info, dict) and ("thrust_vec" in info) and (info["thrust_vec"] is not None):
+                thrust_vec = np.asarray(info["thrust_vec"], dtype=np.float64).ravel()
+            else:
+                thrust_vec = np.asarray(thrust_intent, dtype=np.float64).ravel()
+
+            t_unit, t_norm = _safe_unit(thrust_vec)
+
+            # (1) Thrust vs velocity alignment
+            if (t_unit is not None) and (v_unit is not None):
+                cos_tv = float(np.clip(np.dot(t_unit, v_unit), -1.0, 1.0))
+            else:
+                cos_tv = float("nan")
+
+            # (2) Specific orbital energy: eps = v^2/2 - mu/r
+            mu = _get_mu(env)
+            if (mu is not None) and (r_norm > 1e-12) and (v_norm > 0.0):
+                eps = 0.5 * (v_norm ** 2) - float(mu) / r_norm
+            else:
+                eps = float("nan")
+
+            # (3) Angular momentum magnitude |h| = |r x v|
+            if r_vec.size == 2 and v_vec.size == 2:
+                h = float(abs(r_vec[0] * v_vec[1] - r_vec[1] * v_vec[0]))
+            elif r_vec.size >= 3 and v_vec.size >= 3:
+                h = float(np.linalg.norm(np.cross(r_vec[:3], v_vec[:3])))
+            else:
+                h = float("nan")
+
+            # One compact line (less spam, more signal)
+            print(
+                f"[SELF-CHECK] step={steps} r={r_norm:.12e} r_err={r_err:.12e} rel_err={rel_err:.6e} | "
+                f"v={v_norm:.3e} cos(thrust,vel)={cos_tv:+.6f} | "
+                f"eps={eps:.6e} |h|={h:.6e} | thrust_norm={t_norm:.3e}"
+            )
 
         a_norm = np.linalg.norm(aa_print)
         if a_norm > 1e-12:
@@ -330,6 +445,18 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
         steps += 1
         if done:
             break
+
+    # WHPL_02: interface compression stats
+    thrust_intents_arr = np.stack(thrust_intents, axis=0)  # (T, D)
+    actions_arr = np.stack(actions, axis=0)                # (T, A)
+
+    thrust_intent_norm_mean = norm_mean(thrust_intents_arr)
+    thrust_intent_dir_var = dir_variation_unit(thrust_intents_arr)
+    action_norm_mean = norm_mean(actions_arr)
+
+    print(f"[STAT] thrust_intent_norm_mean={thrust_intent_norm_mean:.6e}")
+    print(f"[STAT] thrust_intent_dir_var={thrust_intent_dir_var:.6e}")
+    print(f"[STAT] action_norm_mean={action_norm_mean:.6e}")
 
     avg_radius_error = float(np.mean(radius_errors)) if radius_errors else 0.0
     avg_jitter = float(np.mean(jitter_terms)) if jitter_terms else 0.0
@@ -388,6 +515,19 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
 def main():
     CFG_PATH = os.environ.get("CFG_PATH", os.path.join(PROJECT_ROOT, "config", "default.yaml"))
     cfg = load_cfg(CFG_PATH)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--scenario", type=str, default=None, help="run single scenario only")
+    parser.add_argument("--thrust", type=float, default=None, help="use single thrust_newton")
+    parser.add_argument("--no_sweep", action="store_true", help="disable default thrust sweep")
+    args = parser.parse_args()
+    # --- CLI guardrails ---
+    if args.no_sweep and (args.thrust is None):
+        parser.error("--no_sweep requires --thrust (e.g., --no_sweep --thrust 200)")
+    if (args.thrust is not None) and (not args.no_sweep):
+        parser.error("--thrust only works with --no_sweep. Use: --no_sweep --thrust 200")
+    if (args.scenario == "weak_thrust_far") and (not args.no_sweep) and (_parse_env_float("THRUST_NEWTON") is None):
+        print(
+            "[SELF-CHECK][WARN] --scenario weak_thrust_far without --no_sweep/THRUST_NEWTON -> will run default thrust sweep.")
 
     # One place to tune the saturation penalty.
     # Keep it small; we only want to punish saturation without deleting reward scale.
@@ -396,23 +536,35 @@ def main():
     # Controlled contrast: same scenario, sweep thrust levels.
     env_ts = _parse_env_float("THRUST_NEWTON")
 
-    if env_ts is not None:
+    # Priority: CLI --no_sweep/--thrust > env THRUST_NEWTON > default sweep
+    if args.no_sweep:
+        thrust_sweep = [float(args.thrust)]
+        print(f"[SELF-CHECK] cli override: --no_sweep (single-run thrust={thrust_sweep[0]})")
+    elif env_ts is not None:
         thrust_sweep = [env_ts]
         print(f"[SELF-CHECK] env override: THRUST_NEWTON={env_ts} (single-run)")
     else:
         thrust_sweep = [200.0, 800.0, 2000.0]
         print(f"[SELF-CHECK] env override: none (default sweep={thrust_sweep})")
 
+    # Build scenario list
     scenarios = []
     for t in thrust_sweep:
         scenarios.append(("weak_thrust_far", {"thrust_newton": float(t)}))
 
-    # Keep other scenarios for diagnostics, but now with explicit support state.
     scenarios += [
         ("oscillation_noise", None),
         ("misaligned_entry", None),
         (None, None),
     ]
+
+    # CLI: run single scenario only
+    if args.scenario is not None:
+        # keep physical overrides ONLY if that scenario already carries one
+        scenarios = [(s, p) for (s, p) in scenarios if (s or "default") == args.scenario]
+        if len(scenarios) == 0:
+            # fallback: run requested scenario with no physical override
+            scenarios = [(args.scenario, None)]
 
     results = []
     for s, phys_override in scenarios:
