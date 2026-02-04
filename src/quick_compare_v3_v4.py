@@ -4,6 +4,10 @@ import numpy as np
 import inspect
 import json
 import argparse
+import csv
+from pathlib import Path
+import math
+
 
 def dir_variation_unit(vecs: np.ndarray, eps: float = 1e-12) -> float:
     """
@@ -115,7 +119,7 @@ def make_env_for_scenario(scenario_name=None, cfg=None, physical_override=None):
         start_mode = "spiral"
     elif scenario_name == "weak_thrust_far":
         # Base scenario uses a physical override to be "weak thrust".
-        physical_kwargs["thrust_newton"] = 800.0
+        pass
     elif scenario_name == "misaligned_entry":
         # Currently implemented as a distinct scenario label but same start_mode.
         # Keep it supported, but do not pretend it changes anything if OrbitEnv doesn't.
@@ -267,6 +271,12 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
         obs, info = reset_result, {}
 
     controller = build_controller(ControllerCls, env, obs)
+
+    # WHPL_03: initial radius r0 for CSV (no physics/control change)
+    x0 = np.asarray(obs, dtype=float)
+    n0 = x0.size // 2
+    pos0 = x0[:n0]
+    r0 = float(np.linalg.norm(pos0))
 
     print(f"[SELF-CHECK] {label} ControllerCls={ControllerCls} | file={inspect.getsourcefile(ControllerCls)}")
 
@@ -509,7 +519,25 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
         "lambda_sat": float(lambda_sat),
         "reward_minus_lambda_sat": float(reward_minus_lambda_sat),
         "sat_adjusted_score": float(sat_adjusted_score),
+        "target_radius": float(target_radius),
+        "r0_over_target": float(r0 / max(1e-12, target_radius)),
+
     }
+
+
+def append_row_csv(csv_path: Path, fieldnames: list[str], row: dict) -> None:
+    # Ensure parent directory exists
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+
+    file_exists = csv_path.exists()
+    write_header = (not file_exists) or (csv_path.stat().st_size == 0)
+
+    # Append only; never overwrite
+    with csv_path.open("a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        if write_header:
+            writer.writeheader()
+        writer.writerow(row)
 
 
 def main():
@@ -520,7 +548,16 @@ def main():
     parser.add_argument("--thrust", type=float, default=None, help="use single thrust_newton")
     parser.add_argument("--no_sweep", action="store_true", help="disable default thrust sweep")
     args = parser.parse_args()
-    # --- CLI guardrails ---
+
+    # WHPL_03 guardrail: disallow CLI overrides that change today's single-run coordinate
+    if args.scenario is not None or args.no_sweep or args.thrust is not None:
+        parser.error("WHPL_03 is frozen: do not pass --scenario/--no_sweep/--thrust today.")
+
+    # WHPL_03 fixed single-run coordinate (no sweep, no comparison)
+    WHPL3_THRUST_NEWTON = 800.0
+    WHPL3_DIFFICULTY_TAG = "Hard"
+
+    # CLI guardrails
     if args.no_sweep and (args.thrust is None):
         parser.error("--no_sweep requires --thrust (e.g., --no_sweep --thrust 200)")
     if (args.thrust is not None) and (not args.no_sweep):
@@ -547,16 +584,8 @@ def main():
         thrust_sweep = [200.0, 800.0, 2000.0]
         print(f"[SELF-CHECK] env override: none (default sweep={thrust_sweep})")
 
-    # Build scenario list
-    scenarios = []
-    for t in thrust_sweep:
-        scenarios.append(("weak_thrust_far", {"thrust_newton": float(t)}))
-
-    scenarios += [
-        ("oscillation_noise", None),
-        ("misaligned_entry", None),
-        (None, None),
-    ]
+    # WHPL_03: single scenario only (thrust × difficulty = one concrete row)
+    scenarios = [("weak_thrust_far", {"thrust_newton": float(WHPL3_THRUST_NEWTON)})]
 
     # CLI: run single scenario only
     if args.scenario is not None:
@@ -568,8 +597,47 @@ def main():
 
     results = []
     for s, phys_override in scenarios:
-        results.append(run_episode(s, "ExpertV3", ExpertV3, cfg, physical_override=phys_override, lambda_sat=LAMBDA_SAT))
-        results.append(run_episode(s, "ExpertImproved", ExpertV4, cfg, physical_override=phys_override, lambda_sat=LAMBDA_SAT))
+        results.append(
+            run_episode(s, "ExpertImproved", ExpertV4, cfg, physical_override=phys_override, lambda_sat=LAMBDA_SAT)
+        )
+
+    assert len(results) == 1, f"WHPL_03 expects exactly 1 run, got {len(results)}"
+
+    # WHPL_03: append exactly one CSV row per run
+    CSV_PATH = Path(PROJECT_ROOT) / "analysis" / "results" / "ablation_thrust_x_difficulty.csv"
+    FIELDNAMES = [
+        "thrust_newton",
+        "difficulty_tag",
+        "r0_over_target",
+        "avg_radius_error",
+        "final_radius_error",
+        "saturation_rate_mean",
+        "total_reward",
+    ]
+
+    r = results[-1]
+    target_r = float(r.get("target_radius", math.nan))
+    r0_over_target = float(r.get("r0_over_target", math.nan))
+
+    final_r = r.get("final_r", None)
+    if final_r is None or (not np.isfinite(float(final_r))) or (not np.isfinite(target_r)):
+        final_radius_error = math.nan
+    else:
+        final_radius_error = float(abs(float(final_r) - target_r))
+
+    row = {
+        "thrust_newton": float(WHPL3_THRUST_NEWTON),
+        "difficulty_tag": str(WHPL3_DIFFICULTY_TAG),
+        "r0_over_target": float(r0_over_target),
+        "avg_radius_error": float(r.get("avg_radius_error", math.nan)),
+        "final_radius_error": float(final_radius_error),
+        "saturation_rate_mean": float(r.get("saturation_rate_mean", math.nan)),
+        "total_reward": float(r.get("total_reward", math.nan)),
+    }
+
+    append_row_csv(CSV_PATH, FIELDNAMES, row)
+    print(f"[WHPL_03] appended 1 row -> {CSV_PATH}")
+    print(f"[WHPL_03] row = {row}")
 
     # Sanity check: if everything is identical, something is wrong.
     key_fields = [
@@ -582,20 +650,20 @@ def main():
         "reward_minus_lambda_sat",
     ]
 
-    for label in ["ExpertV3", "ExpertImproved"]:
-        subset = [r for r in results if r["label"] == label]
-        sigs = {
-            tuple(
-                round(r[k], 12) if isinstance(r.get(k, None), float) else r.get(k, None)
-                for k in key_fields
-            )
-            for r in subset
-        }
-        if len(sigs) == 1 and len(subset) >= 2:
-            print(
-                f"[SELF-CHECK][WARN] All scenarios produced identical metrics for {label}. "
-                "This suggests scenario switching is not applied in OrbitEnv (or scenarios are equivalent)."
-            )
+    # for label in ["ExpertV3", "ExpertImproved"]:
+    #     subset = [r for r in results if r["label"] == label]
+    #     sigs = {
+    #         tuple(
+    #             round(r[k], 12) if isinstance(r.get(k, None), float) else r.get(k, None)
+    #             for k in key_fields
+    #         )
+    #         for r in subset
+    #     }
+    #     if len(sigs) == 1 and len(subset) >= 2:
+    #         print(
+    #             f"[SELF-CHECK][WARN] All scenarios produced identical metrics for {label}. "
+    #             "This suggests scenario switching is not applied in OrbitEnv (or scenarios are equivalent)."
+    #         )
 
     out_path = os.path.join(PROJECT_ROOT, "analysis", "SESSION6_metrics_upgrade.json")
     os.makedirs(os.path.dirname(out_path), exist_ok=True)

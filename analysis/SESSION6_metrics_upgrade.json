@@ -9,36 +9,20 @@
       "scenario_effective": "weak_thrust_far",
       "scenario_supported": true,
       "phys": {
-        "thrust_newton": 200.0
-      },
-      "label": "ExpertV3",
-      "steps": 2000,
-      "total_reward": -19187.03064050939,
-      "final_r": 9375012880468.637,
-      "avg_radius_error": 1875010407879.8855,
-      "avg_jitter": 4.710551369790228e-10,
-      "saturation_rate_mean": 0.0,
-      "lambda_sat": 0.1,
-      "reward_minus_lambda_sat": -19187.03064050939,
-      "sat_adjusted_score": -19187.03064050939
-    },
-    {
-      "scenario_requested": "weak_thrust_far",
-      "scenario_effective": "weak_thrust_far",
-      "scenario_supported": true,
-      "phys": {
-        "thrust_newton": 200.0
+        "thrust_newton": 800.0
       },
       "label": "ExpertImproved",
       "steps": 2000,
-      "total_reward": -19186.127834959254,
-      "final_r": 9375012880468.703,
-      "avg_radius_error": 1875010404209.8894,
-      "avg_jitter": 4.679527942396971e-10,
+      "total_reward": -20795.30937671524,
+      "final_r": 9374958354446.145,
+      "avg_radius_error": 1874990333906.366,
+      "avg_jitter": 2.8963500428717884e-08,
       "saturation_rate_mean": 0.0,
       "lambda_sat": 0.1,
-      "reward_minus_lambda_sat": -19186.127834959254,
-      "sat_adjusted_score": -19186.127834959254
+      "reward_minus_lambda_sat": -20795.30937671524,
+      "sat_adjusted_score": -20795.30937671524,
+      "target_radius": 7500000000000.0,
+      "r0_over_target": 1.2500000396629334
     }
   ]
 }
