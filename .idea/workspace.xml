@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="restart day: validate thrust sensitivity + log scaling cancellation">
+      <change afterPath="$PROJECT_DIR$/project_log/WHPL_04.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/SESSION6_metrics_upgrade.json" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/SESSION6_metrics_upgrade.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/quick_compare_v3_v4.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/quick_compare_v3_v4.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
