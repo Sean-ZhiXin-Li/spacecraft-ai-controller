@@ -7,6 +7,8 @@ import argparse
 import csv
 from pathlib import Path
 import math
+import hashlib
+import subprocess
 
 
 def dir_variation_unit(vecs: np.ndarray, eps: float = 1e-12) -> float:
@@ -525,19 +527,103 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
     }
 
 
-def append_row_csv(csv_path: Path, fieldnames: list[str], row: dict) -> None:
-    # Ensure parent directory exists
-    csv_path.parent.mkdir(parents=True, exist_ok=True)
+def _git_short_sha() -> str:
+    """Best-effort git commit id; empty if unavailable."""
+    try:
+        out = subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"],
+            stderr=subprocess.DEVNULL,
+            text=True,
+        ).strip()
+        return out
+    except Exception:
+        return ""
 
-    file_exists = csv_path.exists()
-    write_header = (not file_exists) or (csv_path.stat().st_size == 0)
 
-    # Append only; never overwrite
-    with csv_path.open("a", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        if write_header:
-            writer.writeheader()
-        writer.writerow(row)
+def _compute_dedup_key(row: dict) -> str:
+    """
+    Idempotent logging key. Same logical run => same key => block duplicate append.
+    Only 'dedup_key' is persisted; other ingredients are not added as new columns.
+    """
+    code_ver = _git_short_sha()
+
+    parts = [
+        str(row.get("controller", "")),
+        str(row.get("scenario", "")),
+        str(row.get("thrust_newton", "")),
+        f"{float(row.get('r0_over_target', 0.0)):.12g}",
+        f"{float(row.get('target_r', 0.0)):.12g}",
+        code_ver,
+    ]
+    raw = "|".join(parts).encode("utf-8")
+    return hashlib.sha1(raw).hexdigest()[:8]
+
+
+def append_row_csv(csv_path: str, fieldnames: list, row: dict, key_name: str = "dedup_key"):
+    """
+    Append one row into CSV with dedup based on `dedup_key`.
+    Compatible with existing call: append_row_csv(CSV_PATH, FIELDNAMES, row)
+    """
+
+    p = Path(csv_path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+
+    # Ensure key column exists in target schema
+    if key_name not in fieldnames:
+        fieldnames = list(fieldnames) + [key_name]
+
+    # --- Create new file ---
+    if not p.exists():
+        with p.open("w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=fieldnames)
+            w.writeheader()
+            w.writerow({k: row.get(k, "") for k in fieldnames})
+        return "created"
+
+    # --- Read existing file ---
+    with p.open("r", newline="", encoding="utf-8") as f:
+        r = csv.DictReader(f)
+        existing_fieldnames = list(r.fieldnames) if r.fieldnames else []
+        rows = list(r)
+
+    # --- Upgrade header if missing dedup_key ---
+    upgraded = False
+    if key_name not in existing_fieldnames:
+        existing_fieldnames.append(key_name)
+        for rr in rows:
+            rr[key_name] = rr.get(key_name, "")
+        upgraded = True
+
+    # Also ensure any new columns from fieldnames are included
+    for col in fieldnames:
+        if col not in existing_fieldnames:
+            existing_fieldnames.append(col)
+            for rr in rows:
+                rr[col] = rr.get(col, "")
+            upgraded = True
+
+    # --- Dedup check ---
+    new_key = row.get(key_name, "")
+    if new_key:
+        for rr in rows:
+            if rr.get(key_name, "") == new_key:
+                if upgraded:
+                    with p.open("w", newline="", encoding="utf-8") as f:
+                        w = csv.DictWriter(f, fieldnames=existing_fieldnames)
+                        w.writeheader()
+                        w.writerows([{k: x.get(k, "") for k in existing_fieldnames} for x in rows])
+                    return "upgraded_skip"
+                return "skip"
+
+    # --- Append and rewrite ---
+    rows.append({k: row.get(k, "") for k in existing_fieldnames})
+
+    with p.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=existing_fieldnames)
+        w.writeheader()
+        w.writerows([{k: x.get(k, "") for k in existing_fieldnames} for x in rows])
+
+    return "upgraded_append" if upgraded else "append"
 
 
 def main():
@@ -606,6 +692,7 @@ def main():
     # WHPL_03: append exactly one CSV row per run
     CSV_PATH = Path(PROJECT_ROOT) / "analysis" / "results" / "ablation_thrust_x_difficulty.csv"
     FIELDNAMES = [
+        "dedup_key",
         "thrust_newton",
         "difficulty_tag",
         "r0_over_target",
@@ -635,8 +722,13 @@ def main():
         "total_reward": float(r.get("total_reward", math.nan)),
     }
 
-    append_row_csv(CSV_PATH, FIELDNAMES, row)
-    print(f"[WHPL_03] appended 1 row -> {CSV_PATH}")
+    row["controller"] = "ExpertImproved"  # used only for key computation (not saved as a column)
+    row["scenario"] = r.get("scenario_effective", r.get("scenario_requested", ""))
+    row["target_r"] = target_r  # used only for key computation
+
+    row["dedup_key"] = _compute_dedup_key(row)
+    status = append_row_csv(CSV_PATH, FIELDNAMES, row)
+    print(f"[WHPL_03] csv_status={status} -> {CSV_PATH}")
     print(f"[WHPL_03] row = {row}")
 
     # Sanity check: if everything is identical, something is wrong.
