@@ -641,7 +641,7 @@ def main():
 
     # WHPL_03 fixed single-run coordinate (no sweep, no comparison)
     WHPL3_THRUST_NEWTON = 800.0
-    WHPL3_DIFFICULTY_TAG = "Hard"
+    WHPL3_DIFFICULTY_TAG = os.environ.get("DIFFICULTY_TAG", "Hard").strip() or "Hard"
 
     # CLI guardrails
     if args.no_sweep and (args.thrust is None):
@@ -670,8 +670,9 @@ def main():
         thrust_sweep = [200.0, 800.0, 2000.0]
         print(f"[SELF-CHECK] env override: none (default sweep={thrust_sweep})")
 
-    # WHPL_03: single scenario only (thrust × difficulty = one concrete row)
-    scenarios = [("weak_thrust_far", {"thrust_newton": float(WHPL3_THRUST_NEWTON)})]
+    ts_for_scenario = float(env_ts) if env_ts is not None else float(WHPL3_THRUST_NEWTON)
+
+    scenarios = [("weak_thrust_far", {"thrust_newton": ts_for_scenario})]
 
     # CLI: run single scenario only
     if args.scenario is not None:
@@ -713,8 +714,8 @@ def main():
         final_radius_error = float(abs(float(final_r) - target_r))
 
     row = {
-        "thrust_newton": float(WHPL3_THRUST_NEWTON),
-        "difficulty_tag": str(WHPL3_DIFFICULTY_TAG),
+        "thrust_newton": float(ts_for_scenario),
+        "difficulty_tag": str(os.environ.get("DIFFICULTY_TAG", WHPL3_DIFFICULTY_TAG)),
         "r0_over_target": float(r0_over_target),
         "avg_radius_error": float(r.get("avg_radius_error", math.nan)),
         "final_radius_error": float(final_radius_error),

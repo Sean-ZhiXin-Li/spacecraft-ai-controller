@@ -5,10 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e2bb176-8da5-43f7-842a-98f7d8a0a854" name="更改" comment="restart day: validate thrust sensitivity + log scaling cancellation">
-      <change afterPath="$PROJECT_DIR$/project_log/WHPL_06.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/plot_ablation_heatmap.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/validate_ablation_csv.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/project_log/WHPL_07.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/make_ablation_clean_csv.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/patch_ablation_tag.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/repair_ablation_csv.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/run_grid_min.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/SESSION6_metrics_upgrade.json" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/SESSION6_metrics_upgrade.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/envs/orbit_env.py" beforeDir="false" afterPath="$PROJECT_DIR$/envs/orbit_env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/quick_compare_v3_v4.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/quick_compare_v3_v4.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,9 +64,14 @@
     "Python.expert_controller_improved.executor": "Run",
     "Python.fig_helpers.executor": "Run",
     "Python.load_config.executor": "Run",
+    "Python.make_ablation_clean_csv.executor": "Run",
+    "Python.patch_ablation_tag.executor": "Run",
     "Python.plot_ablation_heatmap.executor": "Run",
+    "Python.plot_ablation_heatmap_whpl07.executor": "Run",
     "Python.plot_radius_vs_time.executor": "Run",
     "Python.quick_compare_v3_v4.executor": "Run",
+    "Python.repair_ablation_csv.executor": "Run",
+    "Python.run_grid_min.executor": "Run",
     "Python.smoke_test_full_system.executor": "Run",
     "Python.smoke_test_v4.executor": "Run",
     "Python.stress_battery.executor": "Run",
@@ -78,29 +88,7 @@
       <recent name="E:\spacecraft_ai_project\controller" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.plot_ablation_heatmap">
-    <configuration name="action_interface" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="spacecraft_ai_project" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/utils/action_interface.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Python.patch_ablation_tag">
     <configuration name="clean_ablation_csv" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
@@ -115,28 +103,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/script/clean_ablation_csv.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="debug_scaling_unfreeze" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="spacecraft_ai_project" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/debug_scaling_unfreeze.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -167,7 +133,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="plot_ablation_heatmap" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="make_ablation_clean_csv" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -180,7 +146,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/plot_ablation_heatmap.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/make_ablation_clean_csv.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -189,7 +155,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="smoke_test_full_system" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="patch_ablation_tag" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="spacecraft_ai_project" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -202,7 +168,73 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/smoke_test_full_system.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/patch_ablation_tag.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="plot_ablation_heatmap_whpl07" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="spacecraft_ai_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/plot_ablation_heatmap_whpl07.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="repair_ablation_csv" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="spacecraft_ai_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/repair_ablation_csv.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="run_grid_min" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="spacecraft_ai_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/run_grid_min.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -233,45 +265,23 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="validate_ablation_csv" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="spacecraft_ai_project" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/validate_ablation_csv.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <list>
       <item itemvalue="Python.expert_controller_improved" />
       <item itemvalue="Python.smoke_test_v4" />
       <item itemvalue="Python.clean_ablation_csv" />
-      <item itemvalue="Python.plot_ablation_heatmap" />
-      <item itemvalue="Python.validate_ablation_csv" />
-      <item itemvalue="Python.debug_scaling_unfreeze" />
-      <item itemvalue="Python.action_interface" />
-      <item itemvalue="Python.smoke_test_full_system" />
+      <item itemvalue="Python.patch_ablation_tag" />
+      <item itemvalue="Python.make_ablation_clean_csv" />
+      <item itemvalue="Python.repair_ablation_csv" />
+      <item itemvalue="Python.plot_ablation_heatmap_whpl07" />
+      <item itemvalue="Python.run_grid_min" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.plot_ablation_heatmap" />
-        <item itemvalue="Python.validate_ablation_csv" />
-        <item itemvalue="Python.debug_scaling_unfreeze" />
-        <item itemvalue="Python.action_interface" />
-        <item itemvalue="Python.smoke_test_full_system" />
+        <item itemvalue="Python.patch_ablation_tag" />
+        <item itemvalue="Python.make_ablation_clean_csv" />
+        <item itemvalue="Python.repair_ablation_csv" />
+        <item itemvalue="Python.plot_ablation_heatmap_whpl07" />
+        <item itemvalue="Python.run_grid_min" />
       </list>
     </recent_temporary>
   </component>

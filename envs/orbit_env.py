@@ -2,6 +2,7 @@ import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
 from typing import Optional, Tuple, Dict, Any
+import os
 
 # Keep aligned with local rewards_utils.py
 from ppo_orbit.rewards_utils import compute_reward
@@ -244,8 +245,14 @@ class OrbitEnv(gym.Env):
         self.steps = 0
         self.success_counter = 0
 
+        # Difficulty axis: initial radius multiplier (default = 1.25 for legacy Hard)
+        try:
+            r0_mul = float(os.environ.get("R0_OVER_TARGET", "1.25"))
+        except Exception:
+            r0_mul = 1.25
+
         if start_mode == "default":
-            self.pos = np.array([0.0, 1.25 * self.target_radius], dtype=np.float64)
+            self.pos = np.array([0.0, r0_mul * self.target_radius], dtype=np.float64)
             v_mag = np.sqrt(self.mu / np.linalg.norm(self.pos))
             angle = np.deg2rad(30.0)
             self.vel = v_mag * np.array([np.cos(angle), np.sin(angle)], dtype=np.float64)
