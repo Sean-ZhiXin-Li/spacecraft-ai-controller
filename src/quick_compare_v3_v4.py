@@ -323,6 +323,9 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
     sat_rates = []   # saturation_rate from action_interface (single source of truth)
 
     do_shadow_step = True
+    # --- WHPL_08 BEGIN: state for dr/dt (logging only) ---
+    prev_r_norm_scalar = None
+    # --- WHPL_08 END ---
     steps = 0
 
     # Cache config for action interface
@@ -418,6 +421,43 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
 
             t_unit, t_norm = _safe_unit(thrust_vec)
 
+            # --- WHPL_08 BEGIN: radial/tangential decomposition (logging only) ---
+            # NOTE: in your code, t_unit currently means "thrust unit". We'll keep it but add explicit names.
+            th_unit = t_unit  # thrust direction unit
+
+            # 2D tangential unit = rotate r_unit by +90 deg
+            if (r_unit is not None) and (r_vec.size == 2):
+                tan_unit = np.array([-r_unit[1], r_unit[0]], dtype=np.float64)
+            else:
+                tan_unit = None
+
+            if (th_unit is not None) and (r_unit is not None) and (tan_unit is not None):
+                cos_tr = float(np.clip(np.dot(th_unit, r_unit), -1.0, 1.0))  # cos(thrust, radial)
+                cos_tt = float(np.clip(np.dot(th_unit, tan_unit), -1.0, 1.0))  # cos(thrust, tangential)
+            else:
+                cos_tr = float("nan")
+                cos_tt = float("nan")
+
+            # radial velocity v_r = dot(v, r_unit)
+            if (v_vec is not None) and (r_unit is not None):
+                v_r = float(np.dot(v_vec, r_unit))
+            else:
+                v_r = float("nan")
+
+            # dr/dt using env dt if available
+            dt_now = None
+            if isinstance(info, dict) and ("dt" in info) and (info["dt"] is not None):
+                try:
+                    dt_now = float(info["dt"])
+                except Exception:
+                    dt_now = None
+
+            if (prev_r_norm_scalar is not None) and (dt_now is not None) and (dt_now > 0.0) and np.isfinite(r_norm):
+                dr_dt = float((r_norm - prev_r_norm_scalar) / dt_now)
+            else:
+                dr_dt = float("nan")
+            # --- WHPL_08 END ---
+
             # (1) Thrust vs velocity alignment
             if (t_unit is not None) and (v_unit is not None):
                 cos_tv = float(np.clip(np.dot(t_unit, v_unit), -1.0, 1.0))
@@ -439,12 +479,16 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
             else:
                 h = float("nan")
 
-            # One compact line (less spam, more signal)
             print(
                 f"[SELF-CHECK] step={steps} r={r_norm:.12e} r_err={r_err:.12e} rel_err={rel_err:.6e} | "
                 f"v={v_norm:.3e} cos(thrust,vel)={cos_tv:+.6f} | "
-                f"eps={eps:.6e} |h|={h:.6e} | thrust_norm={t_norm:.3e}"
+                f"eps={eps:.6e} |h|={h:.6e} | thrust_norm={t_norm:.3e} | "
+                f"[WHPL_08] cos(thrust,rad)={cos_tr:+.6f} cos(thrust,tan)={cos_tt:+.6f} v_r={v_r:+.6e} dr_dt={dr_dt:+.6e}"
             )
+
+            # --- WHPL_08 BEGIN: update state ---
+            prev_r_norm_scalar = float(r_norm) if np.isfinite(r_norm) else prev_r_norm_scalar
+            # --- WHPL_08 END ---
 
         a_norm = np.linalg.norm(aa_print)
         if a_norm > 1e-12:
