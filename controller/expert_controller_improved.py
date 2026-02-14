@@ -55,6 +55,19 @@ class ExpertController:
         self.smoothed_dir = None
         self.prev_thrust = None
 
+        # WHPL_09: explicit radial PD (always-on, bounded)
+        self.enable_radial_pd = True
+        self.radial_pd_gain_p = 0.60    # dimensionless, used inside tanh
+        self.radial_pd_gain_d = 0.60    # dimensionless, used inside tanh
+        self.radial_pd_cap_frac = 0.60  # IMPORTANT: was 0.20; make it visible
+
+        self.whpl09_debug = False
+        self.whpl09_every = 200
+        self._whpl09_ctr = 0
+
+
+
+
 
     # v4 Part 1: distance-based scaling
 
@@ -110,6 +123,28 @@ class ExpertController:
             radial_error / (0.05 * self.target_radius)
         )
 
+        # =========================
+        # WHPL_09: always-on radial PD injection (bounded)
+        thrust_r_pd = 0.0  # default evidence value
+
+        if self.enable_radial_pd:
+            radial_velocity = float(np.dot(v_vec, radial_dir))  # v_r
+
+            # PD in the SAME normalized coordinates as your existing design
+            p_term = -self.radial_pd_gain_p * np.tanh(
+                radial_error / (0.05 * self.target_radius + 1e-12)
+            )
+            d_term = -self.radial_pd_gain_d * np.tanh(radial_velocity / 1e4)
+
+            thrust_r_pd = p_term + d_term
+
+            # Bound PD injection by a fraction of thrust_limit (same units as thrust_r)
+            cap = float(self.radial_pd_cap_frac) * float(self.thrust_limit)
+            thrust_r_pd = float(np.clip(thrust_r_pd, -1.0, 1.0)) * cap
+
+            thrust_r += thrust_r_pd
+        # =========================
+
         # damping term (near target)
         if self.enable_damping:
             radial_velocity = np.dot(v_vec, radial_dir)
@@ -134,6 +169,7 @@ class ExpertController:
 
         # raw thrust vector
         thrust_vec = thrust_r * radial_dir + thrust_t * tangential_dir
+
         base_norm = np.linalg.norm(thrust_vec)
         if base_norm < 1e-12:
             return np.zeros(2)
@@ -180,6 +216,24 @@ class ExpertController:
             thrust_vec = thrust_vec / nrm * self.thrust_limit
 
         self.prev_thrust = thrust_vec
+
+        if self.whpl09_debug:
+            ctr = self._whpl09_ctr  # snapshot current counter
+
+            if ctr % self.whpl09_every == 0:
+                print(
+                    f"[WHPL_09] step={ctr} "
+                    f"r={r:.12e} "
+                    f"r_err={radial_error:.12e} "
+                    f"v_r={np.dot(v_vec, radial_dir):+.6e} "
+                    f"thrust_r={thrust_r:+.6e} "
+                    f"thrust_r_pd={thrust_r_pd:+.6e} "
+                    f"thrust_t={thrust_t:+.6e} "
+                    f"thrust_norm={np.linalg.norm(thrust_vec):.6e}"
+                )
+
+            self._whpl09_ctr = ctr + 1
+
         return thrust_vec
 
 
