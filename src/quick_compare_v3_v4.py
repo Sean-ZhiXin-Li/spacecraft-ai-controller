@@ -483,7 +483,7 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
                 f"[SELF-CHECK] step={steps} r={r_norm:.12e} r_err={r_err:.12e} rel_err={rel_err:.6e} | "
                 f"v={v_norm:.3e} cos(thrust,vel)={cos_tv:+.6f} | "
                 f"eps={eps:.6e} |h|={h:.6e} | thrust_norm={t_norm:.3e} | "
-                f"[WHPL_08] cos(thrust,rad)={cos_tr:+.6f} cos(thrust,tan)={cos_tt:+.6f} v_r={v_r:+.6e} dr_dt={dr_dt:+.6e}"
+                f"[WHPL_10] cos(thrust,rad)={cos_tr:+.6f} cos(thrust,tan)={cos_tt:+.6f} v_r={v_r:+.6e} dr_dt={dr_dt:+.6e}"
             )
 
             # --- WHPL_08 BEGIN: update state ---

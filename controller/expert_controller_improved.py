@@ -61,12 +61,10 @@ class ExpertController:
         self.radial_pd_gain_d = 0.60    # dimensionless, used inside tanh
         self.radial_pd_cap_frac = 0.60  # IMPORTANT: was 0.20; make it visible
 
-        self.whpl09_debug = False
+        self.whpl09_debug = True
+        self.whpl10_disable_smoothing = False  # WHPL_10: 1-shot smoothing control
         self.whpl09_every = 200
         self._whpl09_ctr = 0
-
-
-
 
 
     # v4 Part 1: distance-based scaling
@@ -126,9 +124,20 @@ class ExpertController:
         # =========================
         # WHPL_09: always-on radial PD injection (bounded)
         thrust_r_pd = 0.0  # default evidence value
+        g_r = 0.0
+        d_scale = 1.0
 
         if self.enable_radial_pd:
             radial_velocity = float(np.dot(v_vec, radial_dir))  # v_r
+
+
+            # WHPL_10 Knife 1: Error-band gating (continuous)
+
+            r_on = 0.12
+            r_full = 0.30
+            rel = abs(radial_error) / (self.target_radius + 1e-12)  # dimensionless
+            g_r = (rel - r_on) / (r_full - r_on + 1e-12)
+            g_r = float(np.clip(g_r, 0.0, 1.0))
 
             # PD in the SAME normalized coordinates as your existing design
             p_term = -self.radial_pd_gain_p * np.tanh(
@@ -136,13 +145,28 @@ class ExpertController:
             )
             d_term = -self.radial_pd_gain_d * np.tanh(radial_velocity / 1e4)
 
+            # WHPL_10 Knife 2: D-term sign gating (reduce D when already moving inward)
+            # Condition uses YOUR conventions:
+            # radial_error > 0  => r above target
+            # radial_velocity < 0 => moving inward
+
+            d_inward_scale = 0.3
+            d_scale = 1.0
+            if (radial_error > 0.0) and (radial_velocity < 0.0):
+                d_scale = d_inward_scale
+            d_term = d_scale * d_term
+
             thrust_r_pd = p_term + d_term
 
             # Bound PD injection by a fraction of thrust_limit (same units as thrust_r)
             cap = float(self.radial_pd_cap_frac) * float(self.thrust_limit)
             thrust_r_pd = float(np.clip(thrust_r_pd, -1.0, 1.0)) * cap
 
+            # Apply error-band gating to the PD injection (structure gate)
+            thrust_r_pd = g_r * thrust_r_pd
+
             thrust_r += thrust_r_pd
+
         # =========================
 
         # damping term (near target)
@@ -175,18 +199,19 @@ class ExpertController:
             return np.zeros(2)
 
         # v4 Part 2: low-pass filtering
-
         raw_dir = thrust_vec / base_norm
 
-        if self.smoothed_dir is None:
-            self.smoothed_dir = raw_dir
+        if self.whpl10_disable_smoothing:
+            thrust_dir = raw_dir
         else:
-            # v4.2: even stronger smoothing, focusing on reducing jitter
-            alpha = 0.05
-            self.smoothed_dir = alpha * raw_dir + (1.0 - alpha) * self.smoothed_dir
-            self.smoothed_dir /= np.linalg.norm(self.smoothed_dir) + 1e-12
+            if self.smoothed_dir is None:
+                self.smoothed_dir = raw_dir
+            else:
+                alpha = 0.05
+                self.smoothed_dir = alpha * raw_dir + (1.0 - alpha) * self.smoothed_dir
+                self.smoothed_dir /= np.linalg.norm(self.smoothed_dir) + 1e-12
+            thrust_dir = self.smoothed_dir
 
-        thrust_dir = self.smoothed_dir
         thrust_mag = base_norm
 
         # v4 Part 3: angular momentum alignment near target
@@ -220,12 +245,15 @@ class ExpertController:
         if self.whpl09_debug:
             ctr = self._whpl09_ctr  # snapshot current counter
 
-            if ctr % self.whpl09_every == 0:
+            if ctr in (0, 200, 400, 600, 800):
                 print(
-                    f"[WHPL_09] step={ctr} "
+                    f"[WHPL_10] step={ctr} "
                     f"r={r:.12e} "
                     f"r_err={radial_error:.12e} "
                     f"v_r={np.dot(v_vec, radial_dir):+.6e} "
+                    f"rel={abs(radial_error) / (self.target_radius + 1e-12):.4f} "
+                    f"g_r={g_r:.3f} "
+                    f"d_scale={d_scale:.2f} "
                     f"thrust_r={thrust_r:+.6e} "
                     f"thrust_r_pd={thrust_r_pd:+.6e} "
                     f"thrust_t={thrust_t:+.6e} "
