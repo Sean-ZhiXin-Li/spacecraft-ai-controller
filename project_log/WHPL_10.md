@@ -195,4 +195,4 @@ This establishes the first confirmed structural control-regime improvement towar
 * Preserve structural differences in 2D ablation heatmap.
 * Avoid scope expansion.
 
-
+    

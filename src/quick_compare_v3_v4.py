@@ -9,6 +9,8 @@ from pathlib import Path
 import math
 import hashlib
 import subprocess
+# WHPL_11: controller variant tracking (hard-coded, no auto-detect)
+CONTROLLER_VARIANT = "whpl11_variant_tracking"
 
 
 def dir_variation_unit(vecs: np.ndarray, eps: float = 1e-12) -> float:
@@ -593,12 +595,14 @@ def _compute_dedup_key(row: dict) -> str:
 
     parts = [
         str(row.get("controller", "")),
+        str(row.get("controller_variant", "legacy")),  # WHPL_11 NEW
         str(row.get("scenario", "")),
         str(row.get("thrust_newton", "")),
         f"{float(row.get('r0_over_target', 0.0)):.12g}",
         f"{float(row.get('target_r', 0.0)):.12g}",
         code_ver,
     ]
+
     raw = "|".join(parts).encode("utf-8")
     return hashlib.sha1(raw).hexdigest()[:8]
 
@@ -738,6 +742,7 @@ def main():
     CSV_PATH = Path(PROJECT_ROOT) / "analysis" / "results" / "ablation_thrust_x_difficulty.csv"
     FIELDNAMES = [
         "dedup_key",
+        "controller_variant",  # WHPL_11 NEW
         "thrust_newton",
         "difficulty_tag",
         "r0_over_target",
@@ -758,6 +763,7 @@ def main():
         final_radius_error = float(abs(float(final_r) - target_r))
 
     row = {
+        "controller_variant": CONTROLLER_VARIANT,  # WHPL_11 NEW
         "thrust_newton": float(ts_for_scenario),
         "difficulty_tag": str(os.environ.get("DIFFICULTY_TAG", WHPL3_DIFFICULTY_TAG)),
         "r0_over_target": float(r0_over_target),
