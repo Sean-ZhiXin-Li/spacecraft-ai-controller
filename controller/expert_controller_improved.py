@@ -31,7 +31,7 @@ class ExpertController:
         target_radius: desired orbit radius
         G, M: gravitational parameters
         mass: spacecraft mass
-        radial_gain, tangential_gain: control gains
+        radial_gain, tangential_gain: control gainsz
         damping_gain: radial oscillation damping
         thrust_limit: max thrust magnitude
         enable_damping: toggle for radial damping term
@@ -65,7 +65,8 @@ class ExpertController:
         self.whpl10_disable_smoothing = False  # WHPL_10: 1-shot smoothing control
         self.whpl09_every = 200
         self._whpl09_ctr = 0
-
+        # WHPL_13: toggle error-band gating for radial PD injection
+        self.enable_pd_gating = True
 
     # v4 Part 1: distance-based scaling
 
@@ -162,8 +163,9 @@ class ExpertController:
             cap = float(self.radial_pd_cap_frac) * float(self.thrust_limit)
             thrust_r_pd = float(np.clip(thrust_r_pd, -1.0, 1.0)) * cap
 
-            # Apply error-band gating to the PD injection (structure gate)
-            thrust_r_pd = g_r * thrust_r_pd
+            # WHPL_13: optional error-band gating (structure toggle)
+            if self.enable_pd_gating:
+                thrust_r_pd = g_r * thrust_r_pd
 
             thrust_r += thrust_r_pd
 

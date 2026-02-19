@@ -9,8 +9,7 @@ from pathlib import Path
 import math
 import hashlib
 import subprocess
-# WHPL_11: controller variant tracking (hard-coded, no auto-detect)
-CONTROLLER_VARIANT = "whpl11_variant_tracking"
+CONTROLLER_VARIANT = os.getenv("CONTROLLER_VARIANT", "whpl11_variant_tracking")
 
 
 def dir_variation_unit(vecs: np.ndarray, eps: float = 1e-12) -> float:
@@ -96,7 +95,20 @@ def build_controller(ControllerCls, env, obs):
         n = x.size // 2
         pos0 = x[:n]
         tr = float(np.linalg.norm(pos0))
-    return ControllerCls(target_radius=float(tr))
+
+    controller = ControllerCls(target_radius=float(tr))
+
+    # --- WHPL_13: toggle PD gating via env controller variant ---
+    variant = os.environ.get("CONTROLLER_VARIANT", "").strip().lower()
+    if hasattr(controller, "enable_pd_gating"):
+        if variant in ("always_on", "pd_always_on", "no_gate", "ungated"):
+            controller.enable_pd_gating = False
+        elif variant in ("gated", "pd_gated", "gate", "whpl10_gated"):
+            controller.enable_pd_gating = True
+        # else: leave default (True) to preserve baseline behavior
+
+    return controller
+
 
 
 def make_env_for_scenario(scenario_name=None, cfg=None, physical_override=None):
