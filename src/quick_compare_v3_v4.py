@@ -751,7 +751,15 @@ def main():
     assert len(results) == 1, f"WHPL_03 expects exactly 1 run, got {len(results)}"
 
     # WHPL_03: append exactly one CSV row per run
-    CSV_PATH = Path(PROJECT_ROOT) / "analysis" / "results" / "ablation_thrust_x_difficulty.csv"
+    DEFAULT_CSV_PATH = Path(PROJECT_ROOT) / "analysis" / "results" / "ablation_thrust_x_difficulty.csv"
+
+    csv_override = os.environ.get("ABLATION_CSV")
+
+    if csv_override:
+        CSV_PATH = Path(PROJECT_ROOT) / csv_override
+    else:
+        CSV_PATH = DEFAULT_CSV_PATH
+
     FIELDNAMES = [
         "dedup_key",
         "controller_variant",  # WHPL_11 NEW
