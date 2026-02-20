@@ -139,6 +139,12 @@ class ExpertController:
             rel = abs(radial_error) / (self.target_radius + 1e-12)  # dimensionless
             g_r = (rel - r_on) / (r_full - r_on + 1e-12)
             g_r = float(np.clip(g_r, 0.0, 1.0))
+            # floor-gating (avoid lock-out at rel=0.05 like r0=1.05)
+            rel_err_tol = 0.01
+            if rel > rel_err_tol:
+                g_r = max(g_r, 0.10)
+            else:
+                g_r = 0.0
 
             # PD in the SAME normalized coordinates as your existing design
             p_term = -self.radial_pd_gain_p * np.tanh(
