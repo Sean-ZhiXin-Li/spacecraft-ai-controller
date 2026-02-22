@@ -350,6 +350,10 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
     actions = []
     a_effs = []
 
+    # --- Day16: trajectory recording (no behavior change) ---
+    r_series = []
+    vr_series = []
+
     for _ in range(max_steps):
         # 1) Controller outputs thrust intent in Newtons
         thrust_intent = controller.act(obs)
@@ -411,6 +415,21 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
         n = x.size // 2
         pos = x[:n]
         r = float(np.linalg.norm(pos))
+        # Record radius each step
+        r_series.append(float(r))
+        # --- Day16: record radial velocity v_r each step (no behavior change) ---
+        x2 = np.asarray(obs, dtype=np.float64).ravel()
+        n2 = x2.size // 2
+        r_vec = x2[:n2]
+        v_vec = x2[n2:]
+
+        r_unit_step, _ = _safe_unit(r_vec)
+        if r_unit_step is not None:
+            v_r_step = float(np.dot(v_vec, r_unit_step))
+        else:
+            v_r_step = float("nan")
+
+        vr_series.append(v_r_step)
         r_err = abs(r - target_radius)
 
         radius_errors.append(r_err)
@@ -418,11 +437,6 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
 
         if steps % 200 == 0:
             rel_err = r_err / max(1e-12, target_radius)
-
-            x2 = np.asarray(obs, dtype=np.float64).ravel()
-            n2 = x2.size // 2
-            r_vec = x2[:n2]
-            v_vec = x2[n2:]
 
             r_unit, r_norm = _safe_unit(r_vec)
             v_unit, v_norm = _safe_unit(v_vec)
@@ -563,6 +577,33 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
         f"avg_radius_error={avg_radius_error:.3e}, "
         f"avg_jitter={avg_jitter:.3e}"
     )
+
+    # Day16: save trajectory to analysis/runs/<dedup_key>/traj.npz
+    runs_root = Path(PROJECT_ROOT) / "analysis" / "runs"
+    runs_root.mkdir(parents=True, exist_ok=True)
+
+    # Use a temporary key; dedup_key is computed later in main(), so we store by timestamp-ish folder.
+    # If you want exact dedup_key folder, we can pass it in later.
+    run_dir = runs_root / f"run_{int(1e6*np.random.rand())}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    np.savez(
+        run_dir / "traj.npz",
+        r=np.asarray(r_series, dtype=np.float64),
+        vr=np.asarray(vr_series, dtype=np.float64),
+        target_r=float(target_radius),
+    )
+    # Optional: save meta for Day16 scanner
+    meta = {
+        "controller_variant": os.environ.get("CONTROLLER_VARIANT", ""),
+        "thrust_newton": float(phys.get("thrust_newton", float("nan"))) if isinstance(phys, dict) else float("nan"),
+        "r0_over_target": float(r0 / max(1e-12, target_radius)),
+        "total_reward": float(total_reward),
+        "saturation_rate_mean": float(sat_rate_mean),
+        "target_radius": float(target_radius),
+    }
+    with (run_dir / "metrics.json").open("w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2)
 
     return {
         "scenario_requested": requested,

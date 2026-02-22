@@ -13,16 +13,16 @@
       },
       "label": "ExpertImproved",
       "steps": 2000,
-      "total_reward": -17720.254519256196,
-      "final_r": 7874805760174.324,
-      "avg_radius_error": 374928097136.91455,
-      "avg_jitter": 1.2643753496186959e-07,
-      "saturation_rate_mean": 0.009,
+      "total_reward": 5380.439774582626,
+      "final_r": 7537502978229.407,
+      "avg_radius_error": 37505133172.46185,
+      "avg_jitter": 1.7917356649486137e-07,
+      "saturation_rate_mean": 0.0,
       "lambda_sat": 0.1,
-      "reward_minus_lambda_sat": -17736.203648323528,
-      "sat_adjusted_score": -17736.203648323528,
+      "reward_minus_lambda_sat": 5380.439774582626,
+      "sat_adjusted_score": 5380.439774582626,
       "target_radius": 7500000000000.0,
-      "r0_over_target": 1.049999966208
+      "r0_over_target": 1.0049999776426666
     }
   ]
 }
