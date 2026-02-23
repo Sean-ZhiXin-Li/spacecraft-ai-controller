@@ -2,7 +2,7 @@
 
 ## Date
 
-Day16: 2026-02-22
+Day16: 2026-02-22 -- 23
 
 ---
 
@@ -10,7 +10,7 @@ Day16: 2026-02-22
 
 Transition from boundary visualization (Day15) to mechanism-level explanation.
 
-Instead of drawing more maps, compress observed stability differences into dynamical structure.
+Instead of drawing additional stability maps, compress observed stability differences into dynamical structure.
 
 Core question:
 
@@ -18,9 +18,9 @@ Core question:
 
 ---
 
-# Experimental Setup (Near-field)
+# Experimental Setup (Near-field Regime)
 
-Fixed condition:
+Fixed initial condition:
 
 * r0_over_target ≈ 1.005
 
@@ -39,7 +39,6 @@ Metrics extracted per run:
 * t_flip
 * t_cross
 * delta_r
-* rel_delta_r
 
 ---
 
@@ -49,12 +48,12 @@ Metrics extracted per run:
 
 * t_flip ≈ 840
 * min_vr ≈ −890 m/s
-* r_err almost constant
-* No target crossing
+* r_err remains nearly constant
+* No target crossing within 2000 steps
 
 Behavior:
-Conservative correction, limited inward momentum.
-Stable but slow convergence.
+Conservative inward correction with limited momentum buildup.
+Stable, but convergence is slow.
 
 ---
 
@@ -67,60 +66,69 @@ Stable but slow convergence.
 
 Interpretation:
 Thrust amplification increases effective closed-loop gain.
-Earlier radial sign flip → stronger inward momentum accumulation.
-System enters high-energy correction phase sooner.
+Earlier velocity sign flip indicates faster inward transition.
+Stronger inward momentum accumulation emerges.
 
-This forms the structural precursor of overshoot risk.
+This configuration enters a high-energy correction phase sooner.
+
+This forms the structural precursor of overshoot risk in extended horizons.
 
 ---
 
 ## 800N + gated (B)
 
 * t_flip = None
-* min_vr ≈ +72 m/s (never truly inward)
+* min_vr ≈ +72 m/s (never significantly inward)
 * r_err barely decreases
 
 Interpretation:
 Gating suppresses correction under low thrust.
-Highly conservative behavior.
+Energy injection remains constrained.
+
+Behavior is highly conservative.
 Stable but under-responsive.
 
 ---
 
 ## 2000N + gated (C)
 
-* t_flip ≈ 864 (delayed)
+* t_flip ≈ 864 (delayed compared to always_on)
 * min_vr ≈ −563 m/s (reduced inward magnitude)
 * Smaller Δr magnitude than always_on
 
 Interpretation:
-Gating under high thrust reduces effective energy injection.
-Suppresses inward momentum buildup.
-Delays entry into high-gain regime.
+Under high thrust, gating reduces effective energy injection.
+Inward momentum buildup is moderated.
 
-Explains expanded stability domain under high thrust.
+Entry into high-gain regime is delayed.
+
+This explains expansion of the stability domain under high thrust when regulation is applied.
 
 ---
 
 # Mechanism Compression
 
-Thrust ≈ closed-loop gain.
+Thrust acts as a gain scaling parameter in the radial feedback loop.
 
-When gain increases:
+Increasing thrust increases effective loop gain, which:
 
-* Earlier velocity sign flip
-* Larger inward velocity magnitude
-* Faster error reduction
-* Higher risk of overshoot beyond target radius
+* Accelerates error correction
+* Increases inward momentum magnitude
+* Reduces time to velocity sign flip
+* Raises overshoot probability in extended horizons
+
+Therefore, thrust does not directly "stabilize" the system.
+It reshapes the energy landscape of the closed-loop dynamics.
 
 always_on allows full gain injection.
 
 High thrust + always_on:
-→ enters high-momentum regime
-→ greater plunge tendency
-→ potential overshoot/oscillation in extended horizon
 
-Gated control acts as energy regulator:
+→ enters high-momentum regime
+→ increases plunge tendency
+→ elevates overshoot / oscillation risk in longer horizons
+
+Gated control functions as an energy regulator:
 
 * Reduces effective gain
 * Delays inward transition
@@ -136,8 +144,19 @@ Therefore:
 
 # Structural Insight
 
+We define a structural plane:
+
+Dimension 1 — Gain scaling (Thrust magnitude)
+Dimension 2 — Energy regulation structure (always_on vs gated)
+
+Stability is not a function of thrust alone.
+It is a surface defined over this 2D interaction space.
+
+The observed stability domain is a projection of this surface
+under a finite-horizon kinetic observation window.
+
 In the near-field regime (r0 ≈ 1.005),
-current 2000-step horizon captures the momentum build-up phase,
+the current 2000-step horizon captures the momentum build-up phase,
 not full geometric convergence.
 
 The system is observed in its kinetic shaping stage.
@@ -149,7 +168,7 @@ Gating modifies the trajectory within that manifold.
 
 # Conclusion
 
-Day16 successfully transforms stability boundary observation
+Day16 transforms stability boundary observation
 into dynamical mechanism explanation.
 
 We now understand:
@@ -158,14 +177,27 @@ We now understand:
 * Why always_on risks high-momentum correction
 * Why gated expands stability under high thrust
 
-This establishes a two-dimensional structural interpretation:
+Stability domain is an emergent property of the interaction between:
 
-Axis 1: Thrust magnitude (gain scaling)
-Axis 2: Control structure (energy regulation)
-
-Stability domain is an emergent property of their interaction.
+1. Gain scaling (thrust)
+2. Energy regulation structure (control logic)
 
 ---
 
-Next step:
-Extend horizon to test overshoot phase and validate full-cycle dynamics.
+# Structural Continuation (Day17)
+
+Day17 does not extend experiments.
+It formalizes trajectory-level metrics into a batch summary table.
+
+The summary CSV becomes the structural interface between:
+
+raw kinetic trajectories → 2D structural interpretation
+
+This freezes the mechanism layer before further expansion.
+
+---
+
+Next phase (post-freeze):
+
+Extend horizon to test overshoot phase
+and validate full-cycle dynamics in extended time regimes.
