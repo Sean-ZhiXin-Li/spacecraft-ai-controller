@@ -139,8 +139,14 @@ def summarize_one_run(run_dir: Path) -> Optional[dict]:
 
     # Load minimal signals present in traj.npz
     r = np.asarray(d[r_key]).astype(float).reshape(-1)
-    target_r = np.asarray(d[target_r_key]).astype(float).reshape(-1)
+    target_r_raw = np.asarray(d[target_r_key]).astype(float)
     vr = np.asarray(d[vr_key]).astype(float).reshape(-1)
+
+    # If target_r is a scalar, broadcast it to match r
+    if target_r_raw.ndim == 0 or target_r_raw.size == 1:
+        target_r = np.full_like(r, float(target_r_raw))
+    else:
+        target_r = target_r_raw.reshape(-1)
 
     # Align lengths
     n = min(r.size, target_r.size, vr.size)

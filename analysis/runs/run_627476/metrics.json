@@ -1,0 +1,8 @@
+{
+  "controller_variant": "always_on",
+  "thrust_newton": 1800.0,
+  "r0_over_target": 1.2500000396629334,
+  "total_reward": -24918.175828143514,
+  "saturation_rate_mean": 0.03775,
+  "target_radius": 7500000000000.0
+}
