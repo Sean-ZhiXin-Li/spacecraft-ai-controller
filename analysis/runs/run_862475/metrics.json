@@ -1,0 +1,8 @@
+{
+  "controller_variant": "gated",
+  "thrust_newton": 1500.0,
+  "r0_over_target": 1.0020000017066666,
+  "total_reward": 1050.0443363033357,
+  "saturation_rate_mean": 0.0,
+  "target_radius": 7500000000000.0
+}

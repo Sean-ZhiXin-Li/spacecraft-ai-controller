@@ -9,20 +9,20 @@
       "scenario_effective": "weak_thrust_far",
       "scenario_supported": true,
       "phys": {
-        "thrust_newton": 2500.0
+        "thrust_newton": 100000.0
       },
       "label": "ExpertImproved",
       "steps": 2000,
-      "total_reward": -25103.857630005237,
-      "final_r": 9374684676290.383,
-      "avg_radius_error": 1874887753332.556,
-      "avg_jitter": 1.0203526980418696e-07,
-      "saturation_rate_mean": 0.00825,
+      "total_reward": -119586.47719701579,
+      "final_r": 7575055635039.958,
+      "avg_radius_error": 74955814031.40594,
+      "avg_jitter": 0.0006165450132166506,
+      "saturation_rate_mean": 0.0,
       "lambda_sat": 0.1,
-      "reward_minus_lambda_sat": -25124.569137549992,
-      "sat_adjusted_score": -25124.569137549992,
+      "reward_minus_lambda_sat": -119586.47719701579,
+      "sat_adjusted_score": -119586.47719701579,
       "target_radius": 7500000000000.0,
-      "r0_over_target": 1.2500000396629334
+      "r0_over_target": 1.0100000074410667
     }
   ]
 }
