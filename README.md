@@ -1,35 +1,52 @@
 # AI-Controlled Spacecraft Orbital Simulator
 
-*A reproducible research framework reflecting the technical and philosophical direction of the Spacecraft AI Controller and Tech Foundations projects.*
+*A reproducible research framework for developing, benchmarking, and scaling AI-based spacecraft control systems under realistic orbital dynamics.*
 
 ---
 
 ## Project Overview
 
-* **Goal:** Develop and benchmark AI controllers for spacecraft thrust control under realistic orbital dynamics.
-* **Features:**
+This project focuses on building a **physics-grounded, AI-driven control framework** for spacecraft orbit management. It combines simulation, classical control, and modern machine learning into a unified experimental platform.
 
-  * Custom `OrbitEnv` (Gymnasium-compatible) with solar-scale orbits.
-  * Multiple controllers: heuristic, expert, imitation (MLP), PPO.
-  * Baseline evaluation harness with fuel-aware metrics and reproducibility.
-  * Integrated research continuum connecting simulation, control, and hardware experiments.
+### Objectives
+
+* Develop AI controllers for orbital thrust and trajectory control
+* Benchmark different control strategies under consistent conditions
+* Build a reproducible pipeline for research and experimentation
+* Bridge simulation results toward real-world embedded systems
+
+### Key Features
+
+* Custom **Gymnasium-compatible orbital environment (`OrbitEnv`)**
+* Support for multiple controllers:
+
+  * Heuristic / rule-based
+  * Expert-designed controllers
+  * Imitation learning (MLP)
+  * Reinforcement learning (PPO)
+* Standardized evaluation pipeline with:
+
+  * Fuel-aware metrics
+  * Orbit accuracy metrics
+  * Reproducibility guarantees
+* Modular structure for rapid experimentation
 
 ---
 
 ## Repository Structure
 
-```text
+```
 spacecraft_ai_project/
 │
-├── simulator/         # Orbit physics environment (OrbitEnv, integrators)
-├── controller/        # Expert, imitation, PPO controllers
-├── data/              # Expert datasets (.npy, .csv)
-├── ppo_orbit/         # PPO agent code
-├── tools/             # Quickrun, summarizer, plotting utilities
-├── project_log/       # Daily project logs (Day1–Day55)
-├── ab/                # Experiment results (task specs, csv, figs)
-├── results/           # Final CSV summaries and baseline results
-├── LICENSE            # License file
+├── simulator/         # Orbital physics and environment (OrbitEnv)
+├── controller/        # Expert, imitation, and RL controllers
+├── data/              # Training datasets (expert trajectories)
+├── ppo_orbit/         # PPO training implementation
+├── tools/             # Utilities (quickrun, plotting, summarization)
+├── project_log/       # Daily research logs and notes
+├── ab/                # Experiment outputs and benchmarks
+├── results/           # Final summarized results
+├── LICENSE
 └── README.md
 ```
 
@@ -40,9 +57,9 @@ spacecraft_ai_project/
 ### Requirements
 
 * Python 3.10+
-* Recommended: create a new virtual environment (venv or conda)
+* Recommended: virtual environment (venv or conda)
 
-### Install dependencies
+### Install Dependencies
 
 ```bash
 pip install numpy matplotlib torch scikit-learn gymnasium
@@ -52,7 +69,7 @@ pip install numpy matplotlib torch scikit-learn gymnasium
 
 ## Quick Start
 
-Run a baseline evaluation with expert controllers:
+Run a baseline evaluation using expert controllers:
 
 ```bash
 python tools/day39_quickrun.py \
@@ -62,145 +79,152 @@ python tools/day39_quickrun.py \
   --limit 64
 ```
 
-**Outputs:**
+### Output
 
-* CSV: `ab/day39/csv/summary.csv`
+* CSV summary: `ab/day39/csv/summary.csv`
 * Figures:
 
-  * `ab/day39/figs/day39_r_err_by_controller.png`
-  * `ab/day39/figs/day39_return_by_controller.png`
+  * Orbit error comparison
+  * Return comparison
 
 ---
 
-## Project History
+## Current Progress (Updated)
 
-This project has evolved from simple orbital physics simulation to multi-phase AI control research, combining expert systems, imitation learning, and reinforcement learning within a reproducible workflow.
+The project has evolved into a **multi-stage AI control research pipeline**, integrating simulation fidelity, controller diversity, and evaluation robustness.
 
-### Phase 1 – Foundations (Day 1–10)
+### What is Working Well
 
-Built the first 2D `OrbitEnv` with gravitational physics and expert controllers. Generated imitation datasets and ran closed-loop training tests.
+* Stable expert controllers for circular and elliptic orbits
+* Reproducible evaluation pipeline (quickrun + summaries)
+* Multi-task benchmarking across orbit types
+* PPO framework integrated and functional
 
-### Phase 2 – Imitation & PPO Experiments (Day 11–19)
+### Current Limitations
 
-Trained imitation models and PPO baselines, stabilized reward shaping, and implemented energy-aligned penalties for realistic thrust behavior.
+* RL policies still show:
 
-### Phase 3 – Hybrid & PPO Refinement (Day 20–29)
-
-Introduced hybrid PPO initialization using expert warm starts. Improved convergence through KL-adaptive updates and entropy scheduling.
-
-### Phase 4 – Baseline Phase A/B (Day 30–35)
-
-Established reproducible benchmarks: Zero (lower bound), Greedy (mid-baseline), Expert (upper bound). Achieved stable circular and elliptic orbits.
-
-### Phase 5 – Complex Environment & Quickruns (Day 36–39)
-
-Implemented task bundles across circular, elliptic, and transfer orbits. Automated replay and summary pipelines for scalable evaluation.
-
-### Phase 6–10 – Research Expansion
-
-* Multi-orbit environment integration and fault simulation.
-* Quantitative metrics (`metrics_core.py`) and energy-momentum analyses (`energy_view.py`).
-* Validation of Expert v3.1 controllers across diverse orbital families.
+  * Energy inefficiency
+  * Thrust misalignment
+* Transfer tasks remain harder than circular stabilization
+* Reward design is not yet fully aligned with physical efficiency
 
 ---
 
-## I.5 Research Continuum — From Simulation to Concept Architecture
+## Research Progress Timeline
 
-The current 2D simulation environment represents the foundation of a broader vision. Each iteration, from imitation learning to PPO and curriculum-based control, builds reproducible autonomy for future orbital intelligence.
+### Phase 1 — Foundations
 
-This continuum extends into the **Tech Foundations** repository, where embedded experimentation is underway. Integrating AI controllers with embedded systems (Arduino and ROS2) bridges simulation and hardware, transforming algorithms into tangible, real-time architectures. Each simulation cycle thus becomes a step toward practical, autonomous spacecraft systems.
+* Built 2D orbital simulator
+* Implemented basic expert controllers
+
+### Phase 2 — Learning Models
+
+* Imitation learning (MLP)
+* PPO baseline setup
+
+### Phase 3 — RL Refinement
+
+* Improved reward shaping
+* Stabilized PPO training
+
+### Phase 4 — Benchmark System
+
+* Established baseline tiers:
+
+  * Zero
+  * Greedy
+  * Expert
+
+### Phase 5 — Scalable Evaluation
+
+* Task bundles (circular, elliptic, transfer)
+* Automated evaluation pipeline
+
+### Phase 6+ — Expansion
+
+* Metrics system
+* Energy-based analysis
+* Multi-orbit validation
 
 ---
 
-## Results & Figures
+## Key Insights
 
-| Scenario           | Controller  | Reward  | Final Orbit Error | Δv₁ (m/s) | Notes                               |
-| ------------------ | ----------- | ------- | ----------------- | --------- | ----------------------------------- |
-| Circular           | Expert v3.1 | −1541.7 | 0.25              | 0         | Stable baseline                     |
-| Elliptic           | Expert v3.1 | −1541.7 | 0.25              | 0         | Stable circular-like performance    |
-| Transfer (2-Phase) | Expert v3.1 | −2769.1 | 0.25↑             | ≈563      | Δv₁ matches Hohmann transfer theory |
-| Spiral-In          | Expert v3.1 | −1503   | 0.31              | –         | Energy deviation +38.9%             |
-
-### Interpretation
-
-* Expert controllers achieved 100% stability in circular and elliptic orbits.
-* Transfer and spiral-in scenarios revealed energy-thrust inefficiency and angular misalignment.
-* Week 0 metrics indicated ~23% thrust saturation, sufficient but not excessive.
-* Energy convergence efficiency η ≈ 2.8%, motivating future reward redesign.
+* Expert controllers achieve **high stability** in simple orbits
+* RL models require **better physical alignment** in rewards
+* Energy efficiency is currently the main bottleneck
+* Transfer maneuvers expose weaknesses in learned policies
 
 ---
 
 ## Next Steps
 
-### Immediate Objectives (Phase 1–2)
+### Short-Term
 
-* **Hybrid Imitation + PPO Initialization**  Combine expert imitation pretraining with PPO fine-tuning for faster convergence.
-* **Curriculum Training across Multi-Orbit Tasks**  Gradually expand environment complexity to improve generalization.
-* **Robustness under Faults & Sensor Noise**  Monte Carlo testing with thrust degradation and attitude noise.
-* **Expanded Evaluation Pipeline**  Aggregate performance metrics and build hardest-task benchmark suite.
+* Hybrid training (Imitation → PPO)
+* Curriculum learning across orbit complexity
+* Improved reward shaping (energy-aware)
+* Robustness testing (noise, faults)
 
-### Planned Extensions (Phase 3–5)
+### Mid-Term
 
-* **3D Orbit Dynamics Integration**  Extend to full 3D mechanics with inclination parameters.
-* **Multi-Agent Formation & Rendezvous Control**  Implement coordination among spacecraft for formation-keeping and docking.
-* **Advanced Propulsion Models**  Add switchable propulsion backends (chemical, electric, photonic, fusion).
-* **Reproducible Research Suite**  Modular logging, visualization, and metrics integration for open research reproducibility.
+* 3D orbital dynamics
+* Multi-agent coordination (formation flying)
+* Advanced propulsion modeling
 
----
+### Long-Term
 
-## Project Vision / Long-Term Goal
-
-> *“Trajectory may drift, but the mission continues.”*
-
-This project aspires to evolve into a physics-grounded framework for **autonomous spacecraft propulsion and orbit transfer**, bridging AI decision-making with real-world astrodynamics.
-
-### Long-Term Research Direction
-
-* **AI × Propulsion Control**  Develop controllers that optimize multi-mode thrusters and long-duration orbit transfers under uncertainty.
-* **From Single Spacecraft to Distributed Systems**  Expand toward formation flying and distributed autonomy inspired by Stanford’s SLAB.
-* **Toward Real-World Autonomy**  Integrate reinforcement learning with fault tolerance for resilience beyond Earth contact.
-* **Educational & Open Science Goals**  Provide a transparent testbed for astrodynamics and AI control research.
+* Integration with embedded systems (Arduino / ROS2)
+* Real-time control deployment
+* Autonomous spacecraft decision-making
 
 ---
 
-## Epilogue — Toward the Continuum of Exploration
+## Vision
 
-The frontier of exploration will be defined not by distance but by persistence, by how many autonomous agents can endure, exchange data, self-repair, and evolve collectively.
+This project aims to become a **complete research framework for autonomous spacecraft control**, combining:
 
-What began as a 2D simulation has grown into a conceptual framework for distributed cognition in space. The next step is the realization of embedded, real-time implementations through the **Tech Foundations** initiative, integrating AI controllers with hardware and ROS2 platforms.
+* Physics-based simulation
+* Machine learning
+* Control theory
+* Real-world system integration
 
-This vision synthesizes reinforcement learning, astrodynamics, and control theory into a unified narrative of machine cognition in space. The mission is not to reach perfection but to make exploration sustainable, across generations, worlds, and the silence beyond Earth.
+The long-term goal is to move from:
 
-> *Every trajectory fades, but intelligence endures, carried by the machines we send and the curiosity that sent them.*
+> Simulation → Intelligence → Autonomy → Real Deployment
 
 ---
 
-## Related Document
+## Research Direction
 
-For a detailed philosophical and technical vision behind this project, see  
- [Inspiration Log — From Autonomous Propulsion to Cosmic Intelligence](project_log/inspiration_2025_11_11.md)
+* AI-driven propulsion optimization
+* Fault-tolerant autonomous navigation
+* Distributed spacecraft systems
+* Long-duration mission autonomy
 
+---
 
-## References & Inspirations
+## Philosophy
 
-* **Stanford University** — Space Rendezvous Laboratory (SLAB) and CAESAR, research on distributed autonomy and AI-guided control.
-* **NASA JPL** — Reinforcement learning and fault-tolerant navigation for deep-space probes.
-* **ESA ACT** — AI-driven guidance, navigation, and control (GNC) for autonomous exploration.
-* **MIT Space Systems Lab** — Human-in-the-loop autonomy.
-* **KAIST Propulsion Group** — Intelligent propulsion modeling and degradation prediction.
-* **NFAero** — Nonlinear thrust decay and hybrid propulsion concepts.
-* **Breakthrough Starshot & NIAC Concepts** — Photon sails, magnetic sails, nuclear and fusion propulsion as frontier models.
+> *Trajectory may drift, but the mission continues.*
+
+This project is not only about solving orbital control problems, but also about exploring how **machine intelligence can persist and operate independently in space environments**.
 
 ---
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+MIT License
 
 ---
 
 ## Acknowledgment
 
-Inspired by Stanford Engineering’s broader aspiration of enabling intelligence beyond Earth, this repository represents a continuous journey toward understanding how AI can extend the reach of spacecraft long after contact is lost.
+This work is inspired by ongoing research in:
 
-> *Every trajectory fades, but intelligence endures, carried by the machines we send and the curiosity that sent them.*
+* Autonomous space systems
+* Reinforcement learning for control
+* Distributed intelligence in extreme environments
+
+It represents an ongoing effort to push AI beyond simulation into real-world space applications.
