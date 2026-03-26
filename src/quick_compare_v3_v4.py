@@ -357,6 +357,10 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
     for _ in range(max_steps):
         # 1) Controller outputs thrust intent in Newtons
         thrust_intent = controller.act(obs)
+        # PPO returns normalized action → convert to thrust
+        if label.lower() == "ppo":
+            REF_THRUST_SCALE = float((cfg.get("action_interface", {}) or {}).get("thrust_scale_ref", 3000.0))
+            thrust_intent = thrust_intent * REF_THRUST_SCALE
 
         # 2) Action interface: convert thrust intent -> normalized action
         # Use a fixed reference scale to decouple action normalization from engine strength
