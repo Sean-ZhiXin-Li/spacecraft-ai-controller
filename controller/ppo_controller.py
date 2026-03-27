@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from ppo_orbit.ppo import ActorCritic
+from ppo_orbit.ppo_infer_model import ActorCriticInference
 
 
 class PPOController:
@@ -33,7 +33,7 @@ class PPOController:
             verbose (bool): Print debug info if True.
         """
         self.device = device
-        self.model = ActorCritic().to(self.device)
+        self.model = ActorCriticInference().to(self.device)
 
         # Load checkpoint
         checkpoint = torch.load(model_path, map_location=self.device)
@@ -42,9 +42,11 @@ class PPOController:
         # 1) raw state_dict
         # 2) checkpoint dict with "model_state"
         if isinstance(checkpoint, dict) and "model_state" in checkpoint:
-            self.model.load_state_dict(checkpoint["model_state"])
+            state_dict = checkpoint["model_state"]
         else:
-            self.model.load_state_dict(checkpoint)
+            state_dict = checkpoint
+
+        self.model.load_state_dict(state_dict)
 
         self.model.eval()
 
@@ -69,23 +71,27 @@ class PPOController:
             dtype=np.float32,
         )
 
-    def __call__(self, t, pos, vel):
+    def act(self, obs):
         """
-        Compute normalized action based on the current time, position, and velocity.
+        Compute normalized action from observation.
 
         Args:
-            t (float): Current simulation time (not used in PPO).
-            pos (np.array): Current position [x, y].
-            vel (np.array): Current velocity [vx, vy].
+            obs (np.ndarray): [x, y, vx, vy]
 
         Returns:
-            np.array: Normalized action vector in range [-1, 1].
+            np.ndarray: action in [-1, 1]
         """
-        # Prepare state
+        obs = np.asarray(obs, dtype=np.float32).ravel()
+        n = obs.size // 2
+
+        pos = obs[:n]
+        vel = obs[n:]
+
+        # Use existing normalization logic
         state = (
             self._normalize_state(pos, vel)
             if self.normalize
-            else np.concatenate([pos, vel]).astype(np.float32)
+            else obs.astype(np.float32)
         )
 
         state_tensor = torch.tensor(
@@ -93,21 +99,25 @@ class PPOController:
         ).unsqueeze(0)
 
         with torch.no_grad():
-            # ActorCritic.forward() returns (mu, value), not a distribution
             mu, _ = self.model(state_tensor)
-
-            # Deterministic inference: use mean action instead of sampling
             action = torch.clamp(mu, -1.0, 1.0)
 
-            # Convert to numpy
             action_np = action.squeeze(0).cpu().numpy().astype(np.float32)
 
         if self.verbose:
             print(
-                f"[PPOController] t={t:.2f}, "
-                f"pos={pos}, vel={vel}, action={action_np}"
+                f"[PPOController.act] obs={obs}, action={action_np}"
             )
 
         return action_np
+
+    def __call__(self, t, pos, vel):
+        """
+        Backward-compatible wrapper.
+
+        Converts (pos, vel) into obs and calls act().
+        """
+        obs = np.concatenate([pos, vel]).astype(np.float32)
+        return self.act(obs)
 
 

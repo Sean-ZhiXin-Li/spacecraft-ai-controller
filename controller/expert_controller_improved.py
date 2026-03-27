@@ -84,10 +84,22 @@ class ExpertController:
 
     # API wrapper used by env
 
-    def act(self, obs, info=None):
-        x = np.asarray(obs)
-        n = x.size // 2
-        pos, vel = x[:n], x[n:]
+    def act(self, obs):
+        """
+        Compute normalized action from observation.
+
+        Args:
+            obs (np.ndarray): [x, y, vx, vy]
+
+        Returns:
+            np.ndarray: thrust vector
+        """
+        obs = np.asarray(obs, dtype=np.float32).ravel()
+        n = obs.size // 2
+
+        pos = obs[:n]
+        vel = obs[n:]
+
         return self.__call__(0.0, pos, vel)
 
     # Main controller logic
@@ -139,7 +151,7 @@ class ExpertController:
             rel = abs(radial_error) / (self.target_radius + 1e-12)  # dimensionless
             g_r = (rel - r_on) / (r_full - r_on + 1e-12)
             g_r = float(np.clip(g_r, 0.0, 1.0))
-            # floor-gating (avoid lock-out at rel=0.05 like r0=1.05)
+            # fl    oor-gating (avoid lock-out at rel=0.05 like r0=1.05)
             rel_err_tol = 0.01
             if rel > rel_err_tol:
                 g_r = max(g_r, 0.10)
