@@ -24,9 +24,9 @@ torch.backends.cudnn.benchmark = True
 GAMMA        = 0.995
 LAMBDA       = 0.97
 EPOCHS       = 800
-TRAIN_ITERS  = 20            # adapted per-epoch by KL feedback (cap can rise to 32)
+TRAIN_ITERS = 20         # adapted per-epoch by KL feedback (cap can rise to 32)
 THRUST_SCALE = 3000.0
-BATCH_STEPS  = 4096          # env steps collected per epoch (across episodes)
+BATCH_STEPS  = 800          # env steps collected per epoch (across episodes)
 
 # PPO specifics
 CLIP_EPS         = 0.25      # base PPO clip; we keep it fairly bold overall (won't go below ~0.24 later)
@@ -122,11 +122,6 @@ def log_to_csv(path: str, row_dict: dict, header_order):
 def current_ent_coef(epoch:int)->float:
     """Piecewise entropy schedule (higher early, lower later)."""
     return ENT_COEF_0 if epoch <= ENT_SWITCH_EPOCH else ENT_COEF_1
-
-
-def current_vf_coef(epoch:int)->float:
-    """Make value loss strong early, weaker later to favor policy improvement."""
-    return 1.2 if epoch <= 150 else 0.8
 
 
 def dataset_action_stats(npy_path: str, thrust_scale: float, sample: int = 500_000):
@@ -708,21 +703,39 @@ def train(args):
 
         # Light curriculum: more "spiral" starts early
         def pick_mode(ep):
-            # Higher spiral-start probability early, then taper off to avoid over-curriculum later.
-            p = 0.6 if ep <= 120 else (0.45 if ep <= 300 else 0.0)
-            return "spiral" if (ep <= 300 and np.random.rand() < p) else "default"
+            p = 0.2 if ep <= 80 else 0.0
+            return "spiral" if (ep <= 80 and np.random.rand() < p) else "default"
 
         obs = reset_env(env, start_mode=pick_mode(epoch))
         state = normalize_state(obs)
 
         steps_collected = 0
         while steps_collected < BATCH_STEPS:
-            a_raw_np, a_env_np, log_prob = model.get_action(state)  # @torch.no_grad()
+            a_raw_np, a_env_np, log_prob = model.get_action(state)
             next_obs, reward, done, _ = step_env(env, a_env_np * THRUST_SCALE)
             ns = normalize_state(next_obs)
 
+            # Day 3 sanity checks
+            if np.isnan(a_raw_np).any():
+                raise ValueError(f"NaN detected in a_raw_np at epoch={epoch}, step={steps_collected}")
+            if np.isnan(a_env_np).any():
+                raise ValueError(f"NaN detected in a_env_np at epoch={epoch}, step={steps_collected}")
+            if np.isnan(reward):
+                raise ValueError(f"NaN detected in reward at epoch={epoch}, step={steps_collected}")
+
+            if steps_collected % 200 == 0:
+                print(
+                    f"[ROLLOUT] epoch={epoch} "
+                    f"step={steps_collected} "
+                    f"reward={reward:.4f} "
+                    f"a_raw_mean={a_raw_np.mean():.4f} "
+                    f"a_raw_std={a_raw_np.std():.4f} "
+                    f"a_env_mean={a_env_np.mean():.4f} "
+                    f"a_env_std={a_env_np.std():.4f}"
+                )
+
             states.append(state)
-            actions.append(a_raw_np)   # keep RAW actions for PPO ratios
+            actions.append(a_raw_np)  # keep RAW actions for PPO ratios
             rewards.append(reward)
             masks.append(0 if done else 1)
             log_probs.append(log_prob.detach())
@@ -740,7 +753,11 @@ def train(args):
                 state = normalize_state(obs)
 
         all_rewards.append(total_reward)
-        print(f"Epoch {epoch}/{EPOCHS} | Reward: {total_reward:.2f} | Steps: {steps_collected}")
+        print(
+            f"[EPOCH] {epoch}/{EPOCHS} "
+            f"reward={total_reward:.2f} "
+            f"steps={steps_collected}"
+        )
 
         # Bootstrap last value
         with torch.no_grad():
@@ -748,11 +765,11 @@ def train(args):
             last_v = float(last_v_t.item())
 
         # Tensors
-        states_t   = torch.tensor(np.array(states),  dtype=torch.float32, device=device)
-        actions_t  = torch.tensor(np.array(actions), dtype=torch.float32, device=device)
+        states_t = torch.tensor(np.array(states), dtype=torch.float32, device=device)
+        actions_t = torch.tensor(np.array(actions), dtype=torch.float32, device=device)
         old_logp_t = torch.stack(log_probs).detach()
         returns_np = compute_gae(rewards, values, masks, last_value=last_v)
-        returns_t  = torch.tensor(returns_np, dtype=torch.float32, device=device)
+        returns_t = torch.tensor(returns_np, dtype=torch.float32, device=device)
 
         # ---- Normalize returns for critic training
         value_norm.update(returns_t)
@@ -784,19 +801,19 @@ def train(args):
                     continue
                 mb = torch.tensor(mb_idx, dtype=torch.long, device=device)
 
-                mb_states        = states_t[mb]
-                mb_actions       = actions_t[mb]
-                mb_adv           = adv[mb]
-                mb_returns       = returns_t[mb]
-                mb_returns_norm  = returns_norm[mb]
-                mb_old_logp      = old_logp_t[mb]
-                mb_v_old         = v_old[mb]
+                mb_states = states_t[mb]
+                mb_actions = actions_t[mb]
+                mb_adv = adv[mb]
+                mb_returns = returns_t[mb]
+                mb_returns_norm = returns_norm[mb]
+                mb_old_logp = old_logp_t[mb]
+                mb_v_old = v_old[mb]
 
                 new_logp, entropy, v_pred_mb = model.evaluate(mb_states, mb_actions)
-                ratio  = torch.exp(new_logp - mb_old_logp)
-                surr1  = ratio * mb_adv
-                surr2  = torch.clamp(ratio, 1.0 - clip_eps_epoch, 1.0 + clip_eps_epoch) * mb_adv
-                actor_loss  = -torch.min(surr1, surr2).mean()
+                ratio = torch.exp(new_logp - mb_old_logp)
+                surr1 = ratio * mb_adv
+                surr2 = torch.clamp(ratio, 1.0 - clip_eps_epoch, 1.0 + clip_eps_epoch) * mb_adv
+                actor_loss = -torch.min(surr1, surr2).mean()
 
                 # Value clipping (±0.25) to stabilize EV w/ lowered critic LR
                 v_clipped = mb_v_old + (v_pred_mb - mb_v_old).clamp(-0.25, 0.25)
@@ -806,63 +823,77 @@ def train(args):
                 )
 
                 # Joint update
-                vf_coef = current_vf_coef(epoch)
+                vf_coef = 0.45 if epoch <= 80 else 0.30
                 total_loss = actor_loss + vf_coef * critic_loss - ENT_COEF * entropy.mean()
+
+                # Day 3 sanity checks
+                if torch.isnan(actor_loss):
+                    raise ValueError(f"NaN detected in actor_loss at epoch={epoch}")
+                if torch.isnan(critic_loss):
+                    raise ValueError(f"NaN detected in critic_loss at epoch={epoch}")
+                if torch.isnan(total_loss):
+                    raise ValueError(f"NaN detected in total_loss at epoch={epoch}")
+
                 optimizer.zero_grad(set_to_none=True)
                 total_loss.backward()
                 nn.utils.clip_grad_norm_(model.parameters(), MAX_GRAD_NORM)
                 optimizer.step()
 
+                if start == 0:
+                    current_std = model.log_std.exp().detach().cpu().numpy()
+                    print(
+                        f"[UPDATE] epoch={epoch} "
+                        f"actor_loss={actor_loss.item():.6f} "
+                        f"critic_loss={critic_loss.item():.6f} "
+                        f"total_loss={total_loss.item():.6f} "
+                        f"entropy={entropy.mean().item():.6f} "
+                        f"std={np.round(current_std, 4)}"
+                    )
+
                 with torch.no_grad():
-                    # Keep std within a healthy band; v3.2c: extend early higher floor to 240 and tie to bold lane
-                    low_sigma = 0.12 if (epoch <= 240 or clip_eps_epoch >= 0.34) else 0.08
+                    low_sigma = 0.20 if epoch <= 160 else 0.15
                     model.log_std.data.clamp_(min=np.log(low_sigma), max=np.log(1.2))
-                    approx_kl = (mb_old_logp - new_logp).mean().item()
-                    ratio_now = torch.exp(new_logp - mb_old_logp)
+                    log_ratio = new_logp - mb_old_logp
+                    ratio_now = torch.exp(log_ratio)
+
+                    approx_kl = ((ratio_now - 1.0) - log_ratio).mean().item()
                     clip_frac = (torch.abs(ratio_now - 1.0) > clip_eps_epoch).float().mean().item()
+
                 kls.append(approx_kl)
                 clip_fracs.append(clip_frac)
 
-                last_actor_loss  = float(actor_loss.item())
+                last_actor_loss = float(actor_loss.item())
                 last_critic_loss = float(critic_loss.item())
 
         # Diagnostics (normalized-space vs raw-space EV)
-        EV_raw  = explained_variance(returns_t, v_pred_eval)
+        EV_raw = explained_variance(returns_t, v_pred_eval)
         EV_norm = explained_variance(value_norm.normalize(returns_t), v_pred_full.detach())
         if epoch % 10 == 0:
-            print(f"[Diag] clip_frac={np.mean(clip_fracs):.3f}  KL={np.mean(kls):.4f}  EV_raw={EV_raw:.3f}  EV_norm={EV_norm:.3f}")
+            print(
+                f"[Diag] clip_frac={np.mean(clip_fracs):.3f}  KL={np.mean(kls):.4f}  EV_raw={EV_raw:.3f}  EV_norm={EV_norm:.3f}")
 
         # ===== KL-driven adaptation: iters + actor LR + next-epoch clip/entropy =====
         target_kl = TARGET_KL_BASE
-        # v3.2b: after mid-training, allow a slightly higher lr cap
         lr_cap = 1.5e-4 if epoch <= 60 else 1.8e-4
         mean_kl = float(np.mean(kls)) if len(kls) else 0.0
 
-        # v3.2c super-bold lane: when KL is extremely low, briefly widen clip and boost entropy next epoch
         if mean_kl < 0.008:
             clip_eps_next = 0.36
             ent_coef_boost_next = 1.35
             actor_pg = optimizer.param_groups[0]
             actor_pg["lr"] = min(actor_pg["lr"] * 1.05, lr_cap)
 
-        # 1) Adjust TRAIN_ITERS (v3.2b: add super-low KL lane)
-        if mean_kl < 0.25 * target_kl:              # super-low KL: push harder
-            TRAIN_ITERS = min(TRAIN_ITERS + 4, 32)
-        elif mean_kl < 0.35 * target_kl:
-            TRAIN_ITERS = min(TRAIN_ITERS + 3, 32)
-        elif mean_kl < 0.5 * target_kl:
-            TRAIN_ITERS = min(TRAIN_ITERS + 2, 32)
-        elif mean_kl < 0.8 * target_kl:
-            TRAIN_ITERS = min(TRAIN_ITERS + 1, 32)
+        # --- KL-based adaptive update (stable version) ---
+        if mean_kl < 0.5 * target_kl:
+            TRAIN_ITERS = min(TRAIN_ITERS + 1, 24)
         elif mean_kl > 1.5 * target_kl:
             TRAIN_ITERS = max(TRAIN_ITERS - 1, 10)
 
-        # 2) Adjust actor LR (param_group 0). Ceiling stays soft via lr_cap. (v3.2b)
         actor_pg = optimizer.param_groups[0]
         old_lr = actor_pg["lr"]
         if mean_kl < 0.25 * target_kl:
             actor_pg["lr"] = min(old_lr * 1.12, lr_cap)
-            clip_eps_next = 0.34   # brief bold lane for super-low KL
+            clip_eps_next = 0.34
             ent_coef_boost_next = 1.45
         elif mean_kl < 0.35 * target_kl:
             actor_pg["lr"] = min(old_lr * 1.08, lr_cap)
@@ -878,14 +909,14 @@ def train(args):
             ent_coef_boost_next = 1.00
         elif mean_kl > 1.5 * target_kl:
             actor_pg["lr"] = max(old_lr * 0.92, 1e-5)
-            clip_eps_next = 0.24   # keep a relatively bold floor
+            clip_eps_next = 0.24
             ent_coef_boost_next = 1.00
         else:
-            # Default lane for next epoch
             clip_eps_next = 0.25
             ent_coef_boost_next = 1.0
 
-        print(f"[Adapt] mean_KL={mean_kl:.4f} -> next TRAIN_ITERS={TRAIN_ITERS} | actor_lr={actor_pg['lr']:.2e} | next_clip={clip_eps_next:.2f}")
+        print(
+            f"[Adapt] mean_KL={mean_kl:.4f} -> next TRAIN_ITERS={TRAIN_ITERS} | actor_lr={actor_pg['lr']:.2e} | next_clip={clip_eps_next:.2f}")
 
         log_to_csv(CSV_PATH, {
             "epoch": epoch,
