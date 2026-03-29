@@ -22,7 +22,7 @@ torch.backends.cudnn.benchmark = True
 # Hyperparameters (CLI-overridable)
 # ==========================================================
 GAMMA        = 0.995
-LAMBDA       = 0.97
+LAMBDA       = 0.90
 EPOCHS       = 800
 TRAIN_ITERS = 20         # adapted per-epoch by KL feedback (cap can rise to 32)
 THRUST_SCALE = 3000.0
@@ -823,7 +823,7 @@ def train(args):
                 )
 
                 # Joint update
-                vf_coef = 0.45 if epoch <= 80 else 0.30
+                vf_coef = 0.25
                 total_loss = actor_loss + vf_coef * critic_loss - ENT_COEF * entropy.mean()
 
                 # Day 3 sanity checks
@@ -894,8 +894,8 @@ def train(args):
         actor_pg = optimizer.param_groups[0]
         old_lr = actor_pg["lr"]
         if mean_kl < 0.25 * target_kl:
-            actor_pg["lr"] = min(old_lr * 1.12, lr_cap)
-            clip_eps_next = 0.34
+            actor_pg["lr"] = min(old_lr * 1.15, lr_cap)
+            clip_eps_next = 0.36
             ent_coef_boost_next = 1.45
         elif mean_kl < 0.35 * target_kl:
             actor_pg["lr"] = min(old_lr * 1.08, lr_cap)
