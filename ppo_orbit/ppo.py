@@ -874,20 +874,22 @@ def train(args):
 
         # ===== KL-driven adaptation: iters + actor LR + next-epoch clip/entropy =====
         target_kl = TARGET_KL_BASE
-        lr_cap = 1.5e-4 if epoch <= 60 else 1.8e-4
+        lr_cap = 8e-05 if epoch <= 60 else 1.0e-04
         mean_kl = float(np.mean(kls)) if len(kls) else 0.0
 
-        if mean_kl < 0.008:
-            clip_eps_next = 0.36
-            ent_coef_boost_next = 1.35
-            actor_pg = optimizer.param_groups[0]
-            actor_pg["lr"] = min(actor_pg["lr"] * 1.05, lr_cap)
+        # Day 4 stabilization: remove extra low-KL boost
+        # if mean_kl < 0.008:
+        #     clip_eps_next = 0.36
+        #     ent_coef_boost_next = 1.35
+        #     actor_pg = optimizer.param_groups[0]
+        #     actor_pg["lr"] = min(actor_pg["lr"] * 1.05, lr_cap)
 
         # --- KL-based adaptive update (stable version) ---
-        if mean_kl < 0.5 * target_kl:
-            TRAIN_ITERS = min(TRAIN_ITERS + 1, 24)
-        elif mean_kl > 1.5 * target_kl:
-            TRAIN_ITERS = max(TRAIN_ITERS - 1, 10)
+        # Day 4 stabilization: keep TRAIN_ITERS fixed
+        # if mean_kl < 0.5 * target_kl:
+        #     TRAIN_ITERS = min(TRAIN_ITERS + 1, 24)
+        # elif mean_kl > 1.5 * target_kl:
+        #     TRAIN_ITERS = max(TRAIN_ITERS - 1, 10)
 
         actor_pg = optimizer.param_groups[0]
         old_lr = actor_pg["lr"]
