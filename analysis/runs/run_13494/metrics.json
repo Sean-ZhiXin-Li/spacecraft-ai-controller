@@ -1,0 +1,8 @@
+{
+  "controller_variant": "",
+  "thrust_newton": 800.0,
+  "r0_over_target": 1.2500000396629334,
+  "total_reward": -22721.355000394877,
+  "saturation_rate_mean": 0.0,
+  "target_radius": 7500000000000.0
+}

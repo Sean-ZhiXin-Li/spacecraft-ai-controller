@@ -9,20 +9,60 @@
       "scenario_effective": "weak_thrust_far",
       "scenario_supported": true,
       "phys": {
-        "thrust_newton": 100000.0
+        "thrust_newton": 800.0
       },
-      "label": "ExpertImproved",
+      "label": "always_on",
       "steps": 2000,
-      "total_reward": -119586.47719701579,
-      "final_r": 7575055635039.958,
-      "avg_radius_error": 74955814031.40594,
-      "avg_jitter": 0.0006165450132166506,
+      "total_reward": -23106.798720781895,
+      "final_r": 9374854545417.906,
+      "avg_radius_error": 1874953525743.274,
+      "avg_jitter": 2.035995395039117e-08,
+      "saturation_rate_mean": 0.08425,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -23301.481925004482,
+      "sat_adjusted_score": -23301.481925004482,
+      "target_radius": 7500000000000.0,
+      "r0_over_target": 1.2500000396629334
+    },
+    {
+      "scenario_requested": "weak_thrust_far",
+      "scenario_effective": "weak_thrust_far",
+      "scenario_supported": true,
+      "phys": {
+        "thrust_newton": 800.0
+      },
+      "label": "gated",
+      "steps": 2000,
+      "total_reward": -22817.66169421043,
+      "final_r": 9374878662669.396,
+      "avg_radius_error": 1874961238019.5425,
+      "avg_jitter": 2.3694113863366833e-08,
+      "saturation_rate_mean": 0.0245,
+      "lambda_sat": 0.1,
+      "reward_minus_lambda_sat": -22873.567415361245,
+      "sat_adjusted_score": -22873.567415361245,
+      "target_radius": 7500000000000.0,
+      "r0_over_target": 1.2500000396629334
+    },
+    {
+      "scenario_requested": "weak_thrust_far",
+      "scenario_effective": "weak_thrust_far",
+      "scenario_supported": true,
+      "phys": {
+        "thrust_newton": 800.0
+      },
+      "label": "ppo",
+      "steps": 2000,
+      "total_reward": -22721.355000394877,
+      "final_r": 9374865031171.197,
+      "avg_radius_error": 1874961153616.826,
+      "avg_jitter": 2.1240162022070119e-10,
       "saturation_rate_mean": 0.0,
       "lambda_sat": 0.1,
-      "reward_minus_lambda_sat": -119586.47719701579,
-      "sat_adjusted_score": -119586.47719701579,
+      "reward_minus_lambda_sat": -22721.355000394877,
+      "sat_adjusted_score": -22721.355000394877,
       "target_radius": 7500000000000.0,
-      "r0_over_target": 1.0100000074410667
+      "r0_over_target": 1.2500000396629334
     }
   ]
 }

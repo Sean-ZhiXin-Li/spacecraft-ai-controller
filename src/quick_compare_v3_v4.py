@@ -65,6 +65,7 @@ from utils.action_interface import thrust_to_action, ActionInterfaceConfig
 from envs.orbit_env import OrbitEnv
 from controller.expert_controller import ExpertController as ExpertV3
 from controller.expert_controller_improved import ExpertController as ExpertV4
+from controller.ppo_controller import PPOController
 
 import yaml
 
@@ -87,8 +88,7 @@ def get_thrust_scale(cfg: dict, env: OrbitEnv) -> float:
     return float((cfg.get("actuation", {}) or {}).get("thrust_scale", getattr(env, "thrust_scale", 1.0)))
 
 
-def build_controller(ControllerCls, env, obs):
-    """Build controller using env.target_radius if available."""
+def build_controller(ControllerCls, env, obs, label=None):
     tr = getattr(env, "target_radius", None)
     if tr is None:
         x = np.asarray(obs, dtype=float)
@@ -96,16 +96,25 @@ def build_controller(ControllerCls, env, obs):
         pos0 = x[:n]
         tr = float(np.linalg.norm(pos0))
 
+    if label is not None and label.lower() == "ppo":
+        controller = ControllerCls(
+            model_path="ppo_orbit/ppo_best_model.pth",
+            normalize=True,
+            device="cpu",
+            verbose=False,
+        )
+        return controller
+
     controller = ControllerCls(target_radius=float(tr))
 
-    # --- WHPL_13: toggle PD gating via env controller variant ---
-    variant = os.environ.get("CONTROLLER_VARIANT", "").strip().lower()
+    variant = (label or os.environ.get("CONTROLLER_VARIANT", "")).strip().lower()
     if hasattr(controller, "enable_pd_gating"):
         if variant in ("always_on", "pd_always_on", "no_gate", "ungated"):
             controller.enable_pd_gating = False
         elif variant in ("gated", "pd_gated", "gate", "whpl10_gated"):
             controller.enable_pd_gating = True
-        # else: leave default (True) to preserve baseline behavior
+
+        print(f"[SELF-CHECK] label={label} enable_pd_gating={controller.enable_pd_gating}")
 
     return controller
 
@@ -286,7 +295,7 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
     else:
         obs, info = reset_result, {}
 
-    controller = build_controller(ControllerCls, env, obs)
+    controller = build_controller(ControllerCls, env, obs, label=label)
 
     # WHPL_03: initial radius r0 for CSV (no physics/control change)
     x0 = np.asarray(obs, dtype=float)
@@ -353,6 +362,8 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
     # --- Day16: trajectory recording (no behavior change) ---
     r_series = []
     vr_series = []
+    cos_tr_series = []
+    cos_tt_series = []
 
     for _ in range(max_steps):
         # 1) Controller outputs thrust intent in Newtons
@@ -426,6 +437,32 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
         n2 = x2.size // 2
         r_vec = x2[:n2]
         v_vec = x2[n2:]
+        # Per-step thrust direction analysis
+        if isinstance(info, dict) and ("thrust_vec" in info) and (info["thrust_vec"] is not None):
+            thrust_vec_step = np.asarray(info["thrust_vec"], dtype=np.float64).ravel()
+        else:
+            thrust_vec_step = np.asarray(thrust_intent, dtype=np.float64).ravel()
+
+        r_unit_step2, _ = _safe_unit(r_vec)
+        th_unit_step, _ = _safe_unit(thrust_vec_step)
+
+        if (r_unit_step2 is not None) and (r_vec.size == 2):
+            tan_unit_step = np.array([-r_unit_step2[1], r_unit_step2[0]], dtype=np.float64)
+        else:
+            tan_unit_step = None
+
+        if (th_unit_step is not None) and (r_unit_step2 is not None):
+            cos_tr_step = float(np.clip(np.dot(th_unit_step, r_unit_step2), -1.0, 1.0))
+        else:
+            cos_tr_step = float("nan")
+
+        if (th_unit_step is not None) and (tan_unit_step is not None):
+            cos_tt_step = float(np.clip(np.dot(th_unit_step, tan_unit_step), -1.0, 1.0))
+        else:
+            cos_tt_step = float("nan")
+
+        cos_tr_series.append(cos_tr_step)
+        cos_tt_series.append(cos_tt_step)
 
         r_unit_step, _ = _safe_unit(r_vec)
         if r_unit_step is not None:
@@ -595,8 +632,11 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
         run_dir / "traj.npz",
         r=np.asarray(r_series, dtype=np.float64),
         vr=np.asarray(vr_series, dtype=np.float64),
+        cos_tr=np.asarray(cos_tr_series, dtype=np.float64),
+        cos_tt=np.asarray(cos_tt_series, dtype=np.float64),
         target_r=float(target_radius),
     )
+
     # Optional: save meta for Day16 scanner
     meta = {
         "controller_variant": os.environ.get("CONTROLLER_VARIANT", ""),
@@ -788,12 +828,29 @@ def main():
             scenarios = [(args.scenario, None)]
 
     results = []
-    for s, phys_override in scenarios:
-        results.append(
-            run_episode(s, "ExpertImproved", ExpertV4, cfg, physical_override=phys_override, lambda_sat=LAMBDA_SAT)
-        )
+    controllers = [
+        ("always_on", ExpertV4),
+        ("gated", ExpertV4),
+        ("ppo", PPOController),
+    ]
 
-    assert len(results) == 1, f"WHPL_03 expects exactly 1 run, got {len(results)}"
+    results = []
+    for s, phys_override in scenarios:
+        for label, ControllerCls in controllers:
+            results.append(
+                run_episode(
+                    s,
+                    label,
+                    ControllerCls,
+                    cfg,
+                    physical_override=phys_override,
+                    lambda_sat=LAMBDA_SAT,
+                )
+            )
+
+    assert len(results) == len(scenarios) * len(controllers), (
+        f"Expected {len(scenarios) * len(controllers)} runs, got {len(results)}"
+    )
 
     # WHPL_03: append exactly one CSV row per run
     DEFAULT_CSV_PATH = Path(PROJECT_ROOT) / "analysis" / "results" / "ablation_thrust_x_difficulty.csv"
@@ -807,7 +864,8 @@ def main():
 
     FIELDNAMES = [
         "dedup_key",
-        "controller_variant",  # WHPL_11 NEW
+        "controller",
+        "controller_variant",
         "thrust_newton",
         "difficulty_tag",
         "r0_over_target",
@@ -817,35 +875,36 @@ def main():
         "total_reward",
     ]
 
-    r = results[-1]
-    target_r = float(r.get("target_radius", math.nan))
-    r0_over_target = float(r.get("r0_over_target", math.nan))
+    for r in results:
+        target_r = float(r.get("target_radius", math.nan))
+        r0_over_target = float(r.get("r0_over_target", math.nan))
 
-    final_r = r.get("final_r", None)
-    if final_r is None or (not np.isfinite(float(final_r))) or (not np.isfinite(target_r)):
-        final_radius_error = math.nan
-    else:
-        final_radius_error = float(abs(float(final_r) - target_r))
+        final_r = r.get("final_r", None)
+        if final_r is None or (not np.isfinite(float(final_r))) or (not np.isfinite(target_r)):
+            final_radius_error = math.nan
+        else:
+            final_radius_error = float(abs(float(final_r) - target_r))
 
-    row = {
-        "controller_variant": CONTROLLER_VARIANT,  # WHPL_11 NEW
-        "thrust_newton": float(ts_for_scenario),
-        "difficulty_tag": str(os.environ.get("DIFFICULTY_TAG", WHPL3_DIFFICULTY_TAG)),
-        "r0_over_target": float(r0_over_target),
-        "avg_radius_error": float(r.get("avg_radius_error", math.nan)),
-        "final_radius_error": float(final_radius_error),
-        "saturation_rate_mean": float(r.get("saturation_rate_mean", math.nan)),
-        "total_reward": float(r.get("total_reward", math.nan)),
-    }
+        row = {
+            "controller_variant": CONTROLLER_VARIANT,
+            "thrust_newton": float(ts_for_scenario),
+            "difficulty_tag": str(os.environ.get("DIFFICULTY_TAG", WHPL3_DIFFICULTY_TAG)),
+            "r0_over_target": float(r0_over_target),
+            "avg_radius_error": float(r.get("avg_radius_error", math.nan)),
+            "final_radius_error": float(final_radius_error),
+            "saturation_rate_mean": float(r.get("saturation_rate_mean", math.nan)),
+            "total_reward": float(r.get("total_reward", math.nan)),
+        }
 
-    row["controller"] = "ExpertImproved"  # used only for key computation (not saved as a column)
-    row["scenario"] = r.get("scenario_effective", r.get("scenario_requested", ""))
-    row["target_r"] = target_r  # used only for key computation
+        row["controller"] = str(r.get("label", "unknown"))
+        row["scenario"] = r.get("scenario_effective", r.get("scenario_requested", ""))
+        row["target_r"] = target_r
 
-    row["dedup_key"] = _compute_dedup_key(row)
-    status = append_row_csv(CSV_PATH, FIELDNAMES, row)
-    print(f"[WHPL_03] csv_status={status} -> {CSV_PATH}")
-    print(f"[WHPL_03] row = {row}")
+        row["dedup_key"] = _compute_dedup_key(row)
+        status = append_row_csv(CSV_PATH, FIELDNAMES, row)
+
+        print(f"[W03] csv_status={status} -> {CSV_PATH}")
+        print(f"[W03] row = {row}")
 
     # Sanity check: if everything is identical, something is wrong.
     key_fields = [
