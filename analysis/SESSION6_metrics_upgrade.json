@@ -9,18 +9,18 @@
       "scenario_effective": "weak_thrust_far",
       "scenario_supported": true,
       "phys": {
-        "thrust_newton": 800.0
+        "thrust_newton": 100000.0
       },
       "label": "always_on",
       "steps": 2000,
-      "total_reward": -23106.798720781895,
-      "final_r": 9374854545417.906,
-      "avg_radius_error": 1874953525743.274,
-      "avg_jitter": 2.035995395039117e-08,
-      "saturation_rate_mean": 0.08425,
+      "total_reward": -114879.36437008283,
+      "final_r": 9362302042486.502,
+      "avg_radius_error": 1870742539544.1104,
+      "avg_jitter": 3.0855293655125698e-06,
+      "saturation_rate_mean": 0.001,
       "lambda_sat": 0.1,
-      "reward_minus_lambda_sat": -23301.481925004482,
-      "sat_adjusted_score": -23301.481925004482,
+      "reward_minus_lambda_sat": -114890.85240651983,
+      "sat_adjusted_score": -114890.85240651983,
       "target_radius": 7500000000000.0,
       "r0_over_target": 1.2500000396629334
     },
@@ -29,18 +29,18 @@
       "scenario_effective": "weak_thrust_far",
       "scenario_supported": true,
       "phys": {
-        "thrust_newton": 800.0
+        "thrust_newton": 100000.0
       },
       "label": "gated",
       "steps": 2000,
-      "total_reward": -22817.66169421043,
-      "final_r": 9374878662669.396,
-      "avg_radius_error": 1874961238019.5425,
-      "avg_jitter": 2.3694113863366833e-08,
-      "saturation_rate_mean": 0.0245,
+      "total_reward": -86801.54910847919,
+      "final_r": 9366168142198.617,
+      "avg_radius_error": 1872026126591.5764,
+      "avg_jitter": 4.311878706145163e-06,
+      "saturation_rate_mean": 0.00025,
       "lambda_sat": 0.1,
-      "reward_minus_lambda_sat": -22873.567415361245,
-      "sat_adjusted_score": -22873.567415361245,
+      "reward_minus_lambda_sat": -86803.7191722069,
+      "sat_adjusted_score": -86803.7191722069,
       "target_radius": 7500000000000.0,
       "r0_over_target": 1.2500000396629334
     },
@@ -49,18 +49,18 @@
       "scenario_effective": "weak_thrust_far",
       "scenario_supported": true,
       "phys": {
-        "thrust_newton": 800.0
+        "thrust_newton": 100000.0
       },
       "label": "ppo",
       "steps": 2000,
-      "total_reward": -22721.355000394877,
-      "final_r": 9374865031171.197,
-      "avg_radius_error": 1874961153616.826,
-      "avg_jitter": 2.1240162022070119e-10,
+      "total_reward": -82387.05735097651,
+      "final_r": 9367492108558.727,
+      "avg_radius_error": 1872212317806.4907,
+      "avg_jitter": 2.0242648306636553e-07,
       "saturation_rate_mean": 0.0,
       "lambda_sat": 0.1,
-      "reward_minus_lambda_sat": -22721.355000394877,
-      "sat_adjusted_score": -22721.355000394877,
+      "reward_minus_lambda_sat": -82387.05735097651,
+      "sat_adjusted_score": -82387.05735097651,
       "target_radius": 7500000000000.0,
       "r0_over_target": 1.2500000396629334
     }
