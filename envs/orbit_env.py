@@ -27,30 +27,35 @@ class OrbitEnv(gym.Env):
       either increase thrust_scale, or use a larger dt, or accept slower maneuvers.
     """
 
-    # Gymnasium uses `render_modes` instead of old `render.modes`
     metadata = {"render_modes": ["human"]}
 
-    def __init__(self,
-                 G: float = 6.67430e-11,
-                 M: float = 1.989e30,
-                 mass: float = 722.0,
-                 dt: float = 10.0,
-                 max_steps: int = 60000,
-                 target_radius: float = 7.5e12,
-                 thrust_scale: float = 3000.0,       # keep consistent with PPO THRUST_SCALE
-                 success_threshold: int = 120,       # consecutive steps inside tolerance
-                 tol_r: float = 2e-3,
-                 tol_v: float = 2e-3,
-                 tol_ang: float = 0.08,              # angle tolerance (rad), want near 0
-                 term_reward_success: float = 1000.0,
-                 term_reward_fail: float = -50.0,
-                 verbose: bool = False) -> None:
+    def __init__(
+            self,
+            G: float = 6.67430e-11,
+            M: float = 1.989e30,
+            mass: float = 722.0,
+            dt: float = 10.0,
+            max_steps: int = 60000,
+            target_radius: float = 7.5e12,
+            thrust_scale: float = 3000.0,
+            success_threshold: int = 120,
+            tol_r: float = 2e-3,
+            tol_v: float = 2e-3,
+            tol_ang: float = 0.08,
+            term_reward_success: float = 1000.0,
+            term_reward_fail: float = -50.0,
+            verbose: bool = False,
+            reward_mode: str = "base",
+            w_radius: float = 0.0,
+            w_progress: float = 0.0,
+            w_speed: float = 0.0,
+    ) -> None:
         super().__init__()
 
         # Physical constants and runtime parameters
         self.G = G
         self.M = M
-        self.mu = self.G * self.M  # cached GM for convenience
+        self.mu = self.G * self.M
         self.mass = mass
         self.dt = dt
         self.max_steps = max_steps
@@ -63,12 +68,20 @@ class OrbitEnv(gym.Env):
         self.term_reward_success = term_reward_success
         self.term_reward_fail = term_reward_fail
         self.verbose = verbose
+        self.reward_mode = reward_mode
+        self.w_radius = w_radius
+        self.w_progress = w_progress
 
-        # Optional acceleration cap derived from thrust/mass; updated by setters too.
+        # Day 8 reward controls
+        self.reward_mode = reward_mode
+        self.w_radius = w_radius
+        self.w_progress = w_progress
+        self.w_speed = w_speed
+
+        # Optional acceleration cap derived from thrust/mass
         self.a_cap: Optional[float] = None
         try:
             if self.mass > 0.0:
-                # This is a soft reference value; we do not clip with it by default.
                 self.a_cap = self.thrust_scale / self.mass
         except Exception:
             self.a_cap = None
@@ -86,34 +99,21 @@ class OrbitEnv(gym.Env):
         # Initialize
         self.reset()
 
-    # RUNTIME INJECTION SETTERS
-    def set_physical_params(self,
-                            mass: Optional[float] = None,
-                            thrust_newton: Optional[float] = None,
-                            max_steps: Optional[int] = None,
-                            r_target: Optional[float] = None,
-                            seed: Optional[int] = None) -> None:
+    def set_physical_params(
+        self,
+        mass: Optional[float] = None,
+        thrust_newton: Optional[float] = None,
+        max_steps: Optional[int] = None,
+        r_target: Optional[float] = None,
+        seed: Optional[int] = None,
+    ) -> None:
         """
         Inject physical/task parameters at runtime.
-
-        Args:
-            mass: spacecraft mass [kg]. For mega-mass craft (e.g., 5e9 kg), pass it here.
-            thrust_newton: if provided, we interpret it as the magnitude scale of thrust
-                           and set `thrust_scale = thrust_newton`. The policy still outputs
-                           a vector in [-1,1]^2 which is scaled by `thrust_scale`.
-            max_steps: maximum simulation steps before time-up termination.
-            r_target: target orbital radius used by success/tolerance and reward shaping.
-            seed: random seed to improve determinism (Python + NumPy only).
-
-        Notes:
-            - We also refresh `a_cap = thrust_scale / mass` when both are known.
-            - We do NOT reset() here. Call reset() afterwards to apply new params.
         """
         if mass is not None:
             self.mass = float(mass)
 
         if thrust_newton is not None:
-            # In this env, `thrust_scale` is the vector scale (N) for action ∈ [-1,1]^2.
             self.thrust_scale = float(thrust_newton)
 
         if max_steps is not None:
@@ -122,10 +122,8 @@ class OrbitEnv(gym.Env):
         if r_target is not None:
             self.target_radius = float(r_target)
 
-        # Keep mu cached; if G/M are ever changed elsewhere, user should update self.mu accordingly.
         self.mu = self.G * self.M
 
-        # Optional derived cap for diagnostics/safety (not enforced unless you choose to).
         try:
             if getattr(self, "mass", None) and getattr(self, "thrust_scale", None):
                 if self.mass > 0.0:
@@ -133,9 +131,9 @@ class OrbitEnv(gym.Env):
         except Exception:
             self.a_cap = None
 
-        # Seed basic RNGs (framework RNGs like torch need to be seeded externally if used there)
         if seed is not None:
             import random
+
             try:
                 random.seed(int(seed))
             except Exception:
@@ -148,33 +146,17 @@ class OrbitEnv(gym.Env):
     def set_initial_state(self, init_state: dict) -> None:
         """
         Initialize the environment's state from a task spec.
-
-        Expected fields in `init_state`:
-            - "pos": [x0, y0] in meters
-            - "vel_angle_deg": velocity direction in degrees (0° along +x)
-            - "vel_scale": scalar multiplied by circular speed at target radius
-
-        Effect:
-            Writes to self.pos, self.vel, and makes the observation reflect [x,y,vx,vy].
-
-        If your outer code wants a different initialization (e.g., elliptical velocity at rp),
-        you can extend this function to compute that analytically.
         """
-        # Fallbacks with robust parsing
         pos = init_state.get("pos", [self.target_radius, 0.0])
-        vx_vy = init_state.get("vel", None)  # optional direct velocity override
+        vx_vy = init_state.get("vel", None)
         vel_angle_deg = float(init_state.get("vel_angle_deg", 0.0))
         vel_scale = float(init_state.get("vel_scale", 1.0))
 
-        # Position
         self.pos = np.array([float(pos[0]), float(pos[1])], dtype=np.float64)
 
         if vx_vy is not None:
-            # If explicit velocity is provided, trust it.
             self.vel = np.array([float(vx_vy[0]), float(vx_vy[1])], dtype=np.float64)
         else:
-            # Build velocity from circular-speed reference at target radius.
-            # For large target radius, circular speed is sqrt(mu / r_target).
             r_ref = float(self.target_radius if self.target_radius > 0.0 else np.linalg.norm(self.pos))
             r_ref = max(1e-12, r_ref)
             v_circ = np.sqrt(self.mu / r_ref)
@@ -184,34 +166,20 @@ class OrbitEnv(gym.Env):
             vy = vel_scale * v_circ * np.sin(ang)
             self.vel = np.array([vx, vy], dtype=np.float64)
 
-        # Reset step counters since we are effectively re-initializing
         self.steps = 0
         self.success_counter = 0
 
-    # GYM API
-
     def reset(
-            self,
-            *,
-            seed: Optional[int] = None,
-            options: Optional[dict] = None,
-            start_mode: str = "default",
-            **cfg: Any,
+        self,
+        *,
+        seed: Optional[int] = None,
+        options: Optional[dict] = None,
+        start_mode: str = "default",
+        **cfg: Any,
     ) -> Tuple[np.ndarray, Dict[str, Any]]:
         """
         Reset the environment state.
-
-        Day48 compatibility:
-        - Accept extra keys (mu, body_radius, sc_mass, r0, v0, ecc, inc, name, notes).
-        - Map them onto this env's parameters (G, M, mass, target_radius, etc.).
-          * mu        -> overrides GM (and M accordingly)
-          * sc_mass   -> mass
-          * r0        -> target_radius (used by tolerance window and v_circ references)
-          * others    -> ignored for now (safe)
-        - We DO NOT force-init pos/vel from v0 here; you keep your start_mode logic.
         """
-        # ---------- Day48 param mapping (safe, optional) ----------
-        # mu (GM) override: if provided, recompute M = mu / G and cache mu as well
         if "mu" in cfg and cfg["mu"] is not None:
             try:
                 self.mu = float(cfg["mu"])
@@ -219,33 +187,24 @@ class OrbitEnv(gym.Env):
             except Exception:
                 pass
 
-        # body_radius is not used in this env's physics; ignore safely
-        # if "body_radius" in cfg: _ = cfg["body_radius"]
-
-        # spacecraft mass
         if "sc_mass" in cfg and cfg["sc_mass"] is not None:
             try:
                 self.mass = float(cfg["sc_mass"])
             except Exception:
                 pass
 
-        # target orbit radius (used by tolerance and v_circ references)
         if "r0" in cfg and cfg["r0"] is not None:
             try:
                 self.target_radius = float(cfg["r0"])
             except Exception:
                 pass
-        # v0/ecc/inc/name/notes are ignored here (you can wire them later if needed)
-        # -----------------------------------------------------------
 
-        # Keep mu consistent in case user changed G or M elsewhere
         self.mu = self.G * self.M if not hasattr(self, "mu") else (self.mu if self.mu == self.G * self.M else self.mu)
 
         super().reset(seed=seed)
         self.steps = 0
         self.success_counter = 0
 
-        # Difficulty axis: initial radius multiplier (default = 1.25 for legacy Hard)
         try:
             r0_mul = float(os.environ.get("R0_OVER_TARGET", "1.25"))
         except Exception:
@@ -275,28 +234,19 @@ class OrbitEnv(gym.Env):
     def apply_delta_v(self, dv: float) -> None:
         """
         Apply an instantaneous tangential impulse of magnitude `dv` [m/s] at the current state.
-        - Direction: perpendicular to the radial vector, aligned with current tangential motion.
-        - This is a minimal, physically reasonable implementation for Day48.
-          (Later you can extend it to support arbitrary impulse directions.)
         """
-        # Need a valid state
         r_vec = self.pos.astype(float)
         v_vec = self.vel.astype(float)
         r = np.linalg.norm(r_vec)
         if r < 1e-12:
-            return  # undefined tangential direction at the origin
+            return
 
-        # Unit radial vector
         ur = r_vec / r
-
-        # Two perpendicular tangential directions: [-ur_y, ur_x] and its negative
         t = np.array([-ur[1], ur[0]], dtype=float)
 
-        # Choose the direction aligned with current tangential velocity component
         if np.dot(v_vec, t) < 0.0:
             t = -t
 
-        # Instantaneous velocity change
         self.vel = self.vel + float(dv) * t
 
     def action_space_sample(self) -> np.ndarray:
@@ -309,65 +259,47 @@ class OrbitEnv(gym.Env):
         except Exception:
             return np.zeros(2, dtype=np.float32)
 
-    # STATE SNAPSHOT (for shadow-step / determinism debug)
     def get_state(self) -> dict:
         """
-        Return a snapshot of env internal state so we can do a fair
-        A/B test: step(action) vs step(0) from the exact same state.
-
-        NOTE:
-        - Must include everything that can affect dynamics, termination, and reward.
-        - Keep arrays copied to avoid aliasing.
+        Return a snapshot of env internal state.
         """
         return {
-            # counters
             "steps": int(self.steps),
             "success_counter": int(self.success_counter),
-
-            # kinematics
             "pos": self.pos.copy(),
             "vel": self.vel.copy(),
-
-            # core physical/task params (affect dynamics + reward)
             "G": float(self.G),
             "M": float(self.M),
-            "mu": float(self.mu),  # mu may be overridden independently of G*M
+            "mu": float(self.mu),
             "mass": float(self.mass),
             "dt": float(self.dt),
             "max_steps": int(self.max_steps),
             "target_radius": float(self.target_radius),
             "thrust_scale": float(self.thrust_scale),
-
-            # success/termination params (affect done)
             "success_threshold": int(self.success_threshold),
             "tol_r": float(self.tol_r),
             "tol_v": float(self.tol_v),
             "tol_ang": float(self.tol_ang),
-
-            # terminal reward params (affect reward)
             "term_reward_success": float(self.term_reward_success),
             "term_reward_fail": float(self.term_reward_fail),
-
-            # misc
             "verbose": bool(self.verbose),
-
-            # derived/diagnostic (optional, but keep it for strict restore)
             "a_cap": float(self.a_cap) if self.a_cap is not None else None,
+            "reward_mode": str(self.reward_mode),
+            "w_radius": float(self.w_radius),
+            "w_progress": float(self.w_progress),
+            "w_speed": float(self.w_speed),
         }
 
     def set_state(self, state: dict) -> None:
         """
         Restore a snapshot produced by get_state().
-        Must restore counters + dynamics + termination + reward-related params.
         """
         if not isinstance(state, dict):
             return
 
-        # counters
         self.steps = int(state.get("steps", self.steps))
         self.success_counter = int(state.get("success_counter", self.success_counter))
 
-        # kinematics
         pos = state.get("pos", None)
         vel = state.get("vel", None)
         if pos is not None:
@@ -375,30 +307,30 @@ class OrbitEnv(gym.Env):
         if vel is not None:
             self.vel = np.array(vel, dtype=np.float64, copy=True)
 
-        # core physical/task params
         self.G = float(state.get("G", self.G))
         self.M = float(state.get("M", self.M))
-        self.mu = float(state.get("mu", self.mu))  # do NOT force mu=G*M here
+        self.mu = float(state.get("mu", self.mu))
         self.mass = float(state.get("mass", self.mass))
         self.dt = float(state.get("dt", self.dt))
         self.max_steps = int(state.get("max_steps", self.max_steps))
         self.target_radius = float(state.get("target_radius", self.target_radius))
         self.thrust_scale = float(state.get("thrust_scale", self.thrust_scale))
 
-        # success/termination params
         self.success_threshold = int(state.get("success_threshold", self.success_threshold))
         self.tol_r = float(state.get("tol_r", self.tol_r))
         self.tol_v = float(state.get("tol_v", self.tol_v))
         self.tol_ang = float(state.get("tol_ang", self.tol_ang))
 
-        # terminal reward params
         self.term_reward_success = float(state.get("term_reward_success", self.term_reward_success))
         self.term_reward_fail = float(state.get("term_reward_fail", self.term_reward_fail))
 
-        # misc
         self.verbose = bool(state.get("verbose", self.verbose))
 
-        # derived cap: prefer restoring exact value if provided; otherwise recompute
+        self.reward_mode = str(state.get("reward_mode", self.reward_mode))
+        self.w_radius = float(state.get("w_radius", self.w_radius))
+        self.w_progress = float(state.get("w_progress", self.w_progress))
+        self.w_speed = float(state.get("w_speed", self.w_speed))
+
         a_cap_saved = state.get("a_cap", None)
         if a_cap_saved is not None:
             try:
@@ -411,7 +343,6 @@ class OrbitEnv(gym.Env):
             except Exception:
                 self.a_cap = None
 
-
     def _get_obs(self) -> np.ndarray:
         """Return observation as [x, y, vx, vy]."""
         return np.concatenate([self.pos, self.vel]).astype(np.float32)
@@ -419,7 +350,6 @@ class OrbitEnv(gym.Env):
     def _inside_tolerance(self, pos: np.ndarray, vel: np.ndarray) -> bool:
         """
         Check whether the current state is within the success tolerance window.
-        Tolerances compare current radius/speed/flight-angle to target circular-orbit references.
         """
         r = np.linalg.norm(pos)
         v = np.linalg.norm(vel)
@@ -428,35 +358,32 @@ class OrbitEnv(gym.Env):
         r_err = abs(r - self.target_radius) / self.target_radius
         v_err = abs(v - v_target) / v_target
 
-        # Angle between position vector (radial) and velocity vector.
-        # For circular orbit, we want them perpendicular (dot -> 0, |cos| -> 0).
         ur = pos / (r + 1e-8)
         uv = vel / (v + 1e-8)
-        ang = abs(np.dot(ur, uv))  # want near 0
+        ang = abs(np.dot(ur, uv))
 
         return (r_err < self.tol_r) and (v_err < self.tol_v) and (ang < self.tol_ang)
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, bool, Dict[str, Any]]:
         """
         Advance one simulation step with the given action.
-        Action is a 2D vector in [-1, 1]; we scale it to a thrust vector in Newtons.
-
-        Returns:
-            obs (np.ndarray), reward (float), done (bool), info (dict)
         """
         self.steps += 1
 
+        # Save previous position for progress reward
+        prev_pos = self.pos.copy()
+
         # Thrust from action
         action = np.clip(action, -1.0, 1.0)
-        thrust = self.thrust_scale * action  # [Nx, Ny], Newtons
-        acc_thrust = thrust / max(1e-12, self.mass)  # m/s^2
+        thrust = self.thrust_scale * action
+        acc_thrust = thrust / max(1e-12, self.mass)
 
         # Gravity from point mass at the origin
         r_vec = self.pos
         r = np.linalg.norm(r_vec)
         acc_gravity = -self.mu * r_vec / ((r ** 3) + 1e-12)
 
-        # Numerical safety clamp (prevents rare blow-ups with tiny r)
+        # Numerical safety clamp
         acc_gravity = np.clip(acc_gravity, -1e-2, 1e-2)
 
         # Integrate with simple Euler
@@ -469,18 +396,18 @@ class OrbitEnv(gym.Env):
         else:
             self.success_counter = 0
 
-        # Termination logic (Gymnasium splits terminated vs truncated)
+        # Termination logic
         r_now = np.linalg.norm(self.pos)
         time_up = self.steps >= self.max_steps
         out_range = r_now > 2.5 * self.target_radius
         success = self.success_counter >= self.success_threshold
 
-        terminated = bool(success or out_range)  # "task ended" (success/failure)
-        truncated = bool(time_up)  # "time limit / cutoff"
-        done = bool(terminated or truncated)  # for reward function compatibility
+        terminated = bool(success or out_range)
+        truncated = bool(time_up)
+        done = bool(terminated or truncated)
 
         # Reward shaping
-        reward, shaping, bonus, penalty, r_err, v_err = compute_reward(
+        reward_dict = compute_reward(
             pos=self.pos,
             vel=self.vel,
             thrust=thrust,
@@ -490,9 +417,21 @@ class OrbitEnv(gym.Env):
             M=self.M,
             step_count=self.steps,
             done=done,
+            prev_pos=prev_pos,
+            reward_mode=self.reward_mode,
+            w_radius=self.w_radius,
+            w_progress=self.w_progress,
+            w_speed=self.w_speed,
         )
 
-        # Terminal bonus/penalty (apply only once at episode end)
+        reward = reward_dict["reward"]
+        shaping = reward_dict["shaping"]
+        bonus = reward_dict["bonus"]
+        penalty = reward_dict["penalty"]
+        r_err = reward_dict["r_error"]
+        v_err = reward_dict["v_error"]
+
+        # Terminal bonus/penalty
         term_bonus = 0.0
         if done:
             if success:
@@ -508,6 +447,13 @@ class OrbitEnv(gym.Env):
             "penalty": float(penalty),
             "radius_error": float(r_err),
             "speed_error": float(v_err),
+            "progress": float(reward_dict["progress"]),
+            "reward_radius_term": float(reward_dict["radius_term"]),
+            "reward_progress_term": float(reward_dict["progress_term"]),
+            "angle_cos": float(reward_dict["angle_cos"]),
+            "r_term": float(reward_dict["r_term"]),
+            "v_term": float(reward_dict["v_term"]),
+            "angle_term": float(reward_dict["angle_term"]),
             "steps": int(self.steps),
             "success_counter": int(self.success_counter),
             "terminal_bonus": float(term_bonus),
@@ -518,15 +464,40 @@ class OrbitEnv(gym.Env):
             "mass": float(self.mass),
             "thrust_scale": float(self.thrust_scale),
             "dt": float(self.dt),
+            "reward_mode": str(self.reward_mode),
+            "w_radius": float(self.w_radius),
+            "w_progress": float(self.w_progress),
             "action_clipped": action.astype(np.float32),
             "thrust_vec": thrust.astype(np.float64),
             "acc_thrust": acc_thrust.astype(np.float64),
             "acc_gravity": acc_gravity.astype(np.float64),
             "acc_total": (acc_gravity + acc_thrust).astype(np.float64),
+            "w_speed": float(self.w_speed),
+            "reward_speed_term": float(reward_dict["speed_term"]),
         }
 
         return self._get_obs(), float(reward), terminated, truncated, info
 
+    def set_reward_config(
+            self,
+            reward_mode: Optional[str] = None,
+            w_radius: Optional[float] = None,
+            w_progress: Optional[float] = None,
+            w_speed: Optional[float] = None,
+    ) -> None:
+        """
+        Update reward shaping configuration at runtime.
+        """
+        if reward_mode is not None:
+            self.reward_mode = str(reward_mode)
+        if w_radius is not None:
+            self.w_radius = float(w_radius)
+        if w_progress is not None:
+            self.w_progress = float(w_progress)
+        if w_speed is not None:
+            self.w_speed = float(w_speed)
+
     def render(self):
         """Minimal text renderer for quick debugging."""
         print(f"Step {self.steps} | pos: {self.pos}, vel: {self.vel}")
+

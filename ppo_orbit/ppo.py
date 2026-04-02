@@ -11,16 +11,12 @@ import matplotlib.pyplot as plt
 # Local import
 from envs.orbit_env import OrbitEnv
 
-# ==========================================================
 # Device
-# ==========================================================
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Small perf gain on CUDA convolutions / GEMMs; harmless here
 torch.backends.cudnn.benchmark = True
 
-# ==========================================================
 # Hyperparameters (CLI-overridable)
-# ==========================================================
 GAMMA        = 0.995
 LAMBDA       = 0.90
 EPOCHS       = 800
@@ -45,18 +41,16 @@ LR_CRITIC  = 5e-4            # lowered (was 1e-3) to reduce EV wobble; paired wi
 TARGET_KL_BASE = 0.024
 
 # Logging / I/O
-LOG_DIR   = "ppo_orbit"
+LOG_DIR = os.environ.get("LOG_DIR", "ppo_orbit")
 PLOTS_DIR = LOG_DIR
 os.makedirs(LOG_DIR, exist_ok=True)
-CSV_PATH  = os.path.join(LOG_DIR, "loss_log.csv")
+CSV_PATH = os.path.join(LOG_DIR, "loss_log.csv")
 
 # Optional offline dataset (skipped if actions are near-zero)
 DATASET_PATH = os.path.join("data", "data", "preprocessed", "merged_expert_dataset.npy")
 
 
-# ==========================================================
 # Gym >=0.26 compatibility shims (also support legacy/custom env)
-# ==========================================================
 def reset_env(env, **kwargs):
     """Return only obs. Works for Gym>=0.26 (obs, info) and legacy/custom (obs)."""
     out = env.reset(**kwargs)
@@ -82,9 +76,7 @@ def step_env(env, action):
     raise RuntimeError("Unsupported env.step return format.")
 
 
-# ==========================================================
 # Utils
-# ==========================================================
 def set_seed(seed: int):
     """Set Python/Numpy/Torch RNGs. Pass None to disable reproducibility."""
     if seed is None:
@@ -176,9 +168,7 @@ def dataset_action_stats(npy_path: str, thrust_scale: float, sample: int = 500_0
     return {"mean": mean, "std": std, "p95": p95, "absmax": amax}
 
 
-# ==========================================================
 # Evaluation helpers
-# ==========================================================
 @torch.no_grad()
 def evaluate_policy(env, model, thrust_scale, episodes=2, max_steps=20000):
     """Deterministic eval with mean action (μ)."""
@@ -223,9 +213,7 @@ def evaluate_stochastic(env, model, thrust_scale, episodes=2, max_steps=20000):
     print(f"[Eval/Stoch] mean_return={float(np.mean(totals)):.2f}")
 
 
-# ==========================================================
 # Actor-Critic
-# ==========================================================
 class ActorCritic(nn.Module):
     """Small shared MLP with separate actor/critic heads and a global log_std."""
     def __init__(self, hidden1=256, hidden2=128):
@@ -277,9 +265,7 @@ class ActorCritic(nn.Module):
         return log_probs, entropy, value.squeeze(-1)
 
 
-# ==========================================================
 # Returns normalization for critic (running stats)
-# ==========================================================
 class ValueNorm:
     """Track running mean/var of returns; train critic in normalized space.
     For diagnostics, we de-normalize predictions to compute explained variance.
@@ -315,9 +301,7 @@ class ValueNorm:
         return x * (self.var**0.5 + 1e-8) + self.mean
 
 
-# ==========================================================
 # GAE
-# ==========================================================
 def compute_gae(rewards, values, masks, gamma=GAMMA, lam=LAMBDA, last_value=0.0):
     """Generalized Advantage Estimation with terminal bootstrap."""
     masks = [float(m) for m in masks]
@@ -331,9 +315,7 @@ def compute_gae(rewards, values, masks, gamma=GAMMA, lam=LAMBDA, last_value=0.0)
     return returns
 
 
-# ==========================================================
 # Expert warm start (offline or online)
-# ==========================================================
 def load_expert_from_npy(model, npy_path, thrust_scale, epochs=2, batch_size=4096,
                          shuffle=True, max_samples=1_000_000, progress_every=20):
     """Supervised warm start from an offline (state, action) dataset.
@@ -489,9 +471,7 @@ def load_expert_online(model, env, thrust_scale, samples=20000):
     print("[Init] Actor initialized from basic physics expert (online).")
 
 
-# ==========================================================
 # Plotting
-# ==========================================================
 def plot_curves(reward_hist, csv_path, out_dir):
     """Save reward curve and loss curves."""
     # reward curve
@@ -605,9 +585,7 @@ def explained_variance(y_true_t: torch.Tensor, y_pred_t: torch.Tensor) -> float:
     return float(1 - np.var(y_true - y_pred) / (var_y + 1e-8))
 
 
-# ==========================================================
 # Train
-# ==========================================================
 def train(args):
     global TRAIN_ITERS, EPOCHS, THRUST_SCALE
 
@@ -618,7 +596,18 @@ def train(args):
     TRAIN_ITERS  = int(args.train_iters or TRAIN_ITERS)
     THRUST_SCALE = float(args.thrust_scale or THRUST_SCALE)
 
-    env = OrbitEnv(thrust_scale=int(THRUST_SCALE))
+    reward_mode = os.environ.get("REWARD_MODE", "base")
+    w_radius = float(os.environ.get("W_RADIUS", "0.0"))
+    w_progress = float(os.environ.get("W_PROGRESS", "0.0"))
+    w_speed = float(os.environ.get("W_SPEED", "0.0"))
+
+    env = OrbitEnv(
+        thrust_scale=int(THRUST_SCALE),
+        reward_mode=reward_mode,
+        w_radius=w_radius,
+        w_progress=w_progress,
+        w_speed=w_speed,
+    )
     model = ActorCritic().to(device)
 
     optimizer = optim.Adam([
@@ -630,7 +619,7 @@ def train(args):
     huber = nn.SmoothL1Loss()
     value_norm = ValueNorm()
 
-    # ---- Warm start: offline (if healthy) else online physics expert ----
+    # Warm start: offline (if healthy) else online physics expert
     ok = load_expert_from_npy(
         model, DATASET_PATH, thrust_scale=THRUST_SCALE, epochs=2, batch_size=4096,
         max_samples=1_000_000, progress_every=20
@@ -641,9 +630,7 @@ def train(args):
     # Quick imitation check
     evaluate_policy(env, model, thrust_scale=THRUST_SCALE, episodes=1)
 
-    # ------------------------------------------------------------------
     # Optional but stabilizing: one-epoch TD(lambda) critic bootstrap
-    # ------------------------------------------------------------------
     critic_opt = optim.Adam(model.critic.parameters(), lr=LR_CRITIC)
     for _bootstrap_epoch in range(1):  # quick 1-epoch warmup
         states, rewards, masks, values = [], [], [], []
@@ -693,11 +680,11 @@ def train(args):
     ent_coef_boost_next = 1.0
 
     for epoch in range(1, EPOCHS + 1):
-        # === Epoch-level dynamic knobs (based on last epoch's KL) ===
+        # Epoch-level dynamic knobs (based on last epoch's KL)
         clip_eps_epoch = clip_eps_next
         ENT_COEF = current_ent_coef(epoch) * ent_coef_boost_next
 
-        # === Rollout: collect exactly BATCH_STEPS across episodes ===
+        # Rollout: collect exactly BATCH_STEPS across episodes
         states, actions, rewards, masks, log_probs, values = [], [], [], [], [], []
         total_reward = 0.0
 
@@ -771,7 +758,7 @@ def train(args):
         returns_np = compute_gae(rewards, values, masks, last_value=last_v)
         returns_t = torch.tensor(returns_np, dtype=torch.float32, device=device)
 
-        # ---- Normalize returns for critic training
+        # Normalize returns for critic training
         value_norm.update(returns_t)
         returns_norm = value_norm.normalize(returns_t.detach())
 
@@ -872,7 +859,7 @@ def train(args):
             print(
                 f"[Diag] clip_frac={np.mean(clip_fracs):.3f}  KL={np.mean(kls):.4f}  EV_raw={EV_raw:.3f}  EV_norm={EV_norm:.3f}")
 
-        # ===== KL-driven adaptation: iters + actor LR + next-epoch clip/entropy =====
+        # KL-driven adaptation: iters + actor LR + next-epoch clip/entropy
         target_kl = TARGET_KL_BASE
         lr_cap = 8e-05 if epoch <= 60 else 1.0e-04
         mean_kl = float(np.mean(kls)) if len(kls) else 0.0
@@ -977,3 +964,4 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     train(args)
+
