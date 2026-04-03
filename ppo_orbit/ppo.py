@@ -182,7 +182,7 @@ def evaluate_policy(env, model, thrust_scale, episodes=2, max_steps=20000):
             st = torch.tensor(s, dtype=torch.float32, device=device).unsqueeze(0)
             mu, _ = model.forward(st)
             a_env = np.clip(mu.squeeze(0).detach().cpu().numpy(), -1.0, 1.0)
-            next_obs, r, done, _ = step_env(env, a_env * thrust_scale)
+            next_obs, r, done, _ = step_env(env, a_env)
             s = normalize_state(next_obs)
             ep_ret += r
             steps += 1
@@ -207,7 +207,7 @@ def evaluate_stochastic(env, model, thrust_scale, episodes=2, max_steps=20000):
             std = model.log_std.exp()
             a_raw = Normal(mu, std).sample().squeeze(0).detach().cpu().numpy()
             a_env = np.clip(a_raw, -1.0, 1.0)
-            obs, r, done, _ = step_env(env, a_env * thrust_scale)
+            obs, r, done, _ = step_env(env, a_env)
             s = normalize_state(obs); ep_ret += r; steps += 1
         totals.append(ep_ret)
     print(f"[Eval/Stoch] mean_return={float(np.mean(totals)):.2f}")
@@ -512,7 +512,7 @@ def evaluate_and_plot_orbit(env, model, thrust_scale, out_path=os.path.join(LOG_
         st = torch.tensor(s, dtype=torch.float32, device=device).unsqueeze(0)
         mu, _ = model.forward(st)
         a_env = np.clip(mu.squeeze(0).detach().cpu().numpy(), -1.0, 1.0)
-        obs, r, done, _ = step_env(env, a_env * thrust_scale)
+        obs, r, done, _ = step_env(env, a_env)
         s = normalize_state(obs); ep_ret += r; steps += 1
     plt.figure()
     plt.plot(np.array(xs), np.array(ys))
@@ -545,7 +545,7 @@ def plot_state_timeseries(env, model, thrust_scale, out_path=os.path.join(LOG_DI
         st = torch.tensor(s, dtype=torch.float32, device=device).unsqueeze(0)
         mu, _ = model.forward(st)
         a_env = np.clip(mu.squeeze(0).detach().cpu().numpy(), -1.0, 1.0)
-        obs, _, done, _ = step_env(env, a_env * thrust_scale)
+        obs, _, done, _ = step_env(env, a_env)
         s = normalize_state(obs); t += env.dt
 
     # r(t)
@@ -643,7 +643,7 @@ def train(args):
             with torch.no_grad():
                 mu, v = model.forward(st)
             a_env = np.clip(mu.squeeze(0).detach().cpu().numpy(), -1.0, 1.0)
-            next_obs, r, done, _ = step_env(env, a_env * THRUST_SCALE)
+            next_obs, r, done, _ = step_env(env, a_env)
             ns = normalize_state(next_obs)
             states.append(state); rewards.append(r); masks.append(0 if done else 1); values.append(float(v.item()))
             state = ns; steps += 1

@@ -359,11 +359,12 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
     actions = []
     a_effs = []
 
-    # --- Day16: trajectory recording (no behavior change) ---
+    # Day16: trajectory recording (no behavior change)
     r_series = []
     vr_series = []
     cos_tr_series = []
     cos_tt_series = []
+    thrust_norm_series = []
 
     for _ in range(max_steps):
         # 1) Controller outputs thrust intent in Newtons
@@ -442,6 +443,9 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
             thrust_vec_step = np.asarray(info["thrust_vec"], dtype=np.float64).ravel()
         else:
             thrust_vec_step = np.asarray(thrust_intent, dtype=np.float64).ravel()
+
+        thrust_norm = float(np.linalg.norm(thrust_vec_step))
+        thrust_norm_series.append(thrust_norm)
 
         r_unit_step2, _ = _safe_unit(r_vec)
         th_unit_step, _ = _safe_unit(thrust_vec_step)
@@ -634,6 +638,7 @@ def run_episode(scenario, label, ControllerCls, cfg, max_steps=2000, physical_ov
         vr=np.asarray(vr_series, dtype=np.float64),
         cos_tr=np.asarray(cos_tr_series, dtype=np.float64),
         cos_tt=np.asarray(cos_tt_series, dtype=np.float64),
+        thrust_norm=np.asarray(thrust_norm_series, dtype=np.float64),
         target_r=float(target_radius),
     )
 

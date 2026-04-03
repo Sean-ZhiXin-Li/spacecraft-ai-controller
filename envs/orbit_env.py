@@ -406,6 +406,15 @@ class OrbitEnv(gym.Env):
         truncated = bool(time_up)
         done = bool(terminated or truncated)
 
+        # compute radial velocity
+        r_vec = self.pos
+        v_vec = self.vel
+
+        r_norm = np.linalg.norm(r_vec) + 1e-12
+        r_hat = r_vec / r_norm
+
+        v_r = float(np.dot(v_vec, r_hat))
+
         # Reward shaping
         reward_dict = compute_reward(
             pos=self.pos,
@@ -422,6 +431,7 @@ class OrbitEnv(gym.Env):
             w_radius=self.w_radius,
             w_progress=self.w_progress,
             w_speed=self.w_speed,
+            v_r=v_r,
         )
 
         reward = reward_dict["reward"]

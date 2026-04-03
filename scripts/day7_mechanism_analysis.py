@@ -17,6 +17,9 @@ def load_run(path):
     result["cos_tr"] = data["cos_tr"]
     result["cos_tt"] = data["cos_tt"]
 
+    if "thrust_norm" in data.files:
+        result["thrust_norm"] = data["thrust_norm"]
+
     if "target_r" in data.files:
         result["target_r"] = data["target_r"]
 
@@ -24,6 +27,24 @@ def load_run(path):
 
     return result
 
+def plot_thrust_norm_vs_time(all_results, save_path):
+    plt.figure(figsize=(8, 5))
+
+    for name, result in all_results.items():
+        if "thrust_norm" not in result:
+            continue
+
+        t = result["time"]
+        thrust_norm = result["thrust_norm"]
+        plt.plot(t, thrust_norm, label=name)
+
+    plt.xlabel("Time step")
+    plt.ylabel("Thrust norm")
+    plt.title("Thrust Norm vs Time")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=150)
+    plt.close()
 
 def plot_radial_velocity(all_results, save_path):
     plt.figure(figsize=(8, 5))
@@ -182,9 +203,9 @@ def plot_relative_radius_error_vs_time(all_results, save_path):
 
 def main():
     runs = {
-            "ppo": "analysis/runs/run_964254/traj.npz",
-            "gated": "analysis/runs/run_854705/traj.npz",
-            "always_on": "analysis/runs/run_835152/traj.npz",
+        "always_on": "analysis/runs/run_89064/traj.npz",
+        "gated": "analysis/runs/run_152346/traj.npz",
+        "ppo": "analysis/runs/run_778932/traj.npz",
     }
 
     all_results = {}
@@ -221,12 +242,18 @@ def main():
         out_dir / "relative_radius_error_vs_time.png",
     )
 
+    plot_thrust_norm_vs_time(
+        all_results,
+        out_dir / "thrust_norm_vs_time.png",
+    )
+
     print("\nSaved plots:")
     print("analysis/figs/day7_mechanism/radial_velocity_vs_time.png")
     print("analysis/figs/day7_mechanism/cos_tr_vs_vr.png")
     print("analysis/figs/day7_mechanism/radius_vs_time.png")
     print("analysis/figs/day7_mechanism/radius_error_vs_time.png")
     print("analysis/figs/day7_mechanism/relative_radius_error_vs_time.png")
+    print("analysis/figs/day7_mechanism/thrust_norm_vs_time.png")
     summarize_runs(all_results)
     summarize_radius_error(all_results)
 
