@@ -355,6 +355,7 @@ class OrbitEnv(gym.Env):
         v = np.linalg.norm(vel)
         v_target = np.sqrt(self.mu / self.target_radius)
 
+
         r_err = abs(r - self.target_radius) / self.target_radius
         v_err = abs(v - v_target) / v_target
 
@@ -398,11 +399,15 @@ class OrbitEnv(gym.Env):
 
         # Termination logic
         r_now = np.linalg.norm(self.pos)
+        v_now = np.linalg.norm(self.vel)
+        v_target = np.sqrt(self.mu / self.target_radius)
+
         time_up = self.steps >= self.max_steps
         out_range = r_now > 2.5 * self.target_radius
         success = self.success_counter >= self.success_threshold
+        overspeed = v_now > 1.3 * v_target
 
-        terminated = bool(success or out_range)
+        terminated = bool(success or out_range or overspeed)
         truncated = bool(time_up)
         done = bool(terminated or truncated)
 
@@ -446,8 +451,9 @@ class OrbitEnv(gym.Env):
         if done:
             if success:
                 term_bonus += self.term_reward_success
-            elif out_range:
+            elif out_range or overspeed:
                 term_bonus += self.term_reward_fail
+
         reward += term_bonus
 
         info: Dict[str, Any] = {
@@ -484,6 +490,18 @@ class OrbitEnv(gym.Env):
             "acc_total": (acc_gravity + acc_thrust).astype(np.float64),
             "w_speed": float(self.w_speed),
             "reward_speed_term": float(reward_dict["speed_term"]),
+            "stage": reward_dict.get("stage", "unknown"),
+            "tangential_alignment": float(reward_dict.get("tangential_alignment", 0.0)),
+            "radial_alignment": float(reward_dict.get("radial_alignment", 0.0)),
+            "stop_bonus": float(reward_dict.get("stop_bonus", 0.0)),
+            "v_r_raw": float(reward_dict.get("v_r", v_r)),
+            "overspeed_penalty": float(reward_dict.get("overspeed_penalty", 0.0)),
+            "thrust_norm": float(reward_dict.get("thrust_norm", 0.0)),
+            "h_norm": float(reward_dict.get("h_norm", 0.0)),
+            "angular_momentum": float(reward_dict.get("angular_momentum", 0.0)),
+            "overspeed": bool(overspeed),
+            "v_now": float(v_now),
+            "v_target": float(v_target),
         }
 
         return self._get_obs(), float(reward), terminated, truncated, info
