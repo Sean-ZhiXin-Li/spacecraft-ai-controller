@@ -21,20 +21,21 @@ GAMMA        = 0.995
 LAMBDA       = 0.90
 EPOCHS       = 800
 TRAIN_ITERS = 20         # adapted per-epoch by KL feedback (cap can rise to 32)
-THRUST_SCALE = 3000.0
-BATCH_STEPS  = 800          # env steps collected per epoch (across episodes)
+THRUST_SCALE = 20000.0
+DT = 2.0
+BATCH_STEPS  = 1200         # env steps collected per epoch (across episodes)
 
 # PPO specifics
 CLIP_EPS         = 0.25      # base PPO clip; we keep it fairly bold overall (won't go below ~0.24 later)
 VF_COEF          = 1.2       # scheduled by current_vf_coef()
-ENT_COEF_0       = 0.012     # slightly more early exploration
-ENT_COEF_1       = 0.0015    # v3.2b+ Patch A: more late exploration (was 0.001)
+ENT_COEF_0 = 0.10
+ENT_COEF_1 = 0.03
 ENT_SWITCH_EPOCH = 240
 MAX_GRAD_NORM    = 0.5
 MB_SIZE          = 128       # mini-batch size for PPO updates
 
 # Optimizer learning rates
-LR_ACTOR   = 3e-5
+LR_ACTOR   = 1e-4
 LR_CRITIC  = 5e-4            # lowered (was 1e-3) to reduce EV wobble; paired with value clipping
 
 # KL target (for adaptation) — slightly higher so the "bold lane" triggers a bit more
@@ -183,6 +184,7 @@ def evaluate_policy(env, model, thrust_scale, episodes=2, max_steps=20000):
             mu, _ = model.forward(st)
             a_env = np.clip(mu.squeeze(0).detach().cpu().numpy(), -1.0, 1.0)
             next_obs, r, done, _ = step_env(env, a_env)
+            r = float(np.clip(r, -10.0, 10.0))
             s = normalize_state(next_obs)
             ep_ret += r
             steps += 1
@@ -233,7 +235,7 @@ class ActorCritic(nn.Module):
             nn.Linear(hidden2, 1)
         )
         # Initial exploration std (log-space parameterization)
-        self.log_std = nn.Parameter(torch.log(torch.ones(2, device=device) * 0.2))
+        self.log_std = nn.Parameter(torch.log(torch.ones(2, device=device) * 0.35))
 
     def forward(self, x: torch.Tensor):
         x = self.shared(x)
@@ -602,7 +604,8 @@ def train(args):
     w_speed = float(os.environ.get("W_SPEED", "0.0"))
 
     env = OrbitEnv(
-        thrust_scale=int(THRUST_SCALE),
+        thrust_scale=float(THRUST_SCALE),
+        dt=DT,
         reward_mode=reward_mode,
         w_radius=w_radius,
         w_progress=w_progress,
@@ -699,7 +702,9 @@ def train(args):
         steps_collected = 0
         while steps_collected < BATCH_STEPS:
             a_raw_np, a_env_np, log_prob = model.get_action(state)
-            next_obs, reward, done, _ = step_env(env, a_env_np * THRUST_SCALE)
+            # Env expects normalized action in [-1, 1] and does thrust scaling internally.
+            next_obs, reward, done, _ = step_env(env, a_env_np)
+            reward = float(np.clip(reward, -10.0, 10.0))
             ns = normalize_state(next_obs)
 
             # Day 3 sanity checks
@@ -838,7 +843,7 @@ def train(args):
                     )
 
                 with torch.no_grad():
-                    low_sigma = 0.20 if epoch <= 160 else 0.15
+                    low_sigma = 0.50 if epoch <= 200 else 0.30
                     model.log_std.data.clamp_(min=np.log(low_sigma), max=np.log(1.2))
                     log_ratio = new_logp - mb_old_logp
                     ratio_now = torch.exp(log_ratio)
@@ -861,7 +866,7 @@ def train(args):
 
         # KL-driven adaptation: iters + actor LR + next-epoch clip/entropy
         target_kl = TARGET_KL_BASE
-        lr_cap = 8e-05 if epoch <= 60 else 1.0e-04
+        lr_cap = 2.0e-4 if epoch <= 60 else 1.5e-4
         mean_kl = float(np.mean(kls)) if len(kls) else 0.0
 
         # Day 4 stabilization: remove extra low-KL boost
@@ -880,29 +885,30 @@ def train(args):
 
         actor_pg = optimizer.param_groups[0]
         old_lr = actor_pg["lr"]
-        if mean_kl < 0.25 * target_kl:
-            actor_pg["lr"] = min(old_lr * 1.15, lr_cap)
-            clip_eps_next = 0.36
-            ent_coef_boost_next = 1.45
+
+        if mean_kl < 0.20 * target_kl:
+            actor_pg["lr"] = min(old_lr * 1.30, lr_cap)
+            clip_eps_next = 0.35
+            ent_coef_boost_next = 1.50
         elif mean_kl < 0.35 * target_kl:
-            actor_pg["lr"] = min(old_lr * 1.08, lr_cap)
-            clip_eps_next = 0.32
-            ent_coef_boost_next = 1.30
-        elif mean_kl < 0.5 * target_kl:
+            actor_pg["lr"] = min(old_lr * 1.10, lr_cap)
+            clip_eps_next = 0.30
+            ent_coef_boost_next = 1.20
+        elif mean_kl < 0.50 * target_kl:
             actor_pg["lr"] = min(old_lr * 1.05, lr_cap)
             clip_eps_next = 0.28
             ent_coef_boost_next = 1.00
-        elif mean_kl < 0.8 * target_kl:
+        elif mean_kl < 0.80 * target_kl:
             actor_pg["lr"] = min(old_lr * 1.02, lr_cap)
             clip_eps_next = 0.26
             ent_coef_boost_next = 1.00
-        elif mean_kl > 1.5 * target_kl:
+        elif mean_kl > 1.50 * target_kl:
             actor_pg["lr"] = max(old_lr * 0.92, 1e-5)
             clip_eps_next = 0.24
             ent_coef_boost_next = 1.00
         else:
             clip_eps_next = 0.25
-            ent_coef_boost_next = 1.0
+            ent_coef_boost_next = 1.00
 
         print(
             f"[Adapt] mean_KL={mean_kl:.4f} -> next TRAIN_ITERS={TRAIN_ITERS} | actor_lr={actor_pg['lr']:.2e} | next_clip={clip_eps_next:.2f}")

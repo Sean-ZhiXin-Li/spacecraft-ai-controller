@@ -34,7 +34,7 @@ class OrbitEnv(gym.Env):
             G: float = 6.67430e-11,
             M: float = 1.989e30,
             mass: float = 722.0,
-            dt: float = 10.0,
+            dt: float = 2.0,
             max_steps: int = 60000,
             target_radius: float = 7.5e12,
             thrust_scale: float = 3000.0,
@@ -387,6 +387,14 @@ class OrbitEnv(gym.Env):
         # Numerical safety clamp
         acc_gravity = np.clip(acc_gravity, -1e-2, 1e-2)
 
+        r_norm = np.linalg.norm(r_vec) + 1e-12
+        r_hat = r_vec / r_norm
+        t_hat = np.array([-r_hat[1], r_hat[0]], dtype=np.float64)
+
+        if np.linalg.norm(thrust) < 0.05 * self.thrust_scale:
+            thrust = thrust + 0.05 * self.thrust_scale * t_hat
+            acc_thrust = thrust / max(1e-12, self.mass)
+
         # Integrate with simple Euler
         self.vel = self.vel + (acc_gravity + acc_thrust) * self.dt
         self.pos = self.pos + self.vel * self.dt
@@ -405,18 +413,16 @@ class OrbitEnv(gym.Env):
         time_up = self.steps >= self.max_steps
         out_range = r_now > 2.5 * self.target_radius
         success = self.success_counter >= self.success_threshold
-        overspeed = v_now > 1.3 * v_target
+        overspeed = v_now > 1.45 * v_target
+        too_close = r_now < 0.55 * self.target_radius
 
-        terminated = bool(success or out_range or overspeed)
+        terminated = bool(success or out_range or overspeed or too_close)
         truncated = bool(time_up)
         done = bool(terminated or truncated)
 
         # compute radial velocity
         r_vec = self.pos
         v_vec = self.vel
-
-        r_norm = np.linalg.norm(r_vec) + 1e-12
-        r_hat = r_vec / r_norm
 
         v_r = float(np.dot(v_vec, r_hat))
 
@@ -437,6 +443,7 @@ class OrbitEnv(gym.Env):
             w_progress=self.w_progress,
             w_speed=self.w_speed,
             v_r=v_r,
+            thrust_scale=self.thrust_scale,
         )
 
         reward = reward_dict["reward"]
@@ -451,7 +458,7 @@ class OrbitEnv(gym.Env):
         if done:
             if success:
                 term_bonus += self.term_reward_success
-            elif out_range or overspeed:
+            elif out_range or overspeed or too_close:
                 term_bonus += self.term_reward_fail
 
         reward += term_bonus
@@ -502,6 +509,7 @@ class OrbitEnv(gym.Env):
             "overspeed": bool(overspeed),
             "v_now": float(v_now),
             "v_target": float(v_target),
+            "too_close": bool(too_close),
         }
 
         return self._get_obs(), float(reward), terminated, truncated, info
