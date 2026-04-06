@@ -28,9 +28,9 @@ BATCH_STEPS  = 1200         # env steps collected per epoch (across episodes)
 # PPO specifics
 CLIP_EPS         = 0.25      # base PPO clip; we keep it fairly bold overall (won't go below ~0.24 later)
 VF_COEF          = 1.2       # scheduled by current_vf_coef()
-ENT_COEF_0 = 0.10
-ENT_COEF_1 = 0.03
-ENT_SWITCH_EPOCH = 240
+ENT_COEF_0 = 0.02
+ENT_COEF_1 = 0.003
+ENT_SWITCH_EPOCH = 80
 MAX_GRAD_NORM    = 0.5
 MB_SIZE          = 128       # mini-batch size for PPO updates
 
@@ -184,7 +184,7 @@ def evaluate_policy(env, model, thrust_scale, episodes=2, max_steps=20000):
             mu, _ = model.forward(st)
             a_env = np.clip(mu.squeeze(0).detach().cpu().numpy(), -1.0, 1.0)
             next_obs, r, done, _ = step_env(env, a_env)
-            r = float(np.clip(r, -10.0, 10.0))
+            r = float(r)
             s = normalize_state(next_obs)
             ep_ret += r
             steps += 1
@@ -598,7 +598,7 @@ def train(args):
     TRAIN_ITERS  = int(args.train_iters or TRAIN_ITERS)
     THRUST_SCALE = float(args.thrust_scale or THRUST_SCALE)
 
-    reward_mode = os.environ.get("REWARD_MODE", "base")
+    reward_mode = os.environ.get("REWARD_MODE", "simple_orbit")
     w_radius = float(os.environ.get("W_RADIUS", "0.0"))
     w_progress = float(os.environ.get("W_PROGRESS", "0.0"))
     w_speed = float(os.environ.get("W_SPEED", "0.0"))
@@ -704,7 +704,7 @@ def train(args):
             a_raw_np, a_env_np, log_prob = model.get_action(state)
             # Env expects normalized action in [-1, 1] and does thrust scaling internally.
             next_obs, reward, done, _ = step_env(env, a_env_np)
-            reward = float(np.clip(reward, -10.0, 10.0))
+            reward = float(reward)
             ns = normalize_state(next_obs)
 
             # Day 3 sanity checks
@@ -812,7 +812,7 @@ def train(args):
                 critic_loss = torch.max(
                     huber(mb_returns_norm, v_pred_mb),
                     huber(mb_returns_norm, v_clipped)
-                )
+                ).mean()
 
                 # Joint update
                 vf_coef = 0.25
@@ -843,8 +843,8 @@ def train(args):
                     )
 
                 with torch.no_grad():
-                    low_sigma = 0.50 if epoch <= 200 else 0.30
-                    model.log_std.data.clamp_(min=np.log(low_sigma), max=np.log(1.2))
+                    low_sigma = 0.20 if epoch <= 120 else 0.08
+                    model.log_std.data.clamp_(min=np.log(low_sigma), max=np.log(0.60))
                     log_ratio = new_logp - mb_old_logp
                     ratio_now = torch.exp(log_ratio)
 
@@ -889,7 +889,7 @@ def train(args):
         if mean_kl < 0.20 * target_kl:
             actor_pg["lr"] = min(old_lr * 1.30, lr_cap)
             clip_eps_next = 0.35
-            ent_coef_boost_next = 1.50
+            ent_coef_boost_next = min(ent_coef_boost_next, 1.2)
         elif mean_kl < 0.35 * target_kl:
             actor_pg["lr"] = min(old_lr * 1.10, lr_cap)
             clip_eps_next = 0.30
