@@ -18,6 +18,20 @@ The goal is to build a **research-grade experimental platform** for studying aut
 
 ---
 
+## Core Contribution
+
+This project introduces a **gated control mechanism for orbital insertion**, 
+which improves stability under constrained thrust conditions 
+and reveals structural differences between rule-based and learning-based controllers.
+
+Key contribution:
+
+- Demonstrates that control structure (gating) can outperform naive continuous thrust
+- Provides a reproducible framework for comparing control strategies under identical physics
+- Bridges classical control intuition with modern RL approaches
+
+---
+
 ## Objectives
 
 * Develop control strategies for orbital insertion and stabilization
