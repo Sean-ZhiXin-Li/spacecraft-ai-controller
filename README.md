@@ -6,30 +6,87 @@
 
 ## Project Overview
 
-This project focuses on building a **physics-grounded, AI-driven control framework** for spacecraft orbit management. It combines simulation, classical control, and modern machine learning into a unified experimental platform.
+This project presents a **physics-grounded control framework for spacecraft orbital dynamics**, integrating classical control strategies with modern machine learning methods.
 
-### Objectives
+Rather than focusing solely on learning-based approaches, this work emphasizes:
 
-* Develop AI controllers for orbital thrust and trajectory control
-* Benchmark different control strategies under consistent conditions
-* Build a reproducible pipeline for research and experimentation
-* Bridge simulation results toward real-world embedded systems
+* **Control structure design** (e.g., gated control mechanisms)
+* **Physics-consistent evaluation**
+* **Systematic comparison between rule-based and learning-based controllers**
 
-### Key Features
+The goal is to build a **research-grade experimental platform** for studying autonomous spacecraft control under constrained thrust and realistic orbital conditions.
+
+---
+
+## Objectives
+
+* Develop control strategies for orbital insertion and stabilization
+* Benchmark rule-based and learning-based controllers under identical physics
+* Build a reproducible experimentation pipeline
+* Analyze control behavior through trajectory-level diagnostics
+
+---
+
+## Key Features
 
 * Custom **Gymnasium-compatible orbital environment (`OrbitEnv`)**
-* Support for multiple controllers:
+* Multiple controller paradigms:
 
-  * Heuristic / rule-based
+  * Rule-based / heuristic controllers
   * Expert-designed controllers
   * Imitation learning (MLP)
   * Reinforcement learning (PPO)
-* Standardized evaluation pipeline with:
+* Unified evaluation pipeline with:
 
-  * Fuel-aware metrics
   * Orbit accuracy metrics
-  * Reproducibility guarantees
-* Modular structure for rapid experimentation
+  * Stability analysis
+  * Trajectory logging (`traj.npz`)
+* Automated experiment management and visualization
+
+---
+
+## Demo: Orbital Insertion Performance
+
+### Best Archived Result (Gated Controller)
+
+The strongest archived trajectory is achieved using a **gated control strategy**, which dynamically adjusts thrust based on orbital error.
+
+#### Radius vs Time
+
+![radius](analysis/demo_best/gated_radius_vs_time.png)
+
+#### Radial Velocity vs Time
+
+![vr](analysis/demo_best/gated_vr_vs_time.png)
+
+#### Radius Error vs Time
+
+![error](analysis/demo_best/gated_radius_error_vs_time.png)
+
+### Observations
+
+* Radius converges toward the target orbit
+* Radial velocity stabilizes near zero
+* Radius error decreases and remains bounded
+
+### Configuration
+
+```text
+Controller: gated
+Thrust: 2000 N
+Initial condition: r0 ≈ 1.005 × target radius
+```
+
+### Run the demo locally
+
+```bash
+python main.py
+```
+
+This will:
+
+* Automatically select the best run from `analysis/runs/`
+* Generate trajectory plots in `analysis/demo_best/`
 
 ---
 
@@ -43,9 +100,9 @@ spacecraft_ai_project/
 ├── data/              # Training datasets (expert trajectories)
 ├── ppo_orbit/         # PPO training implementation
 ├── tools/             # Utilities (quickrun, plotting, summarization)
-├── project_log/       # Daily research logs and notes
-├── ab/                # Experiment outputs and benchmarks
-├── results/           # Final summarized results
+├── project_log/       # Research logs and experiment notes
+├── analysis/          # Runs, trajectories, and evaluation outputs
+├── results/           # Aggregated experiment results
 ├── LICENSE
 └── README.md
 ```
@@ -67,149 +124,71 @@ pip install numpy matplotlib torch scikit-learn gymnasium
 
 ---
 
-## Quick Start
+## Experimental Pipeline
 
-Run a baseline evaluation using expert controllers:
+This project follows a structured research workflow:
 
-```bash
-python tools/day39_quickrun.py \
-  --tasks_dir ab/day36/task_specs_fast \
-  --out_dir ab/day39 \
-  --controllers elliptic_strong transfer_2phase spiral_in \
-  --limit 64
-```
+1. **Environment Setup** — fixed physics and normalization
+2. **Controller Design** — rule-based vs learning-based
+3. **Batch Experiments** — parameter sweeps (thrust, initial radius)
+4. **Trajectory Logging** — saved as `traj.npz`
+5. **Metric Extraction** — reward, stability, error
+6. **Visualization & Analysis** — automated plotting tools
 
-### Output
-
-* CSV summary: `ab/day39/csv/summary.csv`
-* Figures:
-
-  * Orbit error comparison
-  * Return comparison
+This ensures **fair comparison and reproducibility** across experiments.
 
 ---
 
-## Current Progress (Updated)
+## Current Progress
 
-The project has evolved into a **multi-stage AI control research pipeline**, integrating simulation fidelity, controller diversity, and evaluation robustness.
+### Working Components
 
-### What is Working Well
+* Stable expert and gated controllers
+* Reproducible evaluation pipeline
+* Automated trajectory analysis and visualization
+* PPO integration with training and checkpointing
 
-* Stable expert controllers for circular and elliptic orbits
-* Reproducible evaluation pipeline (quickrun + summaries)
-* Multi-task benchmarking across orbit types
-* PPO framework integrated and functional
+### Limitations
 
-### Current Limitations
-
-* RL policies still show:
+* RL policies show:
 
   * Energy inefficiency
-  * Thrust misalignment
-* Transfer tasks remain harder than circular stabilization
-* Reward design is not yet fully aligned with physical efficiency
-
----
-
-## Research Progress Timeline
-
-### Phase 1 — Foundations
-
-* Built 2D orbital simulator
-* Implemented basic expert controllers
-
-### Phase 2 — Learning Models
-
-* Imitation learning (MLP)
-* PPO baseline setup
-
-### Phase 3 — RL Refinement
-
-* Improved reward shaping
-* Stabilized PPO training
-
-### Phase 4 — Benchmark System
-
-* Established baseline tiers:
-
-  * Zero
-  * Greedy
-  * Expert
-
-### Phase 5 — Scalable Evaluation
-
-* Task bundles (circular, elliptic, transfer)
-* Automated evaluation pipeline
-
-### Phase 6+ — Expansion
-
-* Metrics system
-* Energy-based analysis
-* Multi-orbit validation
+  * Suboptimal thrust alignment
+* Transfer maneuvers remain challenging
+* Reward design is not fully aligned with physical optimality
 
 ---
 
 ## Key Insights
 
-* Expert controllers achieve **high stability** in simple orbits
-* RL models require **better physical alignment** in rewards
-* Energy efficiency is currently the main bottleneck
-* Transfer maneuvers expose weaknesses in learned policies
-
----
-
-## Next Steps
-
-### Short-Term
-
-* Hybrid training (Imitation → PPO)
-* Curriculum learning across orbit complexity
-* Improved reward shaping (energy-aware)
-* Robustness testing (noise, faults)
-
-### Mid-Term
-
-* 3D orbital dynamics
-* Multi-agent coordination (formation flying)
-* Advanced propulsion modeling
-
-### Long-Term
-
-* Integration with embedded systems (Arduino / ROS2)
-* Real-time control deployment
-* Autonomous spacecraft decision-making
-
----
-
-## Vision
-
-This project aims to become a **complete research framework for autonomous spacecraft control**, combining:
-
-* Physics-based simulation
-* Machine learning
-* Control theory
-* Real-world system integration
-
-The long-term goal is to move from:
-
-> Simulation → Intelligence → Autonomy → Real Deployment
+* Gated control achieves **strong stability under constrained thrust**
+* RL models require **physics-aligned reward shaping**
+* Energy efficiency is a primary bottleneck
+* Learned policies struggle with long-horizon transfer tasks
 
 ---
 
 ## Research Direction
 
-* AI-driven propulsion optimization
-* Fault-tolerant autonomous navigation
-* Distributed spacecraft systems
-* Long-duration mission autonomy
+* Hybrid control (Imitation → PPO)
+* Curriculum learning for orbital complexity
+* Energy-aware reward design
+* Robustness under noise and system uncertainty
 
 ---
 
-## Philosophy
+## Vision
 
-> *Trajectory may drift, but the mission continues.*
+This project aims to evolve into a **research platform for autonomous spacecraft control**, combining:
 
-This project is not only about solving orbital control problems, but also about exploring how **machine intelligence can persist and operate independently in space environments**.
+* Orbital physics simulation
+* Control theory
+* Machine learning
+* Autonomous decision systems
+
+Long-term direction:
+
+> Simulation → Control → Learning → Autonomous Space Systems
 
 ---
 
@@ -221,10 +200,16 @@ MIT License
 
 ## Acknowledgment
 
-This work is inspired by ongoing research in:
+Inspired by research in:
 
 * Autonomous space systems
 * Reinforcement learning for control
-* Distributed intelligence in extreme environments
+* AI-driven robotics and dynamics
 
-It represents an ongoing effort to push AI beyond simulation into real-world space applications.
+---
+
+## Philosophy
+
+> *Trajectory may drift, but control adapts.*
+
+This project explores how intelligent systems can operate reliably under uncertainty in complex physical environments.

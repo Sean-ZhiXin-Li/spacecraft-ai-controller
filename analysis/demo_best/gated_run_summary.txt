@@ -1,0 +1,17 @@
+Best run directory: E:\spacecraft_ai_project\analysis\runs\run_750091
+Trajectory file: E:\spacecraft_ai_project\analysis\runs\run_750091\traj.npz
+Metrics file: E:\spacecraft_ai_project\analysis\runs\run_750091\metrics.json
+Best checkpoint (if found): E:\spacecraft_ai_project\ppo_orbit\ppo_best_model.pth
+
+Key metrics:
+  total_reward = 5380.439774582626
+  final_radius_error = None
+  avg_radius_error = None
+  saturation_rate_mean = 0.0
+  controller_variant = gated
+  thrust_newton = 2000.0
+  r0_over_target = 1.0049999776426666
+
+Saved: E:\spacecraft_ai_project\analysis\demo_best\gated_radius_vs_time.png
+Saved: E:\spacecraft_ai_project\analysis\demo_best\gated_vr_vs_time.png
+Saved: E:\spacecraft_ai_project\analysis\demo_best\gated_radius_error_vs_time.png
