@@ -214,6 +214,39 @@ def evaluate_stochastic(env, model, thrust_scale, episodes=2, max_steps=20000):
         totals.append(ep_ret)
     print(f"[Eval/Stoch] mean_return={float(np.mean(totals)):.2f}")
 
+@torch.no_grad()
+def evaluate_orbit_hold(env, model, episodes=3, max_steps=20000):
+    """
+    Check if policy can hold near-circular orbit for sustained steps.
+    Uses env._inside_tolerance and env.success_threshold as the hold target.
+    """
+    holds = []
+    for _ in range(episodes):
+        obs = reset_env(env)
+        s = normalize_state(obs)
+        done = False
+        hold = 0
+        best_hold = 0
+        steps = 0
+        while not done and steps < max_steps:
+            st = torch.tensor(s, dtype=torch.float32, device=device).unsqueeze(0)
+            mu, _ = model.forward(st)
+            a_env = np.clip(mu.squeeze(0).detach().cpu().numpy(), -1.0, 1.0)
+            obs, _, done, _ = step_env(env, a_env)
+            pos = obs[:2]
+            vel = obs[2:]
+            if env._inside_tolerance(pos, vel):
+                hold += 1
+                best_hold = max(best_hold, hold)
+            else:
+                hold = 0
+            s = normalize_state(obs)
+            steps += 1
+        holds.append(best_hold)
+    mean_hold = float(np.mean(holds)) if holds else 0.0
+    ok = mean_hold >= float(env.success_threshold)
+    print(f"[Eval/OrbitHold] holds={holds} | mean_hold={mean_hold:.1f} | threshold={env.success_threshold} | ok={ok}")
+    return ok, holds
 
 # Actor-Critic
 class ActorCritic(nn.Module):
@@ -622,16 +655,21 @@ def train(args):
     huber = nn.SmoothL1Loss()
     value_norm = ValueNorm()
 
-    # Warm start: offline (if healthy) else online physics expert
-    ok = load_expert_from_npy(
-        model, DATASET_PATH, thrust_scale=THRUST_SCALE, epochs=2, batch_size=4096,
-        max_samples=1_000_000, progress_every=20
-    )
-    if not ok:
-        load_expert_online(model, env, thrust_scale=THRUST_SCALE, samples=20000)
+    # Warm start: offline expert -> online expert -> scratch
+    if args.no_expert:
+        ok = False
+        print("[Init] Expert warm start disabled. Training from scratch.")
+    else:
+        ok = load_expert_from_npy(
+            model, DATASET_PATH, thrust_scale=THRUST_SCALE, epochs=2, batch_size=4096,
+            max_samples=1_000_000, progress_every=20
+        )
+        if not ok:
+            load_expert_online(model, env, thrust_scale=THRUST_SCALE, samples=20000)
 
-    # Quick imitation check
-    evaluate_policy(env, model, thrust_scale=THRUST_SCALE, episodes=1)
+    # Only run imitation sanity check when expert warm start is enabled
+    if not args.no_expert:
+        evaluate_policy(env, model, thrust_scale=THRUST_SCALE, episodes=1)
 
     # Optional but stabilizing: one-epoch TD(lambda) critic bootstrap
     critic_opt = optim.Adam(model.critic.parameters(), lr=LR_CRITIC)
@@ -953,7 +991,9 @@ def train(args):
 
     plot_curves(all_rewards, CSV_PATH, PLOTS_DIR)
     evaluate_policy(env, model, thrust_scale=THRUST_SCALE, episodes=2)
-    evaluate_and_plot_orbit(env, model, thrust_scale=THRUST_SCALE, out_path=os.path.join(PLOTS_DIR, "orbit_trajectory.png"))
+    evaluate_orbit_hold(env, model, episodes=3)
+    evaluate_and_plot_orbit(env, model, thrust_scale=THRUST_SCALE,
+                            out_path=os.path.join(PLOTS_DIR, "orbit_trajectory.png"))
     plot_state_timeseries(env, model, thrust_scale=THRUST_SCALE, out_path=os.path.join(PLOTS_DIR, "state_timeseries.png"))
     print("Training finished.")
 
@@ -964,6 +1004,7 @@ def parse_args():
     p.add_argument("--train-iters", type=int, default=TRAIN_ITERS, help="PPO update iters per epoch")
     p.add_argument("--thrust-scale", type=float, default=THRUST_SCALE, help="env/PPO thrust scaling")
     p.add_argument("--seed", type=int, default=42, help="random seed (None to disable)")
+    p.add_argument("--no-expert", action="store_true", help="disable offline/online expert warm start")
     return p.parse_args()
 
 

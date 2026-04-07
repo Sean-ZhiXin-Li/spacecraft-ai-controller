@@ -38,14 +38,14 @@ class OrbitEnv(gym.Env):
             max_steps: int = 60000,
             target_radius: float = 7.5e12,
             thrust_scale: float = 3000.0,
-            success_threshold: int = 120,
-            tol_r: float = 2e-3,
-            tol_v: float = 2e-3,
-            tol_ang: float = 0.08,
+            success_threshold: int = 60,
+            tol_r: float = 1.2e-2,
+            tol_v: float = 1.2e-2,
+            tol_ang: float = 0.12,
             term_reward_success: float = 1000.0,
-            term_reward_fail: float = -50.0,
+            term_reward_fail: float = -70.0,
             verbose: bool = False,
-            reward_mode: str = "base",
+            reward_mode: str = "simple_orbit",
             w_radius: float = 0.0,
             w_progress: float = 0.0,
             w_speed: float = 0.0,
@@ -95,6 +95,9 @@ class OrbitEnv(gym.Env):
         self.success_counter = 0
         self.pos = np.zeros(2, dtype=np.float64)
         self.vel = np.zeros(2, dtype=np.float64)
+        self.prev_action = np.zeros(2, dtype=np.float64)
+        self.radial_stall_counter = 0
+        self.orbit_lock_counter = 0
 
         # Initialize
         self.reset()
@@ -168,6 +171,9 @@ class OrbitEnv(gym.Env):
 
         self.steps = 0
         self.success_counter = 0
+        self.prev_action = np.zeros(2, dtype=np.float64)
+        self.radial_stall_counter = 0
+        self.orbit_lock_counter = 0
 
     def reset(
         self,
@@ -204,22 +210,26 @@ class OrbitEnv(gym.Env):
         super().reset(seed=seed)
         self.steps = 0
         self.success_counter = 0
+        self.prev_action = np.zeros(2, dtype=np.float64)
+        self.radial_stall_counter = 0
+        self.orbit_lock_counter = 0
 
         try:
-            r0_mul = float(os.environ.get("R0_OVER_TARGET", "1.25"))
+            r0_mul = float(os.environ.get("R0_OVER_TARGET", "1.05"))
         except Exception:
             r0_mul = 1.25
 
         if start_mode == "default":
             self.pos = np.array([0.0, r0_mul * self.target_radius], dtype=np.float64)
             v_mag = np.sqrt(self.mu / np.linalg.norm(self.pos))
-            angle = np.deg2rad(30.0)
+            # Start almost tangential to avoid learning collapse into purely radial motion.
+            angle = np.deg2rad(170.0)
             self.vel = v_mag * np.array([np.cos(angle), np.sin(angle)], dtype=np.float64)
 
         elif start_mode == "spiral":
-            self.pos = np.array([0.0, 0.6 * self.target_radius], dtype=np.float64)
-            v_mag = 0.8 * np.sqrt(self.mu / np.linalg.norm(self.pos))
-            angle = np.deg2rad(60.0)
+            self.pos = np.array([0.0, 0.85 * self.target_radius], dtype=np.float64)
+            v_mag = 0.92 * np.sqrt(self.mu / np.linalg.norm(self.pos))
+            angle = np.deg2rad(72.0)
             self.vel = v_mag * np.array([np.cos(angle), np.sin(angle)], dtype=np.float64)
 
         else:
@@ -229,6 +239,12 @@ class OrbitEnv(gym.Env):
             "start_mode": start_mode,
             "seed": seed,
         }
+
+        # Reset reward-side thrust memory between episodes
+        if hasattr(compute_reward, "prev_thrust"):
+            delattr(compute_reward, "prev_thrust")
+
+
         return self._get_obs(), info
 
     def apply_delta_v(self, dv: float) -> None:
@@ -288,6 +304,9 @@ class OrbitEnv(gym.Env):
             "w_radius": float(self.w_radius),
             "w_progress": float(self.w_progress),
             "w_speed": float(self.w_speed),
+            "prev_action": self.prev_action.copy(),
+            "radial_stall_counter": int(self.radial_stall_counter),
+            "orbit_lock_counter": int(self.orbit_lock_counter),
         }
 
     def set_state(self, state: dict) -> None:
@@ -343,6 +362,14 @@ class OrbitEnv(gym.Env):
             except Exception:
                 self.a_cap = None
 
+        pa = state.get("prev_action", None)
+        if pa is not None:
+            self.prev_action = np.array(pa, dtype=np.float64, copy=True)
+        else:
+            self.prev_action = np.zeros(2, dtype=np.float64)
+        self.radial_stall_counter = int(state.get("radial_stall_counter", 0))
+        self.orbit_lock_counter = int(state.get("orbit_lock_counter", 0))
+
     def _get_obs(self) -> np.ndarray:
         """Return observation as [x, y, vx, vy]."""
         return np.concatenate([self.pos, self.vel]).astype(np.float32)
@@ -375,25 +402,33 @@ class OrbitEnv(gym.Env):
         prev_pos = self.pos.copy()
 
         # Thrust from action
-        action = np.clip(action, -1.0, 1.0)
-        thrust = self.thrust_scale * action
+        action = np.clip(action, -1.0, 1.0).astype(np.float64)
+        max_action_delta = 0.15
+        action_delta = np.clip(action - self.prev_action, -max_action_delta, max_action_delta)
+        action_smooth = np.clip(self.prev_action + action_delta, -1.0, 1.0)
+        self.prev_action = action_smooth.copy()
+
+        r_now_pre = np.linalg.norm(self.pos) + 1e-12
+        v_now_pre = np.linalg.norm(self.vel) + 1e-12
+        v_target_pre = np.sqrt(self.mu / self.target_radius)
+        r_err_pre = abs(r_now_pre - self.target_radius) / (self.target_radius + 1e-12)
+        v_err_pre = abs(v_now_pre - v_target_pre) / (v_target_pre + 1e-12)
+        thrust = self.thrust_scale * action_smooth
         acc_thrust = thrust / max(1e-12, self.mass)
+        # Limit instantaneous velocity change (critical for orbit stability)
+        a_nrm = np.linalg.norm(acc_thrust)
+        # soft cap instead of hard clip
 
         # Gravity from point mass at the origin
         r_vec = self.pos
         r = np.linalg.norm(r_vec)
         acc_gravity = -self.mu * r_vec / ((r ** 3) + 1e-12)
 
-        # Numerical safety clamp
-        acc_gravity = np.clip(acc_gravity, -1e-2, 1e-2)
+        # Keep true inverse-square gravity; avoid hard clipping that distorts orbital physics.
 
         r_norm = np.linalg.norm(r_vec) + 1e-12
         r_hat = r_vec / r_norm
         t_hat = np.array([-r_hat[1], r_hat[0]], dtype=np.float64)
-
-        if np.linalg.norm(thrust) < 0.05 * self.thrust_scale:
-            thrust = thrust + 0.05 * self.thrust_scale * t_hat
-            acc_thrust = thrust / max(1e-12, self.mass)
 
         # Integrate with simple Euler
         self.vel = self.vel + (acc_gravity + acc_thrust) * self.dt
@@ -409,12 +444,23 @@ class OrbitEnv(gym.Env):
         r_now = np.linalg.norm(self.pos)
         v_now = np.linalg.norm(self.vel)
         v_target = np.sqrt(self.mu / self.target_radius)
+        r_err_now = abs(r_now - self.target_radius) / (self.target_radius + 1e-12)
+        ur_now = self.pos / (r_now + 1e-12)
+        uv_now = self.vel / (v_now + 1e-12)
+        ang_abs_now = abs(float(np.dot(ur_now, uv_now)))
+        v_err_now = abs(v_now - v_target) / (v_target + 1e-12)
+        radial_stall = (r_err_now < 0.10) and (v_err_now < 0.12) and (ang_abs_now > 0.85)
+        if radial_stall:
+            self.radial_stall_counter += 1
+        else:
+            self.radial_stall_counter = 0
 
         time_up = self.steps >= self.max_steps
         out_range = r_now > 2.5 * self.target_radius
         success = self.success_counter >= self.success_threshold
-        overspeed = v_now > 1.45 * v_target
-        too_close = r_now < 0.55 * self.target_radius
+        overspeed = v_now > 1.90 * v_target
+        too_close = r_now < 0.35 * self.target_radius
+        radial_stall_fail = self.radial_stall_counter >= 800
 
         terminated = bool(success or out_range or overspeed or too_close)
         truncated = bool(time_up)
@@ -444,6 +490,7 @@ class OrbitEnv(gym.Env):
             w_speed=self.w_speed,
             v_r=v_r,
             thrust_scale=self.thrust_scale,
+            dt=self.dt,
         )
 
         reward = reward_dict["reward"]
@@ -461,7 +508,28 @@ class OrbitEnv(gym.Env):
             elif out_range or overspeed or too_close:
                 term_bonus += self.term_reward_fail
 
+        stall_penalty = 0.0
+        if radial_stall:
+            stall_penalty = min(8.0, 0.03 * float(self.radial_stall_counter))
+
+        in_lock_band = (
+                (r_err < 0.08)
+                and (abs(reward_dict.get("v_t_ratio", 0.0) - 1.0) < 0.08)
+                and (abs(reward_dict.get("v_r", v_r) / (v_target + 1e-12)) < 0.05)
+                and (reward_dict.get("tangential_alignment", 0.0) > 0.70)
+        )
+        if in_lock_band:
+            self.orbit_lock_counter += 1
+        else:
+            self.orbit_lock_counter = 0
+        # Reward staying in stable orbit for consecutive steps
+        lock_hold_bonus = min(25.0, 0.12 * float(self.orbit_lock_counter))
+
         reward += term_bonus
+        reward -= stall_penalty
+        reward += lock_hold_bonus
+        # Penalize abrupt action changes to encourage smooth control
+        reward -= 0.5 * float(np.linalg.norm(action_delta))
 
         info: Dict[str, Any] = {
             "reward": float(reward),
@@ -490,7 +558,9 @@ class OrbitEnv(gym.Env):
             "reward_mode": str(self.reward_mode),
             "w_radius": float(self.w_radius),
             "w_progress": float(self.w_progress),
-            "action_clipped": action.astype(np.float32),
+            "action_clipped": action_smooth.astype(np.float32),
+            "action_raw": action.astype(np.float32),
+            "action_delta_norm": float(np.linalg.norm(action_delta)),
             "thrust_vec": thrust.astype(np.float64),
             "acc_thrust": acc_thrust.astype(np.float64),
             "acc_gravity": acc_gravity.astype(np.float64),
@@ -510,6 +580,29 @@ class OrbitEnv(gym.Env):
             "v_now": float(v_now),
             "v_target": float(v_target),
             "too_close": bool(too_close),
+            "orbit_lock": float(reward_dict.get("orbit_lock", 0.0)),
+            "radial_trap_penalty": float(reward_dict.get("radial_trap_penalty", 0.0)),
+            "lock_gate": float(reward_dict.get("lock_gate", 0.0)),
+            "v_t_ratio": float(reward_dict.get("v_t_ratio", 0.0)),
+            "thrust_tangential": float(reward_dict.get("thrust_tangential", 0.0)),
+            "sustained_tan_force_bonus": float(reward_dict.get("sustained_tan_force_bonus", 0.0)),
+            "tangential_speed_penalty": float(reward_dict.get("tangential_speed_penalty", 0.0)),
+            "outward_escape_penalty": float(reward_dict.get("outward_escape_penalty", 0.0)),
+            "near_target_radial_penalty": float(reward_dict.get("near_target_radial_penalty", 0.0)),
+            "phase_eff": float(reward_dict.get("phase_eff", 0.0)),
+            "closure_bonus": float(reward_dict.get("closure_bonus", 0.0)),
+            "closure_penalty": float(reward_dict.get("closure_penalty", 0.0)),
+            "radial_growth_penalty": float(reward_dict.get("radial_growth_penalty", 0.0)),
+            "energy_rel_error": float(reward_dict.get("energy_rel_error", 0.0)),
+            "specific_energy": float(reward_dict.get("specific_energy", 0.0)),
+            "target_energy": float(reward_dict.get("target_energy", 0.0)),
+            "ecc_proxy": float(reward_dict.get("ecc_proxy", 0.0)),
+            "radial_stall": bool(radial_stall),
+            "radial_stall_counter": int(self.radial_stall_counter),
+            "radial_stall_fail": bool(radial_stall_fail),
+            "stall_penalty": float(stall_penalty),
+            "orbit_lock_counter": int(self.orbit_lock_counter),
+            "lock_hold_bonus": float(lock_hold_bonus),
         }
 
         return self._get_obs(), float(reward), terminated, truncated, info

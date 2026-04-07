@@ -174,75 +174,59 @@ def compute_reward(
             reward -= closure_penalty
 
     if reward_mode == "simple_orbit":
-        # Smooth orbit reward focused on:
-        # 1) staying near target radius
-        # 2) reducing radial motion
-        # 3) matching tangential speed
-        # 4) rewarding sustained orbital holding near the target band
-
         reward = 0.0
 
-        # Core radius tracking: staying near target radius is the top priority.
-        reward -= 24.0 * r_error
+        # 1. radius tracking
+        reward -= 20.0 * r_error
 
-        # Penalize radial speed strongly so the policy does not "fall through" the orbit.
-        reward -= 12.0 * abs(vr_norm)
+        # 2. suppress radial velocity
+        reward -= 15.0 * abs(vr_norm)
 
-        # Penalize tangential speed mismatch.
-        reward -= 8.0 * abs(v_t_ratio - 1.0)
+        # 3. tangential speed matching
+        reward -= 10.0 * (v_t_ratio - 1.0) ** 2
 
-        # Penalize generally wrong velocity magnitude.
-        reward -= 4.0 * abs(v - v_target) / (v_target + 1e-12)
+        speed_err = (v - v_target) / (v_target + 1e-12)
+        reward -= 10.0 * (speed_err ** 2)
+        reward -= 2.0 * abs(v - v_target) / (v_target + 1e-12)
 
-        # Penalize radial alignment globally.
-        reward -= 6.0 * radial_alignment
+        # 4. direction shaping
+        reward += 10.0 * tangential_alignment
+        reward -= 10.0 * radial_alignment
 
-        # Light progress bonus is OK, but do not let it dominate.
-        reward += 2.0 * progress
+        # 5. control effort + smoothness
+        reward -= 2.0 * thrust_norm
+        reward -= 3.0 * (thrust_norm ** 2)
 
-        # Penalize thrust a little, but not too much.
-        reward -= 0.03 * thrust_norm
+        # 6. centripetal consistency
+        v_r = float(np.dot(vel, pos) / (r + 1e-8))
+        reward -= 3.0 * abs(v_r) / (v_target + 1e-8)
 
-        # Penalize outward radial escape.
-        reward -= 6.0 * max(0.0, vr_norm)
+        # 7. angular momentum stabilization
+        h = pos[0] * vel[1] - pos[1] * vel[0]
+        h_target = r * v_target
+        h_err = abs(h - h_target) / (abs(h_target) + 1e-8)
+        if r_error < 0.2:
+            reward -= 6.0 * (h_err ** 2)
 
-        # Penalize radius growing away from target.
-        reward -= radial_growth_penalty
-
-        # Extra shaping near target band:
-        # once close to target radius, force the agent to keep motion tangential.
-        if r_error < 0.15:
+        # 8. near-orbit hard guidance
+        if r_error < 0.2:
             reward += 6.0 * tangential_alignment
             reward -= 6.0 * radial_alignment
-            reward -= 8.0 * abs(vr_norm)
 
-        # Stronger holding reward inside the orbit band.
-        if r_error < 0.08:
-            reward += 8.0 * tangential_alignment
-            reward -= 12.0 * abs(vr_norm)
-            reward -= 6.0 * abs(v_t_ratio - 1.0)
+        # 9. angular velocity consistency
+        omega = abs(np.cross(pos, vel)) / (r ** 2 + 1e-8)
+        omega_target = v_target / (target_radius + 1e-8)
+        omega_err = abs(omega - omega_target) / (omega_target + 1e-8)
+        if r_error < 0.2:
+            reward -= 4.0 * (omega_err ** 2)
 
-        # Orbit lock reward: reward sustained near-circular motion.
-        if r_error < 0.05 and abs(vr_norm) < 0.05 and abs(v_t_ratio - 1.0) < 0.05:
-            reward += 12.0
+        # --- Action smoothness (CRITICAL) ---
+        if hasattr(compute_reward, "prev_thrust"):
+            delta_u = thrust - compute_reward.prev_thrust
+            delta_norm = np.linalg.norm(delta_u) / (thrust_scale + 1e-8)
+            reward -= 4.0 * (delta_norm ** 2)
 
-        # Strong penalty if the agent is close to the orbit but starts drifting radially again.
-        if r_error < 0.10 and abs(vr_norm) > 0.08:
-            reward -= 10.0 * abs(vr_norm)
-
-        # Mild penalty if motion turns back toward radial after entering the useful region.
-        if r_error < 0.20 and angle_cos > 0.75:
-            reward -= 4.0 * (angle_cos - 0.75)
-
-        # Success-like local bonus for very stable orbit holding.
-        if r_error < 0.03 and abs(vr_norm) < 0.03 and abs(v_t_ratio - 1.0) < 0.03:
-            reward += 20.0
-
-        if r_error < 0.15:
-            reward -= 10.0 * abs(vr_norm)
-
-        if r_error < 0.05 and abs(vr_norm) < 0.05:
-            reward += 20.0
+        compute_reward.prev_thrust = thrust.copy()
 
     elif reward_mode == "orbit_strict":
         reward += 2.0 * orbit_lock
@@ -278,7 +262,7 @@ def compute_reward(
             reward -= 5.0 * abs(vr_norm)
 
     # Soft squash keeps gradient signal while preventing huge negative plateaus.
-    reward = 25.0 * np.tanh(reward / 25.0)
+    reward = 10.0 * np.tanh(reward / 10.0)
 
     shaping = 0.0
     bonus = 0.0
