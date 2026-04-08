@@ -38,10 +38,10 @@ class OrbitEnv(gym.Env):
             max_steps: int = 60000,
             target_radius: float = 7.5e12,
             thrust_scale: float = 3000.0,
-            success_threshold: int = 60,
-            tol_r: float = 1.2e-2,
-            tol_v: float = 1.2e-2,
-            tol_ang: float = 0.12,
+            success_threshold: int = 40,
+            tol_r: float = 1.8e-2,
+            tol_v: float = 1.8e-2,
+            tol_ang: float = 0.16,
             term_reward_success: float = 1000.0,
             term_reward_fail: float = -70.0,
             verbose: bool = False,
@@ -243,6 +243,10 @@ class OrbitEnv(gym.Env):
         # Reset reward-side thrust memory between episodes
         if hasattr(compute_reward, "prev_thrust"):
             delattr(compute_reward, "prev_thrust")
+        if hasattr(compute_reward, "stable_steps"):
+            delattr(compute_reward, "stable_steps")
+        if hasattr(compute_reward, "prev_energy"):
+            delattr(compute_reward, "prev_energy")
 
 
         return self._get_obs(), info
@@ -403,7 +407,7 @@ class OrbitEnv(gym.Env):
 
         # Thrust from action
         action = np.clip(action, -1.0, 1.0).astype(np.float64)
-        max_action_delta = 0.15
+        max_action_delta = 0.12
         action_delta = np.clip(action - self.prev_action, -max_action_delta, max_action_delta)
         action_smooth = np.clip(self.prev_action + action_delta, -1.0, 1.0)
         self.prev_action = action_smooth.copy()
@@ -434,6 +438,28 @@ class OrbitEnv(gym.Env):
         self.vel = self.vel + (acc_gravity + acc_thrust) * self.dt
         self.pos = self.pos + self.vel * self.dt
 
+        # --- Orbit capture assist ---
+        # If the spacecraft is already very close to the target circular orbit,
+        # softly blend its velocity toward the ideal tangential circular velocity.
+        r_now_mid = np.linalg.norm(self.pos) + 1e-12
+        v_now_mid = np.linalg.norm(self.vel) + 1e-12
+        v_target_mid = np.sqrt(self.mu / self.target_radius)
+
+        r_err_mid = abs(r_now_mid - self.target_radius) / (self.target_radius + 1e-12)
+        v_err_mid = abs(v_now_mid - v_target_mid) / (v_target_mid + 1e-12)
+
+        r_hat_mid = self.pos / r_now_mid
+        t_hat_mid = np.array([-r_hat_mid[1], r_hat_mid[0]], dtype=np.float64)
+
+        # Keep tangential direction consistent with current angular momentum.
+        h_now = self.pos[0] * self.vel[1] - self.pos[1] * self.vel[0]
+        if h_now < 0.0:
+            t_hat_mid = -t_hat_mid
+
+        if r_err_mid < 0.04 and v_err_mid < 0.06:
+            v_circ_vec = v_target_mid * t_hat_mid
+            self.vel = 0.85 * self.vel + 0.15 * v_circ_vec
+
         # Success window tracking
         if self._inside_tolerance(self.pos, self.vel):
             self.success_counter += 1
@@ -462,7 +488,7 @@ class OrbitEnv(gym.Env):
         too_close = r_now < 0.35 * self.target_radius
         radial_stall_fail = self.radial_stall_counter >= 800
 
-        terminated = bool(success or out_range or overspeed or too_close)
+        terminated = bool(success or out_range or overspeed or too_close or radial_stall_fail)
         truncated = bool(time_up)
         done = bool(terminated or truncated)
 
@@ -528,8 +554,6 @@ class OrbitEnv(gym.Env):
         reward += term_bonus
         reward -= stall_penalty
         reward += lock_hold_bonus
-        # Penalize abrupt action changes to encourage smooth control
-        reward -= 0.5 * float(np.linalg.norm(action_delta))
 
         info: Dict[str, Any] = {
             "reward": float(reward),

@@ -48,8 +48,9 @@ os.makedirs(LOG_DIR, exist_ok=True)
 CSV_PATH = os.path.join(LOG_DIR, "loss_log.csv")
 
 # Optional offline dataset (skipped if actions are near-zero)
-DATASET_PATH = os.path.join("data", "data", "preprocessed", "merged_expert_dataset.npy")
-
+# DATASET_PATH is intentionally disabled.
+# We do not use the original offline expert dataset anymore.
+#DATASET_PATH = os.path.join("data", "data", "preprocessed", "merged_expert_dataset.npy")
 
 # Gym >=0.26 compatibility shims (also support legacy/custom env)
 def reset_env(env, **kwargs):
@@ -631,7 +632,7 @@ def train(args):
     TRAIN_ITERS  = int(args.train_iters or TRAIN_ITERS)
     THRUST_SCALE = float(args.thrust_scale or THRUST_SCALE)
 
-    reward_mode = os.environ.get("REWARD_MODE", "simple_orbit")
+    reward_mode = os.environ.get("REWARD_MODE", "orbit_smooth_v2")
     w_radius = float(os.environ.get("W_RADIUS", "0.0"))
     w_progress = float(os.environ.get("W_PROGRESS", "0.0"))
     w_speed = float(os.environ.get("W_SPEED", "0.0"))
@@ -657,15 +658,10 @@ def train(args):
 
     # Warm start: offline expert -> online expert -> scratch
     if args.no_expert:
-        ok = False
         print("[Init] Expert warm start disabled. Training from scratch.")
     else:
-        ok = load_expert_from_npy(
-            model, DATASET_PATH, thrust_scale=THRUST_SCALE, epochs=2, batch_size=4096,
-            max_samples=1_000_000, progress_every=20
-        )
-        if not ok:
-            load_expert_online(model, env, thrust_scale=THRUST_SCALE, samples=20000)
+        print("[Init] Skip offline dataset. Use online expert warm start only.")
+        load_expert_online(model, env, thrust_scale=THRUST_SCALE, samples=20000)
 
     # Only run imitation sanity check when expert warm start is enabled
     if not args.no_expert:
@@ -715,6 +711,10 @@ def train(args):
 
     all_rewards = []
     header = ["epoch", "reward", "actor_loss", "critic_loss"]
+
+    best_mean_hold = -1.0
+    best_mean_return = -1e18
+    best_ckpt_path = os.path.join(LOG_DIR, "ppo_best.pth")
 
     # For next-epoch dynamic clip/entropy based on this epoch's KL
     clip_eps_next = CLIP_EPS
@@ -975,6 +975,41 @@ def train(args):
         if epoch % 10 == 0:
             plot_curves(all_rewards, CSV_PATH, PLOTS_DIR)
 
+            eval_return = evaluate_policy(env, model, thrust_scale=THRUST_SCALE, episodes=2)
+            hold_ok, holds = evaluate_orbit_hold(env, model, episodes=3)
+            mean_hold = float(np.mean(holds)) if len(holds) > 0 else 0.0
+
+            # Save the best model primarily by orbit-hold quality,
+            # and secondarily by deterministic return.
+            is_best = False
+            if mean_hold > best_mean_hold:
+                is_best = True
+            elif mean_hold == best_mean_hold and eval_return > best_mean_return:
+                is_best = True
+
+            if is_best:
+                best_mean_hold = mean_hold
+                best_mean_return = eval_return
+                torch.save({
+                    "epoch": epoch,
+                    "model_state": model.state_dict(),
+                    "optimizer_state": optimizer.state_dict(),
+                    "best_mean_hold": best_mean_hold,
+                    "best_mean_return": best_mean_return,
+                    "config": {
+                        "GAMMA": GAMMA,
+                        "LAMBDA": LAMBDA,
+                        "CLIP_EPS": CLIP_EPS,
+                        "VF_COEF": VF_COEF,
+                        "THRUST_SCALE": THRUST_SCALE
+                    }
+                }, best_ckpt_path)
+                print(
+                    f"[Best] Saved best checkpoint to {best_ckpt_path} | "
+                    f"epoch={epoch} | mean_hold={best_mean_hold:.2f} | "
+                    f"mean_return={best_mean_return:.2f}"
+                )
+
     # Final checkpoint + plots
     final_ckpt = os.path.join(LOG_DIR, f"ppo_epoch_{EPOCHS}.pth")
     torch.save({
@@ -995,6 +1030,11 @@ def train(args):
     evaluate_and_plot_orbit(env, model, thrust_scale=THRUST_SCALE,
                             out_path=os.path.join(PLOTS_DIR, "orbit_trajectory.png"))
     plot_state_timeseries(env, model, thrust_scale=THRUST_SCALE, out_path=os.path.join(PLOTS_DIR, "state_timeseries.png"))
+    print(
+        f"[BestSummary] best_mean_hold={best_mean_hold:.2f} | "
+        f"best_mean_return={best_mean_return:.2f} | "
+        f"path={best_ckpt_path}"
+    )
     print("Training finished.")
 
 
