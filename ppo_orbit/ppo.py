@@ -644,6 +644,8 @@ def train(args):
         w_radius=w_radius,
         w_progress=w_progress,
         w_speed=w_speed,
+        use_action_smoothing=False,
+        use_orbit_capture_assist=False,
     )
     model = ActorCritic().to(device)
 

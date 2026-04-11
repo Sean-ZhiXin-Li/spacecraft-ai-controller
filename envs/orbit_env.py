@@ -49,6 +49,8 @@ class OrbitEnv(gym.Env):
             w_radius: float = 0.0,
             w_progress: float = 0.0,
             w_speed: float = 0.0,
+            use_action_smoothing: bool = True,
+            use_orbit_capture_assist: bool = True,
     ) -> None:
         super().__init__()
 
@@ -77,6 +79,8 @@ class OrbitEnv(gym.Env):
         self.w_radius = w_radius
         self.w_progress = w_progress
         self.w_speed = w_speed
+        self.use_action_smoothing = bool(use_action_smoothing)
+        self.use_orbit_capture_assist = bool(use_orbit_capture_assist)
 
         # Optional acceleration cap derived from thrust/mass
         self.a_cap: Optional[float] = None
@@ -308,6 +312,8 @@ class OrbitEnv(gym.Env):
             "w_radius": float(self.w_radius),
             "w_progress": float(self.w_progress),
             "w_speed": float(self.w_speed),
+            "use_action_smoothing": bool(self.use_action_smoothing),
+            "use_orbit_capture_assist": bool(self.use_orbit_capture_assist),
             "prev_action": self.prev_action.copy(),
             "radial_stall_counter": int(self.radial_stall_counter),
             "orbit_lock_counter": int(self.orbit_lock_counter),
@@ -353,6 +359,10 @@ class OrbitEnv(gym.Env):
         self.w_radius = float(state.get("w_radius", self.w_radius))
         self.w_progress = float(state.get("w_progress", self.w_progress))
         self.w_speed = float(state.get("w_speed", self.w_speed))
+        self.use_action_smoothing = bool(state.get("use_action_smoothing", self.use_action_smoothing))
+        self.use_orbit_capture_assist = bool(
+            state.get("use_orbit_capture_assist", self.use_orbit_capture_assist)
+        )
 
         a_cap_saved = state.get("a_cap", None)
         if a_cap_saved is not None:
@@ -407,17 +417,22 @@ class OrbitEnv(gym.Env):
 
         # Thrust from action
         action = np.clip(action, -1.0, 1.0).astype(np.float64)
+        action_executed = action.copy()
+        action_smoothing_applied = False
         max_action_delta = 0.12
-        action_delta = np.clip(action - self.prev_action, -max_action_delta, max_action_delta)
-        action_smooth = np.clip(self.prev_action + action_delta, -1.0, 1.0)
-        self.prev_action = action_smooth.copy()
+        action_delta = np.zeros_like(action)
+        if self.use_action_smoothing:
+            action_delta = np.clip(action - self.prev_action, -max_action_delta, max_action_delta)
+            action_executed = np.clip(self.prev_action + action_delta, -1.0, 1.0)
+            action_smoothing_applied = True
+        self.prev_action = action_executed.copy()
 
         r_now_pre = np.linalg.norm(self.pos) + 1e-12
         v_now_pre = np.linalg.norm(self.vel) + 1e-12
         v_target_pre = np.sqrt(self.mu / self.target_radius)
         r_err_pre = abs(r_now_pre - self.target_radius) / (self.target_radius + 1e-12)
         v_err_pre = abs(v_now_pre - v_target_pre) / (v_target_pre + 1e-12)
-        thrust = self.thrust_scale * action_smooth
+        thrust = self.thrust_scale * action_executed
         acc_thrust = thrust / max(1e-12, self.mass)
         # Limit instantaneous velocity change (critical for orbit stability)
         a_nrm = np.linalg.norm(acc_thrust)
@@ -456,9 +471,11 @@ class OrbitEnv(gym.Env):
         if h_now < 0.0:
             t_hat_mid = -t_hat_mid
 
-        if r_err_mid < 0.04 and v_err_mid < 0.06:
+        orbit_capture_assist_applied = False
+        if self.use_orbit_capture_assist and r_err_mid < 0.04 and v_err_mid < 0.06:
             v_circ_vec = v_target_mid * t_hat_mid
             self.vel = 0.85 * self.vel + 0.15 * v_circ_vec
+            orbit_capture_assist_applied = True
 
         # Success window tracking
         if self._inside_tolerance(self.pos, self.vel):
@@ -582,9 +599,12 @@ class OrbitEnv(gym.Env):
             "reward_mode": str(self.reward_mode),
             "w_radius": float(self.w_radius),
             "w_progress": float(self.w_progress),
-            "action_clipped": action_smooth.astype(np.float32),
+            "action_clipped": action_executed.astype(np.float32),
             "action_raw": action.astype(np.float32),
+            "action_executed": action_executed.astype(np.float32),
+            "action_smoothing_applied": bool(action_smoothing_applied),
             "action_delta_norm": float(np.linalg.norm(action_delta)),
+            "orbit_capture_assist_applied": bool(orbit_capture_assist_applied),
             "thrust_vec": thrust.astype(np.float64),
             "acc_thrust": acc_thrust.astype(np.float64),
             "acc_gravity": acc_gravity.astype(np.float64),
