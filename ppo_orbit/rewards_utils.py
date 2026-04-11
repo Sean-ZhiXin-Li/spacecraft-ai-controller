@@ -372,7 +372,17 @@ def compute_reward(
         if speed_ratio > 1.08:
             reward -= 12.0 * (speed_ratio - 1.08)
 
-    reward = 20.0 * np.tanh(reward / 20.0)
+    elif reward_mode == "orbit_circular_minimal":
+
+        reward = 0.0
+
+        reward -= 5.0 * r_error
+        reward -= 2.0 * vt_error
+        reward -= 2.0 * vr_norm
+        reward += 2.0 * (1.0 - abs(v_r) / (abs(v_t) + 1e-6))
+
+    if reward_mode != "orbit_circular_minimal":
+        reward = 20.0 * np.tanh(reward / 20.0)
 
     # ---------- Save internal state ----------
     compute_reward.prev_thrust = thrust.copy()

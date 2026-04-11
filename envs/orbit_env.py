@@ -544,15 +544,17 @@ class OrbitEnv(gym.Env):
         v_err = reward_dict["v_error"]
 
         # Terminal bonus/penalty
+        minimal_reward_mode = (self.reward_mode == "orbit_circular_minimal")
+
         term_bonus = 0.0
-        if done:
+        if (not minimal_reward_mode) and done:
             if success:
                 term_bonus += self.term_reward_success
             elif out_range or overspeed or too_close:
                 term_bonus += self.term_reward_fail
 
         stall_penalty = 0.0
-        if radial_stall:
+        if (not minimal_reward_mode) and radial_stall:
             stall_penalty = min(8.0, 0.03 * float(self.radial_stall_counter))
 
         in_lock_band = (
@@ -565,8 +567,10 @@ class OrbitEnv(gym.Env):
             self.orbit_lock_counter += 1
         else:
             self.orbit_lock_counter = 0
-        # Reward staying in stable orbit for consecutive steps
-        lock_hold_bonus = min(25.0, 0.12 * float(self.orbit_lock_counter))
+        # Keep PPO minimal-reward training free of extra hold bonuses.
+        lock_hold_bonus = 0.0
+        if not minimal_reward_mode:
+            lock_hold_bonus = min(25.0, 0.12 * float(self.orbit_lock_counter))
 
         reward += term_bonus
         reward -= stall_penalty

@@ -632,7 +632,7 @@ def train(args):
     TRAIN_ITERS  = int(args.train_iters or TRAIN_ITERS)
     THRUST_SCALE = float(args.thrust_scale or THRUST_SCALE)
 
-    reward_mode = os.environ.get("REWARD_MODE", "orbit_smooth_v2")
+    reward_mode = os.environ.get("REWARD_MODE", "orbit_circular_minimal")
     w_radius = float(os.environ.get("W_RADIUS", "0.0"))
     w_progress = float(os.environ.get("W_PROGRESS", "0.0"))
     w_speed = float(os.environ.get("W_SPEED", "0.0"))
