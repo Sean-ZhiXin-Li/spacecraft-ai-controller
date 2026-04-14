@@ -61,40 +61,45 @@ Key contribution:
 
 ## Demo: Orbital Insertion Performance
 
-### Best Archived Result (Gated Controller)
+## Demo: Orbital Control Behavior (PPO Controller)
 
-The strongest archived trajectory is achieved using a **gated control strategy**, which dynamically adjusts thrust based on orbital error.
+### Best Behavior-Based Result (PPO)
+
+The best recovered PPO controller demonstrates **stable long-horizon behavior**, 
+but does not yet achieve true closed-loop orbit lock.
 
 #### Radius vs Time
 
-![radius](analysis/demo_best/gated_radius_vs_time.png)
+![radius](analysis/figs/radius_vs_time.png)
 
 #### Radial Velocity vs Time
 
-![vr](analysis/demo_best/gated_vr_vs_time.png)
-
-#### Radius Error vs Time
-
-![error](analysis/demo_best/gated_radius_error_vs_time.png)
+![vr](analysis/figs/vr_vs_time.png)
 
 ### Observations
 
-* Radius converges toward the target orbit
-* Radial velocity stabilizes near zero
-* Radius error decreases and remains bounded
+* The spacecraft maintains stable motion for **20,000 steps**
+* Radius remains consistently above the target orbit (biased trajectory)
+* Radial velocity quickly converges to a small value but **does not oscillate around zero**
+* The controller reduces radial motion but does not form a full closed-loop system
+
+### Metrics
+
+- Survival: 20,000 steps
+- Final radius error: ~3.75e11
+- Average radius error: ~3.75e11 :contentReference[oaicite:0]{index=0}
 
 ### Configuration
 
 ```text
-Controller: gated
-Thrust: 2000 N
-Initial condition: r0 ≈ 1.005 × target radius
+Controller: PPO (speed_refine_50)
+Checkpoint: ppo_orbit/speed_refine_50/ppo_epoch_300.pth
+Initial condition: r0 ≈ 1.05 × target radius
 ```
-
 ### Run the demo locally
 
 ```bash
-python main.py
+python scripts/recover_ppo_rollout.py --checkpoint ppo_orbit/speed_refine_50/ppo_epoch_300.pth --runs-root analysis/runs --thrust-scale 20000 --r0-over-target 1.05 --max-steps 20000
 ```
 
 This will:

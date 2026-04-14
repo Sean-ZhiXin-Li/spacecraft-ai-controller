@@ -266,3 +266,17 @@ ppo_orbit/*.png
 __pycache__/
 checkpoints/
 .idea/
+
+# =========================
+# Analysis outputs (DO NOT PUSH)
+# =========================
+analysis/runs/
+analysis/*.npz
+analysis/*.json
+
+# keep only selected figures
+!analysis/figs/
+!analysis/figs/*.png
+
+# logs
+*.log

@@ -218,8 +218,22 @@ class OrbitEnv(gym.Env):
         self.radial_stall_counter = 0
         self.orbit_lock_counter = 0
 
+        r0_mul = 1.25
         try:
-            r0_mul = float(os.environ.get("R0_OVER_TARGET", "1.05"))
+            if start_mode == "default":
+                r0_multi_start = os.environ.get("R0_MULTI_START", "").strip()
+                if r0_multi_start:
+                    r0_candidates = [
+                        float(x.strip())
+                        for x in r0_multi_start.split(",")
+                        if x.strip()
+                    ]
+                    if r0_candidates:
+                        r0_mul = float(np.random.choice(r0_candidates))
+                    else:
+                        r0_mul = float(os.environ.get("R0_OVER_TARGET", "1.05"))
+                else:
+                    r0_mul = float(os.environ.get("R0_OVER_TARGET", "1.05"))
         except Exception:
             r0_mul = 1.25
 
@@ -242,6 +256,7 @@ class OrbitEnv(gym.Env):
         info: Dict[str, Any] = {
             "start_mode": start_mode,
             "seed": seed,
+            "r0_over_target": float(r0_mul) if start_mode == "default" else None,
         }
 
         # Reset reward-side thrust memory between episodes
@@ -385,8 +400,13 @@ class OrbitEnv(gym.Env):
         self.orbit_lock_counter = int(state.get("orbit_lock_counter", 0))
 
     def _get_obs(self) -> np.ndarray:
-        """Return observation as [x, y, vx, vy]."""
-        return np.concatenate([self.pos, self.vel]).astype(np.float32)
+        """Return observation as [x, y, vx, vy, v_r]."""
+        r = np.linalg.norm(self.pos)
+        v_r = float(np.dot(self.pos, self.vel) / (r + 1e-12))
+        return np.array(
+            [self.pos[0], self.pos[1], self.vel[0], self.vel[1], v_r],
+            dtype=np.float32,
+        )
 
     def _inside_tolerance(self, pos: np.ndarray, vel: np.ndarray) -> bool:
         """

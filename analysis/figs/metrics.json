@@ -1,0 +1,14 @@
+{
+  "controller_variant": "ppo_recovered",
+  "total_reward": 33819.09257645406,
+  "final_radius_error": 374998839028.1426,
+  "avg_radius_error": 374999423919.42426,
+  "saturation_rate_mean": 0.0006,
+  "target_radius": 7500000000000.0,
+  "num_steps": 20000,
+  "terminated": false,
+  "truncated": true,
+  "thrust_scale": 20000.0,
+  "r0_over_target": 1.05,
+  "checkpoint_path": "ppo_orbit\\speed_refine_50\\ppo_epoch_300.pth"
+}

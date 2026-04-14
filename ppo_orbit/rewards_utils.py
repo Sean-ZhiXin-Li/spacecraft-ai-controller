@@ -378,7 +378,8 @@ def compute_reward(
 
         reward -= 5.0 * r_error
         reward -= 2.0 * vt_error
-        reward -= 2.0 * vr_norm
+        reward -= 3.0 * vr_norm
+
         reward += 2.0 * (1.0 - abs(v_r) / (abs(v_t) + 1e-6))
 
     if reward_mode != "orbit_circular_minimal":

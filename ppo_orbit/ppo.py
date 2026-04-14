@@ -95,11 +95,14 @@ def normalize_state(state: np.ndarray) -> np.ndarray:
     """Roughly scale position/velocity to ~[-1, 1] for more stable PPO updates."""
     pos_scale = 7.5e12
     vel_scale = 3e4
+    vr_norm = state[4] / vel_scale
+    vr_scaled = vr_norm * (0.1 + 0.9 * np.exp(-abs(vr_norm) * 10))
     return np.array([
         state[0] / pos_scale,
         state[1] / pos_scale,
         state[2] / vel_scale,
-        state[3] / vel_scale
+        state[3] / vel_scale,
+        vr_scaled,
     ], dtype=np.float32)
 
 
@@ -198,7 +201,7 @@ def evaluate_policy(env, model, thrust_scale, episodes=2, max_steps=20000):
 
 @torch.no_grad()
 def evaluate_stochastic(env, model, thrust_scale, episodes=2, max_steps=20000):
-    """Stochastic eval (sample from current policy)."""
+    """Deterministic eval using the policy mean action."""
     totals = []
     for _ in range(episodes):
         obs = reset_env(env)
@@ -207,13 +210,11 @@ def evaluate_stochastic(env, model, thrust_scale, episodes=2, max_steps=20000):
         while not done and steps < max_steps:
             st = torch.tensor(s, dtype=torch.float32, device=device).unsqueeze(0)
             mu, _ = model.forward(st)
-            std = model.log_std.exp()
-            a_raw = Normal(mu, std).sample().squeeze(0).detach().cpu().numpy()
-            a_env = np.clip(a_raw, -1.0, 1.0)
+            a_env = np.clip(mu.squeeze(0).detach().cpu().numpy(), -1.0, 1.0)
             obs, r, done, _ = step_env(env, a_env)
             s = normalize_state(obs); ep_ret += r; steps += 1
         totals.append(ep_ret)
-    print(f"[Eval/Stoch] mean_return={float(np.mean(totals)):.2f}")
+    print(f"[Eval/Deterministic] mean_return={float(np.mean(totals)):.2f}")
 
 @torch.no_grad()
 def evaluate_orbit_hold(env, model, episodes=3, max_steps=20000):
@@ -235,7 +236,7 @@ def evaluate_orbit_hold(env, model, episodes=3, max_steps=20000):
             a_env = np.clip(mu.squeeze(0).detach().cpu().numpy(), -1.0, 1.0)
             obs, _, done, _ = step_env(env, a_env)
             pos = obs[:2]
-            vel = obs[2:]
+            vel = obs[2:4]
             if env._inside_tolerance(pos, vel):
                 hold += 1
                 best_hold = max(best_hold, hold)
@@ -255,7 +256,7 @@ class ActorCritic(nn.Module):
     def __init__(self, hidden1=256, hidden2=128):
         super().__init__()
         self.shared = nn.Sequential(
-            nn.Linear(4, hidden1),
+            nn.Linear(5, hidden1),
             nn.Tanh()
         )
         self.actor = nn.Sequential(
@@ -487,7 +488,7 @@ def load_expert_online(model, env, thrust_scale, samples=20000):
     states, targets = [], []
     for _ in range(samples):
         obs = reset_env(env)
-        pos, vel = obs[:2], obs[2:]
+        pos, vel = obs[:2], obs[2:4]
         a_env = _basic_expert_action(pos, vel, env.target_radius, thrust_scale)
         states.append(normalize_state(obs))
         targets.append(a_env)
@@ -571,7 +572,7 @@ def plot_state_timeseries(env, model, thrust_scale, out_path=os.path.join(LOG_DI
     rs, vs, coss, ts = [], [], [], []
     t = 0.0
     while not done and len(ts) < max_steps:
-        pos = obs[:2]; vel = obs[2:]
+        pos = obs[:2]; vel = obs[2:4]
         r = float(np.linalg.norm(pos))
         v = float(np.linalg.norm(vel))
         ur = pos / (r + 1e-8); uv = vel / (v + 1e-8)
@@ -658,6 +659,16 @@ def train(args):
     huber = nn.SmoothL1Loss()
     value_norm = ValueNorm()
 
+    resume_epoch = 0
+    if args.resume:
+        checkpoint = torch.load(args.resume, map_location=device)
+        state_dict = checkpoint["model_state"] if isinstance(checkpoint, dict) and "model_state" in checkpoint else checkpoint
+        model.load_state_dict(state_dict)
+        if isinstance(checkpoint, dict) and "optimizer_state" in checkpoint:
+            optimizer.load_state_dict(checkpoint["optimizer_state"])
+        resume_epoch = int(checkpoint.get("epoch", 0)) if isinstance(checkpoint, dict) else 0
+        print(f"[Resume] Loaded checkpoint from {args.resume} | epoch={resume_epoch}")
+
     # Warm start: offline expert -> online expert -> scratch
     if args.no_expert:
         print("[Init] Expert warm start disabled. Training from scratch.")
@@ -722,7 +733,8 @@ def train(args):
     clip_eps_next = CLIP_EPS
     ent_coef_boost_next = 1.0
 
-    for epoch in range(1, EPOCHS + 1):
+    total_epochs = resume_epoch + EPOCHS
+    for epoch in range(resume_epoch + 1, total_epochs + 1):
         # Epoch-level dynamic knobs (based on last epoch's KL)
         clip_eps_epoch = clip_eps_next
         ENT_COEF = current_ent_coef(epoch) * ent_coef_boost_next
@@ -786,7 +798,7 @@ def train(args):
 
         all_rewards.append(total_reward)
         print(
-            f"[EPOCH] {epoch}/{EPOCHS} "
+            f"[EPOCH] {epoch}/{total_epochs} "
             f"reward={total_reward:.2f} "
             f"steps={steps_collected}"
         )
@@ -1013,9 +1025,9 @@ def train(args):
                 )
 
     # Final checkpoint + plots
-    final_ckpt = os.path.join(LOG_DIR, f"ppo_epoch_{EPOCHS}.pth")
+    final_ckpt = os.path.join(LOG_DIR, f"ppo_epoch_{total_epochs}.pth")
     torch.save({
-        "epoch": EPOCHS,
+        "epoch": total_epochs,
         "model_state": model.state_dict(),
         "optimizer_state": optimizer.state_dict(),
         "config": {
@@ -1047,6 +1059,7 @@ def parse_args():
     p.add_argument("--thrust-scale", type=float, default=THRUST_SCALE, help="env/PPO thrust scaling")
     p.add_argument("--seed", type=int, default=42, help="random seed (None to disable)")
     p.add_argument("--no-expert", action="store_true", help="disable offline/online expert warm start")
+    p.add_argument("--resume", type=str, default=None, help="resume training from a saved checkpoint")
     return p.parse_args()
 
 
