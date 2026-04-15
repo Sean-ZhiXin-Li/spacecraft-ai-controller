@@ -1,0 +1,47 @@
+[
+  {
+    "setup_id": 0,
+    "r0_over_target": 1.00002,
+    "dt": 50.0,
+    "thrust_scale": 10000.0,
+    "num_steps": 75877,
+    "phase_transition_count": 2,
+    "success": 1.0
+  },
+  {
+    "setup_id": 1,
+    "r0_over_target": 1.00002,
+    "dt": 50.0,
+    "thrust_scale": 20000.0,
+    "num_steps": 29860,
+    "phase_transition_count": 2,
+    "success": 1.0
+  },
+  {
+    "setup_id": 2,
+    "r0_over_target": 1.00002,
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "num_steps": 15072,
+    "phase_transition_count": 2,
+    "success": 1.0
+  },
+  {
+    "setup_id": 3,
+    "r0_over_target": 1.00005,
+    "dt": 50.0,
+    "thrust_scale": 20000.0,
+    "num_steps": 96260,
+    "phase_transition_count": 2,
+    "success": 1.0
+  },
+  {
+    "setup_id": 4,
+    "r0_over_target": 1.00005,
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "num_steps": 48458,
+    "phase_transition_count": 2,
+    "success": 1.0
+  }
+]

@@ -1,0 +1,41 @@
+{
+  "success": true,
+  "terminated": true,
+  "truncated": false,
+  "steps": 48496,
+  "radius_crossings_total": 1,
+  "first_crossing_step": 48269,
+  "final_radius_error": 27657.630859375,
+  "target_radius": 7500000000000.0,
+  "phase_transition_count": 2,
+  "main_demo_window": {
+    "before": 15000,
+    "after": 25000
+  },
+  "phase_transitions": [
+    {
+      "from": "DESCENT",
+      "to": "CAPTURE",
+      "r_error": -286553.91015625,
+      "v_r": -90.42719268798828,
+      "v_t_error": -5538.584601618977
+    },
+    {
+      "from": "CAPTURE",
+      "to": "LOCK",
+      "r_error": -288415.0703125,
+      "v_r": 0.00012069883814547211,
+      "v_t_error": -12.005725542311666
+    }
+  ],
+  "setup": {
+    "r0_over_target": 1.00005,
+    "dt": 100.0,
+    "max_steps": 100000,
+    "thrust_scale": 10000.0,
+    "tol_r": 0.001,
+    "tol_v": 0.001,
+    "tol_ang": 0.02,
+    "success_threshold": 200
+  }
+}

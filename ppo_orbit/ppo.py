@@ -106,6 +106,21 @@ def normalize_state(state: np.ndarray) -> np.ndarray:
     ], dtype=np.float32)
 
 
+def load_bc_initialization(model: nn.Module, checkpoint_path: str) -> None:
+    """Load BC shared/actor weights into PPO without touching critic weights."""
+    checkpoint = torch.load(checkpoint_path, map_location=device)
+    state_dict = checkpoint["model_state"] if isinstance(checkpoint, dict) and "model_state" in checkpoint else checkpoint
+    current = model.state_dict()
+    loaded = []
+    for key, value in state_dict.items():
+        if key.startswith("shared.") or key.startswith("actor."):
+            if key in current and current[key].shape == value.shape:
+                current[key] = value
+                loaded.append(key)
+    model.load_state_dict(current)
+    print(f"[Init/BC] Loaded {len(loaded)} actor/shared tensors from {checkpoint_path}")
+
+
 def log_to_csv(path: str, row_dict: dict, header_order):
     """Append a row to CSV; create header if file is new."""
     exists = os.path.exists(path)
@@ -632,6 +647,13 @@ def train(args):
     EPOCHS       = int(args.epochs or EPOCHS)
     TRAIN_ITERS  = int(args.train_iters or TRAIN_ITERS)
     THRUST_SCALE = float(args.thrust_scale or THRUST_SCALE)
+    batch_steps = int(args.batch_steps or BATCH_STEPS)
+    actor_lr = float(args.actor_lr or LR_ACTOR)
+    critic_lr = float(args.critic_lr or LR_CRITIC)
+    train_dt = float(args.dt or DT)
+    train_max_steps = int(args.env_max_steps or 60000)
+    if args.r0_over_target is not None:
+        os.environ["R0_OVER_TARGET"] = str(float(args.r0_over_target))
 
     reward_mode = os.environ.get("REWARD_MODE", "orbit_circular_minimal")
     w_radius = float(os.environ.get("W_RADIUS", "0.0"))
@@ -640,7 +662,8 @@ def train(args):
 
     env = OrbitEnv(
         thrust_scale=float(THRUST_SCALE),
-        dt=DT,
+        dt=train_dt,
+        max_steps=train_max_steps,
         reward_mode=reward_mode,
         w_radius=w_radius,
         w_progress=w_progress,
@@ -651,8 +674,8 @@ def train(args):
     model = ActorCritic().to(device)
 
     optimizer = optim.Adam([
-        {"params": list(model.shared.parameters()) + list(model.actor.parameters()) + [model.log_std], "lr": LR_ACTOR},
-        {"params": list(model.critic.parameters()), "lr": LR_CRITIC},
+        {"params": list(model.shared.parameters()) + list(model.actor.parameters()) + [model.log_std], "lr": actor_lr},
+        {"params": list(model.critic.parameters()), "lr": critic_lr},
     ])
 
     # Critic loss: SmoothL1 (Huber) pairs well with ValueNorm
@@ -668,6 +691,8 @@ def train(args):
             optimizer.load_state_dict(checkpoint["optimizer_state"])
         resume_epoch = int(checkpoint.get("epoch", 0)) if isinstance(checkpoint, dict) else 0
         print(f"[Resume] Loaded checkpoint from {args.resume} | epoch={resume_epoch}")
+    elif args.init_bc:
+        load_bc_initialization(model, args.init_bc)
 
     # Warm start: offline expert -> online expert -> scratch
     if args.no_expert:
@@ -687,7 +712,7 @@ def train(args):
         obs = reset_env(env)
         state = normalize_state(obs)
         steps = 0
-        while steps < BATCH_STEPS:
+        while steps < batch_steps:
             # Rollout with mean action (less noisy target for value fitting)
             st = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
             with torch.no_grad():
@@ -739,7 +764,7 @@ def train(args):
         clip_eps_epoch = clip_eps_next
         ENT_COEF = current_ent_coef(epoch) * ent_coef_boost_next
 
-        # Rollout: collect exactly BATCH_STEPS across episodes
+        # Rollout: collect exactly batch_steps across episodes
         states, actions, rewards, masks, log_probs, values = [], [], [], [], [], []
         total_reward = 0.0
 
@@ -752,7 +777,7 @@ def train(args):
         state = normalize_state(obs)
 
         steps_collected = 0
-        while steps_collected < BATCH_STEPS:
+        while steps_collected < batch_steps:
             a_raw_np, a_env_np, log_prob = model.get_action(state)
             # Env expects normalized action in [-1, 1] and does thrust scaling internally.
             next_obs, reward, done, _ = step_env(env, a_env_np)
@@ -1037,6 +1062,21 @@ def train(args):
         }
     }, final_ckpt)
     print(f"[Checkpoint] Saved final model to {final_ckpt}")
+    if args.export_model:
+        export_dir = os.path.dirname(args.export_model)
+        if export_dir:
+            os.makedirs(export_dir, exist_ok=True)
+        torch.save({
+            "epoch": total_epochs,
+            "model_state": model.state_dict(),
+            "optimizer_state": optimizer.state_dict(),
+            "config": {
+                "GAMMA": GAMMA, "LAMBDA": LAMBDA,
+                "CLIP_EPS": CLIP_EPS, "VF_COEF": VF_COEF,
+                "THRUST_SCALE": THRUST_SCALE
+            }
+        }, args.export_model)
+        print(f"[Checkpoint] Exported final model to {args.export_model}")
 
     plot_curves(all_rewards, CSV_PATH, PLOTS_DIR)
     evaluate_policy(env, model, thrust_scale=THRUST_SCALE, episodes=2)
@@ -1056,10 +1096,18 @@ def parse_args():
     p = argparse.ArgumentParser(description="Day29 PPO (Hybrid Init + Faster Lane v3.2b+) [Gym>=0.26]")
     p.add_argument("--epochs", type=int, default=EPOCHS, help="training epochs")
     p.add_argument("--train-iters", type=int, default=TRAIN_ITERS, help="PPO update iters per epoch")
+    p.add_argument("--batch-steps", type=int, default=BATCH_STEPS, help="env steps collected per epoch")
     p.add_argument("--thrust-scale", type=float, default=THRUST_SCALE, help="env/PPO thrust scaling")
+    p.add_argument("--actor-lr", type=float, default=LR_ACTOR, help="actor learning rate")
+    p.add_argument("--critic-lr", type=float, default=LR_CRITIC, help="critic learning rate")
+    p.add_argument("--dt", type=float, default=DT, help="environment dt for training/eval")
+    p.add_argument("--env-max-steps", type=int, default=60000, help="environment max_steps")
+    p.add_argument("--r0-over-target", type=float, default=None, help="override start radius ratio")
     p.add_argument("--seed", type=int, default=42, help="random seed (None to disable)")
     p.add_argument("--no-expert", action="store_true", help="disable offline/online expert warm start")
     p.add_argument("--resume", type=str, default=None, help="resume training from a saved checkpoint")
+    p.add_argument("--init-bc", type=str, default=None, help="initialize actor/shared weights from a BC checkpoint")
+    p.add_argument("--export-model", type=str, default=None, help="optional path to export the final checkpoint")
     return p.parse_args()
 
 

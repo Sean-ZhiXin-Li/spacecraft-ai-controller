@@ -1,234 +1,324 @@
-# AI-Controlled Spacecraft Orbital Simulator
+﻿# AI-Controlled Spacecraft Orbital Simulator
 
-*A reproducible research framework for developing, benchmarking, and scaling AI-based spacecraft control systems under realistic orbital dynamics.*
+Physics-grounded spacecraft control research for orbit insertion under thrust limits.
 
----
+This repository compares three control families under the same orbital environment:
 
-## Project Overview
+- PPO policies
+- simple probe baselines
+- an explicit phase-structured controller
 
-This project presents a **physics-grounded control framework for spacecraft orbital dynamics**, integrating classical control strategies with modern machine learning methods.
+The current best verified result is not PPO. It is a hand-designed **phase-structured explicit controller** that performs:
 
-Rather than focusing solely on learning-based approaches, this work emphasizes:
+1. `DESCENT`
+2. `CAPTURE`
+3. `LOCK`
 
-* **Control structure design** (e.g., gated control mechanisms)
-* **Physics-consistent evaluation**
-* **Systematic comparison between rule-based and learning-based controllers**
+in sequence.
 
-The goal is to build a **research-grade experimental platform** for studying autonomous spacecraft control under constrained thrust and realistic orbital conditions.
+## Current Project Result
 
----
+The project now has a **working explicit insertion controller** that reaches a real target-radius crossing and achieves strict success in a narrow but real reachable regime.
 
-## Core Contribution
+What is supported by the repository outputs:
 
-This project introduces a **gated control mechanism for orbital insertion**, 
-which improves stability under constrained thrust conditions 
-and reveals structural differences between rule-based and learning-based controllers.
+- PPO baseline does not reach the first crossing on the validated baseline.
+- A pure retrograde probe can force one crossing, but does not stabilize afterward.
+- The explicit phase controller is the only controller here that both:
+  - reaches the first crossing
+  - satisfies the project's strict success criterion in successful setups
 
-Key contribution:
+What is **not** currently supported:
 
-- Demonstrates that control structure (gating) can outperform naive continuous thrust
-- Provides a reproducible framework for comparing control strategies under identical physics
-- Bridges classical control intuition with modern RL approaches
+- repeated sustained orbit-lock cycling across the target radius
+- successful PPO transfer of the explicit phase structure
 
----
+Those statements are grounded in:
 
-## Objectives
+- [analysis/final_project_summary.md](analysis/final_project_summary.md)
+- [analysis/orbit_lock_benchmark.md](analysis/orbit_lock_benchmark.md)
+- [analysis/orbit_lock_generalization.md](analysis/orbit_lock_generalization.md)
+- [analysis/ppo_transfer_results.md](analysis/ppo_transfer_results.md)
 
-* Develop control strategies for orbital insertion and stabilization
-* Benchmark rule-based and learning-based controllers under identical physics
-* Build a reproducible experimentation pipeline
-* Analyze control behavior through trajectory-level diagnostics
+## Key Insight
 
----
+Orbit insertion in this system is not a single continuous control problem.
 
-## Key Features
+It is a **phase-structured process** requiring:
 
-* Custom **Gymnasium-compatible orbital environment (`OrbitEnv`)**
-* Multiple controller paradigms:
+- energy removal (descent)
+- post-crossing capture
+- near-orbit stabilization
 
-  * Rule-based / heuristic controllers
-  * Expert-designed controllers
-  * Imitation learning (MLP)
-  * Reinforcement learning (PPO)
-* Unified evaluation pipeline with:
+Controllers that do not explicitly represent this structure fail,
+even if they have sufficient capacity (e.g., PPO).
 
-  * Orbit accuracy metrics
-  * Stability analysis
-  * Trajectory logging (`traj.npz`)
-* Automated experiment management and visualization
+## Demo
 
----
-
-## Demo: Orbital Insertion Performance
-
-## Demo: Orbital Control Behavior (PPO Controller)
-
-### Best Behavior-Based Result (PPO)
-
-The best recovered PPO controller demonstrates **stable long-horizon behavior**, 
-but does not yet achieve true closed-loop orbit lock.
-
-#### Radius vs Time
-
-![radius](analysis/figs/radius_vs_time.png)
-
-#### Radial Velocity vs Time
-
-![vr](analysis/figs/vr_vs_time.png)
-
-### Observations
-
-* The spacecraft maintains stable motion for **20,000 steps**
-* Radius remains consistently above the target orbit (biased trajectory)
-* Radial velocity quickly converges to a small value but **does not oscillate around zero**
-* The controller reduces radial motion but does not form a full closed-loop system
-
-### Metrics
-
-- Survival: 20,000 steps
-- Final radius error: ~3.75e11
-- Average radius error: ~3.75e11 :contentReference[oaicite:0]{index=0}
-
-### Configuration
-
-```text
-Controller: PPO (speed_refine_50)
-Checkpoint: ppo_orbit/speed_refine_50/ppo_epoch_300.pth
-Initial condition: r0 ≈ 1.05 × target radius
-```
-### Run the demo locally
+Running the project entry now generates a real orbital demo animation for the best successful explicit-controller setup.
 
 ```bash
-python scripts/recover_ppo_rollout.py --checkpoint ppo_orbit/speed_refine_50/ppo_epoch_300.pth --runs-root analysis/runs --thrust-scale 20000 --r0-over-target 1.05 --max-steps 20000
+python main.py
 ```
 
-This will:
+This produces:
 
-* Automatically select the best run from `analysis/runs/`
-* Generate trajectory plots in `analysis/demo_best/`
+- [analysis/demo/orbit_demo.gif](analysis/demo/orbit_demo.gif)
+- [analysis/demo/orbit_demo_full.png](analysis/demo/orbit_demo_full.png)
+- [analysis/demo/orbit_demo_trajectory.png](analysis/demo/orbit_demo_trajectory.png)
+- [analysis/demo/orbit_demo_summary.json](analysis/demo/orbit_demo_summary.json)
 
----
+Animated demo:
+
+![Orbit demo](analysis/demo/orbit_demo.gif)
+
+Full-orbit reference for global geometric context:
+
+![Orbit full reference](analysis/demo/orbit_demo_full.png)
+
+Zoomed insertion-event view for local control behavior around crossing, capture, and lock:
+
+![Orbit trajectory](analysis/demo/orbit_demo_trajectory.png)
+
+The demo uses the validated explicit-controller setup:
+
+- `r0_over_target = 1.00005`
+- `dt = 100`
+- `max_steps = 100000`
+- `thrust_scale = 10000`
+
+## Why PPO Fails
+
+PPO fails here for structural reasons, not just weak tuning.
+
+Observed failure pattern:
+
+- PPO behaves as a single continuous reactive policy.
+- It does not reliably produce the control-phase transition needed for:
+  - descent
+  - post-crossing capture
+  - final lock
+- In the validated comparisons, it does not reach the first crossing on the main baseline.
+
+Evidence:
+
+- benchmark successes: explicit `2 / 3`, probe `0 / 3`, PPO `0 / 3`
+- transfer result: BC and short PPO fine-tuning still fail to recover first crossing
+
+See:
+
+- [analysis/orbit_lock_benchmark.md](analysis/orbit_lock_benchmark.md)
+- [analysis/ppo_transfer_results.md](analysis/ppo_transfer_results.md)
+
+## Why Probe Is Not Enough
+
+The `probe_max_retrograde` controller is useful because it proves physical reachability in the reachable regime, but it is still only a descent baseline.
+
+It can:
+
+- remove orbital energy aggressively
+- force one crossing in reachable conditions
+
+It cannot:
+
+- switch behavior after crossing
+- capture and stabilize the orbit
+
+So it is a reachability tool, not a full insertion controller.
+
+## Why the Explicit Controller Works
+
+The explicit controller works because it is **phase-structured**.
+
+It does not use one feedback law for the entire insertion process. Instead it switches between:
+
+1. `DESCENT`
+   - full retrograde thrust aligned with velocity
+   - objective: guarantee first crossing
+2. `CAPTURE`
+   - damp radial motion after crossing
+   - restore tangential support
+3. `LOCK`
+   - apply smaller near-orbit stabilization
+
+This project's main lesson is:
+
+> orbit insertion is not one homogeneous control problem; it is a sequence of control phases
+
+## Benchmark And Generalization
+
+### Final benchmark comparison
+
+Representative benchmark result summary:
+
+![Success comparison](analysis/figs/final_project/success_comparison.png)
+
+This comparison plot shows strict success counts across the three representative benchmark setups used in the final benchmark pass.
+
+More detail:
+
+- [analysis/orbit_lock_benchmark.md](analysis/orbit_lock_benchmark.md)
+- [analysis/figs/orbit_lock_benchmark/aggregate_results.json](analysis/figs/orbit_lock_benchmark/aggregate_results.json)
+
+### Representative controller comparison on a successful setup
+
+The following plot is a controller-comparison diagnostic on one representative successful setup, not a complete characterization of the full physical system.
+
+![Radius vs time](analysis/figs/final_project/radius_vs_time.png)
+
+Related radial-velocity diagnostic:
+
+- [analysis/figs/final_project/final_project_plot_summary.json](analysis/figs/final_project/final_project_plot_summary.json)
+- [analysis/figs/final_project/v_r_vs_time.png](analysis/figs/final_project/v_r_vs_time.png)
+
+These 2D diagnostics are used to illustrate controller behavior and compare control regimes. They are useful validation views, but they are not a full physical system characterization by themselves.
+
+### Generalization takeaway
+
+The explicit controller generalizes, but only in a narrow reachable regime.
+
+Verified result:
+
+- success in `5 / 36` tested setups
+- working region is limited to:
+  - very small initial radius offsets
+  - moderate or large `dt`
+  - moderate thrust, not maximal thrust
+
+See:
+
+- [analysis/orbit_lock_generalization.md](analysis/orbit_lock_generalization.md)
+- [analysis/figs/orbit_lock_generalization/aggregate_results.json](analysis/figs/orbit_lock_generalization/aggregate_results.json)
+
+## Learning Transfer Status
+
+The repository already includes the first learning-transfer stage:
+
+1. behavior cloning from the explicit phase controller
+2. short PPO fine-tuning from the cloned policy
+
+Current status:
+
+- explicit controller: crossing `1`, success `true`
+- behavior cloning: crossing `0`, success `false`
+- PPO fine-tuned from BC: crossing `0`, success `false`
+
+So the explicit structure is solved, but the learned transfer is not solved yet.
+
+Relevant files:
+
+- [analysis/phase_controller_dataset.md](analysis/phase_controller_dataset.md)
+- [analysis/ppo_transfer_results.md](analysis/ppo_transfer_results.md)
+- [analysis/phase_controller_dataset/phase_controller_dataset_balanced.npz](analysis/phase_controller_dataset/phase_controller_dataset_balanced.npz)
 
 ## Repository Structure
 
-```
+```text
 spacecraft_ai_project/
-│
-├── simulator/         # Orbital physics and environment (OrbitEnv)
-├── controller/        # Expert, imitation, and RL controllers
-├── data/              # Training datasets (expert trajectories)
-├── ppo_orbit/         # PPO training implementation
-├── tools/             # Utilities (quickrun, plotting, summarization)
-├── project_log/       # Research logs and experiment notes
-├── analysis/          # Runs, trajectories, and evaluation outputs
-├── results/           # Aggregated experiment results
-├── LICENSE
+├── analysis/               # summaries, figures, demo assets, datasets
+├── controller/             # explicit, probe, PPO-related controllers
+├── envs/                   # orbital environment and task definitions
+├── models/                 # saved BC and PPO-transfer models
+├── ppo_orbit/              # PPO implementation
+├── scripts/                # evaluation, sweeps, plotting, demo generation
+├── main.py                 # current demo entry point
 └── README.md
 ```
 
----
-
 ## Installation
 
-### Requirements
+Recommended:
 
-* Python 3.10+
-* Recommended: virtual environment (venv or conda)
+- Python 3.10+
+- Conda environment setup first
 
-### Install Dependencies
+The primary recommended setup is the Conda environment below. If you prefer a lightweight manual install, the minimal package list is:
 
 ```bash
-pip install numpy matplotlib torch scikit-learn gymnasium
+pip install numpy matplotlib torch pillow gymnasium scikit-learn
 ```
 
----
+## Environment Setup (Conda)
 
-## Experimental Pipeline
+This project is developed and tested with Conda.
 
-This project follows a structured research workflow:
+Create the environment:
 
-1. **Environment Setup** — fixed physics and normalization
-2. **Controller Design** — rule-based vs learning-based
-3. **Batch Experiments** — parameter sweeps (thrust, initial radius)
-4. **Trajectory Logging** — saved as `traj.npz`
-5. **Metric Extraction** — reward, stability, error
-6. **Visualization & Analysis** — automated plotting tools
+```bash
+conda env create -f environment.yml
+conda activate spacecraft
+```
 
-This ensures **fair comparison and reproducibility** across experiments.
+## Reproducibility
 
----
+### Generate the demo
 
-## Current Progress
+```bash
+python main.py
+```
 
-### Working Components
+Equivalent direct script:
 
-* Stable expert and gated controllers
-* Reproducible evaluation pipeline
-* Automated trajectory analysis and visualization
-* PPO integration with training and checkpointing
+```bash
+python scripts/generate_orbit_demo.py
+```
 
-### Limitations
+### Re-run the orbit-lock validation
 
-* RL policies show:
+```bash
+python scripts/orbit_lock_validation.py
+```
 
-  * Energy inefficiency
-  * Suboptimal thrust alignment
-* Transfer maneuvers remain challenging
-* Reward design is not fully aligned with physical optimality
+### Re-run the generalization sweep
 
----
+```bash
+python scripts/orbit_lock_generalization.py
+```
 
-## Key Insights
+### Re-run the benchmark comparison
 
-* Gated control achieves **strong stability under constrained thrust**
-* RL models require **physics-aligned reward shaping**
-* Energy efficiency is a primary bottleneck
-* Learned policies struggle with long-horizon transfer tasks
+```bash
+python scripts/orbit_lock_benchmark.py
+```
 
----
+### Re-run the transfer evaluation
 
-## Research Direction
+```bash
+python scripts/train_behavior_cloning.py
+python scripts/eval_bc_policy.py --policy-kind bc --checkpoint models/bc_policy.pth
+python scripts/eval_bc_policy.py --policy-kind ppo --checkpoint models/ppo_bc_finetuned.pth
+```
 
-* Hybrid control (Imitation → PPO)
-* Curriculum learning for orbital complexity
-* Energy-aware reward design
-* Robustness under noise and system uncertainty
+## Recommended Reading Order
 
----
+If you want the shortest evidence trail, read:
 
-## Vision
+1. [analysis/final_project_summary.md](analysis/final_project_summary.md)  -(final presentation summary — scoped to the 2D insertion setting)
+2. [analysis/orbit_lock_benchmark.md](analysis/orbit_lock_benchmark.md)
+3. [analysis/orbit_lock_generalization.md](analysis/orbit_lock_generalization.md)
+4. [analysis/ppo_transfer_results.md](analysis/ppo_transfer_results.md)
 
-This project aims to evolve into a **research platform for autonomous spacecraft control**, combining:
+## Future Directions
 
-* Orbital physics simulation
-* Control theory
-* Machine learning
-* Autonomous decision systems
+This project currently focuses on a simplified 2D orbital insertion setting to isolate control structure and learning behavior.
 
-Long-term direction:
+Future extensions aim to move toward more realistic and higher-performance systems:
 
-> Simulation → Control → Learning → Autonomous Space Systems
+- **3D Orbital Dynamics**
+  Extending the simulator from planar motion to full 3D orbital mechanics, including inclination and out-of-plane control.
 
----
+- **Higher-Performance Simulation (C++)**
+  Re-implementing the simulation core in C++ to support larger-scale experiments and faster rollout for control and learning.
+
+- **Learning Structured Controllers**
+  Improving reinforcement learning approaches (e.g., PPO) by incorporating phase-aware or memory-based architectures, to better capture sequential control structure.
+
+- **Robust Control Under Constraints**
+  Studying controller performance under stricter thrust limits, perturbations, and uncertainty in system dynamics.
+
+This direction aligns with the broader goal of developing AI-driven control systems for complex physical environments, particularly in orbital and aerospace applications.
 
 ## License
 
-MIT License
+MIT License. See [LICENSE](LICENSE).
 
----
-
-## Acknowledgment
-
-Inspired by research in:
-
-* Autonomous space systems
-* Reinforcement learning for control
-* AI-driven robotics and dynamics
-
----
-
-## Philosophy
-
-> *Trajectory may drift, but control adapts.*
-
-This project explores how intelligent systems can operate reliably under uncertainty in complex physical environments.

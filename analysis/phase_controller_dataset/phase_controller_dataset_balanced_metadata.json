@@ -1,0 +1,71 @@
+{
+  "source_dataset": "E:/spacecraft_ai_project/analysis/phase_controller_dataset/phase_controller_dataset.npz",
+  "balanced_dataset": "E:/spacecraft_ai_project/analysis/phase_controller_dataset/phase_controller_dataset_balanced.npz",
+  "target_count_per_phase": 1021,
+  "phase_stats": {
+    "DESCENT": {
+      "original_count": 264405,
+      "balanced_count": 1021,
+      "sampling": "downsample"
+    },
+    "CAPTURE": {
+      "original_count": 101,
+      "balanced_count": 1021,
+      "sampling": "upsample"
+    },
+    "LOCK": {
+      "original_count": 1021,
+      "balanced_count": 1021,
+      "sampling": "downsample"
+    }
+  },
+  "source_setups": [
+    {
+      "setup_id": 0,
+      "r0_over_target": 1.00002,
+      "dt": 50.0,
+      "thrust_scale": 10000.0,
+      "num_steps": 75877,
+      "phase_transition_count": 2,
+      "success": 1.0
+    },
+    {
+      "setup_id": 1,
+      "r0_over_target": 1.00002,
+      "dt": 50.0,
+      "thrust_scale": 20000.0,
+      "num_steps": 29860,
+      "phase_transition_count": 2,
+      "success": 1.0
+    },
+    {
+      "setup_id": 2,
+      "r0_over_target": 1.00002,
+      "dt": 100.0,
+      "thrust_scale": 10000.0,
+      "num_steps": 15072,
+      "phase_transition_count": 2,
+      "success": 1.0
+    },
+    {
+      "setup_id": 3,
+      "r0_over_target": 1.00005,
+      "dt": 50.0,
+      "thrust_scale": 20000.0,
+      "num_steps": 96260,
+      "phase_transition_count": 2,
+      "success": 1.0
+    },
+    {
+      "setup_id": 4,
+      "r0_over_target": 1.00005,
+      "dt": 100.0,
+      "thrust_scale": 10000.0,
+      "num_steps": 48458,
+      "phase_transition_count": 2,
+      "success": 1.0
+    }
+  ],
+  "total_samples": 3063,
+  "rng_seed": 42
+}

@@ -1,0 +1,11 @@
+{
+  "representative_setup": {
+    "name": "best_success",
+    "r0_over_target": 1.00005,
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "max_steps": 100000
+  },
+  "benchmark_source": "E:/spacecraft_ai_project/analysis/figs/orbit_lock_benchmark/aggregate_results.csv",
+  "generalization_summary": "E:/spacecraft_ai_project/analysis/orbit_lock_generalization.md"
+}

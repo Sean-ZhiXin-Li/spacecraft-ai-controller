@@ -1,0 +1,24 @@
+{
+  "speed_refine_50": {
+    "checkpoint_tag": "speed_refine_50",
+    "checkpoint_path": "E:\\spacecraft_ai_project\\ppo_orbit\\speed_refine_50\\ppo_epoch_300.pth",
+    "step": 26,
+    "r_error": 375000007711.03125,
+    "v_r": -29.206405480990416,
+    "v_t_error": 53.27560036470368,
+    "action_norm": 0.005165910839171297,
+    "target_radius": 7500000000000.0,
+    "v_circ": 4207.165744298648
+  },
+  "state_vr_nonlinear_100": {
+    "checkpoint_tag": "state_vr_nonlinear_100",
+    "checkpoint_path": "E:\\spacecraft_ai_project\\ppo_orbit\\state_vr_nonlinear_100\\ppo_best.pth",
+    "step": 40,
+    "r_error": 375000010754.4463,
+    "v_r": -5.7835649449491555,
+    "v_t_error": -180.29253146365136,
+    "action_norm": 0.009599044726686287,
+    "target_radius": 7500000000000.0,
+    "v_circ": 4207.165744298648
+  }
+}

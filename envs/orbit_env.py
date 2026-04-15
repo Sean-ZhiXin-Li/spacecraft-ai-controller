@@ -92,7 +92,7 @@ class OrbitEnv(gym.Env):
 
         # Action/observation spaces
         self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float32)
-        self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(4,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(5,), dtype=np.float32)
 
         # Internal state buffers
         self.steps = 0

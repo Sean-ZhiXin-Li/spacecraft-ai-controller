@@ -1,0 +1,62 @@
+{
+  "speed_refine_50": {
+    "checkpoint_path": "E:\\spacecraft_ai_project\\ppo_orbit\\speed_refine_50\\ppo_epoch_300.pth",
+    "shutdown_step": 26,
+    "state_at_shutdown": {
+      "r_error": 375000007711.03125,
+      "v_r": -29.206405480990416,
+      "v_t_error": 53.27560036470368,
+      "action_norm": 0.005165910839171297
+    },
+    "branches": [
+      {
+        "label": "baseline_post",
+        "reactivated": false,
+        "max_action_after": 0.005165910839171297,
+        "mean_action_after": 0.0001180615334778677
+      },
+      {
+        "label": "vr_nudge_post",
+        "reactivated": true,
+        "max_action_after": 1.0037647720243301,
+        "mean_action_after": 0.009391662123161518
+      },
+      {
+        "label": "thrust_pulse_post",
+        "reactivated": true,
+        "max_action_after": 0.5147368676766253,
+        "mean_action_after": 0.004617703809411599
+      }
+    ]
+  },
+  "state_vr_nonlinear_100": {
+    "checkpoint_path": "E:\\spacecraft_ai_project\\ppo_orbit\\state_vr_nonlinear_100\\ppo_best.pth",
+    "shutdown_step": 40,
+    "state_at_shutdown": {
+      "r_error": 375000010754.4463,
+      "v_r": -5.7835649449491555,
+      "v_t_error": -180.29253146365136,
+      "action_norm": 0.009599044726686287
+    },
+    "branches": [
+      {
+        "label": "baseline_post",
+        "reactivated": false,
+        "max_action_after": 0.009599044726686287,
+        "mean_action_after": 0.0035250872845232787
+      },
+      {
+        "label": "vr_nudge_post",
+        "reactivated": true,
+        "max_action_after": 0.4818310146967633,
+        "mean_action_after": 0.012362954428811513
+      },
+      {
+        "label": "thrust_pulse_post",
+        "reactivated": true,
+        "max_action_after": 0.3,
+        "mean_action_after": 0.007800319753822602
+      }
+    ]
+  }
+}
