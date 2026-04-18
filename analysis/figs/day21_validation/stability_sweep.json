@@ -1,0 +1,58 @@
+[
+  {
+    "controller": "explicit_orbit_lock",
+    "r0_over_target": 1.00002,
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "success": true,
+    "terminated": true,
+    "truncated": false,
+    "radius_crossings_total": 1,
+    "first_crossing_step": 14849,
+    "final_radius_error": 79136.76953125,
+    "tail_mean_abs_vr": 97.26416250310575,
+    "mean_action_norm": 0.9856767283124295
+  },
+  {
+    "controller": "explicit_orbit_lock",
+    "r0_over_target": 1.00005,
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "success": true,
+    "terminated": true,
+    "truncated": false,
+    "radius_crossings_total": 1,
+    "first_crossing_step": 48269,
+    "final_radius_error": 27657.630859375,
+    "tail_mean_abs_vr": 48.41822733340298,
+    "mean_action_norm": 0.9955462106496343
+  },
+  {
+    "controller": "explicit_orbit_lock",
+    "r0_over_target": 1.0001,
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "success": false,
+    "terminated": false,
+    "truncated": true,
+    "radius_crossings_total": 0,
+    "first_crossing_step": null,
+    "final_radius_error": 345118459.06640625,
+    "tail_mean_abs_vr": 30.397268970105937,
+    "mean_action_norm": 1.000000000080066
+  },
+  {
+    "controller": "explicit_orbit_lock",
+    "r0_over_target": 1.0002,
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "success": false,
+    "terminated": false,
+    "truncated": true,
+    "radius_crossings_total": 0,
+    "first_crossing_step": null,
+    "final_radius_error": 1098113710.7382812,
+    "tail_mean_abs_vr": 31.03599812199754,
+    "mean_action_norm": 1.0000000000215634
+  }
+]

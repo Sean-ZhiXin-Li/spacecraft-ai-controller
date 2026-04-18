@@ -1,0 +1,30 @@
+[
+  {
+    "controller": "explicit_orbit_lock",
+    "r0_over_target": 1.00005,
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "success": true,
+    "terminated": true,
+    "truncated": false,
+    "radius_crossings_total": 1,
+    "first_crossing_step": 48269,
+    "final_radius_error": 27657.630859375,
+    "tail_mean_abs_vr": 48.41822733340298,
+    "mean_action_norm": 0.9955462106496343
+  },
+  {
+    "controller": "ppo_speed_refine_50",
+    "r0_over_target": 1.00005,
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "success": false,
+    "terminated": false,
+    "truncated": true,
+    "radius_crossings_total": 0,
+    "first_crossing_step": null,
+    "final_radius_error": 743203130.3925781,
+    "tail_mean_abs_vr": 688.9232359043789,
+    "mean_action_norm": 1.4142068641451953
+  }
+]

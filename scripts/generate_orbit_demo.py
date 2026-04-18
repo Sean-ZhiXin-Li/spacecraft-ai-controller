@@ -301,7 +301,7 @@ def save_static_plots(metrics: Dict[str, float | int | bool | None], trace: Dict
     fig, ax = plt.subplots(figsize=(7.5, 7.5))
     ax.plot(circle_x, circle_y, "--", linewidth=2.0, color=TARGET_COLOR, alpha=0.35, label="target orbit", zorder=1)
     ax.plot(trace["x"], trace["y"], linewidth=3.0, color=TRAJ_COLOR, alpha=0.95, label="explicit controller", zorder=3)
-    ax.scatter(trace["x"][0], trace["y"][0], s=130, color=START_COLOR, edgecolors="white", linewidths=1.2, label="start", zorder=12)
+    ax.scatter(trace["x"][0], trace["y"][0], s=220, color=START_COLOR, edgecolors="black", linewidths=1.4, label="start", zorder=15)
     ax.scatter(trace["x"][-1], trace["y"][-1], s=130, color=END_COLOR, edgecolors="white", linewidths=1.2, label="end", zorder=13)
     ax.set_xlabel("x [m]")
     ax.set_ylabel("y [m]")
