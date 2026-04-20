@@ -186,7 +186,7 @@ def normalize_rollout_state(state: np.ndarray, input_dim: int) -> np.ndarray:
 class RolloutPPOController:
     def __init__(self, checkpoint_path: Path):
         self.model_path = str(checkpoint_path)
-        checkpoint = torch.load(checkpoint_path, map_location=device)
+        checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
         state_dict = checkpoint["model_state"] if isinstance(checkpoint, dict) and "model_state" in checkpoint else checkpoint
         shared_weight = state_dict.get("shared.0.weight")
         if shared_weight is None or shared_weight.ndim != 2:
@@ -364,7 +364,7 @@ def main() -> None:
     out_dir = make_output_dir(runs_root)
 
     # Optional sanity check that torch can read the checkpoint file.
-    _ = torch.load(checkpoint_path, map_location="cpu")
+    _ = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
 
     print("OrbitEnv signature:")
     print(inspect.signature(OrbitEnv.__init__))

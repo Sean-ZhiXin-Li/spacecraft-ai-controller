@@ -2,9 +2,19 @@
   "dataset_states_path": "E:/spacecraft_ai_project/analysis/minimal_il/explicit_states.npy",
   "dataset_actions_path": "E:/spacecraft_ai_project/analysis/minimal_il/explicit_actions.npy",
   "model_path": "E:/spacecraft_ai_project/models/minimal_il_policy.pth",
+  "baseline_setup": {
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "max_steps": 100000,
+    "r0_over_target": 1.00005,
+    "tol_r": 0.001,
+    "tol_v": 0.001,
+    "tol_ang": 0.02,
+    "success_threshold": 200
+  },
   "num_samples": 48458,
   "train": {
-    "train_loss": 0.00030249880302490986,
+    "train_loss": 0.00028383137762879587,
     "epochs": 60.0
   },
   "eval": {
@@ -12,6 +22,6 @@
     "radius_crossings_total": 0,
     "first_crossing_step": null,
     "success": false,
-    "final_radius_error": 375055146.4824219
+    "final_radius_error": 374926365.8964844
   }
 }

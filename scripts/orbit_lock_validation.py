@@ -26,10 +26,10 @@ JSON_PATH = OUTPUT_DIR / "aggregate_results.json"
 SUMMARY_PATH = PROJECT_ROOT / "analysis" / "orbit_lock_validation.md"
 PHASE_SUMMARY_PATH = PROJECT_ROOT / "analysis" / "orbit_lock_phase_controller.md"
 
-DT = 50.0
+DT = 100.0
 MAX_STEPS = 100000
 R0_OVER_TARGET = 1.00005
-THRUST_SCALE = 20000.0
+THRUST_SCALE = 10000.0
 STRICT_CFG = {
     "tol_r": 1.0e-3,
     "tol_v": 1.0e-3,
@@ -222,7 +222,7 @@ def write_summary(rows: List[ValidationRow]) -> None:
         diagnosis = "No controller maintains tail crossings. The failure is not reachability anymore; it is post-crossing state regulation."
 
     if probe.radius_crossings_total > 0 and explicit.radius_crossings_total == 0:
-        missing_behavior = "The explicit controller is missing enough inward energy-removal authority to reach the first crossing under the new baseline."
+        missing_behavior = "The explicit controller is missing enough inward energy-removal authority to reach the first crossing under this baseline."
     elif explicit.radius_crossings_total > 0 and not explicit.tail_crosses_target_radius:
         missing_behavior = "The explicit controller can cross but does not keep a phase-aware corrective cycle after crossing."
     else:
@@ -293,7 +293,7 @@ def write_summary(rows: List[ValidationRow]) -> None:
         "## Main Answers",
         "",
         f"- Does the phase controller produce repeated crossings? `{'Yes' if explicit.radius_crossings_total >= 2 else 'No'}`",
-        f"- Does it stabilize after crossing? `{'Yes' if explicit.tail_crosses_target_radius and explicit.amplitude_shrinks else 'No'}`",
+        f"- Does it stabilize after crossing into the target band? `{'Yes' if explicit.tail_crosses_target_radius and explicit.amplitude_shrinks else 'No'}`",
         f"- What phase transition behavior is critical? `DESCENT -> CAPTURE` must occur early enough to cross, and `CAPTURE -> LOCK` only matters after radial damping and tangential support are both active near the target.`",
         "",
         "## Explicit Controller Metrics",

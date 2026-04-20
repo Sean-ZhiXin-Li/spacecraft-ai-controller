@@ -89,7 +89,7 @@ def set_default_start(env: OrbitEnv) -> None:
 
 class BCPolicyController:
     def __init__(self, checkpoint_path: Path) -> None:
-        checkpoint = torch.load(checkpoint_path, map_location=DEVICE)
+        checkpoint = torch.load(checkpoint_path, map_location=DEVICE, weights_only=False)
         state_dict = checkpoint["model_state"] if isinstance(checkpoint, dict) and "model_state" in checkpoint else checkpoint
         self.model = BCPolicy().to(DEVICE)
         self.model.load_state_dict(state_dict)
@@ -105,7 +105,7 @@ class BCPolicyController:
 
 class PPOPolicyController:
     def __init__(self, checkpoint_path: Path) -> None:
-        checkpoint = torch.load(checkpoint_path, map_location=DEVICE)
+        checkpoint = torch.load(checkpoint_path, map_location=DEVICE, weights_only=False)
         state_dict = checkpoint["model_state"] if isinstance(checkpoint, dict) and "model_state" in checkpoint else checkpoint
         self.model = ActorCritic().to(DEVICE)
         self.model.load_state_dict(state_dict)

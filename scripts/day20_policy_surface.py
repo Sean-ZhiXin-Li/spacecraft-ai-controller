@@ -138,7 +138,7 @@ def normalize_rollout_state(state: Sequence[float], input_dim: int) -> List[floa
 class LoadedPolicy:
     def __init__(self, checkpoint_path: Path) -> None:
         self.checkpoint_path = str(checkpoint_path)
-        checkpoint = torch.load(checkpoint_path, map_location=DEVICE)
+        checkpoint = torch.load(checkpoint_path, map_location=DEVICE, weights_only=False)
         state_dict = checkpoint["model_state"] if isinstance(checkpoint, dict) and "model_state" in checkpoint else checkpoint
         shared_weight = state_dict.get("shared.0.weight")
         if shared_weight is None:

@@ -4,7 +4,7 @@ import json
 import math
 import sys
 from pathlib import Path
-from typing import Dict, List, Sequence
+from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,14 +21,16 @@ from envs.orbit_env import OrbitEnv
 from ppo_orbit.ppo import normalize_state
 
 
-OUTPUT_DIR = PROJECT_ROOT / "analysis" / "minimal_il"
+OUTPUT_DIR = PROJECT_ROOT / "analysis" / "phase_aware_il"
 MODEL_DIR = PROJECT_ROOT / "models"
-STATES_PATH = OUTPUT_DIR / "explicit_states.npy"
-ACTIONS_PATH = OUTPUT_DIR / "explicit_actions.npy"
-MODEL_PATH = MODEL_DIR / "minimal_il_policy.pth"
-SUMMARY_PATH = OUTPUT_DIR / "minimal_il_summary.json"
-RADIUS_PLOT_PATH = OUTPUT_DIR / "minimal_il_radius.png"
-VR_PLOT_PATH = OUTPUT_DIR / "minimal_il_v_r.png"
+STATES_PATH = OUTPUT_DIR / "phase_states.npy"
+ACTIONS_PATH = OUTPUT_DIR / "phase_actions.npy"
+LABELS_PATH = OUTPUT_DIR / "phase_labels.npy"
+MODEL_PATH = MODEL_DIR / "phase_aware_il_policy.pth"
+SUMMARY_PATH = OUTPUT_DIR / "phase_aware_il_summary.json"
+RADIUS_PLOT_PATH = OUTPUT_DIR / "phase_aware_il_radius.png"
+VR_PLOT_PATH = OUTPUT_DIR / "phase_aware_il_v_r.png"
+NOTE_PATH = PROJECT_ROOT / "analysis" / "phase_aware_il_result.md"
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 DT = 100.0
@@ -41,13 +43,15 @@ STRICT_CFG = {
     "tol_ang": 0.02,
     "success_threshold": 200,
 }
+PHASES = ["DESCENT", "CAPTURE", "LOCK"]
+PHASE_TO_ID = {name: idx for idx, name in enumerate(PHASES)}
 
 
-class TinyPolicy(nn.Module):
+class PhaseAwarePolicy(nn.Module):
     def __init__(self) -> None:
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(5, 64),
+            nn.Linear(8, 64),
             nn.Tanh(),
             nn.Linear(64, 64),
             nn.Tanh(),
@@ -91,7 +95,13 @@ def set_default_start(env: OrbitEnv) -> None:
     env.vel = v_mag * np.array([math.cos(angle), math.sin(angle)], dtype=np.float64)
 
 
-def collect_dataset() -> tuple[np.ndarray, np.ndarray]:
+def phase_one_hot(phase_name: str) -> np.ndarray:
+    one_hot = np.zeros(len(PHASES), dtype=np.float32)
+    one_hot[PHASE_TO_ID[phase_name]] = 1.0
+    return one_hot
+
+
+def collect_dataset() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     env = make_env()
     controller = OrbitLockController(target_radius=env.target_radius, mu=env.mu, config=OrbitLockConfig())
     set_default_start(env)
@@ -99,32 +109,38 @@ def collect_dataset() -> tuple[np.ndarray, np.ndarray]:
 
     states: List[np.ndarray] = []
     actions: List[np.ndarray] = []
+    labels: List[np.ndarray] = []
     terminated = False
     truncated = False
     while not (terminated or truncated):
         info = controller.act_with_info(obs)
         action = np.asarray(info["final_action"], dtype=np.float32)
+        phase = str(info["phase"])
         states.append(obs.copy())
         actions.append(action.copy())
+        labels.append(phase_one_hot(phase))
         next_obs, _, terminated, truncated, _ = env.step(action)
         obs = np.asarray(next_obs, dtype=np.float32)
 
     states_arr = np.asarray(states, dtype=np.float32)
     actions_arr = np.asarray(actions, dtype=np.float32)
+    labels_arr = np.asarray(labels, dtype=np.float32)
     np.save(STATES_PATH, states_arr)
     np.save(ACTIONS_PATH, actions_arr)
-    return states_arr, actions_arr
+    np.save(LABELS_PATH, labels_arr)
+    return states_arr, actions_arr, labels_arr
 
 
-def train_model(states: np.ndarray, actions: np.ndarray) -> tuple[TinyPolicy, Dict[str, float]]:
+def train_model(states: np.ndarray, actions: np.ndarray, labels: np.ndarray) -> tuple[PhaseAwarePolicy, Dict[str, float]]:
     states_norm = np.stack([normalize_state(s) for s in states], axis=0).astype(np.float32)
+    inputs = np.concatenate([states_norm, labels], axis=1).astype(np.float32)
     dataset = TensorDataset(
-        torch.tensor(states_norm, dtype=torch.float32),
+        torch.tensor(inputs, dtype=torch.float32),
         torch.tensor(actions, dtype=torch.float32),
     )
     loader = DataLoader(dataset, batch_size=256, shuffle=True)
 
-    model = TinyPolicy().to(DEVICE)
+    model = PhaseAwarePolicy().to(DEVICE)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     loss_fn = nn.MSELoss()
 
@@ -150,8 +166,11 @@ def train_model(states: np.ndarray, actions: np.ndarray) -> tuple[TinyPolicy, Di
     return model, {"train_loss": float(last_loss), "epochs": float(epochs)}
 
 
-def evaluate_model(model: TinyPolicy) -> tuple[Dict[str, float | int | bool | None], Dict[str, List[float]]]:
+def evaluate_model(model: PhaseAwarePolicy) -> tuple[Dict[str, float | int | bool | None], Dict[str, List[float]]]:
     env = make_env()
+    # This controller is used only as a phase oracle during evaluation.
+    # The learned policy still outputs the action.
+    phase_tracker = OrbitLockController(target_radius=env.target_radius, mu=env.mu, config=OrbitLockConfig())
     set_default_start(env)
     obs = np.asarray(env._get_obs(), dtype=np.float32)
 
@@ -164,9 +183,13 @@ def evaluate_model(model: TinyPolicy) -> tuple[Dict[str, float | int | bool | No
     terminated = False
     truncated = False
     while not (terminated or truncated):
-        x = torch.tensor(normalize_state(obs), dtype=torch.float32, device=DEVICE).unsqueeze(0)
+        phase_info = phase_tracker.act_with_info(obs)
+        phase_vec = phase_one_hot(str(phase_info["phase"]))
+        x = np.concatenate([normalize_state(obs), phase_vec], axis=0).astype(np.float32)
+        x_tensor = torch.tensor(x, dtype=torch.float32, device=DEVICE).unsqueeze(0)
         with torch.no_grad():
-            action = torch.clamp(model(x), -1.0, 1.0).squeeze(0).cpu().numpy()
+            action = torch.clamp(model(x_tensor), -1.0, 1.0).squeeze(0).cpu().numpy()
+
         next_obs, _, terminated, truncated, info = env.step(action)
         radius = float(np.linalg.norm(env.pos))
         r_hat = env.pos / (radius + 1e-12)
@@ -204,21 +227,55 @@ def save_plot(path: Path, trace: Dict[str, List[float]], key: str, title: str, y
     plt.close()
 
 
+def write_note(summary: Dict[str, object]) -> None:
+    eval_metrics = summary["eval"]
+    crossing = bool(eval_metrics["crossing_occurs"])
+    if crossing:
+        implication = "Adding phase information is enough to recover first crossing under this baseline, which implies that structural representation is the missing ingredient."
+        missing = "What is still missing is post-crossing stabilization quality, not the first transition itself."
+    else:
+        implication = "Adding phase information alone is not enough to recover first crossing under this baseline."
+        missing = "What is still missing is a representation or deployment mechanism that preserves the phase-conditioned control law over long horizons, not just access to a phase label at the network input."
+
+    lines = [
+        "# Phase-Aware Imitation Learning Result",
+        "",
+        "## Main Answer",
+        "",
+        f"- Does adding phase information recover crossing? `{'Yes' if crossing else 'No'}`",
+        "",
+        "## Interpretation",
+        "",
+        f"- {implication}",
+        f"- {missing}",
+        "- Evaluation uses the explicit controller only as a phase oracle to provide the phase one-hot input online; the learned model still produces the action itself.",
+        "",
+        "## Metrics",
+        "",
+        f"- crossing_occurs `{eval_metrics['crossing_occurs']}`",
+        f"- radius_crossings_total `{eval_metrics['radius_crossings_total']}`",
+        f"- success `{eval_metrics['success']}`",
+        f"- final_radius_error `{eval_metrics['final_radius_error']:.3e}`",
+    ]
+    NOTE_PATH.write_text("\n".join(lines), encoding="utf-8")
+
+
 def main() -> None:
     ensure_dir(OUTPUT_DIR)
     ensure_dir(MODEL_DIR)
 
-    states, actions = collect_dataset()
-    model, train_metrics = train_model(states, actions)
+    states, actions, labels = collect_dataset()
+    model, train_metrics = train_model(states, actions, labels)
     eval_metrics, trace = evaluate_model(model)
 
     env = make_env()
-    save_plot(RADIUS_PLOT_PATH, trace, "radius", "Minimal IL | radius vs time", "radius [m]", target_value=env.target_radius)
-    save_plot(VR_PLOT_PATH, trace, "v_r", "Minimal IL | v_r vs time", "v_r [m/s]", target_value=0.0)
+    save_plot(RADIUS_PLOT_PATH, trace, "radius", "Phase-aware IL | radius vs time", "radius [m]", target_value=env.target_radius)
+    save_plot(VR_PLOT_PATH, trace, "v_r", "Phase-aware IL | v_r vs time", "v_r [m/s]", target_value=0.0)
 
     summary = {
         "dataset_states_path": STATES_PATH.as_posix(),
         "dataset_actions_path": ACTIONS_PATH.as_posix(),
+        "dataset_labels_path": LABELS_PATH.as_posix(),
         "model_path": MODEL_PATH.as_posix(),
         "baseline_setup": {
             "dt": DT,
@@ -227,15 +284,19 @@ def main() -> None:
             "r0_over_target": R0_OVER_TARGET,
             **STRICT_CFG,
         },
+        "phase_labels": PHASES,
+        "phase_input_source": "explicit_controller_phase_oracle_at_eval",
         "num_samples": int(len(states)),
         "train": train_metrics,
         "eval": eval_metrics,
     }
     SUMMARY_PATH.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    write_note(summary)
     print(json.dumps(summary, indent=2))
-    print(f"Saved dataset to: {STATES_PATH} and {ACTIONS_PATH}")
+    print(f"Saved dataset to: {STATES_PATH}, {ACTIONS_PATH}, {LABELS_PATH}")
     print(f"Saved model to: {MODEL_PATH}")
     print(f"Saved summary to: {SUMMARY_PATH}")
+    print(f"Saved note to: {NOTE_PATH}")
 
 
 if __name__ == "__main__":

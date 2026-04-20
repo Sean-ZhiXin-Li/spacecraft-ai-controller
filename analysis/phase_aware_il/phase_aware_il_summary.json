@@ -1,0 +1,34 @@
+{
+  "dataset_states_path": "E:/spacecraft_ai_project/analysis/phase_aware_il/phase_states.npy",
+  "dataset_actions_path": "E:/spacecraft_ai_project/analysis/phase_aware_il/phase_actions.npy",
+  "dataset_labels_path": "E:/spacecraft_ai_project/analysis/phase_aware_il/phase_labels.npy",
+  "model_path": "E:/spacecraft_ai_project/models/phase_aware_il_policy.pth",
+  "baseline_setup": {
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "max_steps": 100000,
+    "r0_over_target": 1.00005,
+    "tol_r": 0.001,
+    "tol_v": 0.001,
+    "tol_ang": 0.02,
+    "success_threshold": 200
+  },
+  "phase_labels": [
+    "DESCENT",
+    "CAPTURE",
+    "LOCK"
+  ],
+  "phase_input_source": "explicit_controller_phase_oracle_at_eval",
+  "num_samples": 48458,
+  "train": {
+    "train_loss": 0.0005782163551209542,
+    "epochs": 60.0
+  },
+  "eval": {
+    "crossing_occurs": true,
+    "radius_crossings_total": 1,
+    "first_crossing_step": 47987,
+    "success": false,
+    "final_radius_error": 316723421.4658203
+  }
+}
