@@ -1,0 +1,55 @@
+{
+  "model_path": "E:/spacecraft_ai_project/models/residual_explicit_il_policy.pth",
+  "baseline_setup": {
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "max_steps": 100000,
+    "r0_over_target": 1.00005,
+    "tol_r": 0.001,
+    "tol_v": 0.001,
+    "tol_ang": 0.02,
+    "success_threshold": 200
+  },
+  "history_len": 4,
+  "alpha": 0.2,
+  "seed": 7,
+  "device": "cuda",
+  "num_samples": 48458,
+  "input_dim": 20,
+  "state_dim": 5,
+  "residual_target": "zero_correction_on_explicit_controller_action",
+  "train": {
+    "residual_mse": 0.0,
+    "epochs": 30.0
+  },
+  "explicit_action_dataset_stats": {
+    "mean_action_x": -9.529658200335689e-07,
+    "mean_action_y": -1.0689533155527897e-05,
+    "mean_action_norm": 0.9955427050590515
+  },
+  "explicit_baseline": {
+    "success": true,
+    "crossing_occurs": true,
+    "radius_crossings_total": 1,
+    "first_crossing_step": 48269,
+    "final_radius_error": 27657.630859375,
+    "tail_mean_abs_vr": 48.41822733340298
+  },
+  "residual_eval": {
+    "success": true,
+    "crossing_occurs": true,
+    "radius_crossings_total": 1,
+    "first_crossing_step": 48269,
+    "final_radius_error": 27657.630859375,
+    "tail_mean_abs_vr": 48.41822733340298
+  },
+  "residual_stats": {
+    "mean_abs_residual": 0.0,
+    "max_abs_residual": 0.0,
+    "mean_scaled_residual_norm": 0.0
+  },
+  "improves_final_radius_error": false,
+  "improves_tail_mean_abs_vr": false,
+  "preserves_explicit_success": true,
+  "destabilizes_controller": false
+}

@@ -5,7 +5,7 @@ import math
 import random
 import sys
 from pathlib import Path
-from typing import Dict, List, Sequence
+from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -22,17 +22,19 @@ from envs.orbit_env import OrbitEnv
 from ppo_orbit.ppo import normalize_state
 
 
-OUTPUT_DIR = PROJECT_ROOT / "analysis" / "minimal_il"
+OUTPUT_DIR = PROJECT_ROOT / "analysis" / "history_aware_il"
 MODEL_DIR = PROJECT_ROOT / "models"
-STATES_PATH = OUTPUT_DIR / "explicit_states.npy"
-ACTIONS_PATH = OUTPUT_DIR / "explicit_actions.npy"
-MODEL_PATH = MODEL_DIR / "minimal_il_policy.pth"
-SUMMARY_PATH = OUTPUT_DIR / "minimal_il_summary.json"
-RADIUS_PLOT_PATH = OUTPUT_DIR / "minimal_il_radius.png"
-VR_PLOT_PATH = OUTPUT_DIR / "minimal_il_v_r.png"
+STATES_PATH = OUTPUT_DIR / "history_states.npy"
+ACTIONS_PATH = OUTPUT_DIR / "history_actions.npy"
+MODEL_PATH = MODEL_DIR / "history_aware_il_policy.pth"
+SUMMARY_PATH = OUTPUT_DIR / "history_aware_il_summary.json"
+RADIUS_PLOT_PATH = OUTPUT_DIR / "history_aware_il_radius.png"
+VR_PLOT_PATH = OUTPUT_DIR / "history_aware_il_v_r.png"
+NOTE_PATH = PROJECT_ROOT / "analysis" / "history_aware_il_result.md"
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 SEED = 7
+HISTORY_LEN = 4
 DT = 100.0
 THRUST_SCALE = 10000.0
 MAX_STEPS = 100000
@@ -45,11 +47,11 @@ STRICT_CFG = {
 }
 
 
-class TinyPolicy(nn.Module):
-    def __init__(self) -> None:
+class HistoryAwarePolicy(nn.Module):
+    def __init__(self, input_dim: int) -> None:
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(5, 64),
+            nn.Linear(input_dim, 64),
             nn.Tanh(),
             nn.Linear(64, 64),
             nn.Tanh(),
@@ -129,16 +131,26 @@ def collect_dataset() -> tuple[np.ndarray, np.ndarray]:
     return states_arr, actions_arr
 
 
-def train_model(states: np.ndarray, actions: np.ndarray) -> tuple[TinyPolicy, Dict[str, float]]:
-    states_norm = np.stack([normalize_state(s) for s in states], axis=0).astype(np.float32)
+def build_history_inputs(states: np.ndarray) -> np.ndarray:
+    states_norm = np.stack([normalize_state(state) for state in states], axis=0).astype(np.float32)
+    padded = np.repeat(states_norm[:1], HISTORY_LEN - 1, axis=0)
+    padded = np.concatenate([padded, states_norm], axis=0)
+    windows = []
+    for idx in range(len(states_norm)):
+        window = padded[idx : idx + HISTORY_LEN]
+        windows.append(window.reshape(-1))
+    return np.asarray(windows, dtype=np.float32)
+
+
+def train_model(history_inputs: np.ndarray, actions: np.ndarray) -> tuple[HistoryAwarePolicy, Dict[str, float]]:
     generator = torch.Generator().manual_seed(SEED)
     dataset = TensorDataset(
-        torch.tensor(states_norm, dtype=torch.float32),
+        torch.tensor(history_inputs, dtype=torch.float32),
         torch.tensor(actions, dtype=torch.float32),
     )
     loader = DataLoader(dataset, batch_size=256, shuffle=True, generator=generator)
 
-    model = TinyPolicy().to(DEVICE)
+    model = HistoryAwarePolicy(input_dim=int(history_inputs.shape[1])).to(DEVICE)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     loss_fn = nn.MSELoss()
 
@@ -160,15 +172,16 @@ def train_model(states: np.ndarray, actions: np.ndarray) -> tuple[TinyPolicy, Di
             count += x_batch.size(0)
         last_loss = total / max(1, count)
 
-    torch.save({"model_state": model.state_dict()}, MODEL_PATH)
+    torch.save({"model_state": model.state_dict(), "history_len": HISTORY_LEN}, MODEL_PATH)
     return model, {"train_loss": float(last_loss), "epochs": float(epochs)}
 
 
-def evaluate_model(model: TinyPolicy) -> tuple[Dict[str, float | int | bool | None], Dict[str, List[float]]]:
+def evaluate_model(model: HistoryAwarePolicy) -> tuple[Dict[str, float | int | bool | None], Dict[str, List[float]]]:
     env = make_env()
     set_default_start(env)
     obs = np.asarray(env._get_obs(), dtype=np.float32)
 
+    history = [np.asarray(normalize_state(obs), dtype=np.float32) for _ in range(HISTORY_LEN)]
     trace = {
         "step": [],
         "radius": [],
@@ -178,9 +191,11 @@ def evaluate_model(model: TinyPolicy) -> tuple[Dict[str, float | int | bool | No
     terminated = False
     truncated = False
     while not (terminated or truncated):
-        x = torch.tensor(normalize_state(obs), dtype=torch.float32, device=DEVICE).unsqueeze(0)
+        x = np.concatenate(history, axis=0).astype(np.float32)
+        x_tensor = torch.tensor(x, dtype=torch.float32, device=DEVICE).unsqueeze(0)
         with torch.no_grad():
-            action = torch.clamp(model(x), -1.0, 1.0).squeeze(0).cpu().numpy()
+            action = torch.clamp(model(x_tensor), -1.0, 1.0).squeeze(0).cpu().numpy()
+
         next_obs, _, terminated, truncated, info = env.step(action)
         radius = float(np.linalg.norm(env.pos))
         r_hat = env.pos / (radius + 1e-12)
@@ -189,7 +204,10 @@ def evaluate_model(model: TinyPolicy) -> tuple[Dict[str, float | int | bool | No
         trace["radius"].append(radius)
         trace["v_r"].append(v_r)
         success = success or bool(info.get("success", False))
+
         obs = np.asarray(next_obs, dtype=np.float32)
+        history.pop(0)
+        history.append(np.asarray(normalize_state(obs), dtype=np.float32))
 
     radius_arr = np.asarray(trace["radius"], dtype=np.float64)
     r_error = radius_arr - env.target_radius
@@ -218,18 +236,53 @@ def save_plot(path: Path, trace: Dict[str, List[float]], key: str, title: str, y
     plt.close()
 
 
+def write_note(summary: Dict[str, object]) -> None:
+    eval_metrics = summary["eval"]
+    crossing = bool(eval_metrics["crossing_occurs"])
+    if crossing:
+        implication = "Short-term state history is enough to recover target-radius crossing without oracle phase input under this baseline."
+        missing = "What is still missing is stronger implicit phase inference and post-crossing stabilization quality over the full insertion horizon."
+    else:
+        implication = "Short-term state history alone is not enough to recover target-radius crossing without oracle phase input under this baseline."
+        missing = "What is still missing is a representation that can infer and preserve the phase-structured control law from observation history alone."
+
+    lines = [
+        "# History-Aware Imitation Learning Result",
+        "",
+        "## Main Answer",
+        "",
+        f"- Does short-term history recover crossing without oracle phase input? `{'Yes' if crossing else 'No'}`",
+        "",
+        "## Interpretation",
+        "",
+        f"- {implication}",
+        f"- {missing}",
+        f"- This test used a fixed history length of `{HISTORY_LEN}` normalized states and no oracle phase label.",
+        "",
+        "## Metrics",
+        "",
+        f"- crossing_occurs `{eval_metrics['crossing_occurs']}`",
+        f"- radius_crossings_total `{eval_metrics['radius_crossings_total']}`",
+        f"- first_crossing_step `{eval_metrics['first_crossing_step']}`",
+        f"- success `{eval_metrics['success']}`",
+        f"- final_radius_error `{eval_metrics['final_radius_error']:.3e}`",
+    ]
+    NOTE_PATH.write_text("\n".join(lines), encoding="utf-8")
+
+
 def main() -> None:
     ensure_dir(OUTPUT_DIR)
     ensure_dir(MODEL_DIR)
     set_seed(SEED)
 
     states, actions = collect_dataset()
-    model, train_metrics = train_model(states, actions)
+    history_inputs = build_history_inputs(states)
+    model, train_metrics = train_model(history_inputs, actions)
     eval_metrics, trace = evaluate_model(model)
 
     env = make_env()
-    save_plot(RADIUS_PLOT_PATH, trace, "radius", "Minimal IL | radius vs time", "radius [m]", target_value=env.target_radius)
-    save_plot(VR_PLOT_PATH, trace, "v_r", "Minimal IL | v_r vs time", "v_r [m/s]", target_value=0.0)
+    save_plot(RADIUS_PLOT_PATH, trace, "radius", "History-aware IL | radius vs time", "radius [m]", target_value=env.target_radius)
+    save_plot(VR_PLOT_PATH, trace, "v_r", "History-aware IL | v_r vs time", "v_r [m/s]", target_value=0.0)
 
     summary = {
         "dataset_states_path": STATES_PATH.as_posix(),
@@ -242,6 +295,9 @@ def main() -> None:
             "r0_over_target": R0_OVER_TARGET,
             **STRICT_CFG,
         },
+        "history_len": HISTORY_LEN,
+        "input_dim": int(history_inputs.shape[1]),
+        "state_dim": int(states.shape[1]),
         "seed": SEED,
         "device": str(DEVICE),
         "num_samples": int(len(states)),
@@ -249,10 +305,12 @@ def main() -> None:
         "eval": eval_metrics,
     }
     SUMMARY_PATH.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    write_note(summary)
     print(json.dumps(summary, indent=2))
     print(f"Saved dataset to: {STATES_PATH} and {ACTIONS_PATH}")
     print(f"Saved model to: {MODEL_PATH}")
     print(f"Saved summary to: {SUMMARY_PATH}")
+    print(f"Saved note to: {NOTE_PATH}")
 
 
 if __name__ == "__main__":

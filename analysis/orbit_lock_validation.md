@@ -27,12 +27,12 @@
 
 - Can any controller achieve sustained orbit lock? `No`
 - Best controller under this setup: `explicit_orbit_lock`
-- What prevents stability after crossing: The controllers do not sustain phase-aware control after the first crossing, so the trajectory falls back into one-sided drift or a single-pass transit.
-- What control behavior is missing: The controllers do not sustain phase-aware control after the first crossing, so the trajectory falls back into one-sided drift or a single-pass transit.
+- What prevents stability after crossing: The explicit controller achieves a successful single-crossing insertion on this baseline, but it does not demonstrate repeated orbit-lock cycling across the target radius.
+- What control behavior is missing: The explicit controller achieves a successful single-crossing insertion on this baseline, but it does not demonstrate repeated orbit-lock cycling across the target radius.
 
 ## Diagnosis
 
-- No controller maintains tail crossings. The failure is not reachability anymore; it is post-crossing state regulation.
+- No controller shows repeated target crossings into the tail. Reachability is solved for the explicit controller, but repeated post-crossing cycling is still missing.
 - Probe crossing count: `1`
 - Explicit crossing count: `1`
 - PPO crossing count: `0`

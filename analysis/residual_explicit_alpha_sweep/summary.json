@@ -1,0 +1,86 @@
+{
+  "baseline_setup": {
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "max_steps": 100000,
+    "r0_over_target": 1.00005,
+    "tol_r": 0.001,
+    "tol_v": 0.001,
+    "tol_ang": 0.02,
+    "success_threshold": 200
+  },
+  "history_len": 4,
+  "seed": 7,
+  "device": "cuda",
+  "alphas": [
+    0.0,
+    0.02,
+    0.05,
+    0.1,
+    0.2
+  ],
+  "model": {
+    "model_path": "E:/spacecraft_ai_project/models/residual_explicit_il_policy.pth",
+    "loaded_checkpoint": true,
+    "checkpoint_history_len": 4,
+    "checkpoint_seed": 7,
+    "checkpoint_alpha": 0.2
+  },
+  "rows": [
+    {
+      "alpha": 0.0,
+      "success": true,
+      "crossing_occurs": true,
+      "radius_crossings_total": 1,
+      "first_crossing_step": 48269,
+      "final_radius_error": 27657.630859375,
+      "tail_mean_abs_vr": 48.41822733340298,
+      "mean_abs_residual": 0.0,
+      "max_abs_residual": 0.0
+    },
+    {
+      "alpha": 0.02,
+      "success": true,
+      "crossing_occurs": true,
+      "radius_crossings_total": 1,
+      "first_crossing_step": 48269,
+      "final_radius_error": 27657.630859375,
+      "tail_mean_abs_vr": 48.41822733340298,
+      "mean_abs_residual": 0.0,
+      "max_abs_residual": 0.0
+    },
+    {
+      "alpha": 0.05,
+      "success": true,
+      "crossing_occurs": true,
+      "radius_crossings_total": 1,
+      "first_crossing_step": 48269,
+      "final_radius_error": 27657.630859375,
+      "tail_mean_abs_vr": 48.41822733340298,
+      "mean_abs_residual": 0.0,
+      "max_abs_residual": 0.0
+    },
+    {
+      "alpha": 0.1,
+      "success": true,
+      "crossing_occurs": true,
+      "radius_crossings_total": 1,
+      "first_crossing_step": 48269,
+      "final_radius_error": 27657.630859375,
+      "tail_mean_abs_vr": 48.41822733340298,
+      "mean_abs_residual": 0.0,
+      "max_abs_residual": 0.0
+    },
+    {
+      "alpha": 0.2,
+      "success": true,
+      "crossing_occurs": true,
+      "radius_crossings_total": 1,
+      "first_crossing_step": 48269,
+      "final_radius_error": 27657.630859375,
+      "tail_mean_abs_vr": 48.41822733340298,
+      "mean_abs_residual": 0.0,
+      "max_abs_residual": 0.0
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "dataset_states_path": "E:/spacecraft_ai_project/analysis/history_aware_il/history_states.npy",
+  "dataset_actions_path": "E:/spacecraft_ai_project/analysis/history_aware_il/history_actions.npy",
+  "model_path": "E:/spacecraft_ai_project/models/history_aware_il_policy.pth",
+  "baseline_setup": {
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "max_steps": 100000,
+    "r0_over_target": 1.00005,
+    "tol_r": 0.001,
+    "tol_v": 0.001,
+    "tol_ang": 0.02,
+    "success_threshold": 200
+  },
+  "history_len": 4,
+  "input_dim": 20,
+  "state_dim": 5,
+  "seed": 7,
+  "device": "cuda",
+  "num_samples": 48458,
+  "train": {
+    "train_loss": 0.00011347234513359819,
+    "epochs": 60.0
+  },
+  "eval": {
+    "crossing_occurs": true,
+    "radius_crossings_total": 1,
+    "first_crossing_step": 40969,
+    "success": false,
+    "final_radius_error": 539199623.2773438
+  }
+}

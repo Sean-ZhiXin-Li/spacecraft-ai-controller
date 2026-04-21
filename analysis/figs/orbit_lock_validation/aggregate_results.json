@@ -13,7 +13,7 @@
     "tail_radius_std": 4030983.470561819,
     "tail_speed_cv": 0.9272018417286698,
     "amplitude_shrinks": true,
-    "mean_action_norm": 1.0000000001197977,
+    "mean_action_norm": 1.0000000001197975,
     "min_abs_radius_error": 3384.9326171875,
     "sustained_crossing_score": 0,
     "phase_transition_count": 0
@@ -51,7 +51,7 @@
     "tail_radius_std": 5149138.292046867,
     "tail_speed_cv": 0.16782426290431005,
     "amplitude_shrinks": true,
-    "mean_action_norm": 1.4142068641451953,
+    "mean_action_norm": 1.4142068641451948,
     "min_abs_radius_error": 374934550.67285156,
     "sustained_crossing_score": 0,
     "phase_transition_count": 0

@@ -217,14 +217,16 @@ def write_summary(rows: List[ValidationRow]) -> None:
     any_lock = any((row.radius_crossings_total >= 2 and row.tail_crosses_target_radius) for row in rows)
 
     if any_lock:
-        diagnosis = "At least one controller maintains target crossings into the tail, so orbit-lock-like behavior is present."
+        diagnosis = "At least one controller maintains repeated target crossings into the tail, so orbit-lock-like cycling is present."
     else:
-        diagnosis = "No controller maintains tail crossings. The failure is not reachability anymore; it is post-crossing state regulation."
+        diagnosis = "No controller shows repeated target crossings into the tail. Reachability is solved for the explicit controller, but repeated post-crossing cycling is still missing."
 
     if probe.radius_crossings_total > 0 and explicit.radius_crossings_total == 0:
         missing_behavior = "The explicit controller is missing enough inward energy-removal authority to reach the first crossing under this baseline."
     elif explicit.radius_crossings_total > 0 and not explicit.tail_crosses_target_radius:
         missing_behavior = "The explicit controller can cross but does not keep a phase-aware corrective cycle after crossing."
+    elif explicit.success:
+        missing_behavior = "The explicit controller achieves a successful single-crossing insertion on this baseline, but it does not demonstrate repeated orbit-lock cycling across the target radius."
     else:
         missing_behavior = "The controllers do not sustain phase-aware control after the first crossing, so the trajectory falls back into one-sided drift or a single-pass transit."
 

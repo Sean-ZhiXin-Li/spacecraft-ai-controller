@@ -19,16 +19,18 @@
     "LOCK"
   ],
   "phase_input_source": "explicit_controller_phase_oracle_at_eval",
+  "seed": 7,
+  "device": "cuda",
   "num_samples": 48458,
   "train": {
-    "train_loss": 0.0005782163551209542,
+    "train_loss": 0.0005150063798197435,
     "epochs": 60.0
   },
   "eval": {
     "crossing_occurs": true,
-    "radius_crossings_total": 1,
-    "first_crossing_step": 47987,
+    "radius_crossings_total": 2,
+    "first_crossing_step": 45465,
     "success": false,
-    "final_radius_error": 316723421.4658203
+    "final_radius_error": 101819624.52050781
   }
 }

@@ -22,4 +22,4 @@
 
 ## Diagnosis
 
-- The controllers do not sustain phase-aware control after the first crossing, so the trajectory falls back into one-sided drift or a single-pass transit.
+- The explicit controller achieves a successful single-crossing insertion on this baseline, but it does not demonstrate repeated orbit-lock cycling across the target radius.

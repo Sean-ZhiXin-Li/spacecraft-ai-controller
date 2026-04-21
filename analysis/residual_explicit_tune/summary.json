@@ -1,0 +1,190 @@
+{
+  "model_path": "E:/spacecraft_ai_project/models/residual_explicit_tuned_policy.pth",
+  "baseline_setup": {
+    "dt": 100.0,
+    "thrust_scale": 10000.0,
+    "max_steps": 100000,
+    "r0_over_target": 1.00005,
+    "tol_r": 0.001,
+    "tol_v": 0.001,
+    "tol_ang": 0.02,
+    "success_threshold": 200
+  },
+  "history_len": 4,
+  "alpha": 0.05,
+  "raw_residual_clip": 0.2,
+  "objective": {
+    "formula": "final_radius_error + 0.1 * tail_mean_abs_vr + 0.01 * mean_abs_residual",
+    "tail_vr_weight": 0.1,
+    "residual_norm_weight": 0.01
+  },
+  "optimization": {
+    "method": "deterministic_direct_rollout_bias_search",
+    "tune_lr": 0.02,
+    "num_update_attempts": 4,
+    "tuned_parameters": "final_output_bias_only",
+    "acceptance_rule": "preserve_explicit_success_and_improve_objective"
+  },
+  "seed": 7,
+  "device": "cuda",
+  "explicit_baseline": {
+    "success": true,
+    "crossing_occurs": true,
+    "radius_crossings_total": 1,
+    "first_crossing_step": 48269,
+    "final_radius_error": 27657.630859375,
+    "tail_mean_abs_vr": 48.41822733340298,
+    "mean_abs_residual": 0.0,
+    "max_abs_residual": 0.0,
+    "objective": 27662.47268210834
+  },
+  "tuned_eval": {
+    "success": true,
+    "crossing_occurs": true,
+    "radius_crossings_total": 1,
+    "first_crossing_step": 48269,
+    "final_radius_error": 27657.630859375,
+    "tail_mean_abs_vr": 48.41822733340298,
+    "mean_abs_residual": 0.0,
+    "max_abs_residual": 0.0,
+    "objective": 27662.47268210834
+  },
+  "best_objective": 27662.47268210834,
+  "best_bias": [
+    0.0,
+    0.0
+  ],
+  "best_metrics_during_tune": {
+    "success": true,
+    "crossing_occurs": true,
+    "radius_crossings_total": 1,
+    "first_crossing_step": 48269,
+    "final_radius_error": 27657.630859375,
+    "tail_mean_abs_vr": 48.41822733340298,
+    "mean_abs_residual": 0.0,
+    "max_abs_residual": 0.0,
+    "objective": 27662.47268210834
+  },
+  "optimization_history": [
+    {
+      "step": 0,
+      "candidate_bias": [
+        0.0,
+        0.0
+      ],
+      "accepted": true,
+      "reason": "zero_initialization",
+      "metrics": {
+        "success": true,
+        "crossing_occurs": true,
+        "radius_crossings_total": 1,
+        "first_crossing_step": 48269,
+        "final_radius_error": 27657.630859375,
+        "tail_mean_abs_vr": 48.41822733340298,
+        "mean_abs_residual": 0.0,
+        "max_abs_residual": 0.0,
+        "objective": 27662.47268210834
+      }
+    },
+    {
+      "step": 1,
+      "direction": [
+        1.0,
+        0.0
+      ],
+      "candidate_bias": [
+        0.02,
+        0.0
+      ],
+      "accepted": false,
+      "reason": "rejected_success_not_preserved",
+      "metrics": {
+        "success": false,
+        "crossing_occurs": false,
+        "radius_crossings_total": 0,
+        "first_crossing_step": null,
+        "final_radius_error": 376096062.3310547,
+        "tail_mean_abs_vr": 69.08916866035625,
+        "mean_abs_residual": 0.009999999776482582,
+        "max_abs_residual": 0.019999999552965164,
+        "objective": 376096069.2400716
+      }
+    },
+    {
+      "step": 2,
+      "direction": [
+        -1.0,
+        0.0
+      ],
+      "candidate_bias": [
+        -0.02,
+        0.0
+      ],
+      "accepted": false,
+      "reason": "rejected_success_not_preserved",
+      "metrics": {
+        "success": false,
+        "crossing_occurs": false,
+        "radius_crossings_total": 0,
+        "first_crossing_step": null,
+        "final_radius_error": 377951594.6591797,
+        "tail_mean_abs_vr": 72.60593654424494,
+        "mean_abs_residual": 0.009999999776482582,
+        "max_abs_residual": 0.019999999552965164,
+        "objective": 377951601.91987336
+      }
+    },
+    {
+      "step": 3,
+      "direction": [
+        0.0,
+        1.0
+      ],
+      "candidate_bias": [
+        0.0,
+        0.02
+      ],
+      "accepted": false,
+      "reason": "rejected_success_not_preserved",
+      "metrics": {
+        "success": false,
+        "crossing_occurs": false,
+        "radius_crossings_total": 0,
+        "first_crossing_step": null,
+        "final_radius_error": 381772664.2636719,
+        "tail_mean_abs_vr": 565.9270818482184,
+        "mean_abs_residual": 0.009999999776482582,
+        "max_abs_residual": 0.019999999552965164,
+        "objective": 381772720.85648006
+      }
+    },
+    {
+      "step": 4,
+      "direction": [
+        0.0,
+        -1.0
+      ],
+      "candidate_bias": [
+        0.0,
+        -0.02
+      ],
+      "accepted": false,
+      "reason": "rejected_success_not_preserved",
+      "metrics": {
+        "success": false,
+        "crossing_occurs": false,
+        "radius_crossings_total": 0,
+        "first_crossing_step": null,
+        "final_radius_error": 370538621.31640625,
+        "tail_mean_abs_vr": 558.3685257643538,
+        "mean_abs_residual": 0.009999999776482582,
+        "max_abs_residual": 0.019999999552965164,
+        "objective": 370538677.1533588
+      }
+    }
+  ],
+  "preserves_explicit_success": true,
+  "improves_final_radius_error": false,
+  "improves_tail_mean_abs_vr": false,
+  "destabilizes_controller": false
+}

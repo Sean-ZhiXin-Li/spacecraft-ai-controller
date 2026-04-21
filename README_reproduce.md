@@ -1,4 +1,14 @@
-# Reproducing the Key Result (Day5)
+# Reproducing the Historical Day5 Ablation Result
+
+This document is kept for the earlier action-interface ablation path.
+It does not describe the repository's current headline result.
+
+For the current validated explicit-controller result, use:
+
+- `README.md`
+- `analysis/final_project_summary.md`
+- `analysis/orbit_lock_benchmark.md`
+- `analysis/orbit_lock_generalization.md`
 
 This document provides a zero-ambiguity path to reproduce the key result reported in `analysis/ONE_PAGE_SUMMARY.md`.
 The goal is to allow any reviewer, judge, or collaborator to rerun the experiment and obtain the same conclusion.

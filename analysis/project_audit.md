@@ -1,41 +1,43 @@
 # Project Audit
 
-This audit focused on low-risk fixes that improve correctness, reproducibility, and trust without changing physics, controller structure, or PPO training.
+## Findings
 
-## Issues
+| Issue | Severity | Why it matters | Fix applied or not applied | Files involved |
+| --- | --- | --- | --- | --- |
+| Orbit-lock validation summaries contradicted their own metrics by saying no controller maintained tail crossings even when the explicit controller had `tail_crosses_target_radius = true` | high | This directly weakens trust in a current validation summary and blurs the distinction between single-crossing success and repeated cycling | Fixed in the generator and regenerated the affected summaries | `scripts/orbit_lock_validation.py`, `analysis/orbit_lock_validation.md`, `analysis/orbit_lock_phase_controller.md` |
+| `minimal_il_test.py` trained without explicit seeds or deterministic loader state | high | Re-running the same script could silently shift losses and evaluation metrics | Fixed by seeding Python, NumPy, and PyTorch, making the DataLoader shuffle deterministic, and recording seed and device metadata | `scripts/minimal_il_test.py`, `analysis/minimal_il/minimal_il_summary.json` |
+| `phase_aware_il_test.py` trained without explicit seeds or deterministic loader state | high | A current learning-result artifact had already drifted across reruns, which is a direct reproducibility problem | Fixed by adding the same deterministic seeding path and verifying stable repeated metrics after the fix | `scripts/phase_aware_il_test.py`, `analysis/phase_aware_il/phase_aware_il_summary.json`, `analysis/phase_aware_il_result.md` |
+| Phase-aware IL reporting did not clearly foreground oracle phase usage at evaluation time | high | Readers could otherwise over-credit the learned policy and misread the result as fully self-contained | Fixed by strengthening the generated note and preserving explicit metadata in the JSON summary | `scripts/phase_aware_il_test.py`, `analysis/phase_aware_il/phase_aware_il_summary.json`, `analysis/phase_aware_il_result.md` |
+| `README_reproduce.md` described an older Day5 ablation path like a current key-result entry | medium | This created a stale README-facing route that could confuse current project positioning | Fixed by marking it historical and pointing to the current explicit-controller evidence trail | `README_reproduce.md` |
 
-| Issue | Severity | Why it matters | Fix applied (or why not fixed) | File(s) involved |
-|---|---|---|---|---|
-| `day21` summary file was missing even though later work referenced it | high | This breaks the documentation trail and makes the validation stage look unverified | Re-ran the validation script and restored `analysis/day21_summary.md`; also updated the generator so future reruns preserve the radius-error and imitation-learning subsections | [scripts/day21_validation.py](../scripts/day21_validation.py), [analysis/day21_summary.md](./day21_summary.md) |
-| `orbit_lock_validation.py` still used an older baseline (`dt=50`, `thrust_scale=20000`) while the current verified benchmark/demo baseline uses `dt=100`, `thrust_scale=10000` | high | This created a baseline mismatch across scripts, summaries, and README-facing outputs | Aligned the validation script to the verified benchmark/demo baseline and regenerated the validation outputs | [scripts/orbit_lock_validation.py](../scripts/orbit_lock_validation.py), [analysis/orbit_lock_validation.md](./orbit_lock_validation.md), [analysis/orbit_lock_phase_controller.md](./orbit_lock_phase_controller.md) |
-| Phase-aware imitation results did not clearly disclose that evaluation used controller phases as an oracle input | medium | Without this note, the result can be misread as a fully self-contained learned controller | Added explicit metadata to the summary JSON and note; clarified that the learned model outputs the action but receives online phase labels from an explicit-controller phase oracle | [scripts/phase_aware_il_test.py](../scripts/phase_aware_il_test.py), [analysis/phase_aware_il_result.md](./phase_aware_il_result.md), [analysis/phase_aware_il/phase_aware_il_summary.json](./phase_aware_il/phase_aware_il_summary.json) |
-| Minimal IL summary did not record the exact baseline setup | medium | This made it harder to compare minimal IL and phase-aware IL on equal footing | Added `baseline_setup` metadata and regenerated the summary | [scripts/minimal_il_test.py](../scripts/minimal_il_test.py), [analysis/minimal_il/minimal_il_summary.json](./minimal_il/minimal_il_summary.json) |
-| Shared PPO checkpoint loader emitted noisy `torch.load` warnings in evaluation scripts | low | Warnings clutter output and make evaluation logs look unstable even when behavior is correct | Made checkpoint loading explicit with `weights_only=False` in shared evaluation paths used by PPO checkpoints | [scripts/day20_policy_surface.py](../scripts/day20_policy_surface.py), [scripts/eval_bc_policy.py](../scripts/eval_bc_policy.py), [scripts/recover_ppo_rollout.py](../scripts/recover_ppo_rollout.py) |
-| Phase-controller wording could overstate what “stabilize after crossing” means | low | The controller reaches strict success on the verified setup, but it still does not show repeated crossing cycles | Softened the phrasing to “stabilize after crossing into the target band” | [scripts/orbit_lock_validation.py](../scripts/orbit_lock_validation.py), [analysis/orbit_lock_phase_controller.md](./orbit_lock_phase_controller.md) |
+## What Was Checked
 
-## Highest-Priority Findings
+- Repository structure and current project narrative
+- `README.md`, `README_reproduce.md`, `main.py`
+- Current summary docs under `analysis/`
+- Priority scripts:
+  - `scripts/generate_orbit_demo.py`
+  - `scripts/orbit_lock_validation.py`
+  - `scripts/day21_validation.py`
+  - `scripts/minimal_il_test.py`
+  - `scripts/phase_aware_il_test.py`
+- README-facing demo assets and priority generated outputs
+- Markdown links in the checked Markdown set
+- Baseline constant consistency across the priority scripts
 
-1. The most important inconsistency was baseline drift across evaluation scripts. The project now has one clear validated comparison baseline for orbit-lock validation:
-   - `dt = 100`
-   - `max_steps = 100000`
-   - `r0_over_target = 1.00005`
-   - `thrust_scale = 10000`
+## What Was Intentionally Not Changed
 
-2. The most important learning-pipeline caveat was under-documented structural help in phase-aware IL. The current result is meaningful, but it depends on explicit phase labels at evaluation time and should be described that way.
+- Core physics equations
+- PPO training or checkpoints
+- Controller logic and reward design
+- Historical analysis scripts that are not part of the active presentation path
+- The current validated baseline:
+  - `dt = 100`
+  - `max_steps = 100000`
+  - `r0_over_target = 1.00005`
+  - `thrust_scale = 10000`
 
-3. The documentation chain is now complete again for the Day21 validation outputs:
-   - figures exist
-   - summary exists
-   - the summary now retains its diagnostic subsections on rerun
+## Residual Risks
 
-## What Was Intentionally Left Unchanged
-
-- Historical experiment scripts with older baselines were left in place. They document the project’s search process, and normalizing all of them to one baseline would blur provenance.
-- Physics, reward, controller structure, PPO training logic, and demo behavior were not changed.
-- Old output assets that are no longer central were not deleted. They are part of the experiment record and do not currently break README or the main demo path.
-
-## Current Trust Status
-
-- README-linked assets and analysis files referenced in the current presentation path exist.
-- The main demo path is consistent with the verified successful explicit-controller setup.
-- The benchmark, generalization, transfer, minimal IL, and phase-aware IL outputs now all describe their baseline or structural assumptions more clearly.
+- `analysis/final_project_summary.md` remains a manual narrative summary rather than the output of a single regeneration script. It still matches the active evidence chain, so it was left unchanged.
+- Historical docs in `analysis/WEEK*`, `analysis/NEW_WEEK_*`, and `analysis/ONE_PAGE_SUMMARY.md` remain in the repository. They are useful context, but they should not be treated as the active headline result unless explicitly marked as historical.

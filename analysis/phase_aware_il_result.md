@@ -6,13 +6,14 @@
 
 ## Interpretation
 
-- Adding phase information is enough to recover first crossing under this baseline, which implies that structural representation is the missing ingredient.
-- What is still missing is post-crossing stabilization quality, not the first transition itself.
+- With oracle phase labels provided online, the learned policy recovers target-radius crossing under this baseline.
+- What is still missing is self-contained phase inference and post-crossing stabilization quality, not only the first transition itself.
 - Evaluation uses the explicit controller only as a phase oracle to provide the phase one-hot input online; the learned model still produces the action itself.
+- This is therefore not a fully autonomous learned controller result yet.
 
 ## Metrics
 
 - crossing_occurs `True`
-- radius_crossings_total `1`
+- radius_crossings_total `2`
 - success `False`
-- final_radius_error `3.167e+08`
+- final_radius_error `1.018e+08`

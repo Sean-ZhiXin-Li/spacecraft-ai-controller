@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import random
 import sys
 from pathlib import Path
 from typing import Dict, List
@@ -33,6 +34,7 @@ VR_PLOT_PATH = OUTPUT_DIR / "phase_aware_il_v_r.png"
 NOTE_PATH = PROJECT_ROOT / "analysis" / "phase_aware_il_result.md"
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+SEED = 7
 DT = 100.0
 THRUST_SCALE = 10000.0
 MAX_STEPS = 100000
@@ -64,6 +66,17 @@ class PhaseAwarePolicy(nn.Module):
 
 def ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
+
+
+def set_seed(seed: int) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    if hasattr(torch.backends, "cudnn"):
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
 
 
 def make_env() -> OrbitEnv:
@@ -134,11 +147,12 @@ def collect_dataset() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 def train_model(states: np.ndarray, actions: np.ndarray, labels: np.ndarray) -> tuple[PhaseAwarePolicy, Dict[str, float]]:
     states_norm = np.stack([normalize_state(s) for s in states], axis=0).astype(np.float32)
     inputs = np.concatenate([states_norm, labels], axis=1).astype(np.float32)
+    generator = torch.Generator().manual_seed(SEED)
     dataset = TensorDataset(
         torch.tensor(inputs, dtype=torch.float32),
         torch.tensor(actions, dtype=torch.float32),
     )
-    loader = DataLoader(dataset, batch_size=256, shuffle=True)
+    loader = DataLoader(dataset, batch_size=256, shuffle=True, generator=generator)
 
     model = PhaseAwarePolicy().to(DEVICE)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
@@ -231,10 +245,10 @@ def write_note(summary: Dict[str, object]) -> None:
     eval_metrics = summary["eval"]
     crossing = bool(eval_metrics["crossing_occurs"])
     if crossing:
-        implication = "Adding phase information is enough to recover first crossing under this baseline, which implies that structural representation is the missing ingredient."
-        missing = "What is still missing is post-crossing stabilization quality, not the first transition itself."
+        implication = "With oracle phase labels provided online, the learned policy recovers target-radius crossing under this baseline."
+        missing = "What is still missing is self-contained phase inference and post-crossing stabilization quality, not only the first transition itself."
     else:
-        implication = "Adding phase information alone is not enough to recover first crossing under this baseline."
+        implication = "Even with oracle phase labels provided online, the learned policy does not recover target-radius crossing under this baseline."
         missing = "What is still missing is a representation or deployment mechanism that preserves the phase-conditioned control law over long horizons, not just access to a phase label at the network input."
 
     lines = [
@@ -249,6 +263,7 @@ def write_note(summary: Dict[str, object]) -> None:
         f"- {implication}",
         f"- {missing}",
         "- Evaluation uses the explicit controller only as a phase oracle to provide the phase one-hot input online; the learned model still produces the action itself.",
+        "- This is therefore not a fully autonomous learned controller result yet.",
         "",
         "## Metrics",
         "",
@@ -263,6 +278,7 @@ def write_note(summary: Dict[str, object]) -> None:
 def main() -> None:
     ensure_dir(OUTPUT_DIR)
     ensure_dir(MODEL_DIR)
+    set_seed(SEED)
 
     states, actions, labels = collect_dataset()
     model, train_metrics = train_model(states, actions, labels)
@@ -286,6 +302,8 @@ def main() -> None:
         },
         "phase_labels": PHASES,
         "phase_input_source": "explicit_controller_phase_oracle_at_eval",
+        "seed": SEED,
+        "device": str(DEVICE),
         "num_samples": int(len(states)),
         "train": train_metrics,
         "eval": eval_metrics,

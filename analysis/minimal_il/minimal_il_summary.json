@@ -12,9 +12,11 @@
     "tol_ang": 0.02,
     "success_threshold": 200
   },
+  "seed": 7,
+  "device": "cuda",
   "num_samples": 48458,
   "train": {
-    "train_loss": 0.00028383137762879587,
+    "train_loss": 0.00030948646601108544,
     "epochs": 60.0
   },
   "eval": {
@@ -22,6 +24,6 @@
     "radius_crossings_total": 0,
     "first_crossing_step": null,
     "success": false,
-    "final_radius_error": 374926365.8964844
+    "final_radius_error": 375032754.25390625
   }
 }

@@ -11,7 +11,7 @@
     "first_crossing_step": null,
     "final_radius_error": 1004006030.3447266,
     "tail_mean_abs_vr": 116.47903878337843,
-    "mean_action_norm": 0.9999999999700466
+    "mean_action_norm": 0.999999999970047
   },
   {
     "controller": "explicit_orbit_lock",
