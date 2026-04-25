@@ -189,7 +189,7 @@ Meaning:
 
 ---
 
-# Final Conclusion (Day 4)
+# Day 4 Milestone Conclusion
 
 > Reducing actor aggressiveness alone was insufficient.
 >

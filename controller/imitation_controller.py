@@ -1,5 +1,8 @@
 import joblib
 import numpy as np
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
 
 class ImitationController:
     """
@@ -9,7 +12,7 @@ class ImitationController:
 
     def __init__(self,
                  model_path="imitation_policy_model_V5.joblib",
-                 scaler_path="state_scaler_V5.joblib",
+                 scaler_path=BASE_DIR / "state_scaler_V5.joblib",
                  clip=True,
                  verbose=False):
         """

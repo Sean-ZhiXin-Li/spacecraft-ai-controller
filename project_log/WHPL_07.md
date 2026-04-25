@@ -147,7 +147,7 @@ Increasing thrust cannot overcome structural limitations in control policy.
 
 ---
 
-## 7. Final Conclusion of WHPL_07
+## 7. Milestone Conclusion of WHPL_07
 
 WHPL_07 successfully eliminates the hypothesis that failure is caused by insufficient thrust.
 

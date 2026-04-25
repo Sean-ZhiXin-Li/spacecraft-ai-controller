@@ -278,6 +278,27 @@ analysis/*.json
 !analysis/figs/
 !analysis/figs/*.png
 
+# README-linked 2D Phase 7 milestone artifacts
+!analysis/phase76_soft_hybrid/soft_hybrid_ranking.csv
+!analysis/phase76_soft_hybrid/soft_hybrid_comparison.png
+!analysis/phase76_soft_hybrid/soft_hybrid_success_map.png
+!analysis/phase7_pre_window_shaping/pre_window_ranking.csv
+!analysis/phase7_pre_window_shaping/best_prewindow_success_map.png
+!analysis/phase75_hybrid/hybrid_ranking.csv
+!analysis/phase75_hybrid/hybrid_vs_baseline.png
+
+# README-linked demo and benchmark artifacts
+!analysis/demo/orbit_demo.gif
+!analysis/demo/orbit_demo_full.png
+!analysis/demo/orbit_demo_trajectory.png
+!analysis/demo/orbit_demo_summary.json
+!analysis/figs/final_project/success_comparison.png
+!analysis/figs/final_project/radius_vs_time.png
+!analysis/figs/final_project/v_r_vs_time.png
+!analysis/figs/final_project/final_project_plot_summary.json
+!analysis/figs/orbit_lock_benchmark/*.json
+!analysis/figs/orbit_lock_generalization/*.json
+
 # logs
 *.log
 

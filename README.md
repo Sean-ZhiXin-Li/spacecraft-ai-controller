@@ -17,15 +17,15 @@ The current best verified result is not PPO. It is a hand-designed **phase-struc
 
 in sequence.
 
-## Final Project Status
+## Current 2D Phase 7 Milestone Status
 
-The current best controller is `soft_linear_3e4` from Phase 7.6:
+The current best 2D controller is `soft_linear_3e4` from Phase 7.6:
 
 - 217 / 270 strict successes
 - 217 CAPTURE entries
 - 8 near-misses
 
-This is the best verified result in the repository's 2D local orbit-insertion grid. It beats the prior references:
+This is the current 2D milestone result in the repository's local orbit-insertion grid. It beats the prior references:
 
 | Controller | Phase | Successes | CAPTURE entries | Near-misses |
 |---|---:|---:|---:|---:|
@@ -44,8 +44,10 @@ Primary Phase 7.6 artifacts:
 - [Phase 7.6 ranking](analysis/phase76_soft_hybrid/soft_hybrid_ranking.csv)
 - [Soft-hybrid comparison plot](analysis/phase76_soft_hybrid/soft_hybrid_comparison.png)
 - [Soft-hybrid success map](analysis/phase76_soft_hybrid/soft_hybrid_success_map.png)
+- [Project logs index](docs/project_logs_index.md)
+- [Repository organization audit](docs/audits/phase7_milestone_repo_audit.md)
 
-## Current Project Result
+## Current Milestone Result
 
 The project now has a **working explicit insertion controller family** whose best member is the Phase 7.6 soft hybrid. It reaches target-radius crossing, enters CAPTURE, and achieves strict success in 217 of the 270 tested local 2D regimes.
 
@@ -181,13 +183,13 @@ This project's main lesson is:
 
 ## Benchmark And Generalization
 
-### Final benchmark comparison
+### Earlier benchmark comparison
 
 Representative benchmark result summary:
 
 ![Success comparison](analysis/figs/final_project/success_comparison.png)
 
-This comparison plot shows strict success counts across the three representative benchmark setups used in the final benchmark pass.
+This comparison plot shows strict success counts across the three representative benchmark setups used in an earlier benchmark pass.
 
 More detail:
 
@@ -327,6 +329,13 @@ conda env create -f environment.yml
 conda activate spacecraft
 ```
 
+### Notes on PPO and Environment
+
+- The PPO controller requires a trained checkpoint (`ppo_orbit/ppo_best_model.pth`) and is not part of the current best-performing pipeline.
+- The current best result comes from explicit Phase 7.6 controller (`soft_linear_3e4`).
+- Any Python 3.10 environment with `numpy` and `matplotlib` is sufficient to run Phase 7 scripts.
+- The provided `environment.yml` is one recommended setup, but not strictly required.
+
 ## Reproducibility
 
 ### Generate the demo
@@ -375,7 +384,7 @@ If you want the shortest evidence trail, read:
 2. [project_log/pl27_phase76_soft_hybrid.md](project_log/pl27_phase76_soft_hybrid.md)
 3. [project_log/pl25_phase7_prewindow_shaping.md](project_log/pl25_phase7_prewindow_shaping.md)
 4. [project_log/pl24_phase67_adaptive_ws.md](project_log/pl24_phase67_adaptive_ws.md)
-5. [analysis/final_project_summary.md](analysis/final_project_summary.md) - older final presentation summary scoped to the earlier 2D insertion setting
+5. [analysis/final_project_summary.md](analysis/final_project_summary.md) - older milestone presentation summary scoped to an earlier 2D insertion setting
 6. [analysis/orbit_lock_benchmark.md](analysis/orbit_lock_benchmark.md)
 7. [analysis/ppo_transfer_results.md](analysis/ppo_transfer_results.md)
 
@@ -388,7 +397,7 @@ For the Phase 6.5-7.6 development trail, read:
 5. [project_log/pl26_phase75_hard_hybrid.md](project_log/pl26_phase75_hard_hybrid.md)
 6. [project_log/pl27_phase76_soft_hybrid.md](project_log/pl27_phase76_soft_hybrid.md)
 
-Key final plots:
+Key current milestone plots:
 
 - [Soft-hybrid comparison](analysis/phase76_soft_hybrid/soft_hybrid_comparison.png)
 - [Soft-hybrid success map](analysis/phase76_soft_hybrid/soft_hybrid_success_map.png)

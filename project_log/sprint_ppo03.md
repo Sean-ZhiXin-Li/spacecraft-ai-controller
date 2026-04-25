@@ -127,7 +127,7 @@ During testing, PPO produced:
 
 This is enough to conclude that the Day 3 objective was achieved.
 
-## Final Conclusion for Day 3
+## Day 3 Milestone Conclusion
 
 Day 3 is complete.
 

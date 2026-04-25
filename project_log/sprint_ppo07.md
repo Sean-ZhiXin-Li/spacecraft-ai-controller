@@ -113,7 +113,7 @@ However:
 
 ---
 
-### Final Conclusion
+### Sprint Milestone Conclusion
 
 > PPO discovers a stabilizing control mechanism (tangential thrust) that mitigates radial collapse, but this comes at the cost of slower radius convergence.
 

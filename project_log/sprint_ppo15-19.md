@@ -212,7 +212,7 @@ Result:
 
 ---
 
-## Final Conclusion (Day 15–19)
+## Day 15-19 Milestone Conclusion
 
 The PPO controller achieves:
 

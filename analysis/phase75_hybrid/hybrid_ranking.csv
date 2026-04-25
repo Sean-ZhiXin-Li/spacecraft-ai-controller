@@ -1,0 +1,4 @@
+rank,variant_name,switch_threshold,success_count,capture_count,lock_count,near_miss_count,mean_minimum_abs_radius_error,mean_tail_abs_vr,mean_steps
+1,hybrid_1e4,0.0001,170,170,170,42,131625586.57634187,117.4319307519268,73819.19259259259
+2,hybrid_3e4,0.0003,157,157,157,31,201118350.86276403,90.60644051034575,75134.0
+3,hybrid_2e4,0.0002,157,157,157,36,189617419.66627243,93.05623209051708,75134.0
