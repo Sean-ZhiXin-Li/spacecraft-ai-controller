@@ -280,3 +280,11 @@ analysis/*.json
 
 # logs
 *.log
+
+# Local analysis/render caches
+.matplotlib/
+**/.matplotlib/
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+*.tmp
+*.temp

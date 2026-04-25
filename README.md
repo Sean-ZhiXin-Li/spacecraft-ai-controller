@@ -10,32 +10,64 @@ This repository compares three control families under the same orbital environme
 
 The current best verified result is not PPO. It is a hand-designed **phase-structured explicit controller** that performs:
 
-1. `DESCENT`
-2. `CAPTURE`
-3. `LOCK`
+1. pre-window trajectory shaping
+2. window-seeking
+3. `CAPTURE`
+4. `LOCK`
 
 in sequence.
 
+## Final Project Status
+
+The current best controller is `soft_linear_3e4` from Phase 7.6:
+
+- 217 / 270 strict successes
+- 217 CAPTURE entries
+- 8 near-misses
+
+This is the best verified result in the repository's 2D local orbit-insertion grid. It beats the prior references:
+
+| Controller | Phase | Successes | CAPTURE entries | Near-misses |
+|---|---:|---:|---:|---:|
+| `adaptive_soft` | 6.7 | 172 | 172 | 44 |
+| `prewindow_radial_medium` | 7.0 | 209 | 209 | 56 |
+| `hard_hybrid_1e4` | 7.5 | 170 | 170 | 42 |
+| `soft_linear_3e4` | 7.6 | 217 | 217 | 8 |
+
+Core conclusion:
+
+> Orbit insertion in this 2D setting is not solved by reactive learning or static gain tuning. It requires phase-structured continuous coordination: pre-window shaping + window-seeking + capture/lock stabilization.
+
+Primary Phase 7.6 artifacts:
+
+- [Phase 7.6 summary](analysis/phase76_soft_hybrid/phase76_summary.md)
+- [Phase 7.6 ranking](analysis/phase76_soft_hybrid/soft_hybrid_ranking.csv)
+- [Soft-hybrid comparison plot](analysis/phase76_soft_hybrid/soft_hybrid_comparison.png)
+- [Soft-hybrid success map](analysis/phase76_soft_hybrid/soft_hybrid_success_map.png)
+
 ## Current Project Result
 
-The project now has a **working explicit insertion controller** that reaches a real target-radius crossing and achieves strict success in a narrow but real reachable regime.
+The project now has a **working explicit insertion controller family** whose best member is the Phase 7.6 soft hybrid. It reaches target-radius crossing, enters CAPTURE, and achieves strict success in 217 of the 270 tested local 2D regimes.
 
 What is supported by the repository outputs:
 
 - PPO baseline does not reach the first crossing on the validated baseline.
 - A pure retrograde probe can force one crossing, but does not stabilize afterward.
-- The explicit phase controller is the only controller here that both:
-  - reaches the first crossing
-  - satisfies the project's strict success criterion in successful setups
+- Explicit phase-structured controllers are the only controllers here that both:
+  - reach the first crossing
+  - satisfy the project's strict success criterion in successful setups
+  - improve substantially when pre-window shaping and window-seeking are continuously coordinated
 
 What is **not** currently supported:
 
 - repeated sustained orbit-lock cycling across the target radius
 - successful PPO transfer of the explicit phase structure
+- claims beyond the tested 2D local grid
 
 Those statements are grounded in:
 
 - [analysis/final_project_summary.md](analysis/final_project_summary.md)
+- [analysis/phase76_soft_hybrid/phase76_summary.md](analysis/phase76_soft_hybrid/phase76_summary.md)
 - [analysis/orbit_lock_benchmark.md](analysis/orbit_lock_benchmark.md)
 - [analysis/orbit_lock_generalization.md](analysis/orbit_lock_generalization.md)
 - [analysis/ppo_transfer_results.md](analysis/ppo_transfer_results.md)
@@ -46,6 +78,8 @@ Orbit insertion in this system is not a single continuous control problem.
 
 It is a **phase-structured process** requiring:
 
+- pre-window trajectory shaping
+- window-seeking near target radius
 - energy removal (descent)
 - post-crossing capture
 - near-orbit stabilization
@@ -211,6 +245,50 @@ Relevant files:
 - [analysis/ppo_transfer_results.md](analysis/ppo_transfer_results.md)
 - [analysis/phase_controller_dataset/phase_controller_dataset_balanced.npz](analysis/phase_controller_dataset/phase_controller_dataset_balanced.npz)
 
+## Phase 3 Hybrid Residual Status
+
+Phase 3 tested whether learning can safely refine the explicit controller without replacing its control structure.
+
+Current result:
+
+- zero-residual hybrid exactly preserves explicit-controller success
+- alpha sweep shows no behavioral change when the residual output is zero
+- tiny unconstrained nonzero residual tuning harmed success
+- magnitude-only residual keeps the explicit action direction, but nonzero magnitude bias did not improve the accepted checkpoint
+
+The Phase 3 conclusion is conservative: hybrid learning should preserve the explicit controller as the primary structure and only accept residual authority when rollout evidence shows both success preservation and objective improvement.
+
+See:
+
+- [analysis/residual_explicit_il_result.md](analysis/residual_explicit_il_result.md)
+- [analysis/residual_explicit_alpha_sweep_result.md](analysis/residual_explicit_alpha_sweep_result.md)
+- [analysis/residual_explicit_tune_result.md](analysis/residual_explicit_tune_result.md)
+- [analysis/residual_explicit_magnitude_only_result.md](analysis/residual_explicit_magnitude_only_result.md)
+
+## Current 2D Deep-Dive Diagnostics
+
+The latest same-scenario explicit-controller diagnostics characterize the local basin, timestep sensitivity, perturbation robustness, and phase-wise mechanism without changing the core 2D problem.
+
+Key artifacts:
+
+- [analysis/final_phase3_summary_v2.md](analysis/final_phase3_summary_v2.md)
+- [analysis/final_phase3_audit_v2.md](analysis/final_phase3_audit_v2.md)
+- [analysis/phase_map_v2/phase_map_v2.csv](analysis/phase_map_v2/phase_map_v2.csv)
+- [analysis/phase_map_v2/success_heatmap_v2.png](analysis/phase_map_v2/success_heatmap_v2.png)
+- [analysis/phase_map_v2/boundary_refine_summary_v2.md](analysis/phase_map_v2/boundary_refine_summary_v2.md)
+- [analysis/dt_mechanism/dt_mechanism_summary.md](analysis/dt_mechanism/dt_mechanism_summary.md)
+- [analysis/phase4_regime/phase4_regime_summary.md](analysis/phase4_regime/phase4_regime_summary.md)
+- [analysis/phase5_reachability_summary.md](analysis/phase5_reachability_summary.md)
+- [analysis/mechanism_compare_v2/mechanism_compare_summary_v2.md](analysis/mechanism_compare_v2/mechanism_compare_summary_v2.md)
+- [analysis/phase_map/phase_map.csv](analysis/phase_map/phase_map.csv)
+- [analysis/phase_map/success_heatmap.png](analysis/phase_map/success_heatmap.png)
+- [analysis/phase_map/boundary_refine_summary.md](analysis/phase_map/boundary_refine_summary.md)
+- [analysis/mechanism_compare/mechanism_compare_summary.md](analysis/mechanism_compare/mechanism_compare_summary.md)
+- [analysis/mechanism_compare/phase_duration_table.json](analysis/mechanism_compare/phase_duration_table.json)
+- [analysis/robustness_quick_check.md](analysis/robustness_quick_check.md)
+- [analysis/final_phase3_summary.md](analysis/final_phase3_summary.md)
+- [analysis/next_stage_recommendation.md](analysis/next_stage_recommendation.md)
+
 ## Repository Structure
 
 ```text
@@ -293,10 +371,29 @@ python scripts/eval_bc_policy.py --policy-kind ppo --checkpoint models/ppo_bc_fi
 
 If you want the shortest evidence trail, read:
 
-1. [analysis/final_project_summary.md](analysis/final_project_summary.md)  -(final presentation summary — scoped to the 2D insertion setting)
-2. [analysis/orbit_lock_benchmark.md](analysis/orbit_lock_benchmark.md)
-3. [analysis/orbit_lock_generalization.md](analysis/orbit_lock_generalization.md)
-4. [analysis/ppo_transfer_results.md](analysis/ppo_transfer_results.md)
+1. [analysis/phase76_soft_hybrid/phase76_summary.md](analysis/phase76_soft_hybrid/phase76_summary.md)
+2. [project_log/pl27_phase76_soft_hybrid.md](project_log/pl27_phase76_soft_hybrid.md)
+3. [project_log/pl25_phase7_prewindow_shaping.md](project_log/pl25_phase7_prewindow_shaping.md)
+4. [project_log/pl24_phase67_adaptive_ws.md](project_log/pl24_phase67_adaptive_ws.md)
+5. [analysis/final_project_summary.md](analysis/final_project_summary.md) - older final presentation summary scoped to the earlier 2D insertion setting
+6. [analysis/orbit_lock_benchmark.md](analysis/orbit_lock_benchmark.md)
+7. [analysis/ppo_transfer_results.md](analysis/ppo_transfer_results.md)
+
+For the Phase 6.5-7.6 development trail, read:
+
+1. [project_log/pl22_phase65_window_seeking.md](project_log/pl22_phase65_window_seeking.md)
+2. [project_log/pl23_phase66_ws1_refine.md](project_log/pl23_phase66_ws1_refine.md)
+3. [project_log/pl24_phase67_adaptive_ws.md](project_log/pl24_phase67_adaptive_ws.md)
+4. [project_log/pl25_phase7_prewindow_shaping.md](project_log/pl25_phase7_prewindow_shaping.md)
+5. [project_log/pl26_phase75_hard_hybrid.md](project_log/pl26_phase75_hard_hybrid.md)
+6. [project_log/pl27_phase76_soft_hybrid.md](project_log/pl27_phase76_soft_hybrid.md)
+
+Key final plots:
+
+- [Soft-hybrid comparison](analysis/phase76_soft_hybrid/soft_hybrid_comparison.png)
+- [Soft-hybrid success map](analysis/phase76_soft_hybrid/soft_hybrid_success_map.png)
+- [Best pre-window success map](analysis/phase7_pre_window_shaping/best_prewindow_success_map.png)
+- [Hard-hybrid comparison](analysis/phase75_hybrid/hybrid_vs_baseline.png)
 
 ## Future Directions
 

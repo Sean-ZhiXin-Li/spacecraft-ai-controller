@@ -122,17 +122,31 @@ The explicit controller is now the correct benchmark target for learning transfe
 
 ## Learning Transfer
 
-The next learning step should not be raw PPO retraining.
+The first learning-transfer stage has now been run.
 
-Correct path:
+Completed path:
 1. behavior cloning from the explicit controller
-2. PPO fine-tuning after cloning reproduces first crossing
-3. optional phase-aligned reward shaping only later if needed
+2. short PPO fine-tuning from the cloned policy
+3. fixed-baseline comparison against the explicit controller and probe
 
-Why:
-- the explicit controller already contains the missing structure
-- the dataset now exposes both actions and phase labels
-- cloning gives PPO a structured starting point instead of expecting it to discover phases from sparse interaction
+Result:
+- behavior cloning did not reproduce the first crossing on rollout
+- short PPO fine-tuning from the cloned policy also did not recover first crossing
+- the explicit controller remains the only fully successful controller in the validated comparison
+
+This means the repository should not return to blind PPO retraining. Any later learned controller should keep the explicit phase structure visible, constrained, or directly supervised.
+
+## Phase 3 Hybrid Residual Result
+
+Phase 3 tested hybrid residual learning around the explicit controller.
+
+Completed residual tests:
+- zero-residual hybrid exactly preserved explicit-controller success
+- alpha sweep showed no change because the residual policy output remained zero
+- tiny unconstrained nonzero residual tuning harmed success
+- magnitude-only residual preserved the accepted zero-residual checkpoint, but nonzero magnitude bias did not improve the rollout objective
+
+Phase 3 did not prove a useful learned residual. It did show that the safe hybrid design principle is to preserve explicit structure first and reject residual authority unless it improves rollout metrics without losing success.
 
 ## Dataset
 
@@ -162,9 +176,10 @@ The explicit controller works because it encodes descent, capture, and lock as s
 
 ## Recommended Next Step
 
-Train a behavior-cloned policy from the **balanced phase-controller dataset**, then benchmark that cloned policy against:
-- explicit controller
-- probe controller
-- PPO baseline
+Move beyond single-regime 2D validation by testing the explicit phase structure across multiple 2D orbit regimes before moving to 3D or systems integration.
 
-Only after cloning preserves first crossing and capture behavior should PPO fine-tuning begin.
+The immediate next target should be multi-orbit / multi-regime generalization:
+- keep physics and controller structure explicit
+- vary initial radius offset, target radius, thrust, and timestep in controlled regimes
+- measure where the phase controller succeeds, where it fails, and which failure modes are structural
+- only revisit learned residuals after the successful/failing regimes are mapped clearly

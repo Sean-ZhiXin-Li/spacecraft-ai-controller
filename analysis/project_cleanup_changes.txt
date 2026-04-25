@@ -1,0 +1,29 @@
+Phase 3 final cleanup changes
+=============================
+
+Applied:
+- Added shared explicit-controller analysis utilities in `scripts/explicit_controller_analysis_utils.py`.
+- Added and ran `scripts/explicit_controller_phase_map.py`.
+- Added and ran `scripts/explicit_controller_boundary_refine.py`.
+- Added and ran `scripts/explicit_controller_mechanism_compare.py`.
+- Added and ran `scripts/explicit_controller_robustness_quick_check.py`.
+- Generated final phase-map outputs under `analysis/phase_map/`.
+- Generated mechanism-comparison outputs under `analysis/mechanism_compare/`.
+- Generated `analysis/robustness_quick_check.md`.
+- Updated `README.md` to point at the current final Phase 3 diagnostics.
+- Removed the heavy Monte Carlo script and partial Monte Carlo output from the current working set after the task scope changed to no heavy Monte Carlo.
+- Wrote `analysis/project_audit_phase3_final.md`.
+- Wrote `analysis/final_phase3_summary.md`.
+- Wrote `analysis/next_stage_recommendation.md`.
+
+Verified:
+- Local Markdown links in `README.md`, `README_reproduce.md`, and top-level `analysis/*.md` have no missing local targets.
+- Active explicit/residual scripts use the validated baseline constants where applicable.
+- Required final Phase 3 outputs exist on disk.
+- New scripts compile under the `spacecraft` Conda environment.
+
+Not changed:
+- Environment physics.
+- Explicit controller design.
+- PPO checkpoints or PPO training.
+- Historical notes and older exploratory outputs.

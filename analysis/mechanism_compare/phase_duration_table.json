@@ -1,0 +1,80 @@
+[
+  {
+    "case": "validated_success",
+    "spec": {
+      "case": "validated_success",
+      "r0_over_target": 1.00005,
+      "dt": 100.0,
+      "seed": 7
+    },
+    "metrics": {
+      "success": true,
+      "crossing_occurs": true,
+      "radius_crossings_total": 1,
+      "first_crossing_step": 48269,
+      "final_radius_error": 27657.630859375,
+      "tail_mean_abs_vr": 48.41822733340298,
+      "steps": 48496,
+      "terminated": true,
+      "truncated": false,
+      "phase_transition_count": 2
+    },
+    "phase_durations": {
+      "DESCENT": 48276,
+      "CAPTURE": 17,
+      "LOCK": 203
+    }
+  },
+  {
+    "case": "near_boundary_failure",
+    "spec": {
+      "case": "near_boundary_failure",
+      "r0_over_target": 1.00006,
+      "dt": 100.0,
+      "seed": 7
+    },
+    "metrics": {
+      "success": false,
+      "crossing_occurs": false,
+      "radius_crossings_total": 0,
+      "first_crossing_step": null,
+      "final_radius_error": 44008088.39355469,
+      "tail_mean_abs_vr": 30.153458482676466,
+      "steps": 100000,
+      "terminated": false,
+      "truncated": true,
+      "phase_transition_count": 0
+    },
+    "phase_durations": {
+      "DESCENT": 100000,
+      "CAPTURE": 0,
+      "LOCK": 0
+    }
+  },
+  {
+    "case": "dt_induced_failure",
+    "spec": {
+      "case": "dt_induced_failure",
+      "r0_over_target": 1.00005,
+      "dt": 200.0,
+      "seed": 7
+    },
+    "metrics": {
+      "success": false,
+      "crossing_occurs": false,
+      "radius_crossings_total": 0,
+      "first_crossing_step": null,
+      "final_radius_error": 541704950.0996094,
+      "tail_mean_abs_vr": 242.2208993356387,
+      "steps": 100000,
+      "terminated": false,
+      "truncated": true,
+      "phase_transition_count": 0
+    },
+    "phase_durations": {
+      "DESCENT": 100000,
+      "CAPTURE": 0,
+      "LOCK": 0
+    }
+  }
+]
