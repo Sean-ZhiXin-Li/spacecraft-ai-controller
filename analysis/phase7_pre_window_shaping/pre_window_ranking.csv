@@ -1,0 +1,7 @@
+rank,variant_name,schedule,success_count,capture_count,lock_count,near_miss_count,mean_minimum_abs_radius_error,mean_tail_abs_vr,mean_steps,gained_vs_original,lost_vs_original,retained_vs_original,gained_vs_adaptive_soft,lost_vs_adaptive_soft,retained_vs_adaptive_soft
+1,prewindow_radial_medium,soft_rerr+prewindow_radial,209,209,209,56,18931369.527430557,105.7664504068285,71250.43703703703,60,8,149,44,7,165
+2,prewindow_radial_light,soft_rerr+prewindow_radial,178,178,178,68,55533328.69727647,104.18506313411064,72674.44814814815,32,11,146,15,9,163
+3,prewindow_energy_guided,soft_rerr+prewindow_energy,177,177,177,21,168723130.19425637,84.20946119654405,74360.45555555556,30,10,147,24,19,153
+4,prewindow_geometry_guided,soft_rerr+prewindow_geometry,176,176,176,73,65762942.269191265,94.0876831207827,72502.51481481481,28,9,148,18,14,158
+5,adaptive_soft,soft_rerr,172,172,172,44,128168847.30628979,89.1158082448999,74138.71851851852,29,14,143,0,0,172
+6,original_ws1,fixed_0p70,157,157,157,42,164541548.2449906,110.32186710489496,75642.39259259259,0,0,157,14,29,143
