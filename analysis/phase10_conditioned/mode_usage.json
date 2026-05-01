@@ -1,0 +1,44 @@
+{
+  "case_counts": {
+    "angle_misaligned": 24,
+    "inner_orbit": 12,
+    "near_window": 12,
+    "outer_orbit": 24
+  },
+  "descent_step_counts": {
+    "angle_misaligned": 1867180,
+    "inner_orbit": 85,
+    "near_window": 2188,
+    "outer_orbit": 532820
+  },
+  "success_by_mode": {
+    "angle_misaligned": {
+      "capture_rate": 0.0,
+      "captures": 0,
+      "cases_triggered": 24,
+      "success_rate": 0.0,
+      "successes": 0
+    },
+    "inner_orbit": {
+      "capture_rate": 0.0,
+      "captures": 0,
+      "cases_triggered": 12,
+      "success_rate": 0.0,
+      "successes": 0
+    },
+    "near_window": {
+      "capture_rate": 1.0,
+      "captures": 12,
+      "cases_triggered": 12,
+      "success_rate": 1.0,
+      "successes": 12
+    },
+    "outer_orbit": {
+      "capture_rate": 0.0,
+      "captures": 0,
+      "cases_triggered": 24,
+      "success_rate": 0.0,
+      "successes": 0
+    }
+  }
+}

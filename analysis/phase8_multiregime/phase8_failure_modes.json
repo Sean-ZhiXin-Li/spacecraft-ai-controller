@@ -1,0 +1,14 @@
+{
+  "by_controller": {
+    "soft_linear_3e4": {
+      "near_miss": 68,
+      "no_capture_access": 1008
+    }
+  },
+  "failure_count": 1076,
+  "failure_modes": {
+    "near_miss": 68,
+    "no_capture_access": 1008
+  },
+  "total_rows": 1296
+}

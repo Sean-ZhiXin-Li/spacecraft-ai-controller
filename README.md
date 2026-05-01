@@ -404,6 +404,11 @@ Key current milestone plots:
 - [Best pre-window success map](analysis/phase7_pre_window_shaping/best_prewindow_success_map.png)
 - [Hard-hybrid comparison](analysis/phase75_hybrid/hybrid_vs_baseline.png)
 
+Phase 8 begins testing whether the Phase 7.6 soft-hybrid structure generalizes across a wider 2D regime map:
+
+- [Phase 8 multi-regime summary](analysis/phase8_multiregime/phase8_summary.md)
+- [Phase 8-19 research summary](analysis/phase8_to_19_research_summary.md): failed global-reachability attempts and motivation for predictive planning.
+
 ## Future Directions
 
 This project currently focuses on a simplified 2D orbital insertion setting to isolate control structure and learning behavior.
