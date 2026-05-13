@@ -14,6 +14,72 @@ crossing -> post-cross smooth synchronization -> recoverability basin -> surviva
 
 Phase34 is the current architecture breakthrough. It does not solve the entire orbital insertion problem, and it is not a real spacecraft controller. It shows that, for trajectory families that already produce a target-radius crossing, adding a post-cross synchronization mode can convert those crossings into recoverable cases.
 
+## Demo & Visual Overview
+
+The fastest way to understand this repository is to inspect the insertion event directly. The demo below shows a successful explicit-controller sandbox insertion sequence. It is control-architecture evidence from a 2D simulator, not flight validation.
+
+Verified demo summary:
+
+- success: `true`
+- radius crossings: `1`
+- first crossing step: `48,269`
+- final radius error: `27,657.63 m`
+- phase transitions: `DESCENT -> CAPTURE`, `CAPTURE -> LOCK`
+
+### Primary Insertion Event
+
+![Primary insertion event](analysis/demo/orbit_demo_trajectory.png)
+
+### Dynamic Zoomed Insertion Window
+
+![Zoomed insertion GIF](analysis/demo/orbit_demo_zoom.gif)
+
+### Full Trajectory Reference
+
+![Full trajectory reference](analysis/demo/orbit_demo_full.png)
+
+## Visual Interpretation
+
+These visuals represent the core control-science distinction explored throughout this project:
+
+- Crossing target radius is not equivalent to orbital insertion.
+- A trajectory may visually "reach" the orbit but still fail recoverability.
+- The important structure is:
+
+```text
+crossing -> post-cross correction -> recoverability -> CAPTURE -> LOCK
+```
+
+Interpretation of the simulator labels:
+
+- Crossing: a geometric event where the trajectory crosses the target radius.
+- Recoverability: dynamic viability, where radius, radial velocity, and tangential velocity can be brought into a survivable basin.
+- CAPTURE: the simulator insertion regime has been entered.
+- LOCK: the simulator stabilized regime has been entered.
+
+What to look for in weaker architectures such as PPO and early heuristics:
+
+- radius approach without stable insertion
+- one-sided drift
+- unstable or non-recoverable crossing
+
+What to look for in stronger architectures such as Phase34 post-cross synchronization:
+
+- crossing-producing transfer
+- smooth post-cross correction
+- radius, radial-velocity, and tangential-velocity synchronization
+- recoverable trajectory family
+
+## Why This Matters
+
+This repository is not primarily about making a spacecraft touch a target orbit.
+
+It is about understanding:
+
+> What control architecture converts geometric success into dynamically survivable insertion?
+
+The visuals above should be interpreted as control-architecture evidence, not flight-readiness evidence.
+
 ## Project Overview
 
 The project tests control architectures in a simplified planar orbital environment. The environment tracks radius, radial velocity, tangential velocity, thrust-limited control, target-radius crossing, CAPTURE, LOCK, and survival-style success criteria.
