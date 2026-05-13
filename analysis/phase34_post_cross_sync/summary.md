@@ -9,7 +9,7 @@
 
 ## Results
 
-| Controller/mode | Cases | Crossings | Recoverable states | Recoverable crossings | CAPTURE | LOCK | Success | Mean crossing sync | Crossing-case best sync | Crossing-case best distance | All-case best distance | Overspeed |
+| Controller/mode | Cases | Crossings | Recoverable states | Recoverable crossings | CAPTURE | LOCK | Success | Mean crossing sync | Crossing-case best sync | Crossing-case best distance | Finite-row best distance | Overspeed |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | `none` | 24 | 8 | 0 | 0 | 8 | 8 | 8 | 3.8769 | nan | 3.9923 | 3.9923 | 0 |
 | `radius_priority` | 24 | 8 | 8 | 8 | 8 | 8 | 8 | 3.2940 | 0.9855 | 0.9855 | 8.3901 | 0 |
@@ -27,6 +27,7 @@
 ## Honesty Note
 
 - This script does not claim the first crossing itself is recoverable. `recoverable_crossing` means crossing occurred and the post-cross synchronization arc later reached a recoverable state.
-- All-case mean distance includes non-crossing families, which Phase 34 deliberately does not solve. Crossing-case best distance is the primary Phase 34 diagnostic.
+- For Phase34 modes, finite-row best distance includes all 24 cases. For the imported Phase31/`none` reference, only the 8 crossing rows have finite best-distance values, so its finite-row value is effectively a crossing-row mean.
+- Crossing-case best distance is the primary Phase34 diagnostic. Non-crossing families remain outside this phase's scope.
 - CAPTURE and LOCK thresholds are not relaxed.
 - If recoverable crossings do not improve, the conclusion is that optimal structure exists but this heuristic imitation is insufficient.
