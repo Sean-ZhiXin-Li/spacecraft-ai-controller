@@ -14,6 +14,8 @@ The tested structure was:
 
 `crossing -> post-cross smooth synchronization -> recoverability basin -> CAPTURE -> LOCK`
 
+CAPTURE and LOCK are simulator state-machine labels in this 2D sandbox, not real flight-validation states.
+
 ## 2. Background
 
 Phase31 demonstrated that the explicit transfer stack could create crossings on the reduced benchmark, but those crossings were not dynamically recoverable. In the Phase31 reference set, 8 of 24 cases crossed the target radius, yet 0 of those crossings reached the recoverability basin.

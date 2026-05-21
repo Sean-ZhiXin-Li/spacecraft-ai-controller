@@ -12,11 +12,11 @@ Successful insertion in this sandbox requires:
 crossing -> post-cross smooth synchronization -> recoverability basin -> survival
 ```
 
-Phase34 is the current architecture breakthrough. It does not solve the entire orbital insertion problem, and it is not a real spacecraft controller. It shows that, for trajectory families that already produce a target-radius crossing, adding a post-cross synchronization mode can convert those crossings into recoverable cases.
+Phase34 is the current architecture result. It does not solve the entire orbital insertion problem, and it is not a real spacecraft controller. It shows that, for trajectory families that already produce a target-radius crossing, adding a post-cross synchronization mode can convert those crossings into recoverable cases.
 
 ## Demo & Visual Overview
 
-The fastest way to understand this repository is to inspect the insertion event directly. The demo below shows a successful explicit-controller sandbox insertion sequence. It is control-architecture evidence from a 2D simulator, not flight validation.
+The fastest way to understand this repository is to inspect the insertion event directly. The demo below shows a simulator-successful explicit-controller sandbox insertion sequence. It is control-architecture evidence from a 2D simulator, not flight validation.
 
 Verified demo summary:
 
@@ -82,7 +82,7 @@ The visuals above should be interpreted as control-architecture evidence, not fl
 
 ## Project Overview
 
-The project tests control architectures in a simplified planar orbital environment. The environment tracks radius, radial velocity, tangential velocity, thrust-limited control, target-radius crossing, CAPTURE, LOCK, and survival-style success criteria.
+The project tests control architectures in a simplified planar orbital environment. The environment tracks radius, radial velocity, tangential velocity, thrust-limited control, target-radius crossing, CAPTURE, LOCK, and simulator-defined survival criteria.
 
 The main controller families explored so far are:
 
@@ -134,7 +134,7 @@ The project's development path can be read as a sequence of increasingly specifi
 
 Early PPO and baseline experiments tested whether a learned reactive policy could solve insertion directly. In the validated comparisons, PPO did not reliably reach the first crossing. Behavior cloning and short PPO fine-tuning from explicit-controller data also failed to recover the explicit phase structure. This suggested that the problem was not just reward tuning or model capacity; it had an architecture-level bottleneck.
 
-Phase6.5 through Phase7.6 established that explicit phase structure matters in the local reachable regime. The best Phase7.6 controller, `soft_linear_3e4`, used coordinated pre-window shaping, window-seeking, CAPTURE, and LOCK behavior and reached `217 / 270` strict successes on its local 2D grid. That was a strong local milestone, but Phase8 and later phases showed that it did not solve global reachability.
+Phase6.5 through Phase7.6 established that explicit phase structure matters in the local reachable regime. The best Phase7.6 controller, `soft_linear_3e4`, used coordinated pre-window shaping, window-seeking, CAPTURE, and LOCK behavior and reached `217 / 270` strict simulator success labels on its local 2D grid. That was a strong local milestone, but Phase8 and later phases showed that it did not solve global reachability.
 
 Phases15 through Phase19 tested local and semi-planned fixes: oscillation forcing, trajectory tracking, elliptical transfer targets, crossing-state targeting, and minimal burn/coast planning. These variants clarified failure modes but did not expand recoverability. The lesson was that local heuristics cannot solve a global reachability and phasing problem.
 
@@ -146,7 +146,7 @@ Phase33 extracted the structure of the best Phase32 trajectory. The key mechanis
 
 Phase34 then tested that extracted structure as an explicit controller modification.
 
-## Phase34 Breakthrough
+## Phase34 Architecture Result
 
 Phase34 preserved the Phase22/31-style early transfer behavior and inserted a post-cross synchronization mode after the first target-radius crossing. Physics, reward, thresholds, CAPTURE, and LOCK rules were not relaxed.
 
@@ -157,7 +157,7 @@ The Phase34 result is narrow but important:
 - it does not solve non-crossing trajectory families
 - it does not prove full end-to-end universal insertion
 
-On the reduced Phase34 comparison, the baseline Phase31-style mode produced crossings but no recoverable crossings. The best Phase34 mode, `radius_priority`, converted every crossing-producing case in that benchmark into a recoverable case and a success.
+On the reduced Phase34 comparison, the baseline Phase31-style mode produced crossings but no recoverable crossings. The best Phase34 mode, `radius_priority`, converted every crossing-producing case in that benchmark into a recoverable case and a simulator-defined success label.
 
 The quantitative headline is:
 
@@ -166,9 +166,11 @@ The quantitative headline is:
 | Cases | 24 | 24 |
 | Crossings | 8 | 8 |
 | Recoverable crossings | 0 | 8 |
-| Successes | 8 | 8 |
+| Simulator success label | 8 | 8 |
 | Crossing-case best distance | 3.9923 | 0.9855 |
 | Overspeed | 0 | 0 |
+
+“Success” here refers to the simulator-defined success label, not real spacecraft mission success.
 
 Important interpretation: in Phase34, "recoverable crossing" means a trajectory crossed and later reached a recoverable state during the post-cross synchronization arc. It does not mean the first crossing state itself was already recoverable.
 
