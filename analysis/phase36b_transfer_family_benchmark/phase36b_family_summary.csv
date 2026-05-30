@@ -1,0 +1,5 @@
+transfer_family,cases,crossing_count,phase34_compatible_crossing_count,recoverable_crossing_count,simulator_success_label_count,overspeed_count,instability_count,mean_min_abs_radius_error_ratio,mean_best_crossing_potential,mean_crossing_sync,mean_best_post_cross_distance
+baseline_phase34,24,8,8,8,8,0,0,0.013311098592797341,0.8155614217063757,3.294001249983759,0.9854654772051625
+spiral_approach,24,8,8,8,8,0,0,0.01330339203020052,0.8614959094220498,4.201671819306862,0.9818072771100603
+grazing_corridor,24,8,8,8,8,0,0,0.013289477685497217,0.8789212540854497,4.775199032294655,0.810714275903294
+redesigned_delayed_crossing,24,8,8,8,8,0,0,0.013313469606574674,0.8800354465334689,5.06638146373058,0.8228647723534375

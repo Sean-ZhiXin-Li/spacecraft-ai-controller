@@ -1,0 +1,6 @@
+transfer_family,dominant_failure_label,count
+baseline_phase34,near_crossing,8
+baseline_phase34,over_conservative_transfer,8
+spiral_approach,near_crossing,16
+grazing_corridor,near_crossing,16
+redesigned_delayed_crossing,near_crossing,16

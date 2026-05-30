@@ -1,132 +1,138 @@
-# Research Direction — Orbital Insertion Architecture
+# Research Direction - Orbital Insertion Architecture
 
-## 1. Core Problem
+## 1. Core Research Problem
 
-This project studies recoverable orbital insertion in a simplified 2D control sandbox. The simulator is useful for control-architecture research because it exposes radius, radial velocity, tangential velocity, thrust-limited control, target-radius crossing, CAPTURE, LOCK, and simulator-defined survival criteria under repeatable conditions.
+This repository studies recoverable orbital insertion in a simplified 2D orbital-control sandbox. It is not real spacecraft guidance, navigation, and control software, and it is not flight validation.
 
-The core problem is that crossing the target radius is not enough. A trajectory can geometrically touch or cross the target orbit while still carrying radial and tangential velocity errors that make the state dynamically unrecoverable.
+The core distinction is:
 
-Recoverable insertion in this sandbox requires:
+    first crossing is not orbital insertion
+
+A target-radius crossing is only a geometric event. A trajectory can cross the target radius while carrying radial velocity or tangential velocity errors that make the state dynamically unrecoverable.
+
+The current working architecture is:
 
     crossing -> post-cross synchronization -> recoverability basin -> survival
 
-The project therefore studies orbital insertion as an architecture problem, not as a single reward score or one-step radius objective.
+The project has therefore moved from asking whether a controller can touch or cross a target radius to asking which trajectory structures produce crossing states that can be recovered by a terminal controller.
 
-## 2. Research Evolution
+## 2. Scientific Arc
 
-- Phase20: tested predictive local planning as a way to improve crossing and insertion behavior through short-horizon action selection.
-- Phase31: explored global transfer families, including named transfer structures and burn/coast variants, but did not produce recoverable crossings.
-- Phase32: used direct optimal-control style search as an upper-bound probe and showed that recoverable states were physically reachable in the simplified simulator.
-- Phase33: extracted the important structure from the best optimal-control behavior: the recoverable state occurred after first crossing through smooth post-cross synchronization.
-- Phase34: implemented post-cross synchronization as an explicit terminal controller and converted the existing crossing-producing cases into recoverable crossings.
-- Phase35: tested local pre-cross steering biases and found that they did not expand the crossing basin.
-- Phase36: prepares a transfer-family search to investigate which long-horizon trajectory structures can create Phase34-compatible crossings.
+The current scientific arc is:
 
-The research direction has moved from asking whether a controller can reach the target radius to asking which architecture can produce and then recover from a dynamically useful crossing.
+- Early PPO, imitation-learning, and heuristic phases tested whether reactive policies or local explicit controllers could solve insertion directly.
+- Phase31 showed that transfer families could produce geometric crossings without recoverable crossings.
+- Phase32 showed, with a scoped SciPy direct-shooting probe, that recoverable states were physically reachable in the simplified dynamics. It was not full CasADi/IPOPT direct collocation and was not a production controller.
+- Phase33 extracted the important structure from the best direct-shooting behavior: the useful recoverable state occurred after first crossing.
+- Phase34 introduced post-cross synchronization and converted the existing crossing-producing benchmark cases into recoverable crossings.
+- Phase35 tested local upstream biases and found that they did not expand the crossing basin.
+- Phase36A visualized transfer-family geometry on representative cases. It clarified differences between families, but it was not a full benchmark and did not prove a new family works generally.
+- Phase36B tested four transfer families on the full 24-case benchmark. All four matched the Phase34 baseline crossing set and did not expand the crossing basin.
+- Phase36C isolated the remaining baseline non-crossing cases and prepared a parameterized planner-level transfer search space.
 
-## 3. Current Architecture
+## 3. Phase31 Through Phase36C Evidence
 
-The current architecture is layered:
+Phase31 established the crossing/recoverability gap. In the Phase34 reduced comparison, the Phase31-style reference produced `8 / 24` geometric crossings and `0 / 24` recoverable crossings.
 
-Layer 1: transfer family / pre-cross generation
+Phase32 provided an upper-bound probe. Because CasADi/IPOPT was unavailable in the checked runtime, the phase used SciPy direct shooting. Its value is that it showed recoverable states can exist under the simplified 2D dynamics, not that the repo has a deployable optimal-control solver.
 
-This layer must route an initial condition toward a trajectory that will actually cross the target radius. Phase35 indicates that local steering biases are not enough for this layer.
+Phase33 showed why first crossing was insufficient. The best recoverable state occurred after the first crossing, which motivated treating post-cross behavior as an explicit control problem.
+
+Phase34 added a post-cross synchronization mode while preserving the early transfer behavior and simulator thresholds. In the reduced benchmark, Phase34 `radius_priority` kept the same `8 / 24` crossing count but converted those cases into `8 / 24` recoverable crossings.
+
+Phase35 asked whether local pre-cross biases could create more crossing-producing cases. They did not. The Phase34 baseline and `predictive_crossing_bias` both stayed at `8 / 24` crossings, while `radial_energy_push` and `tangential_corridor_entry` collapsed crossing performance.
+
+Phase36A shifted from local steering to transfer-family visualization. Its representative subset should be read as geometry evidence only. It did not improve crossing count and should not be presented as full benchmark proof.
+
+Phase36B then tested `baseline_phase34`, `spiral_approach`, `grazing_corridor`, and `redesigned_delayed_crossing` on the full reduced benchmark. Every family produced `8 / 24` geometric crossings, `8 / 24` Phase34-compatible crossings, `8 / 24` recoverable crossings, `0` overspeed cases, and `0` instability cases. No family expanded the crossing basin beyond `baseline_phase34`.
+
+Phase36C analyzed the `16 / 24` baseline non-crossing cases without running a new controller. The baseline failures split into `8` `near_crossing` cases and `8` `over_conservative_transfer` cases. Across the Phase36B families, closest-approach and crossing-potential metrics changed without producing new target-radius crossings.
+
+## 4. Current Architecture
+
+The current architecture has four conceptual layers:
+
+Layer 1: transfer-family or pre-cross generation
+
+This layer must route initial conditions into target-radius crossing trajectories. Phase35 showed that simple local radial or tangential biases are not enough.
 
 Layer 2: first target-radius crossing
 
-This is a geometric event, not a final success condition. The crossing state must be evaluated by its radial velocity, tangential velocity error, and compatibility with downstream recovery.
+This is a geometric event, not a final success condition. The crossing state must be judged by radial velocity, tangential velocity error, sync error, and compatibility with Phase34 recovery.
 
 Layer 3: Phase34 post-cross synchronization
 
-This layer is the current terminal controller. Once a crossing exists, Phase34 smooth post-cross synchronization can reduce radius, radial-velocity, and tangential-velocity mismatch until the state enters the recoverability basin.
+This is the current terminal controller. Once a crossing exists, Phase34 post-cross synchronization attempts to reduce radius error, radial velocity, and tangential velocity error until the trajectory enters the recoverability basin.
 
 Layer 4: CAPTURE / LOCK / survival
 
-These simulator regimes represent the post-recoverability stabilization sequence. They are useful internal labels, but they should not be interpreted as real flight validation.
+CAPTURE and LOCK are simulator state-machine labels. They are useful internal labels in the 2D sandbox and should not be interpreted as flight-validation states.
 
-## 4. Current Bottleneck
+## 5. Current Bottleneck
 
-Phase34 converts crossing-producing cases into recoverable cases. On the reduced benchmark, Phase34 kept the same 8 / 24 crossing count but converted those 8 crossings into 8 recoverable crossings.
+The current bottleneck is crossing-generation.
 
-Phase35 showed that local upstream biases do not create new crossing-producing cases. The `predictive_crossing_bias` variant matched the Phase34 baseline at 8 / 24 crossings, while `radial_energy_push` and `tangential_corridor_entry` collapsed crossing performance to 0 / 24.
+Phase34 solved the downstream problem for crossing-producing cases in the reduced benchmark. It did not solve non-crossing trajectory families.
 
-Therefore the current bottleneck is crossing-generation.
+Phase35 showed that local upstream steering biases did not create new crossing-producing cases. Phase36B then showed that four interpretable transfer families also did not expand the crossing set beyond `8 / 24`. Phase36C found that geometry metrics can improve or worsen while the remaining cases still fail to cross.
 
-The open problem is no longer what to do after a crossing exists. The open problem is how to generate more target-radius crossings that are compatible with the Phase34 terminal controller.
+The open problem is upstream crossing-generation, not post-cross stabilization for crossing-producing cases.
 
-## 5. Current Hypothesis
+## 6. Current Hypothesis
 
 Crossing-generation is likely a global trajectory-geometry problem rather than a local steering problem.
 
-It may require:
+It may depend on:
 
-- long-horizon geometry shaping
+- long-horizon transfer shape
 - timing coordination
-- energy/angular-momentum evolution
-- transfer-family selection
-- planner-level search
+- energy and angular-momentum evolution
+- tangential corridor entry
+- controlled coast duration
+- family-level trajectory structure
 
-This hypothesis is based on the negative Phase35 result. Local radial push did not add crossings. Local tangential corridor correction did not add crossings. A simple predictive local action selector improved crossing-potential scoring but still did not increase the crossing count. That pattern suggests the transfer arc itself must be shaped coherently.
+This hypothesis is not yet proven. Phase36B and Phase36C narrow the search space by showing that local metric movement and manually named transfer-family variants are not sufficient by themselves.
 
-## 6. Near-Term Research Plan
+## 7. Next Direction
 
-Phase36 should focus on transfer-family search.
+The next experiment should be a small parameterized planner-level transfer search, not another manually named local family and not MPC-lite yet.
 
-The near-term plan is:
+The first search should use a coarse grid over only a few upstream variables:
 
-- define candidate transfer families with interpretable geometry
-- compare families at the trajectory level rather than only by local controller gains
-- evaluate which families create target-radius crossings
-- measure whether those crossings are compatible with Phase34 post-cross synchronization
-- identify families that approach the target radius but fail to commit to crossing
-- separate geometric crossing gains from recoverable handoff gains
+- `coast_duration`
+- `radial_push_timing`
+- `radial_push_magnitude`
+- `tangential_shaping_magnitude`
 
-Phase36 should not jump directly to 3D, C++, SPICE, or high-fidelity astrodynamics. The current research need is to understand the transfer structures that generate usable crossings in the existing 2D sandbox.
+Phase34 `radius_priority` post-cross synchronization should remain fixed as the terminal controller. The immediate question is whether coarse transfer timing and shaping parameters can create new target-radius crossings and preserve recoverable handoff behavior in the simplified 2D sandbox.
 
-## 7. Medium-Term Engineering Plan
+## 8. What Not To Add Yet
 
-After the transfer-family question is clearer, the project can move toward more engineering-realistic tools and environments.
+The project should not jump directly to:
 
-Medium-term directions include:
-
-- C++ simulation core for faster rollouts and larger trajectory-family sweeps
+- larger PPO or RL systems
+- MPC-lite
+- direct trajectory optimization as the next default step
 - 3D orbital mechanics
-- multi-orbit regimes, including LEO, MEO, GEO, HEO, cislunar, and interplanetary-style transfers
-- realistic perturbations such as J2, atmospheric drag, solar radiation pressure, thrust degradation, mass depletion, communication delay, and sensor uncertainty
-- fault injection, including actuator asymmetry, fuel faults, navigation corruption, and partial subsystem loss
-- MPC-lite for exploiting promising transfer-family geometry
-- direct trajectory optimization after family-level structure is understood
+- SPICE
+- C++ simulation rewrites
+- high-fidelity perturbation models
 
-These steps should come after the current crossing-generation bottleneck is better characterized. Higher-fidelity simulation will not by itself answer which transfer structures create recoverable insertion attempts.
-
-## 8. Long-Term Vision
-
-The long-term direction is resilient spacecraft autonomy, developed from simplified control-architecture principles toward more realistic space environments.
-
-The durable ideas are:
-
-- survival over optimization
-- explicit distinction between milestone events and recoverable regimes
-- final veto power when an optimization path becomes unsafe
-- failure-mode labeling
-- layered autonomy across planning, control, and recovery
-- distributed autonomy with structured divergence rather than identical centralized behavior
-- operation in complex space environments with partial models, degraded information, and long-horizon uncertainty
-
-This remains a staged research path. The current repository is not a spacecraft autonomy stack. It is a simplified platform for finding control-architecture principles that may later be stress-tested in more realistic simulators.
+These may matter later, but the current 2D transfer-family question is not mature enough to justify that complexity.
 
 ## 9. What This Project Is Not
 
 This project is not:
 
 - real spacecraft readiness
+- validated GNC software
 - full orbital autonomy
-- validated guidance, navigation, and control software
 - proof that PPO solves spacecraft control
-- a claim that current 2D results directly transfer to real missions
+- proof that Phase34 solves all initial conditions
+- evidence that manually defined Phase36B families solve the remaining non-crossing cases
 
-The current results are simulation evidence about controller architecture in a simplified 2D orbital sandbox. They are useful because they clarify bottlenecks, not because they certify operational capability.
+The current evidence is simulator evidence about control architecture in a simplified 2D setting.
 
 ## 10. Bottom Line
 
-The current research direction is to understand which trajectory structures can produce recoverable orbital insertion, then scale that architecture toward more realistic spacecraft autonomy.
+The current research direction is to understand which transfer-family structures can produce target-radius crossings that Phase34 can convert into recoverable insertion attempts in the simplified simulator.
