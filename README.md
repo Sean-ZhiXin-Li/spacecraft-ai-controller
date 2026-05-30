@@ -225,23 +225,39 @@ Current limitations:
 - CAPTURE, LOCK, and success criteria are simulator-specific and should not be interpreted as flight-readiness metrics.
 - The environment is planar and simplified; it does not include full 3D orbital mechanics, real navigation uncertainty, actuator constraints, or operational safety validation.
 
+## Current Research Status (May 2026)
+
+Latest completed phases:
+
+- Phase36B: Transfer-family benchmark
+- Phase36C: Non-crossing geometry diagnosis
+
+Key finding:
+
+- Phase34 solved post-cross recoverability.
+- Phase36B showed multiple transfer families converge to the same crossing basin.
+- Phase36C showed the current bottleneck is upstream crossing-generation rather than post-cross stabilization.
+
+Current research question:
+
+Which parameterized transfer trajectory can generate new Phase34-compatible crossings among the remaining 16 / 24 non-crossing cases?
+
 ## Next Steps
 
-The next research direction is Phase35: crossing basin expansion.
+Phase36B and Phase36C completed the next diagnostic step for crossing-basin expansion.
 
-Phase34 answered what to do after a crossing exists. Phase35 should address the upstream problem: how to move more initial conditions into crossing-producing trajectory families that can then benefit from post-cross synchronization.
+Phase36B tested four upstream transfer families on the full reduced benchmark, but none expanded the crossing set beyond the Phase34 baseline. Phase36C then isolated the remaining `16 / 24` baseline non-crossing cases and showed that closest-approach and crossing-potential metrics can move without producing new crossings.
 
-Likely directions:
+The next direction is a small parameterized planner-level transfer search for upstream crossing-generation:
 
-- map the boundary between non-crossing and crossing-producing families
-- design predictive crossing-basin expansion controllers
-- use Phase34 recoverability distance as a terminal objective
-- test MPC-lite or direct-shooting planners that target future recoverability, not radius alone
-- keep Phase34 post-cross synchronization as the local terminal controller
+- search a coarse grid over transfer timing and shaping variables
+- measure geometric crossing and Phase34-compatible handoff separately
+- preserve Phase34 post-cross synchronization as the fixed local terminal controller
+- defer MPC-lite until the transfer search reveals geometry worth exploiting
 
-The guiding question for the next phase is:
+The guiding question is:
 
-> Which planned trajectory reaches the Phase34 recoverability basin?
+> Which parameterized transfer trajectory creates a target-radius crossing that can hand off into Phase34 recovery?
 
 ## Long-Term Vision
 
