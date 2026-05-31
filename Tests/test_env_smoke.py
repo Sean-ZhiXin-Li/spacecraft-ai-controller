@@ -9,7 +9,8 @@ def test_env_step_smoke():
     # Adjust to your real API if different:
     s = env.reset_to_circular(r0=1.0e7, mass=720.0)
 
-    s2, r, done, info = env.step((0.0, 0.0))
+    s2, r, terminated, truncated, info = env.step((0.0, 0.0))
+    done = terminated or truncated
     assert s2 is not None
     assert isinstance(r, float)
     assert isinstance(done, bool)
