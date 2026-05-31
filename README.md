@@ -414,6 +414,22 @@ conda env create -f environment.yml
 conda activate spacecraft
 ```
 
+Linux-first migration setup:
+
+```bash
+git clone https://github.com/Sean-ZhiXin-Li/spacecraft-ai-controller.git
+cd spacecraft-ai-controller
+conda env create -f conda_envs/spacecraft_linux.yml
+conda activate spacecraft-linux
+export MPLBACKEND=Agg
+python -m pytest -q Tests/test_env_smoke.py Tests/test_quickrun_smoke.py
+```
+
+The Linux manifest is a CPU baseline for migration validation. Add
+machine-specific CUDA support only after the smoke checks pass. See the
+[Linux migration guide](docs/linux_migration.md) for the full checklist,
+entry points, and known risks.
+
 Minimal manual setup, if not using Conda:
 
 ```bash

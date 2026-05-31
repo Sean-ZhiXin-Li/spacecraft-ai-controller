@@ -1,0 +1,28 @@
+name: spacecraft_linux
+
+channels:
+  - pytorch
+  - conda-forge
+
+dependencies:
+  # Linux-first CPU baseline. Add a CUDA-specific PyTorch install separately
+  # only after the CPU smoke checks pass on the target machine.
+  - python=3.10
+  - pip
+  - numpy<2
+  - scipy
+  - pandas
+  - matplotlib
+  - pillow
+  - scikit-learn
+  - joblib
+  - pyyaml
+  - pytest
+  - tqdm
+  - gymnasium
+  - casadi
+  - osqp
+  - do-mpc
+  - spiceypy
+  - pytorch=2.2
+  - cpuonly
