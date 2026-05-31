@@ -13,7 +13,7 @@ Use the Linux CPU baseline first:
 git clone https://github.com/Sean-ZhiXin-Li/spacecraft-ai-controller.git
 cd spacecraft-ai-controller
 conda env create -f conda_envs/spacecraft_linux.yml
-conda activate spacecraft-linux
+conda activate spacecraft_linux
 ```
 
 The CPU baseline is intentional. Validate imports and deterministic smoke

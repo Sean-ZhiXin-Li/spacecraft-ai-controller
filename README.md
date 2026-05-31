@@ -420,7 +420,7 @@ Linux-first migration setup:
 git clone https://github.com/Sean-ZhiXin-Li/spacecraft-ai-controller.git
 cd spacecraft-ai-controller
 conda env create -f conda_envs/spacecraft_linux.yml
-conda activate spacecraft-linux
+conda activate spacecraft_linux
 export MPLBACKEND=Agg
 python -m pytest -q Tests/test_env_smoke.py Tests/test_quickrun_smoke.py
 ```
