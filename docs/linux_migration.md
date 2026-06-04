@@ -117,7 +117,7 @@ Do not replace the Linux manifest with a platform-locked export. When the
 Linux environment changes intentionally, prefer:
 
 ```bash
-conda env export --from-history -n spacecraft-linux > conda_envs/spacecraft_linux.yml
+conda env export --from-history -n spacecraft_linux > conda_envs/spacecraft_linux.yml
 ```
 
 Then review the file manually so that required pip-only packages and comments

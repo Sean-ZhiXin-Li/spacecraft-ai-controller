@@ -2,7 +2,7 @@
 
 ## Why Modularization Matters Scientifically
 
-The project has reached a point where duplicated experiment code can affect scientific credibility. Phase34, Phase35, and Phase36A all repeat similar dynamics, state-machine handling, metric calculation, and CSV/report generation.
+The project has reached a point where duplicated experiment code can affect scientific credibility. Phase34, Phase35, Phase36A, and Phase36B all repeat similar dynamics, state-machine handling, metric calculation, and CSV/report generation.
 
 Modularization is not cosmetic. It matters because it reduces the risk that future phases silently change:
 
@@ -17,7 +17,7 @@ The goal is to make future benchmark comparisons more trustworthy.
 
 ## Duplicated Areas
 
-Repeated logic appears across Phase34, Phase35, and Phase36A:
+Repeated logic appears across Phase34, Phase35, Phase36A, and Phase36B:
 
 - 2D dynamics step
 - initial state construction
@@ -52,13 +52,13 @@ Proposed modules:
 
 ### Stage 1 - Documentation First
 
-Write down the exact benchmark contract and expected metrics before moving code. This is now represented by `docs/benchmark_contract.md` and `docs/phase36b_plan.md`.
+Write down the exact benchmark contract and expected metrics before moving code. This is now represented by `docs/benchmark_contract.md` and `docs/planner_search_benchmark_manifest.md`.
 
 No behavior changes should happen in this stage.
 
 ### Stage 2 - Benchmark Manifest Second
 
-Create a simple manifest for the 24-case reduced benchmark.
+Create a simple manifest for the 24-case reduced benchmark. This is now represented by `docs/planner_search_benchmark_manifest.md`.
 
 Validation:
 
@@ -117,11 +117,13 @@ Before and after extraction:
 
 ## Near-Term Recommendation
 
-Do not start with a broad refactor. First implement Phase36B under the current structure if needed, then extract shared metrics and benchmark manifest once the benchmark contract is stable.
+Do not start with a broad refactor. Phase36B and Phase36C are complete, and the next research step is a small parameterized planner-level transfer search with Phase34 fixed as the terminal/post-cross controller.
+
+The safest near-term engineering work is to stabilize shared definitions before adding planner-search code.
 
 The safest order is:
 
-1. document the benchmark contract
-2. run or plan Phase36B against that contract
-3. extract shared metrics
-4. extract shared rollout core only after regression checks are defined
+1. keep the benchmark contract and planner-search manifest current
+2. extract shared metrics only after regression checks are written
+3. implement the small parameterized planner-search benchmark against the manifest
+4. extract shared rollout core only after Phase34 and Phase36B aggregate results can be reproduced unchanged

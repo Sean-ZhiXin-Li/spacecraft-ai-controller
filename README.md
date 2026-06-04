@@ -12,7 +12,7 @@ Successful insertion in this sandbox requires:
 crossing -> post-cross smooth synchronization -> recoverability basin -> survival
 ```
 
-Phase34 is the current architecture result. It does not solve the entire orbital insertion problem, and it is not a real spacecraft controller. It shows that, for trajectory families that already produce a target-radius crossing, adding a post-cross synchronization mode can convert those crossings into recoverable cases.
+Phase34 is the fixed terminal/post-cross controller result. It does not solve the entire orbital insertion problem, and it is not a real spacecraft controller. It shows that, for trajectory families that already produce a target-radius crossing, adding a post-cross synchronization mode can convert those crossings into recoverable cases. The latest Phase36B/36C work shows that the remaining bottleneck is upstream crossing-generation, so the next research step is a small parameterized planner-level transfer search.
 
 ## Demo & Visual Overview
 
@@ -225,7 +225,7 @@ Current limitations:
 - CAPTURE, LOCK, and success criteria are simulator-specific and should not be interpreted as flight-readiness metrics.
 - The environment is planar and simplified; it does not include full 3D orbital mechanics, real navigation uncertainty, actuator constraints, or operational safety validation.
 
-## Current Research Status (May 2026)
+## Current Research Status (June 2026)
 
 Latest completed phases:
 
@@ -241,6 +241,13 @@ Key finding:
 Current research question:
 
 Which parameterized transfer trajectory can generate new Phase34-compatible crossings among the remaining 16 / 24 non-crossing cases?
+
+Current controller role:
+
+- Phase34 `radius_priority` is the fixed terminal/post-cross controller for the next search.
+- Phase36B is the completed transfer-family benchmark; it did not expand crossings beyond the Phase34 baseline.
+- Phase36C is the completed non-crossing diagnosis; it prepared the planner-level search space.
+- The next phase should test a small parameterized planner-level transfer search, not another manually named local family.
 
 ## Next Steps
 
@@ -260,6 +267,9 @@ The guiding question is:
 > Which parameterized transfer trajectory creates a target-radius crossing that can hand off into Phase34 recovery?
 
 ## Long-Term Vision
+
+> Note: The following stages represent the author's personal vision and conceptual horizon for future research. 
+> They are not validated results or claims about current experiments.
 
 This repository is currently a 2D orbital insertion research sandbox, but its long-term purpose is broader: to build staged control-architecture foundations for increasingly realistic spacecraft autonomy across complex space environments. The durable contribution is not any single algorithm, PPO checkpoint, heuristic controller, or phase script. Algorithmic obsolescence is expected. Architecture principles are the durable contribution: survival over optimization, explicit failure recognition, and control logic that can refuse false progress.
 
@@ -496,12 +506,15 @@ spacecraft_ai_project/
 
 For the current research narrative, read:
 
-1. [Phase34 summary](analysis/phase34_post_cross_sync/summary.md)
-2. [Phase34 vs Phase31 comparison](analysis/phase34_post_cross_sync/phase34_vs_phase31_comparison.md)
-3. [Phase33 summary](analysis/phase33_optimal_structure_extraction/phase33_summary.md)
-4. [Phase33 structure decomposition](analysis/phase33_optimal_structure_extraction/structure_decomposition.md)
-5. [Sprint log Phase28 to Phase33](project_log/sprint_ppo28-33.md)
-6. [Sprint log PPO22 to PPO27](project_log/sprint_ppo22-27.md)
+1. [Research direction](docs/research_direction.md)
+2. [PL36 transfer-family benchmark and diagnosis](project_log/pl36_transfer_family_benchmark_and_diagnosis.md)
+3. [Phase36B transfer-family benchmark](analysis/phase36b_transfer_family_benchmark/summary.md)
+4. [Phase36C non-crossing diagnosis](analysis/phase36c_non_crossing_geometry_diagnosis/summary.md)
+5. [Planner search benchmark manifest](docs/planner_search_benchmark_manifest.md)
+6. [Phase34 summary](analysis/phase34_post_cross_sync/summary.md)
+7. [Phase34 vs Phase31 comparison](analysis/phase34_post_cross_sync/phase34_vs_phase31_comparison.md)
+8. [Phase33 summary](analysis/phase33_optimal_structure_extraction/phase33_summary.md)
+9. [Phase33 structure decomposition](analysis/phase33_optimal_structure_extraction/structure_decomposition.md)
 
 For older local-controller context:
 
