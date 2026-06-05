@@ -1,5 +1,8 @@
 name: smoke-test
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: ["main"]
@@ -11,28 +14,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout repository code
-    - uses: actions/checkout@v4
+      # Checkout repository code
+      - uses: actions/checkout@v4
 
-    # Setup micromamba (lightweight conda) and create environment
-    - name: Setup micromamba
-      uses: mamba-org/setup-micromamba@v1
-      with:
-        # Use the provided environment.yml to create the env
-        environment-file: environment.yml
+      # Setup micromamba (lightweight conda) and create environment
+      - name: Setup micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          # Use the provided environment.yml to create the env
+          environment-file: environment.yml
+          # Enable caching to speed up future runs
+          cache-environment: true
 
-        # Enable caching to speed up future runs
-        cache-environment: true
+      # Run smoke test inside the activated conda environment
+      - name: Run controller smoke test
+        shell: bash -l {0}   # Required to properly activate conda env
+        run: |
+          # Print Python version (debugging)
+          python -V
 
-    # Run smoke test inside the activated conda environment
-    - name: Run controller smoke test
-      shell: bash -l {0}   # Required to properly activate conda env
-      run: |
-        # Print Python version (debugging)
-        python -V
+          # Show which Python is being used (should be from conda env)
+          which python
 
-        # Show which Python is being used (should be from conda env)
-        which python
-
-        # Run controller test script
-        python -m scripts.test_all_controllers
+          # Run controller test script
+          python -m scripts.test_all_controllers
