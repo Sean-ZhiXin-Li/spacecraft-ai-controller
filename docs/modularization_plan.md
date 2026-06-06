@@ -2,7 +2,7 @@
 
 ## Why Modularization Matters Scientifically
 
-The project has reached a point where duplicated experiment code can affect scientific credibility. Phase34, Phase35, Phase36A, and Phase36B all repeat similar dynamics, state-machine handling, metric calculation, and CSV/report generation.
+The project has reached a point where duplicated experiment code can affect scientific credibility. Phase34, Phase35, Phase36A, Phase36B, and Phase37A all repeat similar dynamics, state-machine handling, metric calculation, and CSV/report generation.
 
 Modularization is not cosmetic. It matters because it reduces the risk that future phases silently change:
 
@@ -17,7 +17,7 @@ The goal is to make future benchmark comparisons more trustworthy.
 
 ## Duplicated Areas
 
-Repeated logic appears across Phase34, Phase35, Phase36A, and Phase36B:
+Repeated logic appears across Phase34, Phase35, Phase36A, Phase36B, and Phase37A:
 
 - 2D dynamics step
 - initial state construction
@@ -117,13 +117,13 @@ Before and after extraction:
 
 ## Near-Term Recommendation
 
-Do not start with a broad refactor. Phase36B and Phase36C are complete, and the next research step is a small parameterized planner-level transfer search with Phase34 fixed as the terminal/post-cross controller.
+Do not start with a broad refactor. Phase36B, Phase36C, and Phase37A are complete, and Phase37A shows that radial commitment timing alone did not create new crossings. The next research step should inspect Phase37A closest-approach deltas before adding any Phase37B tangential-shaping variable.
 
-The safest near-term engineering work is to stabilize shared definitions before adding planner-search code.
+The safest near-term engineering work is to stabilize shared definitions and regression checks before adding planner-search code.
 
 The safest order is:
 
 1. keep the benchmark contract and planner-search manifest current
-2. extract shared metrics only after regression checks are written
-3. implement the small parameterized planner-search benchmark against the manifest
+2. keep `scripts/check_phase_results.py` passing before and after any extraction
+3. extract shared metrics only after regression checks are written
 4. extract shared rollout core only after Phase34 and Phase36B aggregate results can be reproduced unchanged

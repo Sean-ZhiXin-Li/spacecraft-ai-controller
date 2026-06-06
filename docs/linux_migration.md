@@ -7,7 +7,7 @@ interpretation.
 
 ## Environment Strategy
 
-Use the Linux CPU baseline first:
+Use the Linux CPU baseline first. This is the current environment authority for Linux migration and CI smoke checks:
 
 ```bash
 git clone https://github.com/Sean-ZhiXin-Li/spacecraft-ai-controller.git
@@ -19,10 +19,10 @@ conda activate spacecraft_linux
 The CPU baseline is intentional. Validate imports and deterministic smoke
 checks before adding a machine-specific CUDA installation.
 
-The files `conda_envs/spacecraft.yml` and `conda_envs/orbittools.yml` are
-Windows environment snapshots. Keep them as provenance, but do not use them to
-create the Linux environment because they contain Windows packages and local
-prefixes.
+The root `environment.yml` is a minimal legacy environment. The files
+`conda_envs/spacecraft.yml` and `conda_envs/orbittools.yml` are Windows
+environment snapshots. Keep them as provenance, but do not use them to create
+the Linux environment because they contain Windows packages and local prefixes.
 
 ## Smoke Test Checklist
 
@@ -31,6 +31,7 @@ Run from the repository root:
 ```bash
 export MPLBACKEND=Agg
 python -m pytest -q Tests/test_env_smoke.py Tests/test_quickrun_smoke.py
+python scripts/check_phase_results.py
 python scripts/quickrun.py --steps 1200 --preset voyager1
 python -m py_compile train/preprocess_merge_dataset.py
 python -c "from pathlib import Path; files=sorted((Path('data') / 'dataset').glob('expert_dataset_*.npy')); print(f'expert_dataset_count={len(files)}')"
@@ -39,6 +40,8 @@ python -c "from pathlib import Path; files=sorted((Path('data') / 'dataset').glo
 Expected outcomes:
 
 - Pytest exits with status `0`.
+- `scripts/check_phase_results.py` exits with status `0` and prints a concise
+  PASS summary without rerunning experiments.
 - `scripts/quickrun.py` prints a `[quickrun]` metrics dictionary and exits with
   status `0`.
 - Compilation exits with status `0`.

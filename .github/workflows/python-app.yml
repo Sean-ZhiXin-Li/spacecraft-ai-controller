@@ -21,13 +21,13 @@ jobs:
       - name: Setup micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
-          # Use the provided environment.yml to create the env
-          environment-file: environment.yml
+          # Use the current Linux CPU baseline environment.
+          environment-file: conda_envs/spacecraft_linux.yml
           # Enable caching to speed up future runs
           cache-environment: true
 
-      # Run smoke test inside the activated conda environment
-      - name: Run controller smoke test
+      # Run smoke tests inside the activated conda environment
+      - name: Run repository smoke tests
         shell: bash -l {0}   # Required to properly activate conda env
         run: |
           # Print Python version (debugging)
@@ -36,5 +36,11 @@ jobs:
           # Show which Python is being used (should be from conda env)
           which python
 
-          # Run controller test script
+          # Current Linux smoke tests
+          python -m pytest -q Tests/test_env_smoke.py Tests/test_quickrun_smoke.py
+
+          # Historical lightweight controller import/action smoke test
           python -m scripts.test_all_controllers
+
+          # CSV-only regression guard for protected phase results
+          python scripts/check_phase_results.py

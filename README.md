@@ -12,7 +12,7 @@ Successful insertion in this sandbox requires:
 crossing -> post-cross smooth synchronization -> recoverability basin -> survival
 ```
 
-Phase34 is the fixed terminal/post-cross controller result. It does not solve the entire orbital insertion problem, and it is not a real spacecraft controller. It shows that, for trajectory families that already produce a target-radius crossing, adding a post-cross synchronization mode can convert those crossings into recoverable cases. The latest Phase36B/36C work shows that the remaining bottleneck is upstream crossing-generation, so the next research step is a small parameterized planner-level transfer search.
+Phase34 is the fixed terminal/post-cross controller result. It does not solve the entire orbital insertion problem, and it is not a real spacecraft controller. It shows that, for trajectory families that already produce a target-radius crossing, adding a post-cross synchronization mode can convert those crossings into recoverable cases. Phase36B/36C showed that the remaining bottleneck is upstream crossing-generation. Phase37A then tested radial commitment timing and bounded radial magnitude, but created no new crossings on the baseline non-crossing cases.
 
 ## Demo & Visual Overview
 
@@ -231,40 +231,43 @@ Latest completed phases:
 
 - Phase36B: Transfer-family benchmark
 - Phase36C: Non-crossing geometry diagnosis
+- Phase37A: Radial commitment timing sweep
 
 Key finding:
 
 - Phase34 solved post-cross recoverability.
 - Phase36B showed multiple transfer families converge to the same crossing basin.
 - Phase36C showed the current bottleneck is upstream crossing-generation rather than post-cross stabilization.
+- Phase37A showed that radial commitment timing alone did not create new crossings.
 
 Current research question:
 
-Which parameterized transfer trajectory can generate new Phase34-compatible crossings among the remaining 16 / 24 non-crossing cases?
+Which additional transfer-geometry variable, if any, is justified by the Phase37A closest-approach evidence before attempting Phase37B?
 
 Current controller role:
 
 - Phase34 `radius_priority` is the fixed terminal/post-cross controller for the next search.
 - Phase36B is the completed transfer-family benchmark; it did not expand crossings beyond the Phase34 baseline.
 - Phase36C is the completed non-crossing diagnosis; it prepared the planner-level search space.
-- The next phase should test a small parameterized planner-level transfer search, not another manually named local family.
+- Phase37A tested `early_commit`, `mid_commit`, and `delayed_commit` with `low` and `medium` radial magnitudes over `144` rollouts.
+- Phase37A created `0` new crossings on the `16 / 24` Phase36B baseline non-crossing cases.
 
 ## Next Steps
 
-Phase36B and Phase36C completed the next diagnostic step for crossing-basin expansion.
+Phase36B and Phase36C completed the transfer-family benchmark and non-crossing diagnosis. Phase37A then tested whether radial commitment timing and bounded radial magnitude were enough to create new crossings.
 
-Phase36B tested four upstream transfer families on the full reduced benchmark, but none expanded the crossing set beyond the Phase34 baseline. Phase36C then isolated the remaining `16 / 24` baseline non-crossing cases and showed that closest-approach and crossing-potential metrics can move without producing new crossings.
+Phase37A ran `6` variants across the same `24` cases, for `144` rollouts. It created `0` new crossings on the `16` Phase36B baseline non-crossing cases. `delayed_commit_low` and `delayed_commit_medium` preserved `8 / 24` crossings and `8 / 24` recoverable crossings, while early and mid commitment degraded the existing crossing set. No overspeed or instability occurred.
 
-The next direction is a small parameterized planner-level transfer search for upstream crossing-generation:
+The next direction is not blind expansion of radial timing search. Before Phase37B, inspect Phase37A closest-approach deltas and decide whether a limited tangential-shaping variable is justified by the evidence.
 
-- search a coarse grid over transfer timing and shaping variables
+- keep Phase34 post-cross synchronization fixed
 - measure geometric crossing and Phase34-compatible handoff separately
-- preserve Phase34 post-cross synchronization as the fixed local terminal controller
+- protect the existing `8 / 24` crossing-producing cases as regression guards
 - defer MPC-lite until the transfer search reveals geometry worth exploiting
 
 The guiding question is:
 
-> Which parameterized transfer trajectory creates a target-radius crossing that can hand off into Phase34 recovery?
+> Does any evidence-backed upstream shaping variable create a target-radius crossing that can hand off into Phase34 recovery?
 
 ## Long-Term Vision
 
@@ -417,14 +420,7 @@ This repository is not the final spacecraft autonomy system. It is the control-a
 
 ## How to Run
 
-Recommended environment:
-
-```bash
-conda env create -f environment.yml
-conda activate spacecraft
-```
-
-Linux-first migration setup:
+Recommended Linux-first environment:
 
 ```bash
 git clone https://github.com/Sean-ZhiXin-Li/spacecraft-ai-controller.git
@@ -433,9 +429,17 @@ conda env create -f conda_envs/spacecraft_linux.yml
 conda activate spacecraft_linux
 export MPLBACKEND=Agg
 python -m pytest -q Tests/test_env_smoke.py Tests/test_quickrun_smoke.py
+python scripts/check_phase_results.py
 ```
 
-The Linux manifest is a CPU baseline for migration validation. Add
+Legacy/minimal environment:
+
+```bash
+conda env create -f environment.yml
+conda activate spacecraft
+```
+
+`environment.yml` is kept as a minimal legacy environment. The current Linux baseline is `conda_envs/spacecraft_linux.yml`. Add
 machine-specific CUDA support only after the smoke checks pass. See the
 [Linux migration guide](docs/linux_migration.md) for the full checklist,
 entry points, and known risks.
@@ -462,6 +466,12 @@ Re-run the Phase34 post-cross synchronization benchmark:
 
 ```bash
 python scripts/explicit_controller_phase34_post_cross_sync.py
+```
+
+Validate the protected result aggregates without rerunning experiments:
+
+```bash
+python scripts/check_phase_results.py
 ```
 
 Re-run the supporting Phase31 to Phase33 research trail:
@@ -491,15 +501,15 @@ python scripts/eval_bc_policy.py --policy-kind ppo --checkpoint models/ppo_bc_fi
 
 ```text
 spacecraft_ai_project/
-├── analysis/               # summaries, figures, benchmark outputs, datasets
-├── controller/             # explicit, probe, PPO-related controllers
-├── envs/                   # orbital environment and task definitions
-├── models/                 # saved BC and PPO-transfer models
-├── ppo_orbit/              # PPO implementation
-├── project_log/            # sprint logs and phase narratives
-├── scripts/                # evaluation, sweeps, plotting, demo generation
-├── main.py                 # demo entry point
-└── README.md
+|-- analysis/               # summaries, figures, benchmark outputs, datasets
+|-- controller/             # explicit, probe, PPO-related controllers
+|-- envs/                   # orbital environment and task definitions
+|-- models/                 # saved BC and PPO-transfer models
+|-- ppo_orbit/              # PPO implementation
+|-- project_log/            # sprint logs and phase narratives
+|-- scripts/                # evaluation, sweeps, plotting, demo generation
+|-- main.py                 # demo entry point
+`-- README.md
 ```
 
 ## Recommended Reading
@@ -507,14 +517,17 @@ spacecraft_ai_project/
 For the current research narrative, read:
 
 1. [Research direction](docs/research_direction.md)
-2. [PL36 transfer-family benchmark and diagnosis](project_log/pl36_transfer_family_benchmark_and_diagnosis.md)
-3. [Phase36B transfer-family benchmark](analysis/phase36b_transfer_family_benchmark/summary.md)
-4. [Phase36C non-crossing diagnosis](analysis/phase36c_non_crossing_geometry_diagnosis/summary.md)
-5. [Planner search benchmark manifest](docs/planner_search_benchmark_manifest.md)
-6. [Phase34 summary](analysis/phase34_post_cross_sync/summary.md)
-7. [Phase34 vs Phase31 comparison](analysis/phase34_post_cross_sync/phase34_vs_phase31_comparison.md)
-8. [Phase33 summary](analysis/phase33_optimal_structure_extraction/phase33_summary.md)
-9. [Phase33 structure decomposition](analysis/phase33_optimal_structure_extraction/structure_decomposition.md)
+2. [Phase37A radial commitment timing summary](analysis/phase37a_radial_commit_timing/phase37a_summary.md)
+3. [PL37A radial commitment timing log](project_log/phase37a_radial_commit_timing.md)
+4. [Artifact manifest](analysis/artifact_manifest.md)
+5. [PL36 transfer-family benchmark and diagnosis](project_log/pl36_transfer_family_benchmark_and_diagnosis.md)
+6. [Phase36B transfer-family benchmark](analysis/phase36b_transfer_family_benchmark/summary.md)
+7. [Phase36C non-crossing diagnosis](analysis/phase36c_non_crossing_geometry_diagnosis/summary.md)
+8. [Planner search benchmark manifest](docs/planner_search_benchmark_manifest.md)
+9. [Phase34 summary](analysis/phase34_post_cross_sync/summary.md)
+10. [Phase34 vs Phase31 comparison](analysis/phase34_post_cross_sync/phase34_vs_phase31_comparison.md)
+11. [Phase33 summary](analysis/phase33_optimal_structure_extraction/phase33_summary.md)
+12. [Phase33 structure decomposition](analysis/phase33_optimal_structure_extraction/structure_decomposition.md)
 
 For older local-controller context:
 

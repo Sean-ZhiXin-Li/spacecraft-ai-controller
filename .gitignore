@@ -299,6 +299,10 @@ analysis/*.json
 !analysis/figs/orbit_lock_benchmark/*.json
 !analysis/figs/orbit_lock_generalization/*.json
 
+# Phase37A public evidence artifacts
+!analysis/phase37a_radial_commit_timing/phase37a_results.csv
+!analysis/phase37a_radial_commit_timing/phase37a_comparison.png
+
 # logs
 *.log
 

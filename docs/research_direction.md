@@ -29,8 +29,9 @@ The current scientific arc is:
 - Phase36A visualized transfer-family geometry on representative cases. It clarified differences between families, but it was not a full benchmark and did not prove a new family works generally.
 - Phase36B tested four transfer families on the full 24-case benchmark. All four matched the Phase34 baseline crossing set and did not expand the crossing basin.
 - Phase36C isolated the remaining baseline non-crossing cases and prepared a parameterized planner-level transfer search space.
+- Phase37A tested radial commitment timing and bounded radial magnitude as the smallest evidence-backed search slice. It did not create new crossings on the baseline non-crossing cases.
 
-## 3. Phase31 Through Phase36C Evidence
+## 3. Phase31 Through Phase37A Evidence
 
 Phase31 established the crossing/recoverability gap. In the Phase34 reduced comparison, the Phase31-style reference produced `8 / 24` geometric crossings and `0 / 24` recoverable crossings.
 
@@ -47,6 +48,8 @@ Phase36A shifted from local steering to transfer-family visualization. Its repre
 Phase36B then tested `baseline_phase34`, `spiral_approach`, `grazing_corridor`, and `redesigned_delayed_crossing` on the full reduced benchmark. Every family produced `8 / 24` geometric crossings, `8 / 24` Phase34-compatible crossings, `8 / 24` recoverable crossings, `0` overspeed cases, and `0` instability cases. No family expanded the crossing basin beyond `baseline_phase34`.
 
 Phase36C analyzed the `16 / 24` baseline non-crossing cases without running a new controller. The baseline failures split into `8` `near_crossing` cases and `8` `over_conservative_transfer` cases. Across the Phase36B families, closest-approach and crossing-potential metrics changed without producing new target-radius crossings.
+
+Phase37A then tested `early_commit`, `mid_commit`, and `delayed_commit` with `low` and `medium` radial magnitudes over `144` rollouts. It created `0` new crossings on the `16` Phase36B baseline non-crossing cases. `delayed_commit_low` and `delayed_commit_medium` preserved `8 / 24` crossings and `8 / 24` recoverable crossings; early and mid commitment degraded the existing crossing set. No overspeed or instability occurred.
 
 ## 4. Current Architecture
 
@@ -74,7 +77,7 @@ The current bottleneck is crossing-generation.
 
 Phase34 solved the downstream problem for crossing-producing cases in the reduced benchmark. It did not solve non-crossing trajectory families.
 
-Phase35 showed that local upstream steering biases did not create new crossing-producing cases. Phase36B then showed that four interpretable transfer families also did not expand the crossing set beyond `8 / 24`. Phase36C found that geometry metrics can improve or worsen while the remaining cases still fail to cross.
+Phase35 showed that local upstream steering biases did not create new crossing-producing cases. Phase36B then showed that four interpretable transfer families also did not expand the crossing set beyond `8 / 24`. Phase36C found that geometry metrics can improve or worsen while the remaining cases still fail to cross. Phase37A showed that radial commitment timing alone is not enough to create new crossings.
 
 The open problem is upstream crossing-generation, not post-cross stabilization for crossing-producing cases.
 
@@ -91,20 +94,15 @@ It may depend on:
 - controlled coast duration
 - family-level trajectory structure
 
-This hypothesis is not yet proven. Phase36B and Phase36C narrow the search space by showing that local metric movement and manually named transfer-family variants are not sufficient by themselves.
+This hypothesis is not yet proven. Phase36B, Phase36C, and Phase37A narrow the search space by showing that local metric movement, manually named transfer-family variants, and radial commitment timing alone are not sufficient by themselves.
 
 ## 7. Next Direction
 
-The next experiment should be a small parameterized planner-level transfer search, not another manually named local family and not MPC-lite yet.
+The next experiment should not blindly expand radial commitment timing. Before Phase37B, inspect Phase37A closest-approach deltas and decide whether a limited tangential-shaping variable is justified by evidence.
 
-The first search should use a coarse grid over only a few upstream variables:
+Any Phase37B search should keep the grid small and protect the existing crossing-producing cases as regression guards.
 
-- `coast_duration`
-- `radial_push_timing`
-- `radial_push_magnitude`
-- `tangential_shaping_magnitude`
-
-Phase34 `radius_priority` post-cross synchronization should remain fixed as the terminal controller. The immediate question is whether coarse transfer timing and shaping parameters can create new target-radius crossings and preserve recoverable handoff behavior in the simplified 2D sandbox.
+Phase34 `radius_priority` post-cross synchronization should remain fixed as the terminal controller. The immediate question is whether any evidence-backed upstream shaping variable can create new target-radius crossings and preserve recoverable handoff behavior in the simplified 2D sandbox.
 
 ## 8. What Not To Add Yet
 
@@ -130,9 +128,10 @@ This project is not:
 - proof that PPO solves spacecraft control
 - proof that Phase34 solves all initial conditions
 - evidence that manually defined Phase36B families solve the remaining non-crossing cases
+- evidence that Phase37A radial timing solves the remaining non-crossing cases
 
 The current evidence is simulator evidence about control architecture in a simplified 2D setting.
 
 ## 10. Bottom Line
 
-The current research direction is to understand which transfer-family structures can produce target-radius crossings that Phase34 can convert into recoverable insertion attempts in the simplified simulator.
+The current research direction is to identify evidence-backed upstream transfer variables that can produce target-radius crossings that Phase34 can convert into recoverable insertion attempts in the simplified simulator.

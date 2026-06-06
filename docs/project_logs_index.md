@@ -9,20 +9,24 @@ This index points readers to the current 2D orbital-insertion research trail whi
 3. [PL34 - Crossing is transition, not success](../project_log/pl34_post_cross_sync.md)
 4. [PL35 - Crossing basin expansion failed under local bias architectures](../project_log/pl35_crossing_basin_expansion.md)
 5. [PL36 - Transfer-family benchmark and non-crossing diagnosis](../project_log/pl36_transfer_family_benchmark_and_diagnosis.md)
+6. [PL37A - Radial commitment timing sweep](../project_log/phase37a_radial_commit_timing.md)
 
 ## Current Research State
 
 - Phase34 is the fixed terminal/post-cross controller result.
 - Phase36B tested transfer-family variants on the full 24-case reduced benchmark and did not expand crossings beyond the Phase34 baseline.
 - Phase36C diagnosed the remaining `16 / 24` non-crossing cases and prepared the next planner-level search space.
-- The next step is a small parameterized planner-level transfer search for upstream crossing-generation.
+- Phase37A tested radial commitment timing and bounded radial magnitude over `144` rollouts, creating `0` new crossings on the baseline non-crossing cases.
+- The next step is to inspect Phase37A closest-approach deltas before deciding whether limited tangential shaping is justified.
 
 Primary current references:
 
 - [Research direction](research_direction.md)
 - [Phase36B summary](../analysis/phase36b_transfer_family_benchmark/summary.md)
 - [Phase36C summary](../analysis/phase36c_non_crossing_geometry_diagnosis/summary.md)
+- [Phase37A summary](../analysis/phase37a_radial_commit_timing/phase37a_summary.md)
 - [Phase36C planner search space](../analysis/phase36c_non_crossing_geometry_diagnosis/planner_search_space.md)
+- [Artifact manifest](../analysis/artifact_manifest.md)
 
 ## Earlier Local-Controller Milestone
 
