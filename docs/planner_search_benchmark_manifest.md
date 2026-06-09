@@ -6,6 +6,8 @@ This manifest defines the 24-case reduced benchmark for the next small parameter
 
 The fixed terminal controller is Phase34 `radius_priority` post-cross synchronization. The next planner search may change only the upstream pre-cross transfer parameters before first target-radius crossing.
 
+Phase37A and Phase37B narrowed this manifest's use. Radial timing alone created no new crossings, and weak tangential shaping created no selected-case crossings while failing regression preservation. Before any implementation, use `docs/phase38_evidence_based_search_space.md` to justify which variable, if any, should be tested next.
+
 ## Fixed Assumptions
 
 - Environment: simplified 2D orbital-control sandbox.
@@ -48,7 +50,7 @@ The fixed terminal controller is Phase34 `radius_priority` post-cross synchroniz
 
 ## Planner Search Discipline
 
-The first planner search should be small and parameterized:
+Any future planner search should be small and parameterized. The variables below are candidates to evaluate through the Phase38 evidence review, not automatic implementation targets:
 
 - `coast_duration`
 - `radial_push_timing`
@@ -63,4 +65,4 @@ Primary evaluation should separate:
 - simulator success label
 - overspeed and instability
 
-The first search should not use MPC-lite, PPO, 3D dynamics, SPICE, C++, or direct trajectory optimization. The immediate research question is whether coarse upstream timing and shaping parameters can create new target-radius crossings that hand off into the fixed Phase34 terminal controller.
+The next search should not use MPC-lite, PPO, 3D dynamics, SPICE, C++, or direct trajectory optimization. The immediate research question is whether any evidence-backed upstream timing or shaping parameter can create new target-radius crossings that hand off into the fixed Phase34 terminal controller while preserving the known crossing-producing cases.

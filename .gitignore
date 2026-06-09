@@ -303,6 +303,10 @@ analysis/*.json
 !analysis/phase37a_radial_commit_timing/phase37a_results.csv
 !analysis/phase37a_radial_commit_timing/phase37a_comparison.png
 
+# Phase37B public evidence artifacts
+!analysis/phase37b_weak_tangential_subset/phase37b_results.csv
+!analysis/phase37b_weak_tangential_subset/phase37b_comparison.png
+
 # logs
 *.log
 

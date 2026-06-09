@@ -103,6 +103,33 @@ def check_phase37a(failures: list[str]) -> None:
         check_equal(f"Phase37A {variant} recoverable crossings", count(subset, "recoverable_crossing"), 8, failures)
 
 
+def check_phase37b(failures: list[str]) -> None:
+    rows = read_rows("analysis/phase37b_weak_tangential_subset/phase37b_results.csv")
+    check_equal("Phase37B total rows", len(rows), 24, failures)
+    check_equal("Phase37B total overspeed", count(rows, "overspeed"), 0, failures)
+    check_equal("Phase37B total instability", count(rows, "instability"), 0, failures)
+
+    weak_selected = [
+        row
+        for row in rows
+        if row.get("setting") == "early_commit_low_plus_weak_tangential"
+        and row.get("group") == "selected_non_crossing"
+    ]
+    weak_regression = [
+        row
+        for row in rows
+        if row.get("setting") == "early_commit_low_plus_weak_tangential"
+        and row.get("group") == "regression_crossing"
+    ]
+
+    check_equal("Phase37B weak selected cases", len(weak_selected), 4, failures)
+    check_equal("Phase37B weak selected crossings", count(weak_selected, "crossing_occurs"), 0, failures)
+    check_equal("Phase37B weak selected recoverable crossings", count(weak_selected, "recoverable_crossing"), 0, failures)
+    check_equal("Phase37B weak regression cases", len(weak_regression), 8, failures)
+    check_equal("Phase37B weak regression crossings", count(weak_regression, "crossing_occurs"), 4, failures)
+    check_equal("Phase37B weak regression recoverable crossings", count(weak_regression, "recoverable_crossing"), 4, failures)
+
+
 def main() -> int:
     failures: list[str] = []
     checks: list[Callable[[list[str]], None]] = [
@@ -110,6 +137,7 @@ def main() -> int:
         check_phase36b,
         check_phase36c,
         check_phase37a,
+        check_phase37b,
     ]
     for check in checks:
         print(f"\n== {check.__name__} ==")

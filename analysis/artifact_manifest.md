@@ -81,7 +81,7 @@ Supports:
 
 ## Phase37A - Radial Commitment Timing Sweep
 
-Status: current frontier negative result.
+Status: recent negative result.
 
 Artifacts:
 
@@ -97,6 +97,39 @@ Supports:
 - `delayed_commit_low` and `delayed_commit_medium` each preserved `8 / 24` crossings and `8 / 24` recoverable crossings.
 - Early and mid commitment degraded the existing crossing set.
 - No Phase37A variant produced overspeed or instability.
+
+## Phase37B - Weak Tangential Subset Diagnostic
+
+Status: current frontier negative diagnostic.
+
+Artifacts:
+
+- `analysis/phase37b_weak_tangential_subset/phase37b_results.csv`
+- `analysis/phase37b_weak_tangential_subset/phase37b_summary.md`
+- `analysis/phase37b_weak_tangential_subset/phase37b_comparison.png`
+- `project_log/phase37b_weak_tangential_postmortem.md`
+
+Supports:
+
+- Phase37B ran `24` subset rollouts: 4 selected Phase37A-improved non-crossing cases and 8 Phase36B regression crossing cases across 2 settings.
+- Weak tangential shaping created `0 / 4` selected-case crossings and `0 / 4` selected-case recoverable crossings.
+- Weak tangential shaping preserved only `4 / 8` regression crossings and `4 / 8` regression recoverable crossings.
+- Phase37B produced `0` overspeed cases and `0` instability cases.
+- Closest approach improved in `3 / 4` selected cases, but this was not sufficient because no new crossings were created and regression preservation failed.
+
+## Phase38 - Evidence-Based Search-Space Planning
+
+Status: current planning document; not an implementation phase.
+
+Artifacts:
+
+- `docs/phase38_evidence_based_search_space.md`
+
+Supports:
+
+- Phase38 should analyze crossing-basin expansion failures before new controller code.
+- The next experiment must be justified by Phase36B, Phase36C, Phase37A, and Phase37B evidence.
+- The existing `8 / 24` crossing-producing cases should remain regression guards.
 
 ## Preservation Rule
 

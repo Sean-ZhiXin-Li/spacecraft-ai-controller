@@ -12,7 +12,7 @@ Successful insertion in this sandbox requires:
 crossing -> post-cross smooth synchronization -> recoverability basin -> survival
 ```
 
-Phase34 is the fixed terminal/post-cross controller result. It does not solve the entire orbital insertion problem, and it is not a real spacecraft controller. It shows that, for trajectory families that already produce a target-radius crossing, adding a post-cross synchronization mode can convert those crossings into recoverable cases. Phase36B/36C showed that the remaining bottleneck is upstream crossing-generation. Phase37A then tested radial commitment timing and bounded radial magnitude, but created no new crossings on the baseline non-crossing cases.
+Phase34 is the fixed terminal/post-cross controller result. It does not solve the entire orbital insertion problem, and it is not a real spacecraft controller. It shows that, for trajectory families that already produce a target-radius crossing, adding a post-cross synchronization mode can convert those crossings into recoverable cases. Phase36B/36C showed that the remaining bottleneck is upstream crossing-generation. Phase37A tested radial commitment timing and bounded radial magnitude, but created no new crossings on the baseline non-crossing cases. Phase37B then tested a narrow weak tangential-shaping diagnostic; it created no new selected-case crossings and failed regression preservation.
 
 ## Demo & Visual Overview
 
@@ -232,6 +232,7 @@ Latest completed phases:
 - Phase36B: Transfer-family benchmark
 - Phase36C: Non-crossing geometry diagnosis
 - Phase37A: Radial commitment timing sweep
+- Phase37B: Weak tangential subset diagnostic
 
 Key finding:
 
@@ -239,10 +240,11 @@ Key finding:
 - Phase36B showed multiple transfer families converge to the same crossing basin.
 - Phase36C showed the current bottleneck is upstream crossing-generation rather than post-cross stabilization.
 - Phase37A showed that radial commitment timing alone did not create new crossings.
+- Phase37B showed that weak tangential shaping did not create new selected-case crossings and did not preserve the Phase36B regression crossing set.
 
 Current research question:
 
-Which additional transfer-geometry variable, if any, is justified by the Phase37A closest-approach evidence before attempting Phase37B?
+Which upstream transfer variable, if any, has stronger evidence than Phase37B weak tangential shaping and can be tested without damaging the existing crossing-producing cases?
 
 Current controller role:
 
@@ -251,14 +253,17 @@ Current controller role:
 - Phase36C is the completed non-crossing diagnosis; it prepared the planner-level search space.
 - Phase37A tested `early_commit`, `mid_commit`, and `delayed_commit` with `low` and `medium` radial magnitudes over `144` rollouts.
 - Phase37A created `0` new crossings on the `16 / 24` Phase36B baseline non-crossing cases.
+- Phase37B tested `early_commit_low_plus_weak_tangential` on a subset diagnostic and created `0 / 4` selected-case crossings while preserving only `4 / 8` regression crossings.
 
 ## Next Steps
 
-Phase36B and Phase36C completed the transfer-family benchmark and non-crossing diagnosis. Phase37A then tested whether radial commitment timing and bounded radial magnitude were enough to create new crossings.
+Phase36B and Phase36C completed the transfer-family benchmark and non-crossing diagnosis. Phase37A then tested whether radial commitment timing and bounded radial magnitude were enough to create new crossings. Phase37B tested whether a narrow weak tangential correction could help the four Phase37A-improved `over_conservative_transfer` cases.
 
 Phase37A ran `6` variants across the same `24` cases, for `144` rollouts. It created `0` new crossings on the `16` Phase36B baseline non-crossing cases. `delayed_commit_low` and `delayed_commit_medium` preserved `8 / 24` crossings and `8 / 24` recoverable crossings, while early and mid commitment degraded the existing crossing set. No overspeed or instability occurred.
 
-The next direction is not blind expansion of radial timing search. Before Phase37B, inspect Phase37A closest-approach deltas and decide whether a limited tangential-shaping variable is justified by the evidence.
+Phase37B ran `24` subset rollouts. Weak tangential shaping created `0 / 4` selected-case crossings and `0 / 4` selected-case recoverable crossings. It produced no overspeed or instability, but it preserved only `4 / 8` Phase36B regression crossings and `4 / 8` regression recoverable crossings. This makes it a negative diagnostic, not a controller candidate.
+
+The next direction is not blind expansion of radial timing or tangential shaping. Phase38 should analyze the failed crossing-basin expansion evidence before any new controller implementation.
 
 - keep Phase34 post-cross synchronization fixed
 - measure geometric crossing and Phase34-compatible handoff separately
@@ -267,7 +272,7 @@ The next direction is not blind expansion of radial timing search. Before Phase3
 
 The guiding question is:
 
-> Does any evidence-backed upstream shaping variable create a target-radius crossing that can hand off into Phase34 recovery?
+> Does any evidence-backed upstream shaping variable create a target-radius crossing that can hand off into Phase34 recovery without damaging the known crossing-producing cases?
 
 ## Long-Term Vision
 
@@ -517,17 +522,20 @@ spacecraft_ai_project/
 For the current research narrative, read:
 
 1. [Research direction](docs/research_direction.md)
-2. [Phase37A radial commitment timing summary](analysis/phase37a_radial_commit_timing/phase37a_summary.md)
-3. [PL37A radial commitment timing log](project_log/phase37a_radial_commit_timing.md)
-4. [Artifact manifest](analysis/artifact_manifest.md)
-5. [PL36 transfer-family benchmark and diagnosis](project_log/pl36_transfer_family_benchmark_and_diagnosis.md)
-6. [Phase36B transfer-family benchmark](analysis/phase36b_transfer_family_benchmark/summary.md)
-7. [Phase36C non-crossing diagnosis](analysis/phase36c_non_crossing_geometry_diagnosis/summary.md)
-8. [Planner search benchmark manifest](docs/planner_search_benchmark_manifest.md)
-9. [Phase34 summary](analysis/phase34_post_cross_sync/summary.md)
-10. [Phase34 vs Phase31 comparison](analysis/phase34_post_cross_sync/phase34_vs_phase31_comparison.md)
-11. [Phase33 summary](analysis/phase33_optimal_structure_extraction/phase33_summary.md)
-12. [Phase33 structure decomposition](analysis/phase33_optimal_structure_extraction/structure_decomposition.md)
+2. [Phase38 evidence-based search space](docs/phase38_evidence_based_search_space.md)
+3. [Phase37B weak tangential postmortem](project_log/phase37b_weak_tangential_postmortem.md)
+4. [Phase37B weak tangential subset summary](analysis/phase37b_weak_tangential_subset/phase37b_summary.md)
+5. [Phase37A radial commitment timing summary](analysis/phase37a_radial_commit_timing/phase37a_summary.md)
+6. [PL37A radial commitment timing log](project_log/phase37a_radial_commit_timing.md)
+7. [Artifact manifest](analysis/artifact_manifest.md)
+8. [PL36 transfer-family benchmark and diagnosis](project_log/pl36_transfer_family_benchmark_and_diagnosis.md)
+9. [Phase36B transfer-family benchmark](analysis/phase36b_transfer_family_benchmark/summary.md)
+10. [Phase36C non-crossing diagnosis](analysis/phase36c_non_crossing_geometry_diagnosis/summary.md)
+11. [Planner search benchmark manifest](docs/planner_search_benchmark_manifest.md)
+12. [Phase34 summary](analysis/phase34_post_cross_sync/summary.md)
+13. [Phase34 vs Phase31 comparison](analysis/phase34_post_cross_sync/phase34_vs_phase31_comparison.md)
+14. [Phase33 summary](analysis/phase33_optimal_structure_extraction/phase33_summary.md)
+15. [Phase33 structure decomposition](analysis/phase33_optimal_structure_extraction/structure_decomposition.md)
 
 For older local-controller context:
 
