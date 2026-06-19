@@ -1,0 +1,164 @@
+/* GitHub-like screen/PDF style.
+   Purpose: review rendered Markdown fidelity without copying GitHub CSS. */
+
+@page {
+  size: A4;
+  margin: 2.45cm 2.25cm 2.75cm 2.25cm;
+}
+
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.5;
+  color: #24292f;
+  background: #fff;
+}
+
+.print-meta {
+  display: none;
+}
+
+.markdown-body {
+  max-width: 170mm;
+  margin: 0 auto;
+}
+
+h1, h2 {
+  border-bottom: 1px solid #d0d7de;
+  padding-bottom: 0.3em;
+}
+
+h1 {
+  font-size: 24pt;
+  margin: 0 0 16pt 0;
+  line-height: 1.25;
+  break-before: page;
+  page-break-before: always;
+}
+
+.markdown-body > h1:first-child {
+  break-before: auto;
+  page-break-before: auto;
+}
+
+h2 {
+  font-size: 18pt;
+  margin: 22pt 0 10pt 0;
+}
+
+h3 {
+  font-size: 14pt;
+  margin: 18pt 0 8pt 0;
+}
+
+h4, h5, h6 {
+  margin: 14pt 0 6pt 0;
+}
+
+p {
+  margin: 0 0 10pt 0;
+}
+
+ul, ol {
+  margin: 0 0 10pt 20pt;
+  padding-left: 12pt;
+}
+
+li + li {
+  margin-top: 3pt;
+}
+
+blockquote {
+  margin: 10pt 0;
+  padding: 0 10pt;
+  color: #57606a;
+  border-left: 4px solid #d0d7de;
+}
+
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 12pt 0 16pt 0;
+  font-size: 9.5pt;
+  line-height: 1.35;
+}
+
+thead {
+  display: table-header-group;
+}
+
+th, td {
+  border: 1px solid #d0d7de;
+  padding: 5pt 7pt;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+tr:nth-child(2n) {
+  background: #f6f8fa;
+}
+
+tr {
+  page-break-inside: avoid;
+}
+
+th {
+  font-weight: 600;
+  background: #f6f8fa;
+}
+
+code, pre {
+  font-family: Consolas, "Cascadia Mono", "Courier New", monospace;
+  font-size: 9.1pt;
+}
+
+:not(pre) > code {
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  background: rgba(175, 184, 193, 0.2);
+}
+
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 10pt;
+  background: #f6f8fa;
+  border-radius: 6px;
+  page-break-inside: avoid;
+}
+
+a {
+  color: #0969da;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  margin: 10pt auto;
+}
+
+.document-cover {
+  min-height: 210mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.document-cover h1 {
+  border-bottom: 0;
+  page-break-before: auto;
+  break-before: auto;
+}
+
+h1, h2, h3, table, pre, blockquote {
+  page-break-after: avoid;
+}

@@ -1,0 +1,180 @@
+/* Conservative research internal style.
+   Purpose: restrained A4 research binder printing. */
+
+@page {
+  size: A4;
+  margin: 2.75cm 2.45cm 2.95cm 2.45cm;
+}
+
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.55;
+  color: #1f1f1f;
+  background: #fff;
+}
+
+.print-meta {
+  display: none;
+}
+
+.markdown-body {
+  max-width: 164mm;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #1F4E79;
+  font-size: 24pt;
+  font-weight: 700;
+  line-height: 1.16;
+  margin: 2pt 0 17pt 0;
+  padding-bottom: 7pt;
+  border-bottom: 1.5pt solid #C9D8E8;
+  break-before: page;
+  page-break-before: always;
+}
+
+.markdown-body > h1:first-child {
+  break-before: auto;
+  page-break-before: auto;
+}
+
+h2 {
+  color: #2E75B6;
+  font-size: 17pt;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 21pt 0 9pt 0;
+}
+
+h3 {
+  color: #111;
+  font-size: 13.5pt;
+  font-weight: 700;
+  margin: 16pt 0 7pt 0;
+}
+
+h4, h5, h6 {
+  margin: 12pt 0 5pt 0;
+}
+
+p {
+  margin: 0 0 9pt 0;
+  text-align: justify;
+}
+
+ul, ol {
+  margin: 0 0 9pt 19pt;
+  padding-left: 13pt;
+}
+
+li {
+  margin: 2.5pt 0;
+}
+
+blockquote {
+  margin: 11pt 0;
+  padding: 7pt 10pt;
+  border-left: 3.5pt solid #70AD47;
+  background: #FAFCF8;
+  color: #2f3a2b;
+}
+
+table {
+  border-collapse: collapse;
+  table-layout: auto;
+  width: 100%;
+  margin: 12pt 0 16pt 0;
+  font-size: 9.4pt;
+  line-height: 1.34;
+  page-break-inside: auto;
+}
+
+thead {
+  display: table-header-group;
+}
+
+thead th {
+  background: #DCE6F1;
+  color: #1F4E79;
+  font-weight: 700;
+}
+
+tr {
+  page-break-inside: avoid;
+}
+
+th, td {
+  border: 1px solid #C8D3DF;
+  padding: 5.5pt 7pt;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+tbody tr:nth-child(even) {
+  background: #FAFCFE;
+}
+
+code, pre {
+  font-family: Consolas, "Cascadia Mono", "Courier New", monospace;
+  font-size: 9pt;
+}
+
+:not(pre) > code {
+  padding: 1pt 3.5pt;
+  border-radius: 3pt;
+  background: #F1F3F5;
+}
+
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid #D0D7DE;
+  border-radius: 4pt;
+  padding: 8.5pt;
+  background: #F6F8FA;
+  page-break-inside: avoid;
+}
+
+a {
+  color: #0563C1;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  margin: 10pt auto;
+}
+
+.document-cover {
+  min-height: 205mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  gap: 8mm;
+}
+
+.document-cover h1 {
+  border: 0;
+  color: #1F4E79;
+  page-break-before: auto;
+  break-before: auto;
+  margin: 0;
+  padding: 0;
+  max-width: 135mm;
+}
+
+h1, h2, h3, table, pre, blockquote {
+  page-break-after: avoid;
+}

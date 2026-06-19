@@ -1,0 +1,224 @@
+/* Colorful physical binder style.
+   Purpose: polished A4 research-library binder printing. */
+
+@page {
+  size: A4;
+  margin: 2.65cm 2.35cm 2.9cm 2.35cm;
+}
+
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.55;
+  color: #1F2933;
+  background: #fff;
+}
+
+.print-meta {
+  display: none;
+}
+
+.markdown-body {
+  max-width: 166mm;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #163B5C;
+  font-size: 25pt;
+  font-weight: 750;
+  line-height: 1.14;
+  margin: 2pt 0 17pt 0;
+  padding-bottom: 8pt;
+  border-bottom: 2pt solid #1F6FAE;
+  break-before: page;
+  page-break-before: always;
+}
+
+.markdown-body > h1:first-child {
+  break-before: auto;
+  page-break-before: auto;
+}
+
+h2 {
+  color: #1F6FAE;
+  font-size: 18pt;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 22pt 0 10pt 0;
+}
+
+h3 {
+  color: #163B5C;
+  font-size: 13.5pt;
+  font-weight: 700;
+  margin: 16pt 0 7pt 0;
+}
+
+h4, h5, h6 {
+  color: #1F2933;
+  margin: 12pt 0 5pt 0;
+}
+
+p {
+  margin: 0 0 9pt 0;
+  text-align: justify;
+}
+
+ul, ol {
+  margin: 0 0 9pt 19pt;
+  padding-left: 13pt;
+}
+
+li {
+  margin: 2.5pt 0;
+}
+
+blockquote {
+  margin: 11pt 0;
+  padding: 8pt 11pt;
+  border-left: 4pt solid #1F6FAE;
+  background: #EAF3FB;
+  color: #1F2933;
+}
+
+table {
+  border-collapse: collapse;
+  table-layout: auto;
+  width: 100%;
+  margin: 12pt 0 16pt 0;
+  font-size: 9.45pt;
+  line-height: 1.36;
+  page-break-inside: auto;
+}
+
+thead {
+  display: table-header-group;
+}
+
+thead th,
+th {
+  background: #DCEAF7;
+  color: #163B5C;
+  font-weight: 700;
+}
+
+th, td {
+  border: 1px solid #B8C7D6;
+  padding: 6pt 7pt;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+tr {
+  page-break-inside: avoid;
+}
+
+tbody tr:nth-child(even) {
+  background: #F6FAFD;
+}
+
+code, pre {
+  font-family: Consolas, "Cascadia Mono", "Courier New", monospace;
+  font-size: 9pt;
+}
+
+:not(pre) > code {
+  padding: 1pt 4pt;
+  border-radius: 3pt;
+  background: #EAF3FB;
+  color: #163B5C;
+}
+
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid #B8C7D6;
+  border-radius: 5pt;
+  padding: 9pt;
+  background: #F3F8FC;
+  page-break-inside: avoid;
+}
+
+a {
+  color: #1F6FAE;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  margin: 10pt auto;
+}
+
+.document-cover {
+  min-height: 205mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 7mm;
+}
+
+.cover-kicker {
+  color: #163B5C;
+  font-size: 13pt;
+  letter-spacing: 0.05em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.cover-title {
+  color: #163B5C;
+  font-size: 29pt;
+  font-weight: 750;
+  line-height: 1.12;
+  margin: 0;
+  max-width: 135mm;
+}
+
+.cover-subtitle {
+  color: #1F6FAE;
+  font-size: 16pt;
+  margin: 0;
+}
+
+.cover-rule {
+  width: 70mm;
+  height: 0;
+  border: 0;
+  border-top: 3pt solid #1F6FAE;
+  margin: 2mm 0;
+}
+
+.cover-accent {
+  background: #EAF3FB;
+  border: 1px solid #B8C7D6;
+  border-radius: 7pt;
+  padding: 9pt 18pt;
+  color: #163B5C;
+  font-size: 11.5pt;
+  min-width: 75mm;
+}
+
+.document-cover h1 {
+  border: 0;
+  color: #163B5C;
+  page-break-before: auto;
+  break-before: auto;
+  margin: 0;
+  padding: 0;
+  max-width: 135mm;
+}
+
+h1, h2, h3, table, pre, blockquote {
+  page-break-after: avoid;
+}
