@@ -317,3 +317,10 @@ analysis/*.json
 **/.ipynb_checkpoints/
 *.tmp
 *.temp
+
+# Generated print release outputs
+release_print/temp/
+release_print/*.pdf
+release_print/*.zip
+!release_print/release_summary.md
+!release_print/release_manifest.csv
