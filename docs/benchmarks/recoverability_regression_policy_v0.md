@@ -1,8 +1,10 @@
 # Recoverability Regression Policy v0
 
-Status: Week 4 draft.
+## Status
 
-Date: July 22-28, 2026.
+Week 4 milestone document.
+
+Completed: 2026-07-08
 
 Scope: future controller, planner, learning-baseline, and runtime-assurance experiments for the 2D spacecraft recoverability benchmark.
 

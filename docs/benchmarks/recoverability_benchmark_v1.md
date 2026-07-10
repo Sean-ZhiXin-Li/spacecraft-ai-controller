@@ -1,8 +1,10 @@
 # Recoverability Benchmark v1
 
-Status: Week 1 draft.
+## Status
 
-Date: July 5, 2026.
+Week 1 milestone document.
+
+Completed: 2026-07-04
 
 Scope: post-paper baseline for the 2D spacecraft orbital-control research platform.
 

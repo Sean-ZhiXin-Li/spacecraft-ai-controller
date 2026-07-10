@@ -1,8 +1,10 @@
 # Failure Label Taxonomy v0
 
-Status: Week 2 draft.
+## Status
 
-Date: July 8-14, 2026.
+Week 2 milestone document.
+
+Completed: 2026-07-05
 
 Scope: future 2D spacecraft recoverability experiments after Recoverability Benchmark v1.
 

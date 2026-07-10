@@ -1,8 +1,10 @@
 # Decision Log Schema v0
 
-Status: Week 5 draft.
+## Status
 
-Date: July 29-August 4, 2026.
+Week 5 milestone document.
+
+Completed: 2026-07-09
 
 Scope: minimal decision-evidence logging schema for future recoverability experiments.
 

@@ -1,8 +1,10 @@
 # Result Schema v1
 
-Status: Week 3 draft.
+## Status
 
-Date: July 15-21, 2026.
+Week 3 milestone document.
+
+Completed: 2026-07-08
 
 Scope: future 2D spacecraft recoverability experiments after Recoverability Benchmark v1 and Failure Label Taxonomy v0.
 
