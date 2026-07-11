@@ -1,0 +1,394 @@
+{
+  "manifest_schema_version": "final_veto_ablation_manifest_v0",
+  "experiment_id": "final_veto_overspeed_ablation_v0",
+  "experiment_status": "design_frozen_not_run",
+  "created_date": "2026-07-11",
+  "source_commit": "a12edda8085b10b4f635356fbe3471ec9e19489a",
+  "repository": {
+    "repository_full_name": "Sean-ZhiXin-Li/spacecraft-ai-controller",
+    "remote_name": "origin",
+    "remote_url": "ssh://git@ssh.github.com:443/Sean-ZhiXin-Li/spacecraft-ai-controller.git",
+    "default_branch": "main",
+    "source_branch": "main"
+  },
+  "benchmark_id": "recoverability_benchmark",
+  "benchmark_version": "v1",
+  "design_document": "docs/experiments/final_veto_ablation_plan_v0.md",
+  "monitor": {
+    "monitor_id": "one_step_overspeed_veto_v0",
+    "implemented": false,
+    "evaluation_frequency": "every_nominal_proposed_action",
+    "prediction_horizon_steps": 1,
+    "prediction_dynamics": "must_match_rollout_dynamics_exactly",
+    "decision_outputs": [
+      "allow",
+      "veto"
+    ],
+    "action_logging": {
+      "nominal_proposed_action_before_intervention": true,
+      "executed_action_after_intervention": true
+    },
+    "veto_trigger": {
+      "signal": "predicted_nominal_next_state_speed_ratio",
+      "comparator": ">",
+      "threshold": 1.9,
+      "requirements": [
+        "same_current_state",
+        "same_nominal_action",
+        "same_simulator_constants",
+        "same_action_clamp",
+        "same_integration_order",
+        "same_target_circular_speed_normalization"
+      ]
+    },
+    "proposed_module_path": "runtime_assurance/final_veto_monitor.py"
+  },
+  "hazard": {
+    "hazard_target": "overspeed",
+    "realized_signal": "executed_state_speed_ratio",
+    "threshold": 1.9,
+    "comparator": ">",
+    "normalization": "speed / target_circular_speed",
+    "evaluation_stage": "after_executed_action_state_transition",
+    "threshold_source": [
+      "scripts/explicit_controller_phase34_post_cross_sync.py:566",
+      "scripts/explicit_controller_phase35_crossing_basin_expansion.py:678",
+      "scripts/explicit_controller_phase36b_transfer_family_benchmark.py:583",
+      "scripts/explicit_controller_phase37a_radial_commit_timing.py:556",
+      "scripts/explicit_controller_phase37b_weak_tangential_subset.py:548",
+      "docs/experiments/final_veto_ablation_plan_v0.md:51"
+    ],
+    "formal_safety_boundary": false
+  },
+  "fallback": {
+    "fallback_id": "zero_action_one_step_v0",
+    "fallback_type": "zero_action_coast_fallback",
+    "action": [
+      0.0,
+      0.0
+    ],
+    "duration_steps": 1,
+    "reevaluate_next_step": true,
+    "proven_safe": false,
+    "fallback_failure_measurable": true,
+    "interpretation_rule": "a veto followed by overspeed is a fallback failure, not an avoided failure"
+  },
+  "arms": [
+    {
+      "arm_id": "monitor_off",
+      "monitor_enabled": false,
+      "nominal_action_execution": "execute_unchanged"
+    },
+    {
+      "arm_id": "monitor_on",
+      "monitor_enabled": true,
+      "nominal_action_execution": "allow_or_replace_with_declared_fallback"
+    }
+  ],
+  "preservation_set": {
+    "subset_id": "phase34_known_recoverable_preservation_v1",
+    "case_count": 8,
+    "nominal_controller_context": {
+      "phase": "phase34",
+      "controller_id": "phase34_post_cross_sync",
+      "post_cross_mode": "radius_priority"
+    },
+    "known_phase34_recoverable_case": true,
+    "expected_protected_outcome": [
+      "crossed_target_radius",
+      "recoverable_crossing"
+    ],
+    "outcome_status": "protected_expectation_not_future_result",
+    "cases": [
+      {
+        "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_8000",
+        "r0_over_target": 1.0,
+        "initial_velocity_angle_deg": 150,
+        "thrust_scale": 8000,
+        "seed": 0
+      },
+      {
+        "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_8000",
+        "r0_over_target": 1.0,
+        "initial_velocity_angle_deg": 165,
+        "thrust_scale": 8000,
+        "seed": 0
+      },
+      {
+        "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_8000",
+        "r0_over_target": 1.0,
+        "initial_velocity_angle_deg": 170,
+        "thrust_scale": 8000,
+        "seed": 0
+      },
+      {
+        "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+        "r0_over_target": 1.0,
+        "initial_velocity_angle_deg": 175,
+        "thrust_scale": 8000,
+        "seed": 0
+      },
+      {
+        "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_10000",
+        "r0_over_target": 1.0,
+        "initial_velocity_angle_deg": 150,
+        "thrust_scale": 10000,
+        "seed": 0
+      },
+      {
+        "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_10000",
+        "r0_over_target": 1.0,
+        "initial_velocity_angle_deg": 165,
+        "thrust_scale": 10000,
+        "seed": 0
+      },
+      {
+        "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_10000",
+        "r0_over_target": 1.0,
+        "initial_velocity_angle_deg": 170,
+        "thrust_scale": 10000,
+        "seed": 0
+      },
+      {
+        "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_10000",
+        "r0_over_target": 1.0,
+        "initial_velocity_angle_deg": 175,
+        "thrust_scale": 10000,
+        "seed": 0
+      }
+    ]
+  },
+  "diagnostic_stress_set": {
+    "subset_id": "phase35_radial_energy_push_overspeed_stress_v0",
+    "case_count": 5,
+    "nominal_controller_context": {
+      "phase": "phase35",
+      "controller_id": "phase35_crossing_basin_expansion",
+      "upstream_variant": "radial_energy_push",
+      "post_cross_context": "phase34_radius_priority"
+    },
+    "known_phase34_recoverable_case": false,
+    "archived_selection_evidence": {
+      "source_artifact": "analysis/phase35_crossing_basin_expansion/phase35_results.csv",
+      "use": "case_selection_only",
+      "fresh_monitor_off_rerun_required": true,
+      "minimum_fresh_monitor_off_overspeed_for_hazard_reduction_language": 1
+    },
+    "cases": [
+      {
+        "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+        "r0_over_target": 0.98,
+        "initial_velocity_angle_deg": 150,
+        "thrust_scale": 8000,
+        "seed": 0
+      },
+      {
+        "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000",
+        "r0_over_target": 0.98,
+        "initial_velocity_angle_deg": 150,
+        "thrust_scale": 10000,
+        "seed": 0
+      },
+      {
+        "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000",
+        "r0_over_target": 0.98,
+        "initial_velocity_angle_deg": 165,
+        "thrust_scale": 10000,
+        "seed": 0
+      },
+      {
+        "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+        "r0_over_target": 0.98,
+        "initial_velocity_angle_deg": 170,
+        "thrust_scale": 10000,
+        "seed": 0
+      },
+      {
+        "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+        "r0_over_target": 0.98,
+        "initial_velocity_angle_deg": 175,
+        "thrust_scale": 10000,
+        "seed": 0
+      }
+    ]
+  },
+  "pairing": {
+    "arms_per_case": 2,
+    "required_arm_ids": [
+      "monitor_off",
+      "monitor_on"
+    ],
+    "paired_run_id_template": "{case_id}__seed_{seed}",
+    "case_config_hash": "must_match_between_arms",
+    "deterministic_seed_field": "seed",
+    "identical_between_arms": [
+      "case",
+      "initial_state",
+      "nominal_controller",
+      "controller_parameters",
+      "simulator_constants",
+      "horizon",
+      "seed",
+      "output_schema"
+    ],
+    "only_allowed_arm_difference": "monitor_intervention",
+    "requirements": [
+      "exactly_two_arms_per_case",
+      "one_monitor_off",
+      "one_monitor_on",
+      "stable_paired_run_id",
+      "identical_case_hash",
+      "identical_config_hash",
+      "deterministic_seed_recorded",
+      "missing_pair_is_incomplete_evidence"
+    ]
+  },
+  "acceptance_criteria": {
+    "status": "future_evaluation_rules_not_results",
+    "rules": [
+      {
+        "criterion_id": "protected_historical_guard_passes",
+        "requirement": "python scripts/check_phase_results.py exits zero"
+      },
+      {
+        "criterion_id": "no_protected_path_modified",
+        "requirement": "no protected historical artifact or guard is modified"
+      },
+      {
+        "criterion_id": "exact_preservation_case_count",
+        "requirement": "exactly 8 preservation cases"
+      },
+      {
+        "criterion_id": "exact_stress_case_count",
+        "requirement": "exactly 5 diagnostic stress cases"
+      },
+      {
+        "criterion_id": "complete_counterfactual_pairs",
+        "requirement": "every case has one monitor_off and one monitor_on row"
+      },
+      {
+        "criterion_id": "preservation_monitor_on_crossing",
+        "requirement": "monitor_on crosses in 8 of 8 preservation cases"
+      },
+      {
+        "criterion_id": "preservation_monitor_on_recoverable_crossing",
+        "requirement": "monitor_on has recoverable crossing in 8 of 8 preservation cases"
+      },
+      {
+        "criterion_id": "preservation_blocked_successes_zero",
+        "requirement": "blocked successes on the preservation set equal 0"
+      },
+      {
+        "criterion_id": "invalid_simulation_nonincrease",
+        "requirement": "monitor_on invalid simulation count does not exceed monitor_off"
+      },
+      {
+        "criterion_id": "stress_monitor_off_hazard_exercised",
+        "requirement": "fresh monitor_off stress overspeed count is at least 1"
+      },
+      {
+        "criterion_id": "stress_hazard_reduction",
+        "requirement": "monitor_on stress overspeed count is at least 1 lower than monitor_off for H1 support"
+      },
+      {
+        "criterion_id": "paired_avoided_failure",
+        "requirement": "at least 1 complete pair is an avoided failure for positive evidence"
+      },
+      {
+        "criterion_id": "nontrivial_action_execution",
+        "requirement": "the monitor does not veto every proposed action"
+      },
+      {
+        "criterion_id": "blocked_successes_reported",
+        "requirement": "blocked successes are reported even when zero"
+      },
+      {
+        "criterion_id": "unnecessary_vetoes_reported",
+        "requirement": "unnecessary vetoes are reported even when zero"
+      },
+      {
+        "criterion_id": "false_negatives_reported",
+        "requirement": "false negatives are reported even when zero"
+      },
+      {
+        "criterion_id": "fallback_failures_reported",
+        "requirement": "fallback failures are reported even when zero"
+      },
+      {
+        "criterion_id": "claim_sets_separate",
+        "requirement": "preservation and diagnostic stress claims remain separate"
+      },
+      {
+        "criterion_id": "no_formal_safety_claim",
+        "requirement": "no formal-safety claim is permitted"
+      }
+    ]
+  },
+  "output_contract": {
+    "base_directory": "analysis/final_veto_ablation_v0/",
+    "manifest_path": "analysis/final_veto_ablation_v0/manifest.json",
+    "result_schema_version": "result_schema_v1",
+    "decision_log_schema_version": "decision_log_schema_v0",
+    "future_artifacts": [
+      {
+        "artifact_id": "results",
+        "path": "analysis/final_veto_ablation_v0/results.csv",
+        "currently_ignored_by_gitignore": true
+      },
+      {
+        "artifact_id": "paired_results",
+        "path": "analysis/final_veto_ablation_v0/paired_results.csv",
+        "currently_ignored_by_gitignore": true
+      },
+      {
+        "artifact_id": "decision_log",
+        "path": "analysis/final_veto_ablation_v0/decision_log.jsonl",
+        "currently_ignored_by_gitignore": false
+      },
+      {
+        "artifact_id": "summary",
+        "path": "analysis/final_veto_ablation_v0/summary.md",
+        "currently_ignored_by_gitignore": false
+      },
+      {
+        "artifact_id": "comparison_plot",
+        "path": "analysis/final_veto_ablation_v0/comparison.png",
+        "currently_ignored_by_gitignore": true
+      }
+    ]
+  },
+  "protected_paths": [
+    "analysis/phase34_post_cross_sync/",
+    "analysis/phase35_crossing_basin_expansion/",
+    "analysis/phase36b_transfer_family_benchmark/",
+    "analysis/phase36c_non_crossing_geometry_diagnosis/",
+    "analysis/phase37a_radial_commit_timing/",
+    "analysis/phase37b_weak_tangential_subset/",
+    "scripts/check_phase_results.py"
+  ],
+  "allowed_claims": [
+    "rule_based_monitor_reduced_declared_simulated_hazard_on_predeclared_diagnostic_stress_set",
+    "monitor_preserved_known_phase34_recoverable_cases_under_tested_preservation_set",
+    "paired_ablation_reported_safety_benefits_and_performance_costs",
+    "simulator_level_evidence_for_one_minimal_veto_mechanism"
+  ],
+  "prohibited_claims": [
+    "formal_safety",
+    "verified_runtime_assurance",
+    "guaranteed_hazard_avoidance",
+    "flight_readiness",
+    "hardware_readiness",
+    "real_spacecraft_validation",
+    "sim_to_real_transfer",
+    "cross_domain_robotics_validation",
+    "universal_cross_embodiment_safety",
+    "completed_decision_manager_architecture"
+  ],
+  "notes": [
+    "This manifest freezes an experiment design and contains no measured monitor results.",
+    "The monitor and paired runner are not implemented at manifest freeze time.",
+    "The overspeed threshold is an existing simulator threshold, not a formally proven safety boundary.",
+    "Archived Phase35 rows select stress cases only; all evidence claims require fresh paired reruns.",
+    "Future output writers must refuse protected directories and must not overwrite this manifest."
+  ]
+}
