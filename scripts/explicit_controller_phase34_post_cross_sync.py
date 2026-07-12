@@ -24,6 +24,12 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from controller.orbit_lock_controller import OrbitLockConfig
+from simulator.phase34_35_transition import (
+    CartesianState2D,
+    NormalizedAction2D,
+    Phase3435DynamicsContext,
+    step_phase34_35_transition,
+)
 from scripts.explicit_controller_phase21_orbital_transfer_planner import (
     BASE_PARAMS,
     DEFAULT_TARGET_RADIUS,
@@ -291,6 +297,13 @@ def rollout_phase34_case(
         "stage": [],
     }
 
+    transition_context = Phase3435DynamicsContext(
+        mu=MU,
+        dt=DT,
+        mass=MASS,
+        thrust_scale=thrust_scale,
+    )
+
     def env_step(
         state_x: float,
         state_y: float,
@@ -299,17 +312,13 @@ def rollout_phase34_case(
         action_x: float,
         action_y: float,
     ) -> tuple[float, float, float, float]:
-        action_x = clamp(action_x, -1.0, 1.0)
-        action_y = clamp(action_y, -1.0, 1.0)
-        state_radius = math.sqrt(state_x * state_x + state_y * state_y)
-        denom = state_radius**3 + 1.0e-12
-        ax = -MU * state_x / denom + thrust_scale * action_x / MASS
-        ay = -MU * state_y / denom + thrust_scale * action_y / MASS
-        next_vx = state_vx + ax * DT
-        next_vy = state_vy + ay * DT
-        next_x = state_x + next_vx * DT
-        next_y = state_y + next_vy * DT
-        return next_x, next_y, next_vx, next_vy
+        transition = step_phase34_35_transition(
+            CartesianState2D(state_x, state_y, state_vx, state_vy),
+            NormalizedAction2D(action_x, action_y),
+            transition_context,
+        )
+        next_state = transition.next_state
+        return next_state.x, next_state.y, next_state.vx, next_state.vy
 
     def baseline_action(state_vx: float, state_vy: float) -> tuple[float, float]:
         speed = math.sqrt(state_vx * state_vx + state_vy * state_vy)
