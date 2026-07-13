@@ -24,6 +24,14 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from controller.orbit_lock_controller import OrbitLockConfig
+from runtime_assurance.final_veto_runner_types import (
+    ActionInterceptionResult,
+    PostTransitionObservation,
+    PostTransitionObservationHook,
+    PreTransitionActionContext,
+    PreTransitionActionHook,
+    RolloutCaseContext,
+)
 from simulator.phase34_35_transition import (
     CartesianState2D,
     NormalizedAction2D,
@@ -292,6 +300,10 @@ def rollout_phase35_case(
     thrust_scale: float,
     target_scale: float = TARGET_RADIUS_SCALE,
     record_trajectory: bool = False,
+    *,
+    case_id: str = "",
+    pre_transition_action_hook: PreTransitionActionHook | None = None,
+    post_transition_observation_hook: PostTransitionObservationHook | None = None,
 ) -> Dict[str, object]:
     target_radius = DEFAULT_TARGET_RADIUS * target_scale
     x = 0.0
@@ -358,6 +370,31 @@ def rollout_phase35_case(
         mass=MASS,
         thrust_scale=thrust_scale,
     )
+    case_context = RolloutCaseContext(
+        case_id=case_id,
+        controller_id="phase35_crossing_basin_expansion",
+        controller_family="explicit_controller",
+        r0_over_target=r0,
+        initial_velocity_angle_deg=angle,
+        thrust_scale=thrust_scale,
+        target_radius=target_radius,
+        target_circular_speed=v_circ,
+        post_cross_mode=mode.name,
+        upstream_variant=variant.name,
+    )
+
+    def predict_transition(
+        state: CartesianState2D,
+        action: tuple[float, float],
+    ):
+        return step_phase34_35_transition(
+            state,
+            NormalizedAction2D(action[0], action[1]),
+            transition_context,
+        )
+
+    def compute_speed_ratio(state: CartesianState2D) -> float:
+        return math.sqrt(state.vx * state.vx + state.vy * state.vy) / (v_circ + 1.0e-12)
 
     def env_step(
         state_x: float,
@@ -633,8 +670,52 @@ def rollout_phase35_case(
         lock_entered = lock_entered or phase == "LOCK"
         stage_counts[active_stage] += 1
 
+        previous_state = CartesianState2D(x, y, vx, vy)
+        nominal_action = (action_x, action_y)
+        executed_action = nominal_action
+        intervention_applied = False
+        decision_metadata: object | None = None
+        if pre_transition_action_hook is not None:
+            interception = pre_transition_action_hook(
+                PreTransitionActionContext(
+                    step=step,
+                    phase=phase,
+                    active_stage=active_stage,
+                    current_state=previous_state,
+                    nominal_action=nominal_action,
+                    predict_transition=predict_transition,
+                    compute_speed_ratio=compute_speed_ratio,
+                    case=case_context,
+                )
+            )
+            if not isinstance(interception, ActionInterceptionResult):
+                raise TypeError("pre-transition hook must return ActionInterceptionResult")
+            if interception.nominal_action != nominal_action:
+                raise ValueError("pre-transition hook must preserve the nominal action evidence")
+            executed_action = interception.executed_action
+            intervention_applied = interception.intervention_applied
+            decision_metadata = interception.decision_metadata
+        action_x, action_y = executed_action
         x, y, vx, vy = env_step(x, y, vx, vy, action_x, action_y)
         next_diag = orbital_diagnostics(x, y, vx, vy, target_radius)
+        realized_next_state = CartesianState2D(x, y, vx, vy)
+        realized_speed_ratio = next_diag.speed / (v_circ + 1.0e-12)
+        if post_transition_observation_hook is not None:
+            post_transition_observation_hook(
+                PostTransitionObservation(
+                    step=step,
+                    phase=phase,
+                    active_stage=active_stage,
+                    previous_state=previous_state,
+                    nominal_action=nominal_action,
+                    executed_action=executed_action,
+                    realized_next_state=realized_next_state,
+                    realized_next_speed_ratio=realized_speed_ratio,
+                    intervention_applied=intervention_applied,
+                    decision_metadata=decision_metadata,
+                    case=case_context,
+                )
+            )
         r_error = next_diag.radius - target_radius
         next_vr_ratio = next_diag.radial_velocity / (v_circ + 1.0e-12)
         next_vt_ratio = next_diag.vt_error_ratio
@@ -654,7 +735,7 @@ def rollout_phase35_case(
                 crossing_distance_value = next_distance
                 phase = "POST_CROSS_SYNC"
                 stage_step = 0
-                prev_post_action = (action_x, action_y)
+                prev_post_action = nominal_action
         prev_r_error = r_error
 
         if phase == "POST_CROSS_SYNC":
