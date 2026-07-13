@@ -324,3 +324,8 @@ release_print/*.pdf
 release_print/*.zip
 !release_print/release_summary.md
 !release_print/release_manifest.csv
+
+# Final Veto ablation v0: exact formal publication artifacts only
+!analysis/final_veto_ablation_v0/results.csv
+!analysis/final_veto_ablation_v0/paired_results.csv
+!analysis/final_veto_ablation_v0/comparison.png
