@@ -22,6 +22,9 @@ from scripts import explicit_controller_phase35_crossing_basin_expansion as phas
 from scripts.run_final_veto_ablation import (
     ArmExecutionError,
     ArmHookRecorder,
+    FORMAL_ARTIFACT_NAMES,
+    FORMAL_OUTPUT_DIRECTORY,
+    FORMAL_PREFLIGHT_TEST_MODULES,
     RunnerContractError,
     PROJECT_ROOT,
     build_pair_record,
@@ -30,6 +33,7 @@ from scripts.run_final_veto_ablation import (
     load_frozen_manifest,
     main,
     publication_readiness_errors,
+    select_smoke_jobs,
     validate_planned_jobs,
 )
 from simulator.phase34_35_transition import (
@@ -157,13 +161,113 @@ class PairedPlannerTests(unittest.TestCase):
         self.assertIn("simulation_started=false", output.getvalue())
         execute.assert_not_called()
 
-    def test_formal_publication_is_blocked_by_current_ignore_rules(self) -> None:
+    def git_path_is_ignored(self, relative_path) -> bool:
+        completed = subprocess.run(
+            [
+                "git",
+                "-c",
+                f"safe.directory={PROJECT_ROOT.as_posix()}",
+                "check-ignore",
+                "-q",
+                "--no-index",
+                relative_path.as_posix(),
+            ],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if completed.returncode == 0:
+            return True
+        if completed.returncode == 1:
+            return False
+        self.fail(
+            f"git check-ignore failed for {relative_path.as_posix()} "
+            f"with exit {completed.returncode}: {completed.stderr.strip()}"
+        )
+
+    def test_formal_publication_paths_are_publishable_and_validation_is_read_only(self) -> None:
+        formal_paths = {
+            FORMAL_OUTPUT_DIRECTORY / filename
+            for filename in FORMAL_ARTIFACT_NAMES.values()
+        }
+        self.assertEqual(
+            {path.name for path in formal_paths},
+            {
+                "results.csv",
+                "paired_results.csv",
+                "comparison.png",
+                "decision_log.jsonl",
+                "summary.md",
+            },
+        )
+        for relative_path in formal_paths:
+            with self.subTest(path=relative_path.as_posix()):
+                self.assertFalse(self.git_path_is_ignored(relative_path))
+
         errors = publication_readiness_errors(self.manifest, PROJECT_ROOT)
         ignored = [error for error in errors if "ignored by .gitignore" in error]
-        self.assertEqual(len(ignored), 3)
-        self.assertTrue(any("results.csv" in error for error in ignored))
-        self.assertTrue(any("paired_results.csv" in error for error in ignored))
-        self.assertTrue(any("comparison.png" in error for error in ignored))
+        self.assertEqual(len(ignored), 0)
+        self.assertEqual(errors, [])
+
+        output_directory = PROJECT_ROOT / FORMAL_OUTPUT_DIRECTORY
+        before = {
+            path.relative_to(output_directory).as_posix(): path.read_bytes()
+            for path in output_directory.rglob("*")
+            if path.is_file()
+        }
+        with mock.patch(
+            "scripts.run_final_veto_ablation.execute_jobs_to_directory"
+        ) as execute:
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                result = main(["--validate-only"])
+        after = {
+            path.relative_to(output_directory).as_posix(): path.read_bytes()
+            for path in output_directory.rglob("*")
+            if path.is_file()
+        }
+        self.assertEqual(result, 0)
+        self.assertIn("simulation_started=false", output.getvalue())
+        self.assertIn("artifacts_written=false", output.getvalue())
+        self.assertIn("formal publication paths are ready", output.getvalue())
+        self.assertEqual(after, before)
+        execute.assert_not_called()
+
+    def test_formal_preflight_test_gate_excludes_rollout_modules(self) -> None:
+        self.assertIn("Tests.test_final_veto_compact_logging", FORMAL_PREFLIGHT_TEST_MODULES)
+        self.assertNotIn("Tests.test_final_veto_transition", FORMAL_PREFLIGHT_TEST_MODULES)
+        self.assertNotIn("Tests.test_final_veto_runner", FORMAL_PREFLIGHT_TEST_MODULES)
+
+    def test_ordinary_csv_outside_exact_publication_exceptions_remains_ignored(self) -> None:
+        ordinary_csv = FORMAL_OUTPUT_DIRECTORY / "ordinary_diagnostic.csv"
+        self.assertTrue(self.git_path_is_ignored(ordinary_csv))
+
+    def test_publication_readiness_treats_unexpected_git_exit_as_error(self) -> None:
+        failed = subprocess.CompletedProcess(
+            args=["git", "check-ignore"], returncode=2, stdout="", stderr="fatal"
+        )
+        with mock.patch(
+            "scripts.run_final_veto_ablation.subprocess.run", return_value=failed
+        ):
+            errors = publication_readiness_errors(self.manifest, PROJECT_ROOT)
+        self.assertEqual(len(errors), len(FORMAL_ARTIFACT_NAMES))
+        self.assertTrue(all("git check-ignore exited 2" in error for error in errors))
+
+    def test_smoke_case_selector_selects_one_frozen_stress_pair(self) -> None:
+        case_id = (
+            "phase35_radial_energy_push_overspeed_stress_v0"
+            "__r0_0p98__angle_150__thrust_8000"
+        )
+        selected = select_smoke_jobs(self.jobs, case_id)
+        self.assertEqual(len(selected), 2)
+        self.assertEqual({job.arm_id for job in selected}, {"monitor_off", "monitor_on"})
+        self.assertEqual({job.case_id for job in selected}, {case_id})
+        self.assertEqual({job.upstream_variant for job in selected}, {"radial_energy_push"})
+
+    def test_smoke_case_selector_rejects_unknown_case(self) -> None:
+        with self.assertRaises(RunnerContractError):
+            select_smoke_jobs(self.jobs, "not_a_frozen_case")
 
     def test_planner_rejects_missing_arm(self) -> None:
         with self.assertRaises(RunnerContractError):
@@ -438,6 +542,63 @@ class ArmHookRecorderTests(unittest.TestCase):
         self.assertEqual(recorder.allow_count, 0)
         self.assertEqual(recorder.veto_count, 0)
         self.assertEqual(recorder.invalid_monitor_evaluation_count, 1)
+
+    def test_missing_post_transition_event_fails_stream_completeness(self) -> None:
+        recorder = ArmHookRecorder(
+            self.on_job,
+            is_formal_experiment=False,
+            event_sink=lambda _event: None,
+        )
+        recorder.pre_transition(self.context_for_ratios(1.5))
+        with self.assertRaises(RunnerContractError):
+            recorder.assert_complete_decision_stream()
+
+    def test_valid_allow_and_veto_events_have_explicit_decision_reasons(self) -> None:
+        events: list[Mapping[str, object]] = []
+        allow_context = self.context_for_ratios(1.89)
+        allow_recorder = ArmHookRecorder(
+            self.on_job, is_formal_experiment=False, event_sink=events.append
+        )
+        allow_result = allow_recorder.pre_transition(allow_context)
+        allow_recorder.post_transition(
+            self.observation_for(allow_context, allow_result, 1.89)
+        )
+
+        veto_context = self.context_for_ratios(2.0, 1.5)
+        veto_recorder = ArmHookRecorder(
+            self.on_job, is_formal_experiment=False, event_sink=events.append
+        )
+        veto_result = veto_recorder.pre_transition(veto_context)
+        veto_recorder.post_transition(
+            self.observation_for(veto_context, veto_result, 1.5)
+        )
+
+        self.assertNotIn("unknown", {event["decision_reason"] for event in events})
+        self.assertEqual(
+            [
+                (
+                    event["decision_type"],
+                    event["decision_reason"],
+                    event["veto_status"],
+                    event["veto_reason"],
+                )
+                for event in events
+            ],
+            [
+                (
+                    "continue",
+                    "predicted_nominal_within_threshold",
+                    "allow",
+                    "predicted_nominal_within_threshold",
+                ),
+                (
+                    "veto_action",
+                    "predicted_nominal_exceeds_overspeed_threshold",
+                    "veto",
+                    "predicted_nominal_exceeds_overspeed_threshold",
+                ),
+            ],
+        )
 
 
 class PairMetricTests(unittest.TestCase):

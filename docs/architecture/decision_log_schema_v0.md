@@ -412,6 +412,33 @@ Recommended future artifact examples:
 
 Do not create those artifacts until a future implementation task explicitly asks for them.
 
+### Final Veto Compact Public Profile
+
+The Final Veto ablation uses a bounded streaming profile for its public
+`decision_log.jsonl`.  A logical Decision Log-compatible object is still built
+for every monitor evaluation, but contiguous evaluations with the same decision
+state are published as `event_kind=decision_segment` records.  Invalid
+evaluations, false negatives, fallback failures, terminal transitions, and
+predicted-versus-realized fallback-classification mismatches are emitted as
+dedicated records rather than being hidden inside a segment.
+
+The writer retains only the current segment and scalar counters.  It also hashes
+the complete logical per-step stream with SHA-256.  Each logical object is
+serialized as UTF-8 JSON with sorted keys, compact separators, and a trailing
+newline before the digest is updated.  The arm result records the logical event
+count, digest, compact record count, and logging mode so review of the compact
+artifact remains tied to the full decision stream.
+
+Preflight reports both the semantic record upper bound (if every evaluation
+were exceptional or changed state) and the lower enforced publication cap.  A
+run that would exceed the enforced record or byte cap fails atomically; records
+are never silently truncated.
+
+Formal Final Veto execution requires `decision_log_mode=compact`.  A full
+per-step trace is permitted only for an explicitly nonformal run, at a
+user-supplied local path outside the repository.  It is not part of the frozen
+formal output contract and is never written as a second formal artifact.
+
 ## Minimal Example Logs
 
 These examples are schema examples only. They are not historical artifact rewrites.

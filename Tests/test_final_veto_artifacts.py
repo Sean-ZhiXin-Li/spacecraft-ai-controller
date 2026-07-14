@@ -7,10 +7,15 @@ import unittest
 from pathlib import Path
 
 from scripts.final_veto_artifacts import (
+    ARM_DIAGNOSTIC_FIELDNAMES,
     ARM_FIELDNAMES,
     ARM_JSON_LIST_FIELDS,
+    COMPACT_DECISION_EVENT_FIELDNAMES,
     DECISION_FIELDNAMES,
+    DECISION_SEGMENT_FIELDNAMES,
+    PAIR_DIAGNOSTIC_FIELDNAMES,
     PAIR_FIELDNAMES,
+    TERMINAL_TRANSITION_FIELDNAMES,
     ArtifactWriteError,
     JsonlEventWriter,
     resolve_output_path,
@@ -111,6 +116,16 @@ class FinalVetoArtifactTests(unittest.TestCase):
             [{"index": 1}, {"index": 2}],
         )
 
+    def test_jsonl_writer_rejects_noncanonical_nan_without_publishing(self) -> None:
+        with self.assertRaises(ValueError):
+            write_jsonl_atomic(
+                self.output,
+                "decision_log.jsonl",
+                [{"predicted_nominal_speed_ratio": float("nan")}],
+            )
+        self.assertFalse((self.output / "decision_log.jsonl").exists())
+        self.assertEqual(list(self.output.glob("*.tmp")), [])
+
     def test_writer_refuses_protected_path(self) -> None:
         protected = self.root / "analysis" / "phase34_post_cross_sync"
         with self.assertRaises(ArtifactWriteError):
@@ -201,6 +216,32 @@ class FinalVetoArtifactTests(unittest.TestCase):
             "fallback_failure",
         ):
             self.assertIn(field, DECISION_FIELDNAMES)
+
+    def test_compact_contracts_have_a_distinct_event_kind(self) -> None:
+        for fields in (
+            DECISION_SEGMENT_FIELDNAMES,
+            COMPACT_DECISION_EVENT_FIELDNAMES,
+            TERMINAL_TRANSITION_FIELDNAMES,
+        ):
+            self.assertIn("event_kind", fields)
+        self.assertNotIn("event_kind", DECISION_FIELDNAMES)
+
+    def test_result_contracts_include_stream_and_burden_diagnostics(self) -> None:
+        for field in (
+            "decision_stream_event_count",
+            "decision_stream_sha256",
+            "compact_decision_record_count",
+            "decision_log_mode",
+            "intervention_rate",
+            "longest_consecutive_veto_steps",
+        ):
+            self.assertIn(field, ARM_DIAGNOSTIC_FIELDNAMES)
+        for field in (
+            "terminal_outcome_transition",
+            "declared_hazard_avoided",
+            "task_recovered_after_hazard_avoidance",
+        ):
+            self.assertIn(field, PAIR_DIAGNOSTIC_FIELDNAMES)
 
 
 if __name__ == "__main__":

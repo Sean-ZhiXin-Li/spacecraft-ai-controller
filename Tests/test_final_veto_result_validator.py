@@ -3,7 +3,12 @@ from __future__ import annotations
 import copy
 import unittest
 
-from scripts.final_veto_artifacts import ARM_FIELDNAMES, DECISION_FIELDNAMES
+from scripts.final_veto_artifacts import (
+    ARM_DIAGNOSTIC_FIELDNAMES,
+    ARM_FIELDNAMES,
+    DECISION_FIELDNAMES,
+    PAIR_DIAGNOSTIC_FIELDNAMES,
+)
 from scripts.run_final_veto_ablation import (
     build_pair_record,
     build_planned_jobs,
@@ -105,6 +110,22 @@ def make_arm(
             "accepted_as_progress": False,
             "acceptance_reason": "synthetic fixture; aggregate validation pending",
             "is_formal_experiment": formal,
+            "termination_reason": (
+                "overspeed" if overspeed else ("success" if success else "no_crossing")
+            ),
+            "decision_stream_event_count": 10 if monitor_on else 0,
+            "decision_stream_sha256": "a" * 64,
+            "compact_decision_record_count": 3 if monitor_on else 0,
+            "decision_log_mode": "compact",
+            "intervention_rate": 0.1 if monitor_on else 0.0,
+            "allow_rate": 0.9 if monitor_on else 0.0,
+            "fallback_rate": 0.1 if monitor_on else 0.0,
+            "first_veto_step": 10 if monitor_on else None,
+            "last_veto_step": 10 if monitor_on else None,
+            "longest_consecutive_veto_steps": 1 if monitor_on else 0,
+            "longest_consecutive_allow_steps": 9 if monitor_on else 0,
+            "veto_segment_count": 1 if monitor_on else 0,
+            "allow_segment_count": 1 if monitor_on else 0,
         }
     )
     row.update(overrides)
@@ -139,6 +160,19 @@ class FinalVetoResultValidatorTests(unittest.TestCase):
         self.assertTrue(report.pair_complete)
         self.assertEqual(report.preservation_acceptance, "not_evaluated_nonformal")
         self.assertFalse(report.positive_claim_eligible)
+
+    def test_csv_case_parameter_strings_match_frozen_numeric_fields(self) -> None:
+        arms, pairs = self.fixture()
+        for row in arms:
+            for field in (
+                "hazard_threshold",
+                "r0_over_target",
+                "initial_velocity_angle_deg",
+                "thrust_scale",
+            ):
+                row[field] = str(row[field])
+        report = self.report(arms=arms, pairs=pairs)
+        self.assertTrue(report.structural_valid, report.errors)
 
     def test_missing_arm_is_rejected(self) -> None:
         arms, _ = self.fixture()
@@ -180,6 +214,29 @@ class FinalVetoResultValidatorTests(unittest.TestCase):
         report = self.report(arms=arms, pairs=pairs)
         self.assertFalse(report.structural_valid)
         self.assertTrue(any("smoke status as formal" in error for error in report.errors))
+
+    def test_formal_rows_require_complete_compact_and_burden_extensions(self) -> None:
+        off = make_arm(self.job, "monitor_off", formal=True)
+        on = make_arm(self.job, "monitor_on", formal=True)
+        pair = build_pair_record([off, on])
+        for row in (off, on):
+            for field in ARM_DIAGNOSTIC_FIELDNAMES:
+                row.pop(field)
+        for field in PAIR_DIAGNOSTIC_FIELDNAMES:
+            pair.pop(field)
+        report = self.report(arms=[off, on], pairs=[pair])
+        self.assertFalse(report.structural_valid)
+        self.assertTrue(any("lacks compact-logging diagnostics" in error for error in report.errors))
+        self.assertTrue(any("lacks intervention diagnostics" in error for error in report.errors))
+
+    def test_partial_nonformal_extensions_are_rejected(self) -> None:
+        arms, pairs = self.fixture()
+        arms[0].pop("decision_stream_sha256")
+        pairs[0].pop("terminal_outcome_transition")
+        report = self.report(arms=arms, pairs=pairs)
+        self.assertFalse(report.structural_valid)
+        self.assertTrue(any("partial compact-logging extension" in error for error in report.errors))
+        self.assertTrue(any("partial intervention-diagnostic extension" in error for error in report.errors))
 
     def test_protected_output_directory_is_rejected(self) -> None:
         report = self.report(

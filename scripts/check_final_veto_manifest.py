@@ -89,6 +89,9 @@ REQUIRED_ACCEPTANCE_CRITERIA = {
     "no_formal_safety_claim",
 }
 
+# These booleans are freeze-time metadata recorded at manifest source_commit.
+# They are not a live publication-readiness assertion; the runner queries
+# current Git behavior independently before any formal execution.
 EXPECTED_OUTPUT_PATHS = {
     "analysis/final_veto_ablation_v0/results.csv": True,
     "analysis/final_veto_ablation_v0/paired_results.csv": True,
@@ -453,8 +456,8 @@ def validate_manifest_data(data: dict[str, Any]) -> list[str]:
     }
     _check(
         actual_output_map == EXPECTED_OUTPUT_PATHS,
-        "future output paths and current ignore states are frozen",
-        "future output paths or their recorded .gitignore states differ from the frozen contract",
+        "future output paths and freeze-time ignore metadata are frozen",
+        "future output paths or their recorded freeze-time .gitignore metadata differ from the frozen contract",
         passes,
         errors,
     )

@@ -12,7 +12,7 @@ ARM_SCHEMA_VERSION = "result_schema_v1"
 PAIR_SCHEMA_VERSION = "final_veto_pair_schema_v0"
 DECISION_SCHEMA_VERSION = "decision_log_schema_v0"
 
-ARM_FIELDNAMES = (
+LEGACY_ARM_FIELDNAMES = (
     "schema_version",
     "benchmark_id",
     "benchmark_version",
@@ -71,7 +71,26 @@ ARM_FIELDNAMES = (
     "is_formal_experiment",
 )
 
-PAIR_FIELDNAMES = (
+ARM_DIAGNOSTIC_FIELDNAMES = (
+    "termination_reason",
+    "decision_stream_event_count",
+    "decision_stream_sha256",
+    "compact_decision_record_count",
+    "decision_log_mode",
+    "intervention_rate",
+    "allow_rate",
+    "fallback_rate",
+    "first_veto_step",
+    "last_veto_step",
+    "longest_consecutive_veto_steps",
+    "longest_consecutive_allow_steps",
+    "veto_segment_count",
+    "allow_segment_count",
+)
+
+ARM_FIELDNAMES = LEGACY_ARM_FIELDNAMES + ARM_DIAGNOSTIC_FIELDNAMES
+
+LEGACY_PAIR_FIELDNAMES = (
     "pair_schema_version",
     "experiment_id",
     "paired_run_id",
@@ -107,6 +126,22 @@ PAIR_FIELDNAMES = (
     "claim_ineligibility_reason",
     "is_formal_experiment",
 )
+
+PAIR_DIAGNOSTIC_FIELDNAMES = (
+    "terminal_label_without_monitor",
+    "terminal_label_with_monitor",
+    "terminal_label_changed",
+    "termination_reason_without_monitor",
+    "termination_reason_with_monitor",
+    "terminal_outcome_transition",
+    "step_count_delta",
+    "monitor_induced_horizon_extension",
+    "task_outcome_preserved",
+    "declared_hazard_avoided",
+    "task_recovered_after_hazard_avoidance",
+)
+
+PAIR_FIELDNAMES = LEGACY_PAIR_FIELDNAMES + PAIR_DIAGNOSTIC_FIELDNAMES
 
 DECISION_FIELDNAMES = (
     "decision_schema_version",
@@ -144,6 +179,71 @@ DECISION_FIELDNAMES = (
     "fallback_failure",
     "invalid_evaluation",
     "manual_audit_note",
+    "is_formal_experiment",
+)
+
+DECISION_SEGMENT_FIELDNAMES = (
+    "decision_schema_version",
+    "event_kind",
+    "experiment_id",
+    "run_id",
+    "paired_run_id",
+    "case_id",
+    "subset_id",
+    "arm_id",
+    "monitor_id",
+    "start_step",
+    "end_step",
+    "step_count",
+    "phase",
+    "active_stage",
+    "decision_type",
+    "decision_reason",
+    "veto_status",
+    "fallback_executed",
+    "invalid_evaluation",
+    "fallback_failure",
+    "terminal_state",
+    "fallback_failure_count",
+    "false_negative_count",
+    "first_nominal_action",
+    "last_nominal_action",
+    "first_executed_action",
+    "last_executed_action",
+    "first_predicted_nominal_speed_ratio",
+    "last_predicted_nominal_speed_ratio",
+    "minimum_predicted_nominal_speed_ratio",
+    "maximum_predicted_nominal_speed_ratio",
+    "first_realized_executed_speed_ratio",
+    "last_realized_executed_speed_ratio",
+    "minimum_realized_executed_speed_ratio",
+    "maximum_realized_executed_speed_ratio",
+    "minimum_predicted_fallback_speed_ratio",
+    "maximum_predicted_fallback_speed_ratio",
+    "hazard_threshold",
+    "hazard_comparator",
+    "is_formal_experiment",
+)
+
+COMPACT_DECISION_EVENT_FIELDNAMES = (
+    "event_kind",
+    "exception_reasons",
+) + DECISION_FIELDNAMES + ("false_negative",)
+
+TERMINAL_TRANSITION_FIELDNAMES = (
+    "decision_schema_version",
+    "event_kind",
+    "experiment_id",
+    "run_id",
+    "paired_run_id",
+    "case_id",
+    "subset_id",
+    "arm_id",
+    "monitor_id",
+    "step",
+    "terminal_state",
+    "terminal_label",
+    "termination_reason",
     "is_formal_experiment",
 )
 
@@ -319,10 +419,22 @@ class JsonlEventWriter:
         if self._handle is None:
             raise ArtifactWriteError("JSONL writer is not open")
         self._handle.write(
-            json.dumps(event, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+            json.dumps(
+                event,
+                allow_nan=False,
+                ensure_ascii=True,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
         )
         self._handle.write("\n")
         self._handle.flush()
+
+    def staged_path_for_validation(self) -> Path:
+        if self._handle is None or self._temporary is None:
+            raise ArtifactWriteError("JSONL writer is not open")
+        self._handle.flush()
+        return self._temporary
 
     def __exit__(self, exc_type, exc_value, traceback) -> bool:
         if self._handle is not None:
@@ -359,19 +471,63 @@ def write_jsonl_atomic(
         return writer.destination
 
 
+def write_text_atomic(
+    output_directory: Path,
+    filename: str | Path,
+    text: str,
+    *,
+    repository_root: Path | None = None,
+    protected_paths: Sequence[str] = (),
+) -> Path:
+    destination = resolve_output_path(
+        output_directory,
+        filename,
+        repository_root=repository_root,
+        protected_paths=protected_paths,
+    )
+    if destination.exists():
+        raise ArtifactWriteError(f"refusing to overwrite existing artifact: {destination}")
+    temporary: Path | None = None
+    handle = None
+    try:
+        temporary, handle = _open_atomic_text(destination)
+        handle.write(text)
+        handle.flush()
+        os.fsync(handle.fileno())
+        handle.close()
+        handle = None
+        os.replace(temporary, destination)
+        temporary = None
+    except Exception:
+        if handle is not None:
+            handle.close()
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+        raise
+    return destination
+
+
 __all__ = [
     "ARM_FIELDNAMES",
+    "ARM_DIAGNOSTIC_FIELDNAMES",
     "ARM_JSON_LIST_FIELDS",
     "ARM_SCHEMA_VERSION",
     "ArtifactWriteError",
+    "COMPACT_DECISION_EVENT_FIELDNAMES",
     "DECISION_FIELDNAMES",
+    "DECISION_SEGMENT_FIELDNAMES",
     "DECISION_SCHEMA_VERSION",
     "JsonlEventWriter",
+    "LEGACY_ARM_FIELDNAMES",
+    "LEGACY_PAIR_FIELDNAMES",
     "PAIR_FIELDNAMES",
+    "PAIR_DIAGNOSTIC_FIELDNAMES",
     "PAIR_SCHEMA_VERSION",
+    "TERMINAL_TRANSITION_FIELDNAMES",
     "encode_csv_value",
     "resolve_output_path",
     "validate_output_directory",
     "write_csv_atomic",
     "write_jsonl_atomic",
+    "write_text_atomic",
 ]

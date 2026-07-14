@@ -44,6 +44,20 @@ from scripts.final_veto_artifacts import (  # noqa: E402
     ArtifactWriteError,
     validate_output_directory,
     write_csv_atomic,
+    write_text_atomic,
+)
+from scripts.final_veto_compact_log import (  # noqa: E402
+    FORMAL_DEFAULT_DECISION_LOG_MODE,
+    LOG_MODE_COMPACT,
+    LOG_MODE_FULL_TRACE,
+    VALID_DECISION_LOG_MODES,
+    DecisionLogStream,
+    DecisionStreamStatistics,
+    compact_logging_preflight_errors,
+    estimate_compact_logging_plan,
+    infer_terminal_outcome,
+    logging_configuration_errors,
+    terminal_transition_record,
 )
 
 
@@ -55,6 +69,13 @@ FORMAL_ARTIFACT_NAMES = {
     "summary": "summary.md",
     "comparison_plot": "comparison.png",
 }
+FORMAL_PREFLIGHT_TEST_MODULES = (
+    "Tests.test_final_veto_manifest",
+    "Tests.test_final_veto_monitor",
+    "Tests.test_final_veto_artifacts",
+    "Tests.test_final_veto_result_validator",
+    "Tests.test_final_veto_compact_logging",
+)
 VALID_ARM_IDS = ("monitor_off", "monitor_on")
 
 
@@ -276,6 +297,19 @@ class ArmHookRecorder:
         self.fallback_failure_count = 0
         self.invalid_monitor_evaluation_count = 0
         self.nominal_actions_unchanged_count = 0
+        self.decision_statistics = DecisionStreamStatistics()
+
+    def _emit_event(self, event: Mapping[str, object]) -> None:
+        self.decision_statistics.observe(event)
+        if self.event_sink is not None:
+            self.event_sink(event)
+
+    def assert_complete_decision_stream(self) -> None:
+        expected = self.monitor_evaluation_count + self.invalid_monitor_evaluation_count
+        if self.decision_statistics.event_count != expected:
+            raise RunnerContractError(
+                "a monitor evaluation completed without a logical decision-stream event"
+            )
 
     def pre_transition(self, context: PreTransitionActionContext) -> ActionInterceptionResult:
         if context.case.case_id != self.job.case_id:
@@ -303,8 +337,7 @@ class ArmHookRecorder:
             )
         except MonitorEvaluationError as exc:
             self.invalid_monitor_evaluation_count += 1
-            if self.event_sink is not None:
-                self.event_sink(self._invalid_event(context, exc))
+            self._emit_event(self._invalid_event(context, exc))
             raise ArmExecutionError("Final Veto monitor evaluation failed") from exc
 
         self.monitor_evaluation_count += 1
@@ -347,14 +380,13 @@ class ArmHookRecorder:
             self.false_negative_count += 1
         if fallback_failure:
             self.fallback_failure_count += 1
-        if self.event_sink is not None:
-            self.event_sink(
-                self._decision_event(
-                    observation,
-                    false_negative=false_negative,
-                    fallback_failure=fallback_failure,
-                )
+        self._emit_event(
+            self._decision_event(
+                observation,
+                false_negative=false_negative,
+                fallback_failure=fallback_failure,
             )
+        )
 
     def _decision_event(
         self,
@@ -382,6 +414,11 @@ class ArmHookRecorder:
             sort_keys=True,
             separators=(",", ":"),
         )
+        decision_reason = (
+            "predicted_nominal_exceeds_overspeed_threshold"
+            if decision.veto_applied
+            else "predicted_nominal_within_threshold"
+        )
         return {
             "decision_schema_version": DECISION_SCHEMA_VERSION,
             "decision_id": f"{self.job.run_id}__step_{observation.step}",
@@ -395,7 +432,7 @@ class ArmHookRecorder:
             "phase": observation.phase,
             "active_stage": observation.active_stage,
             "decision_type": "veto_action" if decision.veto_applied else "continue",
-            "decision_reason": "overspeed_risk" if decision.veto_applied else "unknown",
+            "decision_reason": decision_reason,
             "decision_scope": "veto",
             "decision_authority": "runtime_assurance",
             "monitor_id": decision.monitor_id,
@@ -410,8 +447,8 @@ class ArmHookRecorder:
             "realized_executed_speed_ratio": observation.realized_next_speed_ratio,
             "hazard_threshold": decision.threshold,
             "hazard_comparator": decision.comparator,
-            "veto_status": "blocked" if decision.veto_applied else "allow",
-            "veto_reason": decision.reason,
+            "veto_status": "veto" if decision.veto_applied else "allow",
+            "veto_reason": decision_reason,
             "fallback_available": True,
             "fallback_action": list(decision.fallback_action),
             "fallback_executed": fallback_executed,
@@ -468,6 +505,7 @@ class ArmHookRecorder:
             "invalid_evaluation": True,
             "manual_audit_note": "Invalid evaluation requires audit; it is not counted as allow or veto.",
             "is_formal_experiment": self.is_formal_experiment,
+            "false_negative": False,
         }
 
 
@@ -506,6 +544,8 @@ def build_arm_record(
     is_formal_experiment: bool,
     invalid_simulation: bool = False,
     manual_audit_note: str = "",
+    decision_log_mode: str = FORMAL_DEFAULT_DECISION_LOG_MODE,
+    compact_decision_record_count: int = 0,
 ) -> dict[str, object]:
     termination_reason = str(legacy.get("termination_reason", ""))
     instability = bool(legacy.get("instability")) or termination_reason in {
@@ -529,6 +569,30 @@ def build_arm_record(
         else "Nonformal smoke row; not scientific evidence."
     )
     crossing = bool(legacy.get("crossing_occurs"))
+    statistics = recorder.decision_statistics
+    executed_steps = max(
+        int(legacy.get("steps", 0) or 0),
+        statistics.last_event_step or 0,
+    )
+    valid_evaluations = recorder.monitor_evaluation_count
+    if valid_evaluations:
+        intervention_rate = recorder.veto_count / valid_evaluations
+        allow_rate = recorder.allow_count / valid_evaluations
+        fallback_rate = recorder.fallback_count / valid_evaluations
+    elif not job.monitor_enabled:
+        intervention_rate = 0.0
+        allow_rate = 0.0
+        fallback_rate = 0.0
+    else:
+        intervention_rate = None
+        allow_rate = None
+        fallback_rate = None
+    terminal_label = _terminal_label(legacy, invalid_simulation)
+    termination_reason = (
+        "invalid_simulation"
+        if invalid_simulation
+        else str(legacy.get("termination_reason", "")).strip() or terminal_label
+    )
     return {
         "schema_version": ARM_SCHEMA_VERSION,
         "benchmark_id": "recoverability_benchmark",
@@ -569,7 +633,7 @@ def build_arm_record(
         "instability": instability,
         "unsafe_state": instability,
         "invalid_simulation": invalid_simulation,
-        "terminal_label": _terminal_label(legacy, invalid_simulation),
+        "terminal_label": terminal_label,
         "precursor_labels": ["target_radius_crossing"] if crossing else [],
         "diagnostic_labels": [],
         "manual_audit_note": note,
@@ -586,7 +650,7 @@ def build_arm_record(
         "fallback_failure_count": recorder.fallback_failure_count,
         "invalid_monitor_evaluation_count": recorder.invalid_monitor_evaluation_count,
         "nominal_actions_unchanged_count": recorder.nominal_actions_unchanged_count,
-        "steps": int(legacy.get("steps", 0) or 0),
+        "steps": executed_steps,
         "accepted_as_progress": False,
         "acceptance_reason": (
             "raw formal arm requires paired and aggregate validation"
@@ -594,6 +658,20 @@ def build_arm_record(
             else "nonformal smoke run"
         ),
         "is_formal_experiment": is_formal_experiment,
+        "termination_reason": termination_reason,
+        "decision_stream_event_count": statistics.event_count,
+        "decision_stream_sha256": statistics.sha256,
+        "compact_decision_record_count": compact_decision_record_count,
+        "decision_log_mode": decision_log_mode,
+        "intervention_rate": intervention_rate,
+        "allow_rate": allow_rate,
+        "fallback_rate": fallback_rate,
+        "first_veto_step": statistics.first_veto_step,
+        "last_veto_step": statistics.last_veto_step,
+        "longest_consecutive_veto_steps": statistics.longest_consecutive_veto_steps,
+        "longest_consecutive_allow_steps": statistics.longest_consecutive_allow_steps,
+        "veto_segment_count": statistics.veto_segment_count,
+        "allow_segment_count": statistics.allow_segment_count,
     }
 
 
@@ -603,12 +681,18 @@ def execute_job(
     implementation_commit: str,
     is_formal_experiment: bool,
     event_sink: Callable[[Mapping[str, object]], None] | None = None,
+    decision_stream: DecisionLogStream | None = None,
+    decision_log_mode: str = FORMAL_DEFAULT_DECISION_LOG_MODE,
 ) -> dict[str, object]:
+    sink = decision_stream.consume if decision_stream is not None else event_sink
     recorder = ArmHookRecorder(
         job,
         is_formal_experiment=is_formal_experiment,
-        event_sink=event_sink,
+        event_sink=sink,
     )
+    legacy: Mapping[str, object] = {}
+    invalid_simulation = False
+    manual_audit_note = ""
     try:
         if job.upstream_variant is None:
             from scripts import explicit_controller_phase34_post_cross_sync as phase34
@@ -642,23 +726,38 @@ def execute_job(
                 pre_transition_action_hook=recorder.pre_transition,
                 post_transition_observation_hook=recorder.post_transition,
             )
-        return build_arm_record(
-            job,
-            legacy,
-            recorder,
-            implementation_commit=implementation_commit,
-            is_formal_experiment=is_formal_experiment,
-        )
     except (ArmExecutionError, ArithmeticError, ValueError) as exc:
-        return build_arm_record(
-            job,
-            {},
-            recorder,
-            implementation_commit=implementation_commit,
-            is_formal_experiment=is_formal_experiment,
-            invalid_simulation=True,
-            manual_audit_note=f"execution failed with {type(exc).__name__}; manual audit required",
+        legacy = {}
+        invalid_simulation = True
+        manual_audit_note = (
+            f"execution failed with {type(exc).__name__}; manual audit required"
         )
+
+    recorder.assert_complete_decision_stream()
+
+    record = build_arm_record(
+        job,
+        legacy,
+        recorder,
+        implementation_commit=implementation_commit,
+        is_formal_experiment=is_formal_experiment,
+        invalid_simulation=invalid_simulation,
+        manual_audit_note=manual_audit_note,
+        decision_log_mode=decision_log_mode,
+    )
+    if decision_stream is not None and job.monitor_enabled:
+        decision_stream.finish_run(terminal_transition_record(record))
+        if (
+            decision_stream.decision_stream_event_count
+            != recorder.decision_statistics.event_count
+            or decision_stream.decision_stream_sha256
+            != recorder.decision_statistics.sha256
+        ):
+            raise RunnerContractError("decision stream digest or count drifted during logging")
+        record["compact_decision_record_count"] = (
+            decision_stream.compact_decision_record_count
+        )
+    return record
 
 
 def _require_boolean(record: Mapping[str, object], field: str) -> bool:
@@ -720,6 +819,18 @@ def build_pair_record(records: Iterable[Mapping[str, object]]) -> dict[str, obje
         reasons.append("invalid arm result")
     if not is_formal:
         reasons.append("nonformal run")
+    off_terminal_label = str(off.get("terminal_label", "unknown"))
+    on_terminal_label = str(on.get("terminal_label", "unknown"))
+    off_terminal_outcome = infer_terminal_outcome(off)
+    on_terminal_outcome = infer_terminal_outcome(on)
+    step_delta = int(on.get("steps", 0)) - int(off.get("steps", 0))
+    task_outcome_preserved = (
+        off_recoverable == on_recoverable and off_success == on_success
+    )
+    task_recovered_after_hazard_avoidance = (
+        avoided_failure and on_recoverable and on_success
+    )
+    terminal_outcome_transition = f"{off_terminal_outcome} -> {on_terminal_outcome}"
     return {
         "pair_schema_version": PAIR_SCHEMA_VERSION,
         "experiment_id": off["experiment_id"],
@@ -754,12 +865,25 @@ def build_pair_record(records: Iterable[Mapping[str, object]]) -> dict[str, obje
         "performance_cost_summary": {
             "off_steps": int(off.get("steps", 0)),
             "on_steps": int(on.get("steps", 0)),
-            "step_delta": int(on.get("steps", 0)) - int(off.get("steps", 0)),
+            "step_delta": step_delta,
             "veto_count": on_veto_count,
+            "intervention_rate": on.get("intervention_rate"),
+            "terminal_outcome_transition": terminal_outcome_transition,
         },
         "claim_eligible": claim_eligible,
         "claim_ineligibility_reason": "; ".join(reasons),
         "is_formal_experiment": is_formal,
+        "terminal_label_without_monitor": off_terminal_label,
+        "terminal_label_with_monitor": on_terminal_label,
+        "terminal_label_changed": off_terminal_label != on_terminal_label,
+        "termination_reason_without_monitor": off_terminal_outcome,
+        "termination_reason_with_monitor": on_terminal_outcome,
+        "terminal_outcome_transition": terminal_outcome_transition,
+        "step_count_delta": step_delta,
+        "monitor_induced_horizon_extension": step_delta,
+        "task_outcome_preserved": task_outcome_preserved,
+        "declared_hazard_avoided": avoided_failure,
+        "task_recovered_after_hazard_avoidance": task_recovered_after_hazard_avoidance,
     }
 
 
@@ -768,6 +892,59 @@ def build_pair_records(arm_records: Iterable[Mapping[str, object]]) -> list[dict
     for record in arm_records:
         grouped.setdefault(str(record.get("paired_run_id", "")), []).append(record)
     return [build_pair_record(grouped[pair_id]) for pair_id in sorted(grouped)]
+
+
+def build_diagnostic_summary(
+    arm_records: Iterable[Mapping[str, object]],
+    pair_records: Iterable[Mapping[str, object]],
+) -> str:
+    arms = list(arm_records)
+    pairs = list(pair_records)
+    monitor_on = [row for row in arms if row.get("arm_id") == "monitor_on"]
+    evaluations = sum(int(row.get("monitor_evaluation_count", 0)) for row in monitor_on)
+    vetoes = sum(int(row.get("veto_count", 0)) for row in monitor_on)
+    intervention_rate = vetoes / evaluations if evaluations else 0.0
+    transitions = sorted(
+        {str(row.get("terminal_outcome_transition", "unknown -> unknown")) for row in pairs}
+    )
+    step_deltas = [int(row.get("step_count_delta", 0)) for row in pairs]
+    lines = [
+        "# Final Veto Paired Diagnostic Summary",
+        "",
+        "This summary separates declared-hazard evidence from task completion and does not make a formal-safety claim.",
+        "",
+        "## Declared hazard reduction",
+        "",
+        f"- Complete valid pairs avoiding the declared overspeed hazard: {sum(bool(row.get('declared_hazard_avoided')) for row in pairs)}.",
+        "",
+        "## Task outcome",
+        "",
+        f"- Pairs recovering the declared task after hazard avoidance: {sum(bool(row.get('task_recovered_after_hazard_avoidance')) for row in pairs)}.",
+        f"- Pairs preserving the explicit recoverable-crossing and simulator-success tuple: {sum(bool(row.get('task_outcome_preserved')) for row in pairs)}.",
+        "",
+        "## Intervention burden",
+        "",
+        f"- Monitor evaluations: {evaluations}.",
+        f"- Vetoes: {vetoes}.",
+        f"- Aggregate intervention rate: {intervention_rate:.8f}.",
+        "",
+        "## Performance cost",
+        "",
+        f"- Monitor-on minus monitor-off step deltas: {step_deltas}.",
+        "- Step deltas are reported without automatically labeling their sign as beneficial or harmful.",
+        "",
+        "## Terminal failure-mode transition",
+        "",
+    ]
+    lines.extend(f"- {transition}." for transition in transitions)
+    lines.extend(
+        [
+            "",
+            "Declared hazard avoidance does not by itself mean the task recovered or completed.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
 
 
 def current_commit(repository_root: Path = PROJECT_ROOT) -> str:
@@ -795,6 +972,9 @@ def publication_readiness_errors(
     manifest: Mapping[str, Any],
     repository_root: Path = PROJECT_ROOT,
 ) -> list[str]:
+    # The manifest's currently_ignored_by_gitignore values describe the
+    # freeze-time state. Formal preflight intentionally asks live Git instead;
+    # dedicated publication exceptions added after the freeze may differ.
     errors: list[str] = []
     expected = {
         artifact_id: FORMAL_OUTPUT_DIRECTORY / filename
@@ -814,13 +994,21 @@ def publication_readiness_errors(
                 f"safe.directory={repository_root.as_posix()}",
                 "check-ignore",
                 "-q",
+                "--no-index",
                 relative.as_posix(),
             ],
             cwd=repository_root,
+            capture_output=True,
+            text=True,
             check=False,
         )
         if ignored.returncode == 0:
             errors.append(f"formal output is ignored by .gitignore: {relative.as_posix()}")
+        elif ignored.returncode != 1:
+            errors.append(
+                "could not determine live .gitignore state for "
+                f"{relative.as_posix()}: git check-ignore exited {ignored.returncode}"
+            )
     return errors
 
 
@@ -830,13 +1018,33 @@ def formal_preflight_errors(
     repository_root: Path = PROJECT_ROOT,
     *,
     run_tests: bool = True,
+    decision_log_mode: str = FORMAL_DEFAULT_DECISION_LOG_MODE,
+    digest_enabled: bool = True,
+    full_trace_path: Path | None = None,
 ) -> list[str]:
+    planned_jobs = list(jobs)
     errors: list[str] = []
     try:
         validate_manifest_data(dict(manifest))
-        validate_planned_jobs(jobs)
+        validate_planned_jobs(planned_jobs)
     except (ManifestValidationError, RunnerContractError) as exc:
         errors.append(f"contract validation failed: {exc}")
+    errors.extend(
+        logging_configuration_errors(
+            mode=decision_log_mode,
+            is_formal_experiment=True,
+            full_trace_path=full_trace_path,
+            repository_root=repository_root,
+            digest_enabled=digest_enabled,
+        )
+    )
+    errors.extend(
+        compact_logging_preflight_errors(
+            planned_jobs,
+            mode=decision_log_mode,
+            digest_enabled=digest_enabled,
+        )
+    )
 
     protected_guard = subprocess.run(
         [sys.executable, "scripts/check_phase_results.py"],
@@ -890,23 +1098,15 @@ def formal_preflight_errors(
     errors.extend(publication_readiness_errors(manifest, repository_root))
 
     if run_tests:
-        modules = (
-            "Tests.test_final_veto_manifest",
-            "Tests.test_final_veto_transition",
-            "Tests.test_final_veto_monitor",
-            "Tests.test_final_veto_runner",
-            "Tests.test_final_veto_artifacts",
-            "Tests.test_final_veto_result_validator",
-        )
         completed = subprocess.run(
-            [sys.executable, "-m", "unittest", "-q", *modules],
+            [sys.executable, "-m", "unittest", "-q", *FORMAL_PREFLIGHT_TEST_MODULES],
             cwd=repository_root,
             capture_output=True,
             text=True,
             check=False,
         )
         if completed.returncode != 0:
-            errors.append("bounded Final Veto test suite has not passed")
+            errors.append("bounded no-rollout Final Veto preflight tests have not passed")
     return errors
 
 
@@ -916,45 +1116,80 @@ def execute_jobs_to_directory(
     manifest: Mapping[str, Any],
     *,
     is_formal_experiment: bool,
+    decision_log_mode: str = FORMAL_DEFAULT_DECISION_LOG_MODE,
+    full_trace_path: Path | None = None,
 ) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
     output = validate_output_directory(
         output_directory,
         repository_root=PROJECT_ROOT,
         protected_paths=manifest["protected_paths"],
     )
+    logging_errors = logging_configuration_errors(
+        mode=decision_log_mode,
+        is_formal_experiment=is_formal_experiment,
+        full_trace_path=full_trace_path,
+        repository_root=PROJECT_ROOT,
+        digest_enabled=True,
+    )
+    if logging_errors:
+        raise RunnerContractError("; ".join(logging_errors))
     commit = current_commit()
     arm_rows: list[dict[str, object]] = []
-    decision_name = "decision_log.jsonl" if is_formal_experiment else "smoke_decision_log.jsonl"
+    if decision_log_mode == LOG_MODE_COMPACT:
+        decision_directory = output
+        decision_name = (
+            "decision_log.jsonl" if is_formal_experiment else "smoke_decision_log.jsonl"
+        )
+        decision_repository_root: Path | None = PROJECT_ROOT
+        decision_protected_paths = manifest["protected_paths"]
+    else:
+        if full_trace_path is None:
+            raise RunnerContractError("full_trace mode requires an output path")
+        decision_directory = full_trace_path.resolve().parent
+        decision_name = full_trace_path.resolve().name
+        decision_repository_root = None
+        decision_protected_paths = ()
     with JsonlEventWriter(
-        output,
+        decision_directory,
         decision_name,
-        repository_root=PROJECT_ROOT,
-        protected_paths=manifest["protected_paths"],
+        repository_root=decision_repository_root,
+        protected_paths=decision_protected_paths,
     ) as decision_writer:
         for job in jobs:
+            decision_stream = (
+                DecisionLogStream(
+                    decision_writer.write_event,
+                    mode=decision_log_mode,
+                    is_formal_experiment=is_formal_experiment,
+                )
+                if job.monitor_enabled
+                else None
+            )
             arm_rows.append(
                 execute_job(
                     job,
                     implementation_commit=commit,
                     is_formal_experiment=is_formal_experiment,
-                    event_sink=decision_writer.write_event,
+                    decision_stream=decision_stream,
+                    decision_log_mode=decision_log_mode,
                 )
             )
-    pair_rows = build_pair_records(arm_rows)
-    from scripts.check_final_veto_results import validate_result_records
+        pair_rows = build_pair_records(arm_rows)
+        from scripts.check_final_veto_results import read_jsonl, validate_result_records
 
-    structural_report = validate_result_records(
-        arm_rows,
-        pair_rows,
-        manifest,
-        output_directory=output,
-        repository_root=PROJECT_ROOT,
-    )
-    if not structural_report.structural_valid:
-        raise RunnerContractError(
-            "generated records failed structural validation: "
-            + "; ".join(structural_report.errors)
+        structural_report = validate_result_records(
+            arm_rows,
+            pair_rows,
+            manifest,
+            decision_events=read_jsonl(decision_writer.staged_path_for_validation()),
+            output_directory=output,
+            repository_root=PROJECT_ROOT,
         )
+        if not structural_report.structural_valid:
+            raise RunnerContractError(
+                "generated records failed structural validation: "
+                + "; ".join(structural_report.errors)
+            )
     result_name = "results.csv" if is_formal_experiment else "smoke_results.csv"
     pair_name = "paired_results.csv" if is_formal_experiment else "smoke_paired_results.csv"
     write_csv_atomic(
@@ -974,16 +1209,62 @@ def execute_jobs_to_directory(
         repository_root=PROJECT_ROOT,
         protected_paths=manifest["protected_paths"],
     )
+    if is_formal_experiment:
+        write_text_atomic(
+            output,
+            "summary.md",
+            build_diagnostic_summary(arm_rows, pair_rows),
+            repository_root=PROJECT_ROOT,
+            protected_paths=manifest["protected_paths"],
+        )
     return arm_rows, pair_rows
 
 
-def _print_plan(jobs: Iterable[PlannedJob]) -> None:
+def _print_plan(
+    jobs: Iterable[PlannedJob],
+    *,
+    decision_log_mode: str = FORMAL_DEFAULT_DECISION_LOG_MODE,
+) -> None:
     planned = list(jobs)
     pair_count = len({job.paired_run_id for job in planned})
     preservation = sum(job.known_phase34_recoverable_case for job in planned)
     print(f"PLAN jobs={len(planned)} pairs={pair_count}")
     print(f"PLAN preservation_jobs={preservation} stress_jobs={len(planned) - preservation}")
     print("PLAN arms=monitor_off,monitor_on simulation_started=false artifacts_written=false")
+    estimate = estimate_compact_logging_plan(planned, mode=decision_log_mode)
+    print(
+        "LOGGING "
+        f"mode={decision_log_mode} digest_enabled=true "
+        f"semantic_record_upper_bound={estimate.semantic_record_upper_bound_without_policy_cap} "
+        f"record_limit_per_run={estimate.enforced_record_limit_per_run} "
+        f"max_public_records={estimate.maximum_public_records} "
+        f"max_public_bytes={estimate.maximum_public_bytes} "
+        f"expected_records={estimate.expected_public_records} "
+        f"expected_bytes={estimate.expected_serialized_bytes} "
+        "overflow_policy=abort_atomic"
+    )
+
+
+def select_smoke_jobs(
+    jobs: Iterable[PlannedJob],
+    case_id: str | None = None,
+) -> list[PlannedJob]:
+    planned = list(jobs)
+    if not planned:
+        raise RunnerContractError("the frozen plan contains no jobs")
+    selected_case_id = case_id or planned[0].case_id
+    selected = [job for job in planned if job.case_id == selected_case_id]
+    if not selected:
+        raise RunnerContractError(f"smoke case is not in the frozen plan: {selected_case_id}")
+    if (
+        len(selected) != 2
+        or {job.arm_id for job in selected} != set(VALID_ARM_IDS)
+        or len({job.paired_run_id for job in selected}) != 1
+    ):
+        raise RunnerContractError(
+            f"smoke case does not resolve to one complete off/on pair: {selected_case_id}"
+        )
+    return selected
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -1013,6 +1294,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="Evaluate formal gates without running any rollout.",
     )
     parser.add_argument("--output-dir", type=Path, help="Required nonformal output directory for --smoke.")
+    parser.add_argument(
+        "--smoke-case-id",
+        help="Exact frozen case ID to run with --smoke; defaults to the first frozen pair.",
+    )
+    parser.add_argument(
+        "--decision-log-mode",
+        choices=VALID_DECISION_LOG_MODES,
+        default=FORMAL_DEFAULT_DECISION_LOG_MODE,
+        help="Formal defaults to bounded compact logging; full_trace is explicit nonformal only.",
+    )
+    parser.add_argument(
+        "--full-trace-path",
+        type=Path,
+        help="Required external local path for explicit nonformal full_trace mode.",
+    )
     parser.add_argument("--manifest", type=Path, help="Alternate manifest path for testing only.")
     return parser
 
@@ -1027,9 +1323,29 @@ def main(argv: list[str] | None = None) -> int:
         print(f"FAIL {exc}", file=sys.stderr)
         return 1
 
+    if args.smoke_case_id and not args.smoke:
+        print("FAIL --smoke-case-id requires --smoke", file=sys.stderr)
+        return 1
+
     if args.validate_only:
-        _print_plan(jobs)
+        _print_plan(jobs, decision_log_mode=args.decision_log_mode)
         blockers = publication_readiness_errors(manifest, PROJECT_ROOT)
+        blockers.extend(
+            logging_configuration_errors(
+                mode=args.decision_log_mode,
+                is_formal_experiment=True,
+                full_trace_path=args.full_trace_path,
+                repository_root=PROJECT_ROOT,
+                digest_enabled=True,
+            )
+        )
+        blockers.extend(
+            compact_logging_preflight_errors(
+                jobs,
+                mode=args.decision_log_mode,
+                digest_enabled=True,
+            )
+        )
         if blockers:
             for blocker in blockers:
                 print(f"NOT_READY {blocker}")
@@ -1039,7 +1355,15 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.formal_preflight or args.formal:
-        errors = formal_preflight_errors(manifest, jobs, PROJECT_ROOT, run_tests=True)
+        errors = formal_preflight_errors(
+            manifest,
+            jobs,
+            PROJECT_ROOT,
+            run_tests=True,
+            decision_log_mode=args.decision_log_mode,
+            digest_enabled=True,
+            full_trace_path=args.full_trace_path,
+        )
         if errors:
             for error in errors:
                 print(f"REFUSE {error}")
@@ -1053,6 +1377,8 @@ def main(argv: list[str] | None = None) -> int:
             PROJECT_ROOT / FORMAL_OUTPUT_DIRECTORY,
             manifest,
             is_formal_experiment=True,
+            decision_log_mode=args.decision_log_mode,
+            full_trace_path=args.full_trace_path,
         )
         return 0
 
@@ -1064,18 +1390,37 @@ def main(argv: list[str] | None = None) -> int:
         if output == (PROJECT_ROOT / FORMAL_OUTPUT_DIRECTORY).resolve():
             print("FAIL smoke output may not use the reserved formal directory", file=sys.stderr)
             return 1
-        first_pair_id = jobs[0].paired_run_id
-        smoke_jobs = [job for job in jobs if job.paired_run_id == first_pair_id]
+        logging_errors = logging_configuration_errors(
+            mode=args.decision_log_mode,
+            is_formal_experiment=False,
+            full_trace_path=args.full_trace_path,
+            repository_root=PROJECT_ROOT,
+            digest_enabled=True,
+        )
+        if logging_errors:
+            for error in logging_errors:
+                print(f"FAIL {error}", file=sys.stderr)
+            return 1
+        try:
+            smoke_jobs = select_smoke_jobs(jobs, args.smoke_case_id)
+        except RunnerContractError as exc:
+            print(f"FAIL {exc}", file=sys.stderr)
+            return 1
         execute_jobs_to_directory(
             smoke_jobs,
             output,
             manifest,
             is_formal_experiment=False,
+            decision_log_mode=args.decision_log_mode,
+            full_trace_path=args.full_trace_path,
         )
         print(f"SMOKE_NONFORMAL pairs=1 output={output}")
         return 0
 
-    _print_plan(jobs)
+    if args.decision_log_mode == LOG_MODE_FULL_TRACE or args.full_trace_path is not None:
+        print("FAIL full_trace mode is available only with --smoke", file=sys.stderr)
+        return 1
+    _print_plan(jobs, decision_log_mode=args.decision_log_mode)
     return 0
 
 
