@@ -4,8 +4,10 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import subprocess
 import sys
+import tempfile
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping
@@ -59,6 +61,12 @@ from scripts.final_veto_compact_log import (  # noqa: E402
     logging_configuration_errors,
     terminal_transition_record,
 )
+from scripts.render_final_veto_comparison import (  # noqa: E402
+    ComparisonRenderError,
+    inspect_png,
+    load_comparison_data,
+    render_comparison_plot,
+)
 
 
 FORMAL_OUTPUT_DIRECTORY = Path("analysis/final_veto_ablation_v0")
@@ -75,6 +83,7 @@ FORMAL_PREFLIGHT_TEST_MODULES = (
     "Tests.test_final_veto_artifacts",
     "Tests.test_final_veto_result_validator",
     "Tests.test_final_veto_compact_logging",
+    "Tests.test_final_veto_comparison_renderer",
 )
 VALID_ARM_IDS = ("monitor_off", "monitor_on")
 
@@ -1110,7 +1119,7 @@ def formal_preflight_errors(
     return errors
 
 
-def execute_jobs_to_directory(
+def _execute_jobs_to_artifact_directory(
     jobs: Iterable[PlannedJob],
     output_directory: Path,
     manifest: Mapping[str, Any],
@@ -1218,6 +1227,137 @@ def execute_jobs_to_directory(
             protected_paths=manifest["protected_paths"],
         )
     return arm_rows, pair_rows
+
+
+def formal_package_errors(artifact_directory: Path) -> list[str]:
+    directory = artifact_directory.resolve()
+    errors: list[str] = []
+    paths = {
+        artifact_id: directory / filename
+        for artifact_id, filename in FORMAL_ARTIFACT_NAMES.items()
+    }
+    for artifact_id, path in paths.items():
+        if not path.is_file():
+            errors.append(f"formal package is missing {artifact_id}: {path.name}")
+        elif path.stat().st_size <= 0:
+            errors.append(f"formal package artifact is empty: {path.name}")
+    comparison = paths["comparison_plot"]
+    if comparison.is_file() and comparison.stat().st_size > 0:
+        try:
+            inspect_png(comparison)
+        except ComparisonRenderError as exc:
+            errors.append(f"formal comparison plot is unreadable: {exc}")
+    results = paths["results"]
+    paired = paths["paired_results"]
+    if results.is_file() and paired.is_file():
+        try:
+            data = load_comparison_data(results, paired)
+        except ComparisonRenderError as exc:
+            errors.append(f"formal CSV package is invalid: {exc}")
+        else:
+            if len(data.arm_rows) != 26 or len(data.pair_rows) != 13:
+                errors.append("formal CSV package requires 26 arm rows and 13 pair rows")
+    return errors
+
+
+def require_complete_formal_package(artifact_directory: Path) -> None:
+    errors = formal_package_errors(artifact_directory)
+    if errors:
+        raise RunnerContractError("incomplete formal artifact package: " + "; ".join(errors))
+
+
+def publish_complete_formal_package(
+    staged_directory: Path,
+    output_directory: Path,
+    manifest: Mapping[str, Any],
+) -> None:
+    staged = staged_directory.resolve()
+    output = validate_output_directory(
+        output_directory,
+        repository_root=PROJECT_ROOT,
+        protected_paths=manifest["protected_paths"],
+    )
+    expected_output = (PROJECT_ROOT / FORMAL_OUTPUT_DIRECTORY).resolve()
+    if output != expected_output:
+        raise RunnerContractError("formal artifacts may be published only to the frozen output directory")
+    expected_paths = {
+        artifact_id: FORMAL_OUTPUT_DIRECTORY / filename
+        for artifact_id, filename in FORMAL_ARTIFACT_NAMES.items()
+    }
+    if _manifest_output_paths(manifest) != expected_paths:
+        raise RunnerContractError("formal output paths differ from the frozen manifest contract")
+    require_complete_formal_package(staged)
+    output.mkdir(parents=True, exist_ok=True)
+    publications = [
+        (staged / filename, output / filename)
+        for filename in FORMAL_ARTIFACT_NAMES.values()
+    ]
+    existing = [destination for _, destination in publications if destination.exists()]
+    if existing:
+        raise RunnerContractError(
+            "refusing to overwrite formal artifacts: "
+            + ", ".join(path.name for path in existing)
+        )
+
+    published: list[tuple[Path, Path]] = []
+    try:
+        for source, destination in publications:
+            os.replace(source, destination)
+            published.append((source, destination))
+        require_complete_formal_package(output)
+    except Exception:
+        for source, destination in reversed(published):
+            if destination.exists() and not source.exists():
+                os.replace(destination, source)
+        raise
+
+
+def execute_jobs_to_directory(
+    jobs: Iterable[PlannedJob],
+    output_directory: Path,
+    manifest: Mapping[str, Any],
+    *,
+    is_formal_experiment: bool,
+    decision_log_mode: str = FORMAL_DEFAULT_DECISION_LOG_MODE,
+    full_trace_path: Path | None = None,
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    planned_jobs = list(jobs)
+    if not is_formal_experiment:
+        return _execute_jobs_to_artifact_directory(
+            planned_jobs,
+            output_directory,
+            manifest,
+            is_formal_experiment=False,
+            decision_log_mode=decision_log_mode,
+            full_trace_path=full_trace_path,
+        )
+
+    output = output_directory.resolve()
+    expected_output = (PROJECT_ROOT / FORMAL_OUTPUT_DIRECTORY).resolve()
+    if output != expected_output:
+        raise RunnerContractError("formal execution requires the frozen output directory")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(
+        prefix=".final_veto_formal_package_",
+        dir=output.parent,
+    ) as temporary_name:
+        staged = Path(temporary_name)
+        arm_rows, pair_rows = _execute_jobs_to_artifact_directory(
+            planned_jobs,
+            staged,
+            manifest,
+            is_formal_experiment=True,
+            decision_log_mode=decision_log_mode,
+            full_trace_path=full_trace_path,
+        )
+        render_comparison_plot(
+            staged / FORMAL_ARTIFACT_NAMES["results"],
+            staged / FORMAL_ARTIFACT_NAMES["paired_results"],
+            staged / FORMAL_ARTIFACT_NAMES["comparison_plot"],
+        )
+        require_complete_formal_package(staged)
+        publish_complete_formal_package(staged, output, manifest)
+        return arm_rows, pair_rows
 
 
 def _print_plan(

@@ -186,7 +186,7 @@ class PairedPlannerTests(unittest.TestCase):
             f"with exit {completed.returncode}: {completed.stderr.strip()}"
         )
 
-    def test_formal_publication_paths_are_publishable_and_validation_is_read_only(self) -> None:
+    def test_published_formal_paths_are_publishable_and_validation_is_read_only(self) -> None:
         formal_paths = {
             FORMAL_OUTPUT_DIRECTORY / filename
             for filename in FORMAL_ARTIFACT_NAMES.values()
@@ -208,7 +208,15 @@ class PairedPlannerTests(unittest.TestCase):
         errors = publication_readiness_errors(self.manifest, PROJECT_ROOT)
         ignored = [error for error in errors if "ignored by .gitignore" in error]
         self.assertEqual(len(ignored), 0)
-        self.assertEqual(errors, [])
+        existing_names = {
+            path.name
+            for path in (PROJECT_ROOT / FORMAL_OUTPUT_DIRECTORY).iterdir()
+            if path.is_file() and path.name in FORMAL_ARTIFACT_NAMES.values()
+        }
+        existing_errors = [error for error in errors if "already exists" in error]
+        self.assertEqual(len(existing_errors), len(existing_names))
+        for filename in existing_names:
+            self.assertTrue(any(filename in error for error in existing_errors))
 
         output_directory = PROJECT_ROOT / FORMAL_OUTPUT_DIRECTORY
         before = {
@@ -230,12 +238,13 @@ class PairedPlannerTests(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertIn("simulation_started=false", output.getvalue())
         self.assertIn("artifacts_written=false", output.getvalue())
-        self.assertIn("formal publication paths are ready", output.getvalue())
+        self.assertIn("formal publication is not ready", output.getvalue())
         self.assertEqual(after, before)
         execute.assert_not_called()
 
     def test_formal_preflight_test_gate_excludes_rollout_modules(self) -> None:
         self.assertIn("Tests.test_final_veto_compact_logging", FORMAL_PREFLIGHT_TEST_MODULES)
+        self.assertIn("Tests.test_final_veto_comparison_renderer", FORMAL_PREFLIGHT_TEST_MODULES)
         self.assertNotIn("Tests.test_final_veto_transition", FORMAL_PREFLIGHT_TEST_MODULES)
         self.assertNotIn("Tests.test_final_veto_runner", FORMAL_PREFLIGHT_TEST_MODULES)
 
@@ -251,8 +260,8 @@ class PairedPlannerTests(unittest.TestCase):
             "scripts.run_final_veto_ablation.subprocess.run", return_value=failed
         ):
             errors = publication_readiness_errors(self.manifest, PROJECT_ROOT)
-        self.assertEqual(len(errors), len(FORMAL_ARTIFACT_NAMES))
-        self.assertTrue(all("git check-ignore exited 2" in error for error in errors))
+        git_errors = [error for error in errors if "git check-ignore exited 2" in error]
+        self.assertEqual(len(git_errors), len(FORMAL_ARTIFACT_NAMES))
 
     def test_smoke_case_selector_selects_one_frozen_stress_pair(self) -> None:
         case_id = (

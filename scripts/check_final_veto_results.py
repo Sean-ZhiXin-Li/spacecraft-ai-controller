@@ -44,6 +44,11 @@ from scripts.final_veto_compact_log import (  # noqa: E402
     VALID_DECISION_LOG_MODES,
     exceptional_event_reasons,
 )
+from scripts.render_final_veto_comparison import (  # noqa: E402
+    ComparisonRenderError,
+    inspect_png,
+    load_comparison_data,
+)
 from scripts.run_final_veto_ablation import (  # noqa: E402
     RunnerContractError,
     build_pair_record,
@@ -53,6 +58,15 @@ from scripts.run_final_veto_ablation import (  # noqa: E402
 
 PRESERVATION_SUBSET_ID = "phase34_known_recoverable_preservation_v1"
 STRESS_SUBSET_ID = "phase35_radial_energy_push_overspeed_stress_v0"
+FORMAL_ARTIFACT_IDS = frozenset(
+    {
+        "results",
+        "paired_results",
+        "decision_log",
+        "summary",
+        "comparison_plot",
+    }
+)
 CONTROLLED_TERMINAL_LABELS = frozenset(
     {
         "success",
@@ -177,6 +191,14 @@ class ResultValidationReport:
     errors: tuple[str, ...]
     observations: tuple[str, ...]
     metrics: Mapping[str, int]
+
+
+@dataclass(frozen=True, slots=True)
+class FormalArtifactCompletenessReport:
+    complete: bool
+    comparison_plot_pending: bool
+    errors: tuple[str, ...]
+    artifact_paths: Mapping[str, Path]
 
 
 def _parse_bool(value: object, field: str) -> bool:
@@ -1278,6 +1300,162 @@ def read_jsonl(path: Path) -> Iterator[dict[str, object]]:
             yield value
 
 
+def _is_within(path: Path, directory: Path) -> bool:
+    try:
+        path.relative_to(directory)
+    except ValueError:
+        return False
+    return True
+
+
+def validate_formal_artifact_completeness(
+    manifest: Mapping[str, Any],
+    *,
+    manifest_path: Path,
+    results_path: Path,
+    paired_results_path: Path,
+    decision_log_path: Path | None,
+    repository_root: Path = PROJECT_ROOT,
+    allow_missing_comparison_plot: bool = False,
+) -> FormalArtifactCompletenessReport:
+    errors: list[str] = []
+    root = repository_root.resolve()
+    output_contract = manifest.get("output_contract")
+    if not isinstance(output_contract, Mapping):
+        return FormalArtifactCompletenessReport(
+            complete=False,
+            comparison_plot_pending=False,
+            errors=("frozen manifest has no output_contract object",),
+            artifact_paths={},
+        )
+
+    base_value = output_contract.get("base_directory")
+    if not isinstance(base_value, str) or not base_value.strip():
+        errors.append("frozen output_contract has no base_directory")
+        base_directory = root
+    else:
+        base_relative = Path(base_value)
+        if base_relative.is_absolute() or ".." in base_relative.parts:
+            errors.append("frozen output base directory escapes the repository")
+        base_directory = (root / base_relative).resolve()
+        if not _is_within(base_directory, root):
+            errors.append("frozen output base directory escapes the repository")
+
+    artifact_paths: dict[str, Path] = {}
+    raw_artifacts = output_contract.get("future_artifacts")
+    if not isinstance(raw_artifacts, list):
+        errors.append("frozen output_contract has no future_artifacts list")
+        raw_artifacts = []
+    for index, entry in enumerate(raw_artifacts, start=1):
+        if not isinstance(entry, Mapping):
+            errors.append(f"future artifact {index} is not an object")
+            continue
+        artifact_id = entry.get("artifact_id")
+        raw_path = entry.get("path")
+        if not isinstance(artifact_id, str) or not artifact_id:
+            errors.append(f"future artifact {index} has no artifact_id")
+            continue
+        if artifact_id in artifact_paths:
+            errors.append(f"duplicate future artifact ID: {artifact_id}")
+            continue
+        if not isinstance(raw_path, str) or not raw_path:
+            errors.append(f"future artifact {artifact_id} has no path")
+            continue
+        relative_path = Path(raw_path)
+        if relative_path.is_absolute() or ".." in relative_path.parts:
+            errors.append(f"future artifact {artifact_id} escapes the formal output directory")
+            continue
+        resolved_path = (root / relative_path).resolve()
+        if not _is_within(resolved_path, base_directory):
+            errors.append(f"future artifact {artifact_id} escapes the formal output directory")
+        artifact_paths[artifact_id] = resolved_path
+
+    declared_ids = frozenset(artifact_paths)
+    if declared_ids != FORMAL_ARTIFACT_IDS:
+        missing = sorted(FORMAL_ARTIFACT_IDS - declared_ids)
+        extra = sorted(declared_ids - FORMAL_ARTIFACT_IDS)
+        if missing:
+            errors.append(f"frozen output contract misses artifacts: {missing}")
+        if extra:
+            errors.append(f"frozen output contract has unexpected artifacts: {extra}")
+
+    raw_manifest_path = output_contract.get("manifest_path")
+    if not isinstance(raw_manifest_path, str) or not raw_manifest_path:
+        errors.append("frozen output_contract has no manifest_path")
+        expected_manifest_path = root
+    else:
+        manifest_relative = Path(raw_manifest_path)
+        if manifest_relative.is_absolute() or ".." in manifest_relative.parts:
+            errors.append("frozen manifest path escapes the formal output directory")
+        expected_manifest_path = (root / manifest_relative).resolve()
+        if not _is_within(expected_manifest_path, base_directory):
+            errors.append("frozen manifest path escapes the formal output directory")
+
+    supplied_paths = {
+        "manifest": manifest_path,
+        "results": results_path,
+        "paired_results": paired_results_path,
+        "decision_log": decision_log_path,
+    }
+    expected_paths: dict[str, Path | None] = {
+        "manifest": expected_manifest_path,
+        "results": artifact_paths.get("results"),
+        "paired_results": artifact_paths.get("paired_results"),
+        "decision_log": artifact_paths.get("decision_log"),
+    }
+    for artifact_id, supplied in supplied_paths.items():
+        expected = expected_paths[artifact_id]
+        if supplied is None:
+            errors.append(f"formal validation requires --{artifact_id.replace('_', '-')}")
+            continue
+        if ".." in supplied.parts:
+            errors.append(f"supplied {artifact_id} path contains traversal")
+        if expected is not None and supplied.resolve() != expected:
+            errors.append(f"supplied {artifact_id} path differs from the frozen output path")
+
+    required_files = {"manifest": expected_manifest_path, **artifact_paths}
+    comparison_pending = False
+    for artifact_id, path in required_files.items():
+        if not path.is_file():
+            if artifact_id == "comparison_plot" and allow_missing_comparison_plot:
+                comparison_pending = True
+            else:
+                errors.append(f"required formal artifact is missing: {path}")
+            continue
+        if path.stat().st_size <= 0:
+            errors.append(f"required formal artifact is empty: {path}")
+
+    comparison_path = artifact_paths.get("comparison_plot")
+    if comparison_path is not None and comparison_path.is_file() and comparison_path.stat().st_size:
+        try:
+            inspect_png(comparison_path)
+        except ComparisonRenderError as exc:
+            errors.append(f"formal comparison plot is unreadable: {exc}")
+
+    declared_results = artifact_paths.get("results")
+    declared_pairs = artifact_paths.get("paired_results")
+    if (
+        declared_results is not None
+        and declared_pairs is not None
+        and declared_results.is_file()
+        and declared_pairs.is_file()
+    ):
+        try:
+            data = load_comparison_data(declared_results, declared_pairs)
+        except ComparisonRenderError as exc:
+            errors.append(f"formal CSV package is invalid: {exc}")
+        else:
+            if len(data.arm_rows) != 26 or len(data.pair_rows) != 13:
+                errors.append("formal CSV package must contain 26 arm rows and 13 pair rows")
+
+    return FormalArtifactCompletenessReport(
+        complete=not errors and not comparison_pending,
+        comparison_plot_pending=not errors and comparison_pending,
+        errors=tuple(errors),
+        artifact_paths=artifact_paths,
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Validate Final Veto arm and pair results.")
     parser.add_argument("--results", type=Path, required=True)
@@ -1285,11 +1463,19 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--decision-log", type=Path)
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--formal", action="store_true", help="Require formal positive-claim acceptance.")
+    parser.add_argument(
+        "--formal-plot-pending",
+        action="store_true",
+        help="Allow only comparison.png to be missing during one-time formal plot creation.",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.formal_plot_pending and not args.formal:
+        print("FAIL --formal-plot-pending requires --formal")
+        return 1
     try:
         manifest_path = args.manifest or PROJECT_ROOT / MANIFEST_RELATIVE_PATH
         manifest = load_manifest(manifest_path)
@@ -1304,6 +1490,16 @@ def main(argv: list[str] | None = None) -> int:
             output_directory=args.results.parent,
             require_formal_acceptance=args.formal,
         )
+        completeness = None
+        if args.formal:
+            completeness = validate_formal_artifact_completeness(
+                manifest,
+                manifest_path=manifest_path,
+                results_path=args.results,
+                paired_results_path=args.paired_results,
+                decision_log_path=args.decision_log,
+                allow_missing_comparison_plot=args.formal_plot_pending,
+            )
     except (OSError, ValueError, ManifestValidationError) as exc:
         print(f"FAIL {exc}")
         return 1
@@ -1313,11 +1509,26 @@ def main(argv: list[str] | None = None) -> int:
     print(f"PRESERVATION {report.preservation_acceptance}")
     print(f"STRESS_HAZARD_EXERCISE {report.stress_hazard_exercised}")
     print(f"POSITIVE_CLAIM_ELIGIBLE {str(report.positive_claim_eligible).lower()}")
+    if completeness is not None:
+        if completeness.complete:
+            print("FORMAL_ARTIFACT_COMPLETENESS PASS")
+        elif completeness.comparison_plot_pending:
+            print("FORMAL_ARTIFACT_COMPLETENESS PENDING comparison.png")
+        else:
+            print("FORMAL_ARTIFACT_COMPLETENESS FAIL")
     for observation in report.observations:
         print(f"INFO {observation}")
     for error in report.errors:
         print(f"FAIL {error}")
-    return 0 if report.structural_valid else 1
+    if completeness is not None:
+        for error in completeness.errors:
+            print(f"FAIL {error}")
+    valid = report.structural_valid and (
+        completeness is None
+        or completeness.complete
+        or completeness.comparison_plot_pending
+    )
+    return 0 if valid else 1
 
 
 if __name__ == "__main__":
