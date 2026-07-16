@@ -225,54 +225,25 @@ Current limitations:
 - CAPTURE, LOCK, and success criteria are simulator-specific and should not be interpreted as flight-readiness metrics.
 - The environment is planar and simplified; it does not include full 3D orbital mechanics, real navigation uncertainty, actuator constraints, or operational safety validation.
 
-## Current Research Status (June 2026)
+## Current Research Milestone (July 2026)
 
-Latest completed phases:
+Final Veto Overspeed Ablation v0 is complete and frozen.
 
-- Phase36B: Transfer-family benchmark
-- Phase36C: Non-crossing geometry diagnosis
-- Phase37A: Radial commitment timing sweep
-- Phase37B: Weak tangential subset diagnostic
+The paired simulator experiment evaluated eight known Phase34 recoverable preservation cases and five diagnostic overspeed stress cases. Monitor-on preserved crossing, recoverable crossing, and simulator-defined success in all `8 / 8` preservation cases. On the stress set, overspeed changed from `5 / 5` with monitor-off to `0 / 5` with monitor-on.
 
-Key finding:
+The key finding is deliberately narrower than task success:
 
-- Phase34 solved post-cross recoverability.
-- Phase36B showed multiple transfer families converge to the same crossing basin.
-- Phase36C showed the current bottleneck is upstream crossing-generation rather than post-cross stabilization.
-- Phase37A showed that radial commitment timing alone did not create new crossings.
-- Phase37B showed that weak tangential shaping did not create new selected-case crossings and did not preserve the Phase36B regression crossing set.
+> A lightweight one-step predictive veto prevented the tested overspeed outcomes while preserving known recoverable trajectories, but veto-only intervention achieved `0 / 5` task recovery on the stress cases.
 
-Current research question:
+All five stress outcomes changed from `overspeed` to `max_steps`. The experiment therefore demonstrates bounded simulator hazard avoidance, not a recovery policy, formal safety, or deployment readiness.
 
-Which upstream transfer variable, if any, has stronger evidence than Phase37B weak tangential shaping and can be tested without damaging the existing crossing-producing cases?
+## Next Research Direction
 
-Current controller role:
+The next research question is recovery-aware intervention:
 
-- Phase34 `radius_priority` is the fixed terminal/post-cross controller for the next search.
-- Phase36B is the completed transfer-family benchmark; it did not expand crossings beyond the Phase34 baseline.
-- Phase36C is the completed non-crossing diagnosis; it prepared the planner-level search space.
-- Phase37A tested `early_commit`, `mid_commit`, and `delayed_commit` with `low` and `medium` radial magnitudes over `144` rollouts.
-- Phase37A created `0` new crossings on the `16 / 24` Phase36B baseline non-crossing cases.
-- Phase37B tested `early_commit_low_plus_weak_tangential` on a subset diagnostic and created `0 / 4` selected-case crossings while preserving only `4 / 8` regression crossings.
+> After rejecting a hazardous nominal action, how should the system choose among continuing, adjusting, recovering, retreating, entering safe mode, or terminating?
 
-## Next Steps
-
-Phase36B and Phase36C completed the transfer-family benchmark and non-crossing diagnosis. Phase37A then tested whether radial commitment timing and bounded radial magnitude were enough to create new crossings. Phase37B tested whether a narrow weak tangential correction could help the four Phase37A-improved `over_conservative_transfer` cases.
-
-Phase37A ran `6` variants across the same `24` cases, for `144` rollouts. It created `0` new crossings on the `16` Phase36B baseline non-crossing cases. `delayed_commit_low` and `delayed_commit_medium` preserved `8 / 24` crossings and `8 / 24` recoverable crossings, while early and mid commitment degraded the existing crossing set. No overspeed or instability occurred.
-
-Phase37B ran `24` subset rollouts. Weak tangential shaping created `0 / 4` selected-case crossings and `0 / 4` selected-case recoverable crossings. It produced no overspeed or instability, but it preserved only `4 / 8` Phase36B regression crossings and `4 / 8` regression recoverable crossings. This makes it a negative diagnostic, not a controller candidate.
-
-The next direction is not blind expansion of radial timing or tangential shaping. Phase38 should analyze the failed crossing-basin expansion evidence before any new controller implementation.
-
-- keep Phase34 post-cross synchronization fixed
-- measure geometric crossing and Phase34-compatible handoff separately
-- protect the existing `8 / 24` crossing-producing cases as regression guards
-- defer MPC-lite until the transfer search reveals geometry worth exploiting
-
-The guiding question is:
-
-> Does any evidence-backed upstream shaping variable create a target-radius crossing that can hand off into Phase34 recovery without damaging the known crossing-producing cases?
+Near-term work should define recovery actions, recovery margin, recovery cost, trust evidence, and multi-horizon prediction before adding a broad Decision Manager or another controller search.
 
 ## Long-Term Vision
 
@@ -519,23 +490,26 @@ spacecraft_ai_project/
 
 ## Recommended Reading
 
-For the current research narrative, read:
+For the completed Final Veto milestone, read:
 
-1. [Research direction](docs/research_direction.md)
-2. [Phase38 evidence-based search space](docs/phase38_evidence_based_search_space.md)
-3. [Phase37B weak tangential postmortem](project_log/phase37b_weak_tangential_postmortem.md)
-4. [Phase37B weak tangential subset summary](analysis/phase37b_weak_tangential_subset/phase37b_summary.md)
-5. [Phase37A radial commitment timing summary](analysis/phase37a_radial_commit_timing/phase37a_summary.md)
-6. [PL37A radial commitment timing log](project_log/phase37a_radial_commit_timing.md)
-7. [Artifact manifest](analysis/artifact_manifest.md)
-8. [PL36 transfer-family benchmark and diagnosis](project_log/pl36_transfer_family_benchmark_and_diagnosis.md)
-9. [Phase36B transfer-family benchmark](analysis/phase36b_transfer_family_benchmark/summary.md)
-10. [Phase36C non-crossing diagnosis](analysis/phase36c_non_crossing_geometry_diagnosis/summary.md)
-11. [Planner search benchmark manifest](docs/planner_search_benchmark_manifest.md)
-12. [Phase34 summary](analysis/phase34_post_cross_sync/summary.md)
-13. [Phase34 vs Phase31 comparison](analysis/phase34_post_cross_sync/phase34_vs_phase31_comparison.md)
-14. [Phase33 summary](analysis/phase33_optimal_structure_extraction/phase33_summary.md)
-15. [Phase33 structure decomposition](analysis/phase33_optimal_structure_extraction/structure_decomposition.md)
+1. [Final Veto v0 completion audit](docs/reports/final_veto_v0_completion_audit.md)
+2. [Final Veto v0 scientific interpretation](docs/reports/final_veto_v0_interpretation.md)
+3. [Frozen formal summary](analysis/final_veto_ablation_v0/summary.md)
+4. [Frozen comparison figure](analysis/final_veto_ablation_v0/comparison.png)
+5. [Recoverability regression policy](docs/benchmarks/recoverability_regression_policy_v0.md)
+6. [Decision and Runtime Assurance architecture](docs/architecture/decision_and_runtime_assurance.md)
+7. [Recoverability platform transition report](docs/reports/recoverability_platform_transition_report_v1.md)
+
+For the preceding phase trail:
+
+1. [Phase37B weak tangential postmortem](project_log/phase37b_weak_tangential_postmortem.md)
+2. [Phase37B weak tangential subset summary](analysis/phase37b_weak_tangential_subset/phase37b_summary.md)
+3. [Phase37A radial commitment timing summary](analysis/phase37a_radial_commit_timing/phase37a_summary.md)
+4. [Phase36B transfer-family benchmark](analysis/phase36b_transfer_family_benchmark/summary.md)
+5. [Phase36C non-crossing diagnosis](analysis/phase36c_non_crossing_geometry_diagnosis/summary.md)
+6. [Phase34 summary](analysis/phase34_post_cross_sync/summary.md)
+7. [Phase34 vs Phase31 comparison](analysis/phase34_post_cross_sync/phase34_vs_phase31_comparison.md)
+8. [Phase33 structure decomposition](analysis/phase33_optimal_structure_extraction/structure_decomposition.md)
 
 For older local-controller context:
 
