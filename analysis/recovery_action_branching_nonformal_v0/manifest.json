@@ -1,0 +1,487 @@
+{
+  "manifest_schema_version": "recovery_action_branching_manifest_v0",
+  "experiment_id": "recovery_action_branching_nonformal_v0",
+  "experiment_status": "design_frozen_not_run",
+  "is_formal_experiment": false,
+  "created_date": "2026-07-18",
+  "source_commit": "4106a53e19eeae79142f36a7bca4479a3d9b54ba",
+  "repository": {
+    "repository_full_name": "Sean-ZhiXin-Li/spacecraft-ai-controller",
+    "remote_name": "origin",
+    "remote_url": "ssh://git@ssh.github.com:443/Sean-ZhiXin-Li/spacecraft-ai-controller.git",
+    "default_branch": "main",
+    "source_branch": "main"
+  },
+  "design_document": "docs/experiments/recovery_action_branching_nonformal_v0.md",
+  "metrics_document": "docs/theory/recovery_metrics_v0.md",
+  "design_state": {
+    "runner_implemented": false,
+    "simulation_executed": false,
+    "measured_outcomes_present": false,
+    "result_rows_present": false,
+    "branch_winner_selected": false,
+    "positive_recovery_claim_made": false
+  },
+  "source_evidence": {
+    "frozen_final_veto_manifest": "analysis/final_veto_ablation_v0/manifest.json",
+    "frozen_final_veto_evidence_paths": [
+      "analysis/final_veto_ablation_v0/manifest.json",
+      "analysis/final_veto_ablation_v0/results.csv",
+      "analysis/final_veto_ablation_v0/paired_results.csv",
+      "analysis/final_veto_ablation_v0/decision_log.jsonl",
+      "analysis/final_veto_ablation_v0/summary.md",
+      "analysis/final_veto_ablation_v0/comparison.png"
+    ],
+    "use": "read_only_case_selection_and_design_context",
+    "modification_permitted": false
+  },
+  "source_case": {
+    "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+    "subset_id": "phase35_radial_energy_push_overspeed_stress_v0",
+    "r0_over_target": 0.98,
+    "initial_velocity_angle_deg": 150,
+    "thrust_scale": 8000,
+    "seed": 0,
+    "nominal_controller_context": {
+      "phase": "phase35",
+      "controller_id": "phase35_crossing_basin_expansion",
+      "upstream_variant": "radial_energy_push",
+      "post_cross_context": "phase34_radius_priority"
+    }
+  },
+  "hazard": {
+    "hazard_target": "overspeed",
+    "predicted_signal": "predicted_nominal_next_state_speed_ratio",
+    "realized_signal": "executed_state_speed_ratio",
+    "threshold": 1.9,
+    "comparator": ">",
+    "normalization": "speed / target_circular_speed",
+    "prediction_horizon_steps": 1,
+    "monitor_id": "one_step_overspeed_veto_v0",
+    "formal_safety_boundary": false
+  },
+  "branch_point": {
+    "definition": "the first valid monitor evaluation where the nominal proposed action has predicted one-step speed_ratio > 1.90, before the nominal action or Final Veto fallback is executed",
+    "selection_ordinal": "first",
+    "required_monitor_decision": "veto",
+    "before_nominal_action_execution": true,
+    "before_final_veto_fallback_execution": true,
+    "required_fields": [
+      "step",
+      "state_vector",
+      "position",
+      "velocity",
+      "phase",
+      "active_stage",
+      "nominal_proposed_action",
+      "predicted_nominal_next_state",
+      "predicted_nominal_speed_ratio",
+      "hazard_threshold",
+      "hazard_comparator",
+      "monitor_decision",
+      "implementation_commit",
+      "simulator_constants_hash",
+      "case_configuration_hash",
+      "canonical_branch_state_hash"
+    ],
+    "state_vector_order": [
+      "x",
+      "y",
+      "vx",
+      "vy"
+    ],
+    "action_vector_order": [
+      "action_x",
+      "action_y"
+    ],
+    "validity_requirements": [
+      "all_state_values_are_finite",
+      "nominal_action_is_finite",
+      "predicted_nominal_next_state_is_finite",
+      "predicted_nominal_speed_ratio_is_finite",
+      "monitor_evaluation_is_valid",
+      "implementation_commit_is_recorded",
+      "simulator_constants_hash_is_recorded",
+      "case_configuration_hash_is_recorded"
+    ],
+    "canonical_hash_contract": {
+      "canonicalization_id": "recovery_branch_state_canonical_json_v0",
+      "encoding": "utf-8",
+      "json_sort_keys": true,
+      "json_separators": [
+        ",",
+        ":"
+      ],
+      "allow_nan": false,
+      "hash_algorithm": "sha256",
+      "hash_field_excluded_from_input": "canonical_branch_state_hash",
+      "hash_input_is_complete_branch_state_object_without_hash_field": true,
+      "all_branches_require_byte_equivalent_canonical_input": true,
+      "all_branches_require_identical_canonical_branch_state_hash": true
+    }
+  },
+  "coordinate_convention": {
+    "frame_id": "inertial_cartesian_2d",
+    "state_vector_order": [
+      "x",
+      "y",
+      "vx",
+      "vy"
+    ],
+    "action_vector_order": [
+      "action_x",
+      "action_y"
+    ],
+    "position_vector": "r = (x, y)",
+    "velocity_vector": "v = (vx, vy)",
+    "position_norm": "r_norm = sqrt(x*x + y*y)",
+    "velocity_norm": "v_norm = sqrt(vx*vx + vy*vy)",
+    "radial_unit_vector": "e_r = r / r_norm",
+    "positive_tangential_unit_vector": "e_t = (-e_r_y, e_r_x)",
+    "positive_tangential_orientation": "counterclockwise_90_degree_rotation_of_e_r",
+    "signed_tangential_speed": "v_t = dot(v, e_t)",
+    "target_circular_speed": "use_the_same_target_circular_speed_as_the_active_phase35_rollout_context",
+    "signed_tangential_error": "tangential_error = v_t - target_circular_speed",
+    "sign_convention": {
+      "positive": 1,
+      "negative": -1,
+      "zero": 0,
+      "zero_tolerance": 1e-12,
+      "zero_tolerance_units": "m/s",
+      "rule": "positive_if_error_gt_tolerance_negative_if_error_lt_negative_tolerance_zero_otherwise"
+    },
+    "velocity_zero_tolerance": 1e-12,
+    "velocity_zero_tolerance_units": "m/s",
+    "invalid_evaluation_conditions": [
+      "position_norm_is_zero",
+      "position_or_velocity_contains_nonfinite_value",
+      "derived_unit_vector_contains_nonfinite_value",
+      "target_circular_speed_is_nonfinite",
+      "action_contains_nonfinite_value"
+    ]
+  },
+  "branches": [
+    {
+      "branch_id": "zero_action_reference_v0",
+      "implemented": false,
+      "policy_type": "repeated_one_step_recovery_action",
+      "action_formula": "u = (0.0, 0.0)",
+      "pre_clip_action": [
+        0.0,
+        0.0
+      ],
+      "record_pre_clip_action": true,
+      "record_post_clip_action": true,
+      "normal_safety_clipping": "apply_existing_component_clipping",
+      "final_veto_evaluation": "required_unchanged_before_execution",
+      "on_allow": "execute_post_clip_action_for_one_realized_transition_then_reevaluate_branch_policy",
+      "on_veto": "apply_recovery_action_rejection_contract"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "implemented": false,
+      "policy_type": "repeated_one_step_recovery_action",
+      "action_formula": "u = -0.25 * v / v_norm",
+      "coordinate_frame": "inertial_cartesian_2d",
+      "action_magnitude_before_clipping": 0.25,
+      "velocity_zero_rule": "if_v_norm_lte_velocity_zero_tolerance_use_action_0_0",
+      "velocity_zero_tolerance": 1e-12,
+      "record_pre_clip_action": true,
+      "record_post_clip_action": true,
+      "normal_safety_clipping": "apply_existing_component_clipping",
+      "final_veto_evaluation": "required_unchanged_before_execution",
+      "on_allow": "execute_post_clip_action_for_one_realized_transition_then_reevaluate_branch_policy",
+      "on_veto": "apply_recovery_action_rejection_contract",
+      "interpretation_limit": "heuristic_velocity_opposed_thrust_not_proven_braking"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "implemented": false,
+      "policy_type": "repeated_one_step_recovery_action",
+      "tangential_error_formula": "tangential_error = v_t - target_circular_speed",
+      "action_formula": "u = -0.25 * sign(tangential_error) * e_t",
+      "coordinate_frame": "inertial_cartesian_2d",
+      "action_magnitude_before_clipping": 0.25,
+      "tangential_error_zero_tolerance": 1e-12,
+      "tangential_error_zero_tolerance_units": "m/s",
+      "zero_error_rule": "if_abs_tangential_error_lte_tolerance_use_action_0_0",
+      "cartesian_mapping": "u_x = -0.25 * sign(tangential_error) * e_t_x; u_y = -0.25 * sign(tangential_error) * e_t_y",
+      "record_radial_component": true,
+      "record_tangential_component": true,
+      "radial_correction_added": false,
+      "record_pre_clip_action": true,
+      "record_post_clip_action": true,
+      "normal_safety_clipping": "apply_existing_component_clipping",
+      "final_veto_evaluation": "required_unchanged_before_execution",
+      "on_allow": "execute_post_clip_action_for_one_realized_transition_then_reevaluate_branch_policy",
+      "on_veto": "apply_recovery_action_rejection_contract"
+    },
+    {
+      "branch_id": "explicit_abort_v0",
+      "implemented": false,
+      "policy_type": "terminal_decision_without_transition",
+      "execute_further_transition": false,
+      "recovery_transitions": 0,
+      "terminal_decision_event_required": true,
+      "branch_terminal_label": "explicit_recovery_abort",
+      "recovery_outcome_rule": "hazard_avoided_through_termination_only_if_no_declared_hazard_occurred_before_termination",
+      "task_recovery": false,
+      "simulator_success_rule": "false_unless_the_existing_pre_branch_simulator_state_independently_already_defines_success",
+      "fallback_action_executed": false
+    }
+  ],
+  "recovery_action_rejection": {
+    "trigger": "unchanged_final_veto_rejects_proposed_recovery_action",
+    "branch_terminal_label": "recovery_action_rejected",
+    "record_recovery_action_rejected": true,
+    "execute_rejected_action": false,
+    "substitute_zero_action": false,
+    "recursive_branch_selection": false,
+    "terminate_current_branch": true,
+    "preserve_evidence_fields": [
+      "recovery_proposed_action_pre_clip",
+      "recovery_proposed_action_post_clip",
+      "predicted_recovery_next_state",
+      "predicted_recovery_speed_ratio",
+      "hazard_threshold",
+      "hazard_comparator",
+      "monitor_decision",
+      "monitor_reason"
+    ]
+  },
+  "horizons": {
+    "total_episode_horizon_realized_transitions": 100000,
+    "recovery_horizon_realized_transitions": 10000,
+    "total_transition_count_origin": "initial_simulator_state",
+    "total_transition_count_includes": "nominal_prefix_and_post_branch_realized_transitions",
+    "recovery_transition_counter_initial_value": 0,
+    "recovery_horizon_start_event": "first_branch_selected_physical_transition_attempt",
+    "recovery_transition_increment_rule": "increment_only_after_a_branch_selected_transition_is_realized",
+    "first_realized_branch_transition_number": 1,
+    "rejected_action_recovery_transition_count": 0,
+    "explicit_abort_recovery_transition_count": 0,
+    "recovery_horizon_exhaustion_rule": "terminate_when_10000_recovery_transitions_have_been_realized_without_an_earlier_stop_condition",
+    "total_horizon_exhaustion_rule": "terminate_when_100000_total_transitions_have_been_realized_without_an_earlier_stop_condition"
+  },
+  "recovery_success": {
+    "definition_id": "recovery_success_v0",
+    "logical_operator": "all",
+    "required_conditions": [
+      "declared_hazard_avoided",
+      "not_invalid_simulation",
+      "not_invalid_recovery_evaluation",
+      "target_radius_crossing",
+      "phase34_compatible_recoverable_crossing",
+      "recovery_target_reached_within_10000_transitions"
+    ],
+    "crossing_must_occur_at_or_after_branch_point": true,
+    "recoverable_condition_source": "existing_phase34_compatible_recoverable_crossing_definition",
+    "hazard_avoidance_alone_is_recovery_success": false,
+    "report_separately": [
+      "simulator_defined_success",
+      "target_radius_crossing",
+      "phase34_compatible_recoverable_crossing",
+      "recovery_success",
+      "retreat_or_termination",
+      "hazard_outcome"
+    ]
+  },
+  "stop_conditions": {
+    "selection_rule": "stop_at_the_first_chronological_condition; if_multiple_conditions_are_detected_at_the_same_boundary_use_priority_order",
+    "priority_order": [
+      "invalid_simulation",
+      "invalid_recovery_evaluation",
+      "realized_overspeed",
+      "instability",
+      "unsafe_state",
+      "recovery_action_rejection",
+      "explicit_abort",
+      "recovery_success",
+      "recovery_horizon_exhaustion",
+      "total_horizon_exhaustion"
+    ],
+    "conditions": [
+      {
+        "condition_id": "recovery_success",
+        "branch_terminal_label": "recovery_success",
+        "controlled_terminal_label_mapping": "success"
+      },
+      {
+        "condition_id": "realized_overspeed",
+        "branch_terminal_label": "overspeed",
+        "controlled_terminal_label_mapping": "overspeed"
+      },
+      {
+        "condition_id": "instability",
+        "branch_terminal_label": "instability",
+        "controlled_terminal_label_mapping": "instability"
+      },
+      {
+        "condition_id": "unsafe_state",
+        "branch_terminal_label": "unsafe_state",
+        "controlled_terminal_label_mapping": "unsafe_state"
+      },
+      {
+        "condition_id": "invalid_simulation",
+        "branch_terminal_label": "invalid_simulation",
+        "controlled_terminal_label_mapping": "invalid_simulation"
+      },
+      {
+        "condition_id": "invalid_recovery_evaluation",
+        "branch_terminal_label": "invalid_recovery_evaluation",
+        "controlled_terminal_label_mapping": "unknown_with_manual_audit"
+      },
+      {
+        "condition_id": "recovery_action_rejection",
+        "branch_terminal_label": "recovery_action_rejected",
+        "controlled_terminal_label_mapping": "unknown_with_manual_audit"
+      },
+      {
+        "condition_id": "explicit_abort",
+        "branch_terminal_label": "explicit_recovery_abort",
+        "controlled_terminal_label_mapping": "unknown_with_manual_audit"
+      },
+      {
+        "condition_id": "recovery_horizon_exhaustion",
+        "branch_terminal_label": "recovery_horizon_exhausted",
+        "controlled_terminal_label_mapping": "timeout"
+      },
+      {
+        "condition_id": "total_horizon_exhaustion",
+        "branch_terminal_label": "total_horizon_exhausted",
+        "controlled_terminal_label_mapping": "timeout"
+      }
+    ]
+  },
+  "required_metrics": {
+    "margin": [
+      "overspeed_headroom",
+      "action_saturation_margin",
+      "available_correction_authority",
+      "required_to_available_correction_ratio"
+    ],
+    "margin_rules": {
+      "available_correction_authority": "populate_only_where_directly_supported",
+      "required_to_available_correction_ratio": "populate_only_when_required_and_available_inputs_are_valid_and_unit_consistent",
+      "unknown_multi_step_quantities": "null_not_guessed"
+    },
+    "cost": [
+      "recovery_steps",
+      "total_steps",
+      "normalized_action_effort",
+      "delta_v_proxy",
+      "crossing_delay",
+      "final_radius_error",
+      "final_radial_velocity_error",
+      "final_tangential_velocity_error",
+      "task_abandonment_status"
+    ],
+    "intervention": [
+      "evaluation_count",
+      "allow_count",
+      "veto_count",
+      "recovery_action_rejection_count",
+      "first_intervention_step",
+      "last_intervention_step",
+      "longest_veto_streak",
+      "veto_segment_count",
+      "action_suppression_duration"
+    ],
+    "outcomes": [
+      "hazard_avoided",
+      "recovery_success",
+      "simulator_success",
+      "terminal_label",
+      "branch_terminal_label",
+      "recovery_outcome_taxonomy",
+      "task_recovery",
+      "explicit_abort",
+      "invalid_evaluation",
+      "new_failure_caused_by_recovery_action"
+    ],
+    "missing_value_rule": "unsupported_or_inapplicable_values_are_null_with_a_reason_and_are_never_guessed"
+  },
+  "comparison_contract": {
+    "comparison_type": "four_branch_common_state_nonformal_diagnostic",
+    "branch_count": 4,
+    "requirements": [
+      "identical_canonical_branch_state_hash",
+      "identical_case_configuration_hash",
+      "identical_simulator_constants_hash",
+      "identical_nominal_prefix",
+      "identical_seed",
+      "only_branch_decision_differs",
+      "explicit_abort_has_zero_post_branch_transitions"
+    ],
+    "not_monitor_off_vs_monitor_on_pairing": true,
+    "no_branch_expected_to_win_in_advance": true
+  },
+  "output_contract": {
+    "base_directory": "analysis/recovery_action_branching_nonformal_v0/",
+    "manifest_path": "analysis/recovery_action_branching_nonformal_v0/manifest.json",
+    "manifest_exists_at_design_freeze": true,
+    "future_artifacts": [
+      {
+        "artifact_id": "branch_state",
+        "path": "analysis/recovery_action_branching_nonformal_v0/branch_state.json",
+        "must_not_exist_at_design_freeze": true
+      },
+      {
+        "artifact_id": "results",
+        "path": "analysis/recovery_action_branching_nonformal_v0/results.csv",
+        "must_not_exist_at_design_freeze": true
+      },
+      {
+        "artifact_id": "decision_log",
+        "path": "analysis/recovery_action_branching_nonformal_v0/decision_log.jsonl",
+        "must_not_exist_at_design_freeze": true
+      },
+      {
+        "artifact_id": "summary",
+        "path": "analysis/recovery_action_branching_nonformal_v0/summary.md",
+        "must_not_exist_at_design_freeze": true
+      },
+      {
+        "artifact_id": "comparison_plot",
+        "path": "analysis/recovery_action_branching_nonformal_v0/comparison.png",
+        "must_not_exist_at_design_freeze": true
+      }
+    ],
+    "publication_rule": "only_manifest_json_exists_at_design_freeze"
+  },
+  "protected_paths": [
+    "analysis/final_veto_ablation_v0/",
+    "analysis/phase34_post_cross_sync/",
+    "analysis/phase35_crossing_basin_expansion/",
+    "analysis/phase36b_transfer_family_benchmark/",
+    "analysis/phase36c_non_crossing_geometry_diagnosis/",
+    "analysis/phase37a_radial_commit_timing/",
+    "analysis/phase37b_weak_tangential_subset/",
+    "scripts/check_phase_results.py"
+  ],
+  "allowed_claims": [
+    "branch_specific_diagnostic_outcome_for_one_predeclared_case",
+    "whether_a_branch_avoided_the_declared_overspeed_hazard_in_that_case",
+    "whether_a_branch_reached_the_predeclared_recovery_target_in_that_case",
+    "relative_intervention_burden_and_cost_for_the_four_branches_in_that_case"
+  ],
+  "prohibited_claims": [
+    "formal_safety",
+    "universal_recovery",
+    "controller_superiority",
+    "benchmark_wide_effectiveness",
+    "cross_case_generalization",
+    "hardware_validity",
+    "deployment_readiness",
+    "cross_embodiment_validation",
+    "proof_action_magnitude_0p25_is_optimal",
+    "proof_recovery_horizon_10000_is_sufficient"
+  ],
+  "notes": [
+    "This manifest freezes a nonformal one-case experiment design and contains no measured outcomes or result rows.",
+    "No branch winner is selected and no positive recovery claim is made.",
+    "The four branch policies and runner are not implemented at design freeze time.",
+    "The frozen Final Veto evidence is read-only source context and must not be modified.",
+    "The action magnitude 0.25 and recovery horizon 10000 are preliminary experiment-design values, not validated constants."
+  ]
+}
