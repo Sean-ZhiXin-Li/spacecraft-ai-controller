@@ -210,6 +210,12 @@ EXPECTED_OUTPUT_PATHS = {
     "analysis/recovery_action_branching_nonformal_v0/summary.md",
     "analysis/recovery_action_branching_nonformal_v0/comparison.png",
 }
+BRANCH_STATE_OUTPUT_PATH = (
+    "analysis/recovery_action_branching_nonformal_v0/branch_state.json"
+)
+EXPERIMENT_RESULT_OUTPUT_PATHS = EXPECTED_OUTPUT_PATHS - {
+    BRANCH_STATE_OUTPUT_PATH
+}
 
 REQUIRED_PROTECTED_PATHS = {
     "analysis/final_veto_ablation_v0/",
@@ -889,17 +895,63 @@ def validate_future_outputs_absent(
     return "all five future artifacts remain uncreated"
 
 
+def validate_post_extraction_pre_experiment_outputs(
+    data: dict[str, Any], repository_root: Path
+) -> list[str]:
+    declared_paths = set(_future_output_paths(data))
+    if declared_paths != EXPECTED_OUTPUT_PATHS:
+        raise ManifestValidationError(
+            ["declared future output paths do not match the frozen contract"]
+        )
+    branch_state_path = repository_root / PurePosixPath(BRANCH_STATE_OUTPUT_PATH)
+    if not branch_state_path.is_file():
+        raise ManifestValidationError(
+            ["authorized frozen branch_state.json is missing"]
+        )
+    existing_result_paths = [
+        path
+        for path in sorted(EXPERIMENT_RESULT_OUTPUT_PATHS)
+        if (repository_root / PurePosixPath(path)).exists()
+    ]
+    if existing_result_paths:
+        raise ManifestValidationError(
+            [
+                "recovery experiment result artifacts exist before authorization: "
+                f"{existing_result_paths}"
+            ]
+        )
+    try:
+        try:
+            from scripts.check_recovery_branch_state import validate_branch_state
+        except ModuleNotFoundError:
+            from check_recovery_branch_state import validate_branch_state
+
+        validate_branch_state(branch_state_path)
+    except (FileNotFoundError, ValueError) as exc:
+        raise ManifestValidationError(
+            [f"authorized branch-state artifact is invalid: {exc}"]
+        ) from exc
+    return [
+        "authorized branch_state.json exists and validates",
+        "recovery result, decision-log, summary, and plot artifacts remain uncreated",
+    ]
+
+
 def validate_manifest(
     path: Path,
     *,
     repository_root: Path | None = None,
     require_future_outputs_absent: bool = False,
+    require_branch_state_ready: bool = False,
 ) -> list[str]:
     data = load_manifest(path)
     passes = validate_manifest_data(data)
     if require_future_outputs_absent:
         root = repository_root or find_repository_root(path)
         passes.append(validate_future_outputs_absent(data, root))
+    if require_branch_state_ready:
+        root = repository_root or find_repository_root(path)
+        passes.extend(validate_post_extraction_pre_experiment_outputs(data, root))
     return passes
 
 
@@ -932,7 +984,7 @@ def main(argv: list[str] | None = None) -> int:
         passes = validate_manifest(
             manifest_path,
             repository_root=repository_root,
-            require_future_outputs_absent=True,
+            require_branch_state_ready=True,
         )
     except (FileNotFoundError, ManifestValidationError) as exc:
         errors = exc.errors if isinstance(exc, ManifestValidationError) else [str(exc)]

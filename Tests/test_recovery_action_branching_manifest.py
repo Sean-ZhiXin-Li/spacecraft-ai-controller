@@ -9,6 +9,8 @@ import unittest
 from pathlib import Path
 
 from scripts.check_recovery_action_branching_manifest import (
+    BRANCH_STATE_OUTPUT_PATH,
+    EXPERIMENT_RESULT_OUTPUT_PATHS,
     EXPECTED_BRANCH_IDS,
     EXPECTED_OUTPUT_PATHS,
     EXPECTED_SOURCE_CASE,
@@ -59,7 +61,7 @@ class RecoveryActionBranchingManifestTests(unittest.TestCase):
         passes = validate_manifest(
             MANIFEST_PATH,
             repository_root=REPOSITORY_ROOT,
-            require_future_outputs_absent=True,
+            require_branch_state_ready=True,
         )
         self.assertGreaterEqual(len(passes), 1)
         self.assertEqual(
@@ -195,16 +197,17 @@ class RecoveryActionBranchingManifestTests(unittest.TestCase):
         self.assertEqual(len(set(branch_ids)), 4)
         self.assertEqual(set(branch_ids), EXPECTED_BRANCH_IDS)
 
-    def test_future_output_paths_remain_uncreated(self) -> None:
+    def test_only_authorized_branch_state_exists_before_experiment(self) -> None:
         output_paths = {
             item["path"]
             for item in self.manifest["output_contract"]["future_artifacts"]
         }
         self.assertEqual(output_paths, EXPECTED_OUTPUT_PATHS)
-        for relative_path in output_paths:
+        self.assertTrue((REPOSITORY_ROOT / BRANCH_STATE_OUTPUT_PATH).is_file())
+        for relative_path in EXPERIMENT_RESULT_OUTPUT_PATHS:
             self.assertFalse(
                 (REPOSITORY_ROOT / relative_path).exists(),
-                f"future design-freeze artifact unexpectedly exists: {relative_path}",
+                f"recovery experiment artifact unexpectedly exists: {relative_path}",
             )
 
 
