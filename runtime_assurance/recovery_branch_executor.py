@@ -333,6 +333,8 @@ def execute_recovery_branch(
     branch_state: Mapping[str, object],
     branch_id: str,
     horizon_steps: int = 1,
+    *,
+    current_state: CartesianState2D | None = None,
 ) -> RecoveryBranchExecutionResult:
     if branch_id not in SUPPORTED_BRANCH_IDS:
         raise RecoveryBranchExecutorError(f"unsupported recovery branch: {branch_id!r}")
@@ -345,7 +347,12 @@ def execute_recovery_branch(
             "Recovery Branch Executor v0 permits exactly one transition"
         )
     validate_branch_state_integrity(branch_state)
-    previous_state = _state_from_document(branch_state)
+    previous_state = (
+        _state_from_document(branch_state)
+        if current_state is None
+        else current_state
+    )
+    _require_finite_state(previous_state)
     previous_state_hash = _state_hash(previous_state)
     dynamics, target_circular_speed, speed_ratio_epsilon = _dynamics_from_document(
         branch_state

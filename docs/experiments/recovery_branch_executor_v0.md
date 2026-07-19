@@ -137,4 +137,4 @@ Recovery Branch Executor v0 permits exactly `horizon_steps=1`. Values of zero, m
 - No controller switching, retreat manager, safe-mode manager, or Decision Manager is implemented.
 - No formal safety, hardware, deployment, or cross-domain claim is supported.
 
-The next implementation boundary is a separately reviewed nonformal runner. It must preserve the common branch-state hash, add declared logging and stop conditions, and pass its own tests before any branch comparison is authorized.
+The bounded orchestration boundary is now documented in `docs/experiments/recovery_branch_runner_v0.md`. That runner preserves the common branch-state hash and adds infrastructure-only stop tracking and diagnostic logging. A recovery comparison still requires separate authorization and validation.
