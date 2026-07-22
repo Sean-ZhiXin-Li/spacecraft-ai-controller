@@ -3,6 +3,16 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from runtime_assurance.recovery_evaluators import (
+    EVALUATION_CLEAR,
+    EVALUATION_INVALID,
+    EVALUATION_NOT_EVALUATED,
+    EVALUATION_TRIGGERED,
+    INSTABILITY_EVALUATOR_ID,
+    RECOVERY_SUCCESS_EVALUATOR_ID,
+    UNSAFE_STATE_EVALUATOR_ID,
+    RecoveryEvaluationResult,
+)
 from simulator.phase34_35_transition import CartesianState2D
 
 
@@ -69,6 +79,40 @@ def _state_is_finite(state: CartesianState2D | None) -> bool | None:
     return all(math.isfinite(value) for value in (state.x, state.y, state.vx, state.vy))
 
 
+def _apply_evaluator_result(
+    statuses: dict[str, str],
+    *,
+    stop_label: str,
+    expected_evaluator_id: str,
+    evaluation: RecoveryEvaluationResult | None,
+) -> bool:
+    if evaluation is None:
+        return False
+    if not isinstance(evaluation, RecoveryEvaluationResult):
+        raise RecoveryStopConditionError(
+            f"{stop_label} evaluation must be a RecoveryEvaluationResult"
+        )
+    if evaluation.evaluator_id != expected_evaluator_id:
+        raise RecoveryStopConditionError(
+            f"{stop_label} received evaluator {evaluation.evaluator_id!r}; "
+            f"expected {expected_evaluator_id!r}"
+        )
+    if evaluation.status == EVALUATION_TRIGGERED:
+        statuses[stop_label] = TRIGGERED
+    elif evaluation.status == EVALUATION_CLEAR:
+        statuses[stop_label] = CLEAR
+    elif evaluation.status == EVALUATION_NOT_EVALUATED:
+        statuses[stop_label] = NOT_EVALUATED
+    elif evaluation.status == EVALUATION_INVALID:
+        statuses[stop_label] = NOT_EVALUATED
+        return True
+    else:  # RecoveryEvaluationResult enforces this; keep the adapter defensive.
+        raise RecoveryStopConditionError(
+            f"unsupported {stop_label} evaluation status: {evaluation.status!r}"
+        )
+    return False
+
+
 def evaluate_recovery_stop_conditions(
     *,
     execution_terminal_reason: str,
@@ -79,6 +123,9 @@ def evaluate_recovery_stop_conditions(
     recovery_horizon_steps: int,
     total_transition_count: int,
     total_horizon_steps: int,
+    recovery_success_evaluation: RecoveryEvaluationResult | None = None,
+    instability_evaluation: RecoveryEvaluationResult | None = None,
+    unsafe_state_evaluation: RecoveryEvaluationResult | None = None,
 ) -> RecoveryStopConditionReport:
     for value, name in (
         (recovery_transition_count, "recovery_transition_count"),
@@ -109,6 +156,26 @@ def evaluate_recovery_stop_conditions(
                 TRIGGERED if realized_speed_ratio > overspeed_threshold else CLEAR
             )
 
+    invalid_evaluator_evidence = False
+    invalid_evaluator_evidence = _apply_evaluator_result(
+        statuses,
+        stop_label=RECOVERY_SUCCESS,
+        expected_evaluator_id=RECOVERY_SUCCESS_EVALUATOR_ID,
+        evaluation=recovery_success_evaluation,
+    ) or invalid_evaluator_evidence
+    invalid_evaluator_evidence = _apply_evaluator_result(
+        statuses,
+        stop_label=INSTABILITY,
+        expected_evaluator_id=INSTABILITY_EVALUATOR_ID,
+        evaluation=instability_evaluation,
+    ) or invalid_evaluator_evidence
+    invalid_evaluator_evidence = _apply_evaluator_result(
+        statuses,
+        stop_label=UNSAFE_STATE,
+        expected_evaluator_id=UNSAFE_STATE_EVALUATOR_ID,
+        evaluation=unsafe_state_evaluation,
+    ) or invalid_evaluator_evidence
+
     if execution_terminal_reason == "recovery_action_rejected":
         statuses[ACTION_REJECTED] = TRIGGERED
     elif execution_terminal_reason == "explicit_recovery_abort":
@@ -119,6 +186,8 @@ def evaluate_recovery_stop_conditions(
         statuses[ACTION_REJECTED] = CLEAR
         statuses[EXPLICIT_ABORT] = CLEAR
         statuses[INVALID_RECOVERY_EVALUATION] = CLEAR
+    if invalid_evaluator_evidence:
+        statuses[INVALID_RECOVERY_EVALUATION] = TRIGGERED
 
     statuses[RECOVERY_HORIZON_EXHAUSTED] = (
         TRIGGERED
@@ -128,6 +197,20 @@ def evaluate_recovery_stop_conditions(
     statuses[TOTAL_HORIZON_EXHAUSTED] = (
         TRIGGERED if total_transition_count >= total_horizon_steps else CLEAR
     )
+
+    if statuses[RECOVERY_SUCCESS] == TRIGGERED and any(
+        statuses[label] == TRIGGERED
+        for label in (
+            INVALID_SIMULATION,
+            INVALID_RECOVERY_EVALUATION,
+            OVERSPEED,
+            INSTABILITY,
+            UNSAFE_STATE,
+            ACTION_REJECTED,
+            EXPLICIT_ABORT,
+        )
+    ):
+        statuses[RECOVERY_SUCCESS] = CLEAR
 
     terminal_reason = next(
         (

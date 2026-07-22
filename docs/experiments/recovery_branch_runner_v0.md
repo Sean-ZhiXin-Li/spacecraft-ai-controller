@@ -104,10 +104,18 @@ Current evaluation is deliberately limited:
 - invalid simulation checks finite realized state and speed ratio;
 - action rejection and explicit abort use executor terminal evidence;
 - recovery and total horizon exhaustion use realized transition counts;
-- recovery success is always `not_evaluated`;
-- instability and unsafe-state evaluation remain `not_evaluated` because no new evaluator is defined here.
+- recovery success remains `not_evaluated` because this bounded runner does not
+  collect the complete crossing/recoverability summary or use the frozen
+  10,000-transition horizon;
+- instability and unsafe-state remain `not_evaluated` because this runner does
+  not supply explicit instrumentation for them.
 
 The runner therefore cannot claim recovery success even when a bounded trajectory remains below the overspeed threshold.
+
+Pure reusable evaluators and their evidence limits are documented in
+`docs/experiments/recovery_evaluators_v0.md`. They are accepted by the shared
+stop-condition layer but are not invoked optimistically by this runner when its
+required evidence is unavailable.
 
 ## Logging Boundary
 
@@ -130,11 +138,15 @@ It never creates `results.csv`, `paired_results.csv`, a formal decision log, a s
 
 - No recovery comparison experiment has run.
 - No branch ranking or winner exists.
-- Recovery success is not evaluated.
-- Instability and unsafe-state evaluators are not implemented.
+- Recovery success is not evaluated by this bounded runner.
+- Pure instability and unsafe-state evaluators exist, but this runner does not
+  have the required explicit evidence to call them.
 - The runner does not implement the frozen 10,000-step horizon.
 - The runner does not write Result Schema v1 or Decision Log Schema v0 artifacts.
 - No controller switching, adaptive policy, learning, optimization, or action tuning is present.
 - No formal safety, hardware, deployment, or cross-domain claim is supported.
 
-A future experiment runner must receive separate authorization, complete the missing stop evaluators and logging contract, preserve the same canonical branch state across all branches, and pass predeclared validation before any four-branch comparison is executed.
+A future experiment runner must receive separate authorization, collect and
+wire the complete evaluator inputs and logging contract, preserve the same
+canonical branch state across all branches, and pass predeclared validation
+before any four-branch comparison is executed.
