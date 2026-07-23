@@ -146,7 +146,8 @@ It never creates `results.csv`, `paired_results.csv`, a formal decision log, a s
 - No controller switching, adaptive policy, learning, optimization, or action tuning is present.
 - No formal safety, hardware, deployment, or cross-domain claim is supported.
 
-A future experiment runner must receive separate authorization, collect and
-wire the complete evaluator inputs and logging contract, preserve the same
-canonical branch state across all branches, and pass predeclared validation
-before any four-branch comparison is executed.
+A separate no-execution preflight and artifact layer is now documented in
+`docs/experiments/recovery_experiment_runner_v0.md`. It validates the future
+full-horizon contract and synthetic publication behavior without changing this
+runner's 32-step cap. A real execution entry point still requires separate
+authorization before any four-branch comparison is executed.

@@ -56,6 +56,10 @@ _TERMINATION_PRIORITY = (
     TOTAL_HORIZON_EXHAUSTED,
 )
 
+# Public read-only contract for preflight and artifact validation. Keep the
+# private alias above for compatibility with the existing implementation.
+FROZEN_TERMINATION_PRIORITY = _TERMINATION_PRIORITY
+
 
 class RecoveryStopConditionError(ValueError):
     pass
@@ -231,6 +235,7 @@ __all__ = [
     "CLEAR",
     "EXPLICIT_ABORT",
     "FROZEN_STOP_LABELS",
+    "FROZEN_TERMINATION_PRIORITY",
     "INSTABILITY",
     "INVALID_RECOVERY_EVALUATION",
     "INVALID_SIMULATION",

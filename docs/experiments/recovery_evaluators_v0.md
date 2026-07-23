@@ -223,7 +223,8 @@ compare branches, or claim recovery performance.
   implemented by this milestone.
 - No formal safety, hardware, deployment, or cross-domain claim is supported.
 
-The next implementation step must remain separate: collect complete evaluator
-evidence in a dedicated nonformal experiment runner, validate it on synthetic
-fixtures, and obtain explicit authorization before enabling the frozen horizon
-or comparing all four branches.
+A separate no-execution preflight and artifact layer now validates evaluator
+availability, full-horizon contracts, and synthetic four-branch bundles. It
+does not collect real evaluator evidence or authorize execution. A future
+execution entry point still requires explicit authorization before enabling
+the frozen horizon or comparing all four branches.
