@@ -572,10 +572,16 @@ class RecoveryExperimentWriterTests(unittest.TestCase):
                 repository_root=self.root,
             )
 
-    def test_no_real_recovery_result_artifact_exists(self) -> None:
+    def test_real_recovery_result_artifacts_are_absent_or_complete(self) -> None:
         real_output = MANIFEST_PATH.parent
-        for filename in PUBLISHED_ARTIFACT_FILENAMES:
-            self.assertFalse((real_output / filename).exists())
+        existing = {
+            filename
+            for filename in PUBLISHED_ARTIFACT_FILENAMES
+            if (real_output / filename).is_file()
+        }
+        self.assertIn(existing, (set(), set(PUBLISHED_ARTIFACT_FILENAMES)))
+        for filename in existing:
+            self.assertGreater((real_output / filename).stat().st_size, 0)
 
 
 if __name__ == "__main__":

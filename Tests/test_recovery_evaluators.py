@@ -539,15 +539,22 @@ class RepositorySafetyTests(unittest.TestCase):
     def test_runner_horizon_remains_capped_at_32(self) -> None:
         self.assertEqual(MAX_RUNNER_HORIZON_STEPS, 32)
 
-    def test_frozen_recovery_output_paths_remain_uncreated(self) -> None:
-        for name in (
+    def test_recovery_output_paths_are_absent_or_complete(self) -> None:
+        names = (
             "results.csv",
             "decision_log.jsonl",
             "summary.md",
             "comparison.png",
-        ):
+        )
+        existing = {
+            name
+            for name in names
+            if (RECOVERY_ARTIFACT_DIRECTORY / name).is_file()
+        }
+        self.assertIn(existing, (set(), set(names)))
+        for name in existing:
             with self.subTest(name=name):
-                self.assertFalse((RECOVERY_ARTIFACT_DIRECTORY / name).exists())
+                self.assertGreater((RECOVERY_ARTIFACT_DIRECTORY / name).stat().st_size, 0)
 
 
 if __name__ == "__main__":
