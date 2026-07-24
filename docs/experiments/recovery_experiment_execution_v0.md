@@ -2,9 +2,11 @@
 
 ## Status
 
-Full-horizon execution infrastructure implemented; real recovery experiment pending.
+Frozen one-case four-branch nonformal experiment executed and published.
 
 Implementation completed: 2026-07-24
+
+Executed: 2026-07-24
 
 This experiment is a one-case nonformal recovery diagnostic. Its results do not establish universal recovery, optimal control, formal safety, hardware validity, or cross-domain effectiveness.
 
