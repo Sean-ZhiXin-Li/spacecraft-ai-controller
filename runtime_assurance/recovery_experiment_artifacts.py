@@ -34,6 +34,32 @@ EVALUATION_STATUSES = frozenset(
 STRUCTURALLY_COMPLETE_EVALUATION_STATUSES = frozenset({"triggered", "clear"})
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
+EXPECTED_BRANCH_TERMINAL_LABELS = {
+    "invalid_simulation": "invalid_simulation",
+    "invalid_recovery_evaluation": "invalid_recovery_evaluation",
+    "overspeed": "overspeed",
+    "instability": "instability",
+    "unsafe_state": "unsafe_state",
+    "action_rejected": "recovery_action_rejected",
+    "explicit_abort": "explicit_recovery_abort",
+    "recovery_success": "recovery_success",
+    "recovery_horizon_exhausted": "recovery_horizon_exhausted",
+    "total_horizon_exhausted": "total_horizon_exhausted",
+}
+
+EXPECTED_CONTROLLED_TERMINAL_LABELS = {
+    "invalid_simulation": "invalid_simulation",
+    "invalid_recovery_evaluation": "unknown_with_manual_audit",
+    "overspeed": "overspeed",
+    "instability": "instability",
+    "unsafe_state": "unsafe_state",
+    "action_rejected": "unknown_with_manual_audit",
+    "explicit_abort": "unknown_with_manual_audit",
+    "recovery_success": "success",
+    "recovery_horizon_exhausted": "timeout",
+    "total_horizon_exhausted": "timeout",
+}
+
 
 class RecoveryArtifactError(ValueError):
     pass
@@ -90,6 +116,9 @@ class RecoveryBranchExperimentRecord:
     stop_priority: tuple[str, ...]
     stop_priority_version: str
     terminal_reason: str
+    branch_terminal_label: str
+    controlled_terminal_label: str
+    recovery_outcome: str
     valid: bool
     overspeed_status: str
     instability_status: str
@@ -104,17 +133,28 @@ class RecoveryBranchExperimentRecord:
     recovery_success: bool | None
     recovery_success_step: int | None
     final_simulator_success: bool | None
+    overspeed_headroom: float | None
+    action_saturation_margin: float | None
+    available_correction_authority: float | None
+    required_to_available_correction_ratio: float | None
     normalized_control_effort: float | None
     delta_v_proxy: float | None
     recovery_steps: int | None
     crossing_delay: int | None
+    final_radius_error: float | None
+    final_radial_velocity_error: float | None
+    final_tangential_velocity_error: float | None
+    task_abandonment_status: bool | None
+    monitor_evaluation_count: int | None
     intervention_count: int | None
     allow_count: int | None
+    veto_count: int | None
     intervention_rate: float | None
     first_intervention_step: int | None
     last_intervention_step: int | None
     longest_intervention_streak: int | None
     veto_segment_count: int | None
+    action_suppression_duration: int | None
     recovery_action_rejection_count: int | None
     action_rejected: bool
     rejected_action_executed: bool
@@ -133,11 +173,13 @@ class RecoveryDecisionEvent:
     branch_state_hash: str
     event_index: int
     post_branch_step: int
+    total_transition_count: int
     proposed_action: tuple[float, float] | None
     final_veto_decision: str
     executed_action: tuple[float, float] | None
     transition_occurred: bool
     current_state_hash: str
+    predicted_next_state_hash: str | None
     next_state_hash: str | None
     predicted_speed_ratio: float | None
     realized_speed_ratio: float | None
@@ -287,17 +329,27 @@ def validate_recovery_experiment_bundle(
         "recovery_success_step",
         "recovery_steps",
         "crossing_delay",
+        "monitor_evaluation_count",
         "intervention_count",
         "allow_count",
+        "veto_count",
         "first_intervention_step",
         "last_intervention_step",
         "longest_intervention_streak",
         "veto_segment_count",
+        "action_suppression_duration",
         "recovery_action_rejection_count",
     )
     optional_numeric_fields = (
+        "overspeed_headroom",
+        "action_saturation_margin",
+        "available_correction_authority",
+        "required_to_available_correction_ratio",
         "normalized_control_effort",
         "delta_v_proxy",
+        "final_radius_error",
+        "final_radial_velocity_error",
+        "final_tangential_velocity_error",
         "intervention_rate",
     )
 
@@ -330,6 +382,22 @@ def validate_recovery_experiment_bundle(
             errors.append(f"{prefix} is structurally invalid")
         if record.terminal_reason not in contract.stop_priority:
             errors.append(f"{prefix} has an undeclared terminal reason")
+        if not record.branch_terminal_label:
+            errors.append(f"{prefix} lacks a branch terminal label")
+        if not record.controlled_terminal_label:
+            errors.append(f"{prefix} lacks a controlled terminal label")
+        if not record.recovery_outcome:
+            errors.append(f"{prefix} lacks a recovery outcome")
+        expected_branch_label = EXPECTED_BRANCH_TERMINAL_LABELS.get(
+            record.terminal_reason
+        )
+        if record.branch_terminal_label != expected_branch_label:
+            errors.append(f"{prefix} has an inconsistent branch terminal label")
+        expected_controlled_label = EXPECTED_CONTROLLED_TERMINAL_LABELS.get(
+            record.terminal_reason
+        )
+        if record.controlled_terminal_label != expected_controlled_label:
+            errors.append(f"{prefix} has an inconsistent controlled terminal label")
         if not _is_nonnegative_integer(record.recovery_transition_count):
             errors.append(f"{prefix} has an invalid recovery transition count")
         elif record.recovery_transition_count > contract.recovery_horizon:
@@ -361,6 +429,20 @@ def validate_recovery_experiment_bundle(
             0.0 <= record.intervention_rate <= 1.0
         ):
             errors.append(f"{prefix} intervention rate is outside [0, 1]")
+        if (
+            record.monitor_evaluation_count is not None
+            and record.allow_count is not None
+            and record.veto_count is not None
+            and record.allow_count + record.veto_count
+            != record.monitor_evaluation_count
+        ):
+            errors.append(f"{prefix} monitor counts are inconsistent")
+        if (
+            record.intervention_count is not None
+            and record.veto_count is not None
+            and record.intervention_count != record.veto_count
+        ):
+            errors.append(f"{prefix} intervention and veto counts differ")
         if record.recovery_success_status == "triggered" and record.recovery_success is not True:
             errors.append(f"{prefix} recovery success boolean conflicts with evaluator")
         if record.recovery_success_status == "clear" and record.recovery_success is not False:
@@ -398,7 +480,11 @@ def validate_recovery_experiment_bundle(
             errors.append(f"decision event for {event.branch_id!r} has provenance drift")
         if event.hazard_threshold != contract.hazard_threshold or event.hazard_comparator != contract.hazard_comparator:
             errors.append(f"decision event for {event.branch_id!r} has hazard-contract drift")
-        if not _is_nonnegative_integer(event.event_index) or not _is_nonnegative_integer(event.post_branch_step):
+        if (
+            not _is_nonnegative_integer(event.event_index)
+            or not _is_nonnegative_integer(event.post_branch_step)
+            or not _is_nonnegative_integer(event.total_transition_count)
+        ):
             errors.append(f"decision event for {event.branch_id!r} has invalid ordering")
         if event.final_veto_decision not in {"allow", "veto", "not_applicable"}:
             errors.append(f"decision event for {event.branch_id!r} has invalid veto decision")
@@ -406,6 +492,10 @@ def validate_recovery_experiment_bundle(
             event.transition_occurred and not event.next_state_hash
         ):
             errors.append(f"decision event for {event.branch_id!r} lacks state hashes")
+        if event.final_veto_decision != "not_applicable" and not event.predicted_next_state_hash:
+            errors.append(
+                f"decision event for {event.branch_id!r} lacks a predicted state hash"
+            )
         evaluator_keys = tuple(key for key, _ in event.evaluator_statuses)
         if evaluator_keys != tuple(sorted(evaluator_keys)) or len(evaluator_keys) != len(set(evaluator_keys)):
             errors.append(f"decision event for {event.branch_id!r} has nondeterministic evaluator ordering")
@@ -506,12 +596,16 @@ def summary_markdown_bytes(
         f"- Decision events: {len(bundle.decision_events)}",
         f"- Synthetic fixture: {'yes' if bundle.is_synthetic else 'no'}",
         "- Scope: one-case nonformal diagnostic",
+        f"- Common branch-state hash: `{contract.branch_state_hash}`",
+        f"- Manifest hash: `{contract.manifest_hash}`",
         "",
         "## Hazard Outcomes",
         "",
         f"- Overspeed triggered: {_status_count(records, 'overspeed_status', 'triggered')}",
         f"- Instability triggered: {_status_count(records, 'instability_status', 'triggered')}",
         f"- Unsafe state triggered: {_status_count(records, 'unsafe_state_status', 'triggered')}",
+        f"- Invalid simulation: {_status_count(records, 'invalid_simulation_status', 'triggered')}",
+        f"- Invalid recovery evaluation: {_status_count(records, 'invalid_recovery_evaluation_status', 'triggered')}",
         "",
         "## State And Task Recovery",
         "",
@@ -520,15 +614,33 @@ def summary_markdown_bytes(
         f"- Recovery Success v0: {sum(record.recovery_success is True for record in records)}",
         f"- Final simulator success: {sum(record.final_simulator_success is True for record in records)}",
         "",
+        "| Branch | Overspeed | Crossing | Recoverable crossing | Recovery Success v0 | Simulator success | Terminal | Recovery outcome |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for record in records:
+        lines.append(
+            f"| `{record.branch_id}` | `{record.overspeed_status}` | "
+            f"`{record.crossed_target_radius}` | "
+            f"`{record.phase34_compatible_recoverable_crossing}` | "
+            f"`{record.recovery_success}` | `{record.final_simulator_success}` | "
+            f"`{record.branch_terminal_label}` | `{record.recovery_outcome}` |"
+        )
+    lines.extend(
+        [
+        "",
         "## Cost And Intervention Burden",
         "",
-    ]
+        ]
+    )
     for record in records:
         lines.append(
             f"- `{record.branch_id}`: recovery_steps={record.recovery_steps!r}, "
             f"control_effort={record.normalized_control_effort!r}, "
-            f"interventions={record.intervention_count!r}, "
-            f"intervention_rate={record.intervention_rate!r}"
+            f"delta_v_proxy={record.delta_v_proxy!r}, "
+            f"evaluations={record.monitor_evaluation_count!r}, "
+            f"allows={record.allow_count!r}, vetoes={record.veto_count!r}, "
+            f"intervention_rate={record.intervention_rate!r}, "
+            f"crossing_delay={record.crossing_delay!r}"
         )
     lines.extend(
         [
@@ -625,6 +737,11 @@ def write_comparison_png(
 
         labels = [record.branch_id.replace("_v0", "") for record in bundle.records]
         hazard = [record.overspeed_status == "triggered" for record in bundle.records]
+        crossing = [record.crossed_target_radius is True for record in bundle.records]
+        recoverable = [
+            record.phase34_compatible_recoverable_crossing is True
+            for record in bundle.records
+        ]
         recovery = [record.recovery_success is True for record in bundle.records]
         interventions = [
             float("nan")
@@ -638,17 +755,39 @@ def write_comparison_png(
         ]
         positions = list(range(len(labels)))
 
-        figure = Figure(figsize=(12.0, 8.0), dpi=100, constrained_layout=True)
+        figure = Figure(figsize=(12.0, 9.0), dpi=100, constrained_layout=True)
         canvas = FigureCanvasAgg(figure)
         hazard_axis, recovery_axis, burden_axis = figure.subplots(3, 1)
         hazard_axis.bar(positions, hazard, color="#c9493f")
         hazard_axis.set_title("Declared overspeed outcome")
         hazard_axis.set_ylabel("Triggered")
         hazard_axis.set_ylim(0, 1.15)
-        recovery_axis.bar(positions, recovery, color="#3b7a57")
-        recovery_axis.set_title("Recovery Success v0")
+        width = 0.24
+        recovery_axis.bar(
+            [position - width for position in positions],
+            crossing,
+            width=width,
+            color="#4c78a8",
+            label="Crossing",
+        )
+        recovery_axis.bar(
+            positions,
+            recoverable,
+            width=width,
+            color="#59a14f",
+            label="Recoverable crossing",
+        )
+        recovery_axis.bar(
+            [position + width for position in positions],
+            recovery,
+            width=width,
+            color="#2f6b45",
+            label="Recovery Success v0",
+        )
+        recovery_axis.set_title("State and task recovery outcomes")
         recovery_axis.set_ylabel("Triggered")
         recovery_axis.set_ylim(0, 1.15)
+        recovery_axis.legend(fontsize=8, loc="upper right")
         burden_axis.bar(positions, interventions, color="#4c78a8", label="Interventions")
         burden_axis.set_title("Intervention burden (component metrics)")
         burden_axis.set_ylabel("Count")

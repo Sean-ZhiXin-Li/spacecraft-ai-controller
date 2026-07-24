@@ -95,6 +95,29 @@ def build_record(contract, branch_id: str):
         stop_priority=contract.stop_priority,
         stop_priority_version=contract.stop_priority_version,
         terminal_reason=terminal_reason,
+        branch_terminal_label=(
+            "recovery_action_rejected"
+            if rejected
+            else "explicit_recovery_abort"
+            if aborted
+            else terminal_reason
+        ),
+        controlled_terminal_label=(
+            "success"
+            if success
+            else "timeout"
+            if terminal_reason == "recovery_horizon_exhausted"
+            else "unknown_with_manual_audit"
+        ),
+        recovery_outcome=(
+            "hazard_avoided_and_task_recovered"
+            if success
+            else "recovery_action_rejected"
+            if rejected
+            else "hazard_avoided_through_termination"
+            if aborted
+            else "hazard_avoided_task_stalled"
+        ),
         valid=True,
         overspeed_status="clear",
         instability_status="clear",
@@ -109,17 +132,28 @@ def build_record(contract, branch_id: str):
         recovery_success=success,
         recovery_success_step=contract.branch_step + 5 if success else None,
         final_simulator_success=success,
+        overspeed_headroom=0.4,
+        action_saturation_margin=None if aborted else 0.75,
+        available_correction_authority=None,
+        required_to_available_correction_ratio=None,
         normalized_control_effort=None if aborted else float(transitions) * 0.25,
         delta_v_proxy=None,
         recovery_steps=transitions,
         crossing_delay=5 if success else None,
+        final_radius_error=0.0,
+        final_radial_velocity_error=0.0,
+        final_tangential_velocity_error=0.0,
+        task_abandonment_status=not success,
+        monitor_evaluation_count=0 if aborted else transitions + int(rejected),
         intervention_count=1 if rejected else 0,
         allow_count=transitions,
+        veto_count=1 if rejected else 0,
         intervention_rate=(1.0 if rejected else 0.0),
         first_intervention_step=1 if rejected else None,
         last_intervention_step=1 if rejected else None,
         longest_intervention_streak=1 if rejected else 0,
         veto_segment_count=1 if rejected else 0,
+        action_suppression_duration=1 if rejected else 0,
         recovery_action_rejection_count=1 if rejected else 0,
         action_rejected=rejected,
         rejected_action_executed=False,
@@ -147,6 +181,10 @@ def build_event(contract, record, branch_index: int):
         branch_state_hash=contract.branch_state_hash,
         event_index=0,
         post_branch_step=0 if aborted or rejected else 1,
+        total_transition_count=(
+            contract.nominal_prefix_transition_count
+            + (1 if record.physical_transition_executed else 0)
+        ),
         proposed_action=None if aborted else (0.0, 0.0),
         final_veto_decision=(
             "not_applicable" if aborted else "veto" if rejected else "allow"
@@ -154,6 +192,7 @@ def build_event(contract, record, branch_index: int):
         executed_action=None if aborted or rejected else (0.0, 0.0),
         transition_occurred=record.physical_transition_executed,
         current_state_hash="c" * 64,
+        predicted_next_state_hash=None if aborted else "e" * 64,
         next_state_hash="d" * 64 if record.physical_transition_executed else None,
         predicted_speed_ratio=None if aborted else 1.5,
         realized_speed_ratio=(

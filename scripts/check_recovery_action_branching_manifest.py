@@ -895,7 +895,7 @@ def validate_future_outputs_absent(
     return "all five future artifacts remain uncreated"
 
 
-def validate_post_extraction_pre_experiment_outputs(
+def validate_recovery_artifact_state(
     data: dict[str, Any], repository_root: Path
 ) -> list[str]:
     declared_paths = set(_future_output_paths(data))
@@ -908,16 +908,16 @@ def validate_post_extraction_pre_experiment_outputs(
         raise ManifestValidationError(
             ["authorized frozen branch_state.json is missing"]
         )
-    existing_result_paths = [
+    existing_result_paths = {
         path
         for path in sorted(EXPERIMENT_RESULT_OUTPUT_PATHS)
         if (repository_root / PurePosixPath(path)).exists()
-    ]
-    if existing_result_paths:
+    }
+    if existing_result_paths and existing_result_paths != EXPERIMENT_RESULT_OUTPUT_PATHS:
         raise ManifestValidationError(
             [
-                "recovery experiment result artifacts exist before authorization: "
-                f"{existing_result_paths}"
+                "recovery experiment result artifacts are only partially published: "
+                f"{sorted(existing_result_paths)}"
             ]
         )
     try:
@@ -931,9 +931,14 @@ def validate_post_extraction_pre_experiment_outputs(
         raise ManifestValidationError(
             [f"authorized branch-state artifact is invalid: {exc}"]
         ) from exc
+    output_message = (
+        "complete recovery result, decision-log, summary, and plot bundle exists"
+        if existing_result_paths
+        else "recovery result, decision-log, summary, and plot artifacts remain uncreated"
+    )
     return [
         "authorized branch_state.json exists and validates",
-        "recovery result, decision-log, summary, and plot artifacts remain uncreated",
+        output_message,
     ]
 
 
@@ -951,7 +956,7 @@ def validate_manifest(
         passes.append(validate_future_outputs_absent(data, root))
     if require_branch_state_ready:
         root = repository_root or find_repository_root(path)
-        passes.extend(validate_post_extraction_pre_experiment_outputs(data, root))
+        passes.extend(validate_recovery_artifact_state(data, root))
     return passes
 
 

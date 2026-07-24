@@ -232,6 +232,44 @@ class RecoveryExperimentPreflightTests(unittest.TestCase):
         report, _ = self.run_report()
         self.assertEqual(self.check(report, "output_collisions").status, "failed")
 
+    def test_complete_published_bundle_is_allowed_in_validate_only(self) -> None:
+        directory = (
+            self.root
+            / "analysis"
+            / "recovery_action_branching_nonformal_v0"
+        )
+        directory.mkdir(parents=True)
+        filenames = (
+            "results.csv",
+            "decision_log.jsonl",
+            "summary.md",
+            "comparison.png",
+        )
+        for filename in filenames:
+            (directory / filename).write_bytes(b"published")
+        state = replace_repository_state(
+            self.repository_state,
+            untracked_paths=tuple(
+                f"analysis/recovery_action_branching_nonformal_v0/{filename}"
+                for filename in filenames
+            ),
+        )
+        report, _ = self.run_report(repository_state=state)
+        self.assertTrue(report.ready, report.failed_check_ids)
+        self.assertEqual(self.check(report, "output_collisions").status, "passed")
+        self.assertEqual(
+            self.check(report, "untracked_output_collisions").status,
+            "passed",
+        )
+        full_report, _ = self.run_report(
+            repository_state=state,
+            require_clean=True,
+        )
+        self.assertEqual(
+            self.check(full_report, "output_collisions").status,
+            "failed",
+        )
+
     def test_protected_output_directory_fails(self) -> None:
         manifest = copy.deepcopy(self.manifest)
         manifest["output_contract"]["base_directory"] = (

@@ -180,16 +180,15 @@ def evaluate_recovery_stop_conditions(
         evaluation=unsafe_state_evaluation,
     ) or invalid_evaluator_evidence
 
+    statuses[ACTION_REJECTED] = CLEAR
+    statuses[EXPLICIT_ABORT] = CLEAR
+    statuses[INVALID_RECOVERY_EVALUATION] = CLEAR
     if execution_terminal_reason == "recovery_action_rejected":
         statuses[ACTION_REJECTED] = TRIGGERED
     elif execution_terminal_reason == "explicit_recovery_abort":
         statuses[EXPLICIT_ABORT] = TRIGGERED
     elif execution_terminal_reason == "invalid_recovery_evaluation":
         statuses[INVALID_RECOVERY_EVALUATION] = TRIGGERED
-    else:
-        statuses[ACTION_REJECTED] = CLEAR
-        statuses[EXPLICIT_ABORT] = CLEAR
-        statuses[INVALID_RECOVERY_EVALUATION] = CLEAR
     if invalid_evaluator_evidence:
         statuses[INVALID_RECOVERY_EVALUATION] = TRIGGERED
 

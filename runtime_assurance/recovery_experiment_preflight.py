@@ -506,6 +506,18 @@ def _check_output_collisions(
         )
 
 
+def _check_static_output_state(
+    repository_root: Path, contract: RecoveryArtifactContract
+) -> None:
+    output = (repository_root / PurePosixPath(contract.output_directory)).resolve()
+    existing = {name for name in contract.output_filenames if (output / name).exists()}
+    expected = set(contract.output_filenames)
+    if existing and existing != expected:
+        raise RecoveryExperimentPreflightError(
+            f"reserved experiment outputs are only partially published: {sorted(existing)}"
+        )
+
+
 def _check_untracked_collisions(
     repository_state: RecoveryRepositoryState,
     contract: RecoveryArtifactContract,
@@ -537,6 +549,27 @@ def _check_protected_target_refusal(
             continue
         raise RecoveryExperimentPreflightError(
             f"artifact writer accepted protected path: {protected}"
+        )
+
+
+def _check_output_location_only(
+    repository_root: Path, contract: RecoveryArtifactContract
+) -> None:
+    output = (repository_root / PurePosixPath(contract.output_directory)).resolve()
+    for protected in contract.protected_paths:
+        protected_path = (
+            repository_root / PurePosixPath(protected.rstrip("/"))
+        ).resolve()
+        if output == protected_path:
+            raise RecoveryExperimentPreflightError(
+                f"recovery output overlaps protected path: {protected}"
+            )
+        try:
+            output.relative_to(protected_path)
+        except ValueError:
+            continue
+        raise RecoveryExperimentPreflightError(
+            f"recovery output overlaps protected path: {protected}"
         )
 
 
@@ -888,32 +921,62 @@ def run_recovery_experiment_preflight(
                 expected=expected_filenames,
             )
         )
+        if require_clean_repository:
+            output_location_check = lambda: validate_publication_target(
+                root / PurePosixPath(contract.output_directory),
+                repository_root=root,
+                contract=contract,
+                synthetic=False,
+            )
+        else:
+            output_location_check = lambda: _check_output_location_only(root, contract)
         checks.append(
             _check_call(
                 "output_location",
                 "frozen recovery output directory does not overlap protected evidence",
-                lambda: validate_publication_target(
-                    root / PurePosixPath(contract.output_directory),
-                    repository_root=root,
-                    contract=contract,
-                    synthetic=False,
-                ),
+                output_location_check,
             )
         )
-        checks.append(
-            _check_call(
-                "output_collisions",
-                "no recovery result artifact already exists",
-                lambda: _check_output_collisions(root, contract),
+        if require_clean_repository:
+            checks.append(
+                _check_call(
+                    "output_collisions",
+                    "no recovery result artifact already exists",
+                    lambda: _check_output_collisions(root, contract),
+                )
             )
-        )
-        checks.append(
-            _check_call(
-                "untracked_output_collisions",
-                "untracked files do not collide with reserved outputs",
-                lambda: _check_untracked_collisions(repo, contract),
+            checks.append(
+                _check_call(
+                    "untracked_output_collisions",
+                    "untracked files do not collide with reserved outputs",
+                    lambda: _check_untracked_collisions(repo, contract),
+                )
             )
-        )
+        else:
+            checks.append(
+                _check_call(
+                    "output_collisions",
+                    "reserved recovery outputs are absent or form a complete bundle",
+                    lambda: _check_static_output_state(root, contract),
+                )
+            )
+            output = (root / PurePosixPath(contract.output_directory)).resolve()
+            complete_bundle_exists = all(
+                (output / filename).is_file()
+                for filename in contract.output_filenames
+            )
+            checks.append(
+                _passed(
+                    "untracked_output_collisions",
+                    "complete published bundle is permitted in static validation",
+                )
+                if complete_bundle_exists
+                else _check_call(
+                    "untracked_output_collisions",
+                    "untracked files do not collide with reserved outputs",
+                    lambda: _check_untracked_collisions(repo, contract),
+                )
+            )
         checks.append(
             _check_call(
                 "protected_output_refusal",

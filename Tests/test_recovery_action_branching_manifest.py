@@ -197,18 +197,19 @@ class RecoveryActionBranchingManifestTests(unittest.TestCase):
         self.assertEqual(len(set(branch_ids)), 4)
         self.assertEqual(set(branch_ids), EXPECTED_BRANCH_IDS)
 
-    def test_only_authorized_branch_state_exists_before_experiment(self) -> None:
+    def test_recovery_artifact_state_is_absent_or_complete(self) -> None:
         output_paths = {
             item["path"]
             for item in self.manifest["output_contract"]["future_artifacts"]
         }
         self.assertEqual(output_paths, EXPECTED_OUTPUT_PATHS)
         self.assertTrue((REPOSITORY_ROOT / BRANCH_STATE_OUTPUT_PATH).is_file())
-        for relative_path in EXPERIMENT_RESULT_OUTPUT_PATHS:
-            self.assertFalse(
-                (REPOSITORY_ROOT / relative_path).exists(),
-                f"recovery experiment artifact unexpectedly exists: {relative_path}",
-            )
+        existing = {
+            relative_path
+            for relative_path in EXPERIMENT_RESULT_OUTPUT_PATHS
+            if (REPOSITORY_ROOT / relative_path).exists()
+        }
+        self.assertIn(existing, (set(), EXPERIMENT_RESULT_OUTPUT_PATHS))
 
 
 if __name__ == "__main__":

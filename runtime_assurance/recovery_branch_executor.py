@@ -71,6 +71,8 @@ class RecoveryBranchExecutionResult:
     previous_state: CartesianState2D
     next_state: CartesianState2D | None
     monitor_decision: FinalVetoDecision | None
+    predicted_nominal_state: CartesianState2D | None = None
+    predicted_fallback_state: CartesianState2D | None = None
 
 
 def _canonical_json_bytes(value: object) -> bytes:
@@ -374,10 +376,9 @@ def execute_recovery_branch(
             monitor_decision=None,
         )
 
-    predicted_transition: Phase3435TransitionResult | None = None
+    predicted_transitions: list[Phase3435TransitionResult] = []
 
     def predictor(state: CartesianState2D, proposed_action: Action2D):
-        nonlocal predicted_transition
         transition = step_phase34_35_transition(
             state,
             NormalizedAction2D(proposed_action[0], proposed_action[1]),
@@ -385,8 +386,7 @@ def execute_recovery_branch(
         )
         speed = math.hypot(transition.next_state.vx, transition.next_state.vy)
         speed_ratio = speed / (target_circular_speed + speed_ratio_epsilon)
-        if state == previous_state and proposed_action == action:
-            predicted_transition = transition
+        predicted_transitions.append(transition)
         return OneStepPrediction(
             next_state=transition.next_state,
             speed_ratio=speed_ratio,
@@ -397,6 +397,14 @@ def execute_recovery_branch(
         action,
         predictor,
         threshold=OVERSPEED_THRESHOLD,
+    )
+    if not predicted_transitions:
+        raise RecoveryBranchExecutorError("nominal recovery prediction was not captured")
+    predicted_transition = predicted_transitions[0]
+    predicted_fallback_state = (
+        predicted_transitions[1].next_state
+        if len(predicted_transitions) > 1
+        else None
     )
     if decision.decision == "veto":
         return RecoveryBranchExecutionResult(
@@ -411,14 +419,13 @@ def execute_recovery_branch(
             previous_state=previous_state,
             next_state=None,
             monitor_decision=decision,
+            predicted_nominal_state=predicted_transition.next_state,
+            predicted_fallback_state=predicted_fallback_state,
         )
     if decision.decision != "allow" or decision.executed_action != action:
         raise RecoveryBranchExecutorError(
             "Final Veto returned an invalid recovery-action decision"
         )
-    if predicted_transition is None:
-        raise RecoveryBranchExecutorError("nominal recovery prediction was not captured")
-
     realized_transition = step_phase34_35_transition(
         previous_state,
         NormalizedAction2D(action[0], action[1]),
@@ -447,6 +454,8 @@ def execute_recovery_branch(
         previous_state=previous_state,
         next_state=next_state,
         monitor_decision=decision,
+        predicted_nominal_state=predicted_transition.next_state,
+        predicted_fallback_state=predicted_fallback_state,
     )
 
 
