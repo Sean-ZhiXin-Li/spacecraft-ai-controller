@@ -1,0 +1,181 @@
+{
+  "analysis_schema_version": "recovery_branch_mechanism_diagnosis_v0",
+  "interpretation_rule": "measured and endpoint-derived evidence is separated from hypotheses; unavailable quantities remain explicit",
+  "mechanisms": [
+    {
+      "confidence": "high",
+      "counterevidence": [],
+      "mechanism_id": "A_hazard_only_correction",
+      "missing_evidence": [
+        "No post-branch execution of the rejected nominal source action exists as a branch counterfactual."
+      ],
+      "scope": "one frozen branch state, three declared physical responses, magnitude 0.25 where applicable, 10000-transition horizon, current simulator",
+      "status": "supported",
+      "supporting_evidence": [
+        "All 30000 physical proposals were allowed and all realized speed ratios remained below 1.90.",
+        "All three physical branches ended without crossing, recoverable crossing, Recovery Success v0, or simulator success."
+      ]
+    },
+    {
+      "confidence": "medium",
+      "counterevidence": [
+        "Zero action and tangential correction retained positive outward endpoint radial velocity."
+      ],
+      "mechanism_id": "B_insufficient_radial_commitment",
+      "missing_evidence": [
+        "Per-step radius and radial velocity are not available, so the closest radial approach and near-horizon radial trend cannot be evaluated."
+      ],
+      "scope": "one frozen branch state, three declared physical responses, magnitude 0.25 where applicable, 10000-transition horizon, current simulator",
+      "status": "partially_supported",
+      "supporting_evidence": [
+        "Velocity-opposed final radial velocity fell from 6140.671312 to 151.984933 m/s and reduced only 0.035715% of the initial radius gap.",
+        "Zero action and tangential correction reduced only 4.094430% and 4.094029% of the endpoint radius gap.",
+        "All final radius and radial-velocity recoverability component margins remained negative."
+      ]
+    },
+    {
+      "confidence": "high",
+      "counterevidence": [],
+      "mechanism_id": "C_excessive_braking_or_energy_removal",
+      "missing_evidence": [
+        "Per-step energy is unavailable; only branch-point and final energy are derivable."
+      ],
+      "scope": "velocity_opposed_thrust_v0 for this frozen state and horizon",
+      "status": "supported",
+      "supporting_evidence": [
+        "Velocity-opposed speed ratio fell from 1.824760 to 0.046574.",
+        "Its derived endpoint specific orbital energy changed by -31614348.604192 J/kg and ended -9191994.827395 J/kg below the target circular energy.",
+        "Endpoint radial velocity was 151.984933 m/s and tangential error was -4083.494966 m/s, showing suppression of both components."
+      ]
+    },
+    {
+      "confidence": "high",
+      "counterevidence": [],
+      "mechanism_id": "D_tangential_only_correction_limitation",
+      "missing_evidence": [
+        "Per-step radial and tangential state components are unavailable."
+      ],
+      "scope": "tangential_error_correction_v0 for this frozen state and horizon",
+      "status": "supported",
+      "supporting_evidence": [
+        "Tangential endpoint error changed from 848.475678 to -262.968555 m/s while no crossing occurred.",
+        "Its final radial velocity remained 6140.487528 m/s and its final radius gap remained 143848083404.778320 m.",
+        "The frozen branch definition supplies tangential correction without a radial correction term."
+      ]
+    },
+    {
+      "confidence": "high",
+      "counterevidence": [
+        "Velocity-opposed and tangential actions changed recorded direction on 9999 and 9999 consecutive boundaries; they were recomputed from current state rather than repeating one fixed vector."
+      ],
+      "mechanism_id": "E_static_action_limitation",
+      "missing_evidence": [
+        "No staged or phase-switching recovery policy was tested."
+      ],
+      "scope": "one frozen branch state, three declared physical responses, magnitude 0.25 where applicable, 10000-transition horizon, current simulator",
+      "status": "not_supported",
+      "supporting_evidence": [
+        "The policies remain single-mode and fixed-magnitude where nonzero."
+      ]
+    },
+    {
+      "confidence": "high",
+      "counterevidence": [
+        "Recovery-horizon exhaustion alone does not establish that a longer horizon would recover."
+      ],
+      "mechanism_id": "F_horizon_limitation",
+      "missing_evidence": [
+        "Per-step target-radius and recoverability-component trends near transition 10000 are unavailable."
+      ],
+      "scope": "one frozen branch state, three declared physical responses, magnitude 0.25 where applicable, 10000-transition horizon, current simulator",
+      "status": "not_evaluable",
+      "supporting_evidence": []
+    },
+    {
+      "confidence": "medium",
+      "counterevidence": [
+        "Only three simple response policies were evaluated; no adaptive, staged, or optimized policy was tested."
+      ],
+      "mechanism_id": "G_state_region_irrecoverability_under_tested_actions",
+      "missing_evidence": [
+        "No reachable-set or controller-complete irrecoverability analysis exists."
+      ],
+      "scope": "one frozen branch state, three declared physical responses, magnitude 0.25 where applicable, 10000-transition horizon, current simulator",
+      "status": "consistent_with_evidence",
+      "supporting_evidence": [
+        "None of the three declared physical responses recovered from the identical branch state within 10000 transitions."
+      ]
+    },
+    {
+      "confidence": "medium",
+      "counterevidence": [
+        "No phase-switching policy was measured, so its benefit is untested."
+      ],
+      "mechanism_id": "H_missing_phase_switching",
+      "missing_evidence": [
+        "No logged policy-phase transitions or alternate staged trajectory exist."
+      ],
+      "scope": "architectural hypothesis motivated by this one-case outcome",
+      "status": "consistent_with_evidence",
+      "supporting_evidence": [
+        "Each physical branch used one response rule for the entire horizon and none reached crossing.",
+        "The active branches corrected different state components but did not jointly satisfy radius, radial-velocity, and tangential-velocity recoverability conditions."
+      ]
+    },
+    {
+      "confidence": "high",
+      "counterevidence": [
+        "Branch-point and final scalar summaries permit endpoint comparisons."
+      ],
+      "mechanism_id": "I_insufficient_observability_in_published_artifacts",
+      "missing_evidence": [
+        "A compact checkpoint state-summary stream was not published."
+      ],
+      "scope": "physical mechanism diagnosis from the published v0 artifact schema",
+      "status": "supported",
+      "supporting_evidence": [
+        "Decision events contain state hashes, actions, and speed ratios but no per-step state vectors.",
+        "Per-step radius, radial velocity, tangential velocity, orbital energy, and recoverability components cannot be calculated from hashes."
+      ]
+    }
+  ],
+  "trajectory_divergence": {
+    "common_pre_transition_state_at_step_1": true,
+    "different_hash_interpretation": "exact_state_identity_differs; physical distance is not derivable from hashes",
+    "first_next_state_hash_divergence_step": 1,
+    "initial_current_state_hashes": {
+      "tangential_error_correction_v0": "636847a9a1972cb5d07a8434778c7bae883a0ee591b43dc34082650d34b8ecc1",
+      "velocity_opposed_thrust_v0": "636847a9a1972cb5d07a8434778c7bae883a0ee591b43dc34082650d34b8ecc1",
+      "zero_action_reference_v0": "636847a9a1972cb5d07a8434778c7bae883a0ee591b43dc34082650d34b8ecc1"
+    },
+    "pairwise": {
+      "velocity_opposed_thrust_v0__vs__tangential_error_correction_v0": {
+        "action_direction_cosine_maximum": 0.6356039006642044,
+        "action_direction_cosine_mean": -0.6311214573370272,
+        "action_direction_cosine_minimum": -0.6356044686844234,
+        "exact_later_state_hash_match_count": 0,
+        "exact_later_state_hash_match_observed": false,
+        "same_step_exact_action_count": 0,
+        "same_step_opposite_action_count_tolerance_1e-12": 0
+      },
+      "zero_action_reference_v0__vs__tangential_error_correction_v0": {
+        "action_direction_cosine_maximum": null,
+        "action_direction_cosine_mean": null,
+        "action_direction_cosine_minimum": null,
+        "exact_later_state_hash_match_count": 0,
+        "exact_later_state_hash_match_observed": false,
+        "same_step_exact_action_count": 0,
+        "same_step_opposite_action_count_tolerance_1e-12": 0
+      },
+      "zero_action_reference_v0__vs__velocity_opposed_thrust_v0": {
+        "action_direction_cosine_maximum": null,
+        "action_direction_cosine_mean": null,
+        "action_direction_cosine_minimum": null,
+        "exact_later_state_hash_match_count": 0,
+        "exact_later_state_hash_match_observed": false,
+        "same_step_exact_action_count": 0,
+        "same_step_opposite_action_count_tolerance_1e-12": 0
+      }
+    }
+  }
+}
