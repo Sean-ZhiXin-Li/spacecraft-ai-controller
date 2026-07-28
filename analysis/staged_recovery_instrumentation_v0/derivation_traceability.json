@@ -1,0 +1,281 @@
+{
+  "canonical_payload_hash": "7210f530d5acd73e5f03f4d017067eb80f2d9a81d9438eca9c4b0f58657657b0",
+  "completed_date": "2026-07-28",
+  "derivation_traceability_schema_version": "staged_recovery_instrumentation_derivation_traceability_v0",
+  "derivations": [
+    {
+      "boundary_semantics": "exact nonzero boundary; no state-hash inference",
+      "derivation_id": "orbital_basis_radius",
+      "evidence_status": "derived",
+      "exact_repository_source": "analysis/recovery_action_branching_nonformal_v0/manifest.json:coordinate_convention.position_norm",
+      "formula_description": "sqrt(x*x + y*y)",
+      "input_fields": [
+        "position_x",
+        "position_y"
+      ],
+      "invalid_conditions": "position norm must be finite and greater than zero",
+      "limitations": "Geometry only; no transition or physical closeness inference.",
+      "output_field": "radius",
+      "tests_covering_it": [
+        "test_radius_derivation_is_exact",
+        "test_zero_position_norm_is_invalid"
+      ],
+      "units": "m"
+    },
+    {
+      "boundary_semantics": "counterpart tangential basis is a positive 90-degree rotation",
+      "derivation_id": "orbital_radial_basis",
+      "evidence_status": "derived",
+      "exact_repository_source": "runtime_assurance/recovery_branch_executor.py:generate_tangential_correction_action",
+      "formula_description": "e_r = (x/r, y/r)",
+      "input_fields": [
+        "position_x",
+        "position_y",
+        "radius"
+      ],
+      "invalid_conditions": "invalid basis propagates invalid evidence",
+      "limitations": "No normalization is attempted at zero radius.",
+      "output_field": "radial_unit_vector",
+      "tests_covering_it": [
+        "test_radial_unit_vector_is_normalized",
+        "test_all_quadrants"
+      ],
+      "units": "dimensionless"
+    },
+    {
+      "boundary_semantics": "positive orientation is counterclockwise",
+      "derivation_id": "orbital_tangential_basis",
+      "evidence_status": "derived",
+      "exact_repository_source": "analysis/recovery_action_branching_nonformal_v0/manifest.json:coordinate_convention.positive_tangential_unit_vector",
+      "formula_description": "e_t = (-e_r_y, e_r_x)",
+      "input_fields": [
+        "radial_unit_vector"
+      ],
+      "invalid_conditions": "invalid radial basis propagates invalid evidence",
+      "limitations": "Orientation is repository-specific and not inferred from a branch name.",
+      "output_field": "tangential_unit_vector",
+      "tests_covering_it": [
+        "test_tangential_orientation",
+        "test_basis_is_orthogonal"
+      ],
+      "units": "dimensionless"
+    },
+    {
+      "boundary_semantics": "signed; inward velocity remains negative",
+      "derivation_id": "radial_velocity",
+      "evidence_status": "derived",
+      "exact_repository_source": "scripts/explicit_controller_phase21_orbital_transfer_planner.py:basis",
+      "formula_description": "dot((vx,vy), e_r)",
+      "input_fields": [
+        "velocity_x",
+        "velocity_y",
+        "radial_unit_vector"
+      ],
+      "invalid_conditions": "invalid basis or velocity propagates invalid evidence",
+      "limitations": "A single signed value does not classify progress.",
+      "output_field": "radial_velocity",
+      "tests_covering_it": [
+        "test_radial_outward",
+        "test_radial_inward",
+        "test_mixed_velocity"
+      ],
+      "units": "m/s"
+    },
+    {
+      "boundary_semantics": "signed counterclockwise convention",
+      "derivation_id": "tangential_velocity",
+      "evidence_status": "derived",
+      "exact_repository_source": "scripts/explicit_controller_phase21_orbital_transfer_planner.py:basis",
+      "formula_description": "dot((vx,vy), e_t)",
+      "input_fields": [
+        "velocity_x",
+        "velocity_y",
+        "tangential_unit_vector"
+      ],
+      "invalid_conditions": "invalid basis or velocity propagates invalid evidence",
+      "limitations": "Signed component is not an action or task-success label.",
+      "output_field": "tangential_velocity",
+      "tests_covering_it": [
+        "test_positive_tangential_velocity",
+        "test_negative_tangential_velocity"
+      ],
+      "units": "m/s"
+    },
+    {
+      "boundary_semantics": "no fallback denominator or guessed target",
+      "derivation_id": "target_circular_speed",
+      "evidence_status": "derived",
+      "exact_repository_source": "scripts/explicit_controller_phase21_orbital_transfer_planner.py:orbital_diagnostics",
+      "formula_description": "sqrt(mu / target_radius)",
+      "input_fields": [
+        "mu",
+        "target_radius"
+      ],
+      "invalid_conditions": "mu and target radius must be finite and positive",
+      "limitations": "Current simplified simulator target only.",
+      "output_field": "target_circular_speed",
+      "tests_covering_it": [
+        "test_target_circular_speed_matches_repository_formula"
+      ],
+      "units": "m/s"
+    },
+    {
+      "boundary_semantics": "signed ratios retained",
+      "derivation_id": "target_error_ratios",
+      "evidence_status": "derived",
+      "exact_repository_source": "runtime_assurance/recovery_experiment_runner.py:_observe",
+      "formula_description": "(r-r_target)/r_target; v_r/(v_circ+1e-12); (v_t-v_circ)/(v_circ+1e-12)",
+      "input_fields": [
+        "radius",
+        "target_radius",
+        "radial_velocity",
+        "tangential_velocity",
+        "target_circular_speed"
+      ],
+      "invalid_conditions": "nonpositive denominator is invalid",
+      "limitations": "Ratios are components, not a combined recovery score.",
+      "output_field": "radius_error_ratio,radial_velocity_ratio,tangential_velocity_error_ratio",
+      "tests_covering_it": [
+        "test_target_ratios",
+        "test_invalid_denominator"
+      ],
+      "units": "dimensionless"
+    },
+    {
+      "boundary_semantics": "strict overspeed comparator remains > 1.90",
+      "derivation_id": "realized_speed_ratio",
+      "evidence_status": "derived",
+      "exact_repository_source": "runtime_assurance/recovery_experiment_runner.py:_observe",
+      "formula_description": "speed / (target_circular_speed + speed_ratio_denominator_epsilon)",
+      "input_fields": [
+        "speed_magnitude",
+        "target_circular_speed"
+      ],
+      "invalid_conditions": "nonpositive denominator is invalid",
+      "limitations": "Below one hazard threshold does not establish safety.",
+      "output_field": "realized_speed_ratio",
+      "tests_covering_it": [
+        "test_realized_speed_ratio",
+        "test_exact_threshold_is_not_overspeed"
+      ],
+      "units": "dimensionless"
+    },
+    {
+      "boundary_semantics": "positive below, zero at, negative above strict threshold",
+      "derivation_id": "overspeed_headroom",
+      "evidence_status": "derived",
+      "exact_repository_source": "runtime_assurance/final_veto_monitor.py:OVERSPEED_THRESHOLD",
+      "formula_description": "1.90 - speed_ratio",
+      "input_fields": [
+        "realized_speed_ratio"
+      ],
+      "invalid_conditions": "missing ratio remains not_evaluated",
+      "limitations": "Headroom is relative to one diagnostic threshold, not formal safety margin.",
+      "output_field": "overspeed_headroom",
+      "tests_covering_it": [
+        "test_headroom_signs"
+      ],
+      "units": "dimensionless"
+    },
+    {
+      "boundary_semantics": "declared diagnostic proxy; not exact softened-force invariant",
+      "derivation_id": "specific_orbital_energy_proxy",
+      "evidence_status": "derived",
+      "exact_repository_source": "scripts/explicit_controller_phase21_orbital_transfer_planner.py:orbital_diagnostics",
+      "formula_description": "0.5*speed^2 - mu/(radius+1e-12)",
+      "input_fields": [
+        "speed_magnitude",
+        "mu",
+        "radius"
+      ],
+      "invalid_conditions": "supported gravity model and positive radius required",
+      "limitations": "Specific energy is not mass-scaled, fuel use, or exact conserved energy.",
+      "output_field": "specific_orbital_energy",
+      "tests_covering_it": [
+        "test_specific_energy_proxy",
+        "test_unsupported_energy_model"
+      ],
+      "units": "J/kg"
+    },
+    {
+      "boundary_semantics": "inclusive component bounds",
+      "derivation_id": "phase34_recoverability",
+      "evidence_status": "derived",
+      "exact_repository_source": "runtime_assurance/recovery_evaluators.py:evaluate_phase34_compatible_recoverability",
+      "formula_description": "abs(r_ratio)<=0.0025 and abs(vr_ratio)<=0.02 and abs(vt_ratio)<=0.25",
+      "input_fields": [
+        "radius_error_ratio",
+        "radial_velocity_ratio",
+        "tangential_velocity_error_ratio"
+      ],
+      "invalid_conditions": "all three finite components required",
+      "limitations": "Crossing, simulator success, and hazard avoidance remain separate.",
+      "output_field": "phase34_compatible_recoverability",
+      "tests_covering_it": [
+        "test_recoverability_boundaries",
+        "test_recoverability_equivalence"
+      ],
+      "units": "boolean"
+    },
+    {
+      "boundary_semantics": "previous exactly on target is not a new crossing; current exactly on target can be",
+      "derivation_id": "target_radius_crossing",
+      "evidence_status": "derived",
+      "exact_repository_source": "scripts/explicit_controller_phase34_post_cross_sync.py:rollout_phase34_case crossing test",
+      "formula_description": "previous_error>0 and current_error<=0, or previous_error<0 and current_error>=0",
+      "input_fields": [
+        "previous_state",
+        "current_state",
+        "target_radius"
+      ],
+      "invalid_conditions": "both measured states and valid target required",
+      "limitations": "No interpolation is performed.",
+      "output_field": "target_radius_crossing",
+      "tests_covering_it": [
+        "test_crossing_directions",
+        "test_exact_target_crossing_semantics"
+      ],
+      "units": "boolean"
+    },
+    {
+      "boundary_semantics": "no threshold or progress class is applied",
+      "derivation_id": "threshold_free_progress",
+      "evidence_status": "derived",
+      "exact_repository_source": "docs/architecture/staged_recovery_architecture_v0.md:No-Progress Detection",
+      "formula_description": "current component minus previous component",
+      "input_fields": [
+        "previous_orbital_state",
+        "current_orbital_state"
+      ],
+      "invalid_conditions": "missing and invalid components propagate independently",
+      "limitations": "Short-term component changes do not imply eventual recovery.",
+      "output_field": "delta_*",
+      "tests_covering_it": [
+        "test_raw_progress_deltas",
+        "test_progress_has_no_classification"
+      ],
+      "units": "component-specific"
+    },
+    {
+      "boundary_semantics": "abort and rejection remain distinct from physical zero action",
+      "derivation_id": "action_geometry",
+      "evidence_status": "derived",
+      "exact_repository_source": "analysis/recovery_action_branching_nonformal_v0/manifest.json:coordinate_convention and simulator/phase34_35_transition.py action bounds",
+      "formula_description": "dot(action,e_r); dot(action,e_t); 1-max(abs(action components))",
+      "input_fields": [
+        "explicit_action",
+        "orbital_basis",
+        "action_component_limit"
+      ],
+      "invalid_conditions": "explicit finite action and valid basis required",
+      "limitations": "Normalized action is not delta-v or a generated policy action.",
+      "output_field": "action radial/tangential components and saturation margin",
+      "tests_covering_it": [
+        "test_action_geometry",
+        "test_explicit_abort_has_no_action"
+      ],
+      "units": "normalized_action"
+    }
+  ],
+  "instrumentation_id": "staged_recovery_instrumentation_v0"
+}

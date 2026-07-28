@@ -1,0 +1,3162 @@
+{
+  "architecture_signal_coverage": [
+    [
+      "simulation_validity",
+      "direct_input_supported"
+    ],
+    [
+      "recovery_evaluation_validity",
+      "direct_input_supported"
+    ],
+    [
+      "overspeed_status",
+      "pure_derivation_supported"
+    ],
+    [
+      "instability_status",
+      "direct_input_supported"
+    ],
+    [
+      "unsafe_state_status",
+      "direct_input_supported"
+    ],
+    [
+      "final_veto_decision",
+      "direct_input_supported"
+    ],
+    [
+      "action_rejection_status",
+      "direct_input_supported"
+    ],
+    [
+      "explicit_abort_requested",
+      "direct_input_supported"
+    ],
+    [
+      "position_x",
+      "direct_input_supported"
+    ],
+    [
+      "position_y",
+      "direct_input_supported"
+    ],
+    [
+      "velocity_x",
+      "direct_input_supported"
+    ],
+    [
+      "velocity_y",
+      "direct_input_supported"
+    ],
+    [
+      "radius",
+      "pure_derivation_supported"
+    ],
+    [
+      "target_radius",
+      "direct_input_supported"
+    ],
+    [
+      "target_radius_error",
+      "pure_derivation_supported"
+    ],
+    [
+      "radial_velocity",
+      "pure_derivation_supported"
+    ],
+    [
+      "tangential_velocity",
+      "pure_derivation_supported"
+    ],
+    [
+      "target_circular_speed",
+      "pure_derivation_supported"
+    ],
+    [
+      "radial_velocity_ratio",
+      "pure_derivation_supported"
+    ],
+    [
+      "tangential_velocity_error_ratio",
+      "pure_derivation_supported"
+    ],
+    [
+      "realized_speed_ratio",
+      "pure_derivation_supported"
+    ],
+    [
+      "predicted_speed_ratio",
+      "requires_predicted_state"
+    ],
+    [
+      "overspeed_headroom",
+      "pure_derivation_supported"
+    ],
+    [
+      "orbital_energy_or_proxy",
+      "pure_derivation_supported"
+    ],
+    [
+      "target_radius_crossing",
+      "requires_previous_state"
+    ],
+    [
+      "first_crossing_step",
+      "requires_previous_state"
+    ],
+    [
+      "phase34_compatible_recoverability",
+      "pure_derivation_supported"
+    ],
+    [
+      "recoverability_component_vector",
+      "pure_derivation_supported"
+    ],
+    [
+      "recovery_success_v0",
+      "direct_input_supported"
+    ],
+    [
+      "recovery_horizon_remaining",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "recovery_horizon_exhausted",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "total_horizon_remaining",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "total_horizon_exhausted",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "radial_progress",
+      "requires_previous_state"
+    ],
+    [
+      "radial_progress_direction",
+      "requires_previous_state"
+    ],
+    [
+      "radial_progress_rate",
+      "requires_previous_state"
+    ],
+    [
+      "tangential_progress",
+      "requires_previous_state"
+    ],
+    [
+      "crossing_progress",
+      "requires_previous_state"
+    ],
+    [
+      "predicted_crossing_direction",
+      "requires_predicted_state"
+    ],
+    [
+      "crossing_proximity",
+      "requires_predicted_state"
+    ],
+    [
+      "energy_change_direction",
+      "requires_previous_state"
+    ],
+    [
+      "available_correction_authority",
+      "not_yet_supported"
+    ],
+    [
+      "action_saturation_margin",
+      "pure_derivation_supported"
+    ],
+    [
+      "no_progress_status",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "phase_dwell_count",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "phase_transition_count",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "recent_phase_history",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "phase_transition_reason",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "proposed_action",
+      "direct_input_supported"
+    ],
+    [
+      "executed_action",
+      "direct_input_supported"
+    ],
+    [
+      "handoff_readiness",
+      "requires_future_evaluator"
+    ],
+    [
+      "simulator_success",
+      "direct_input_supported"
+    ]
+  ],
+  "canonical_payload_hash": "2f3fc6adf19f684d1f989c5f261cb8861518d4f9161d651115e09872001091a1",
+  "completed_date": "2026-07-28",
+  "coverage_counts": [
+    [
+      "direct_input_supported",
+      16
+    ],
+    [
+      "pure_derivation_supported",
+      14
+    ],
+    [
+      "requires_previous_state",
+      8
+    ],
+    [
+      "requires_predicted_state",
+      3
+    ],
+    [
+      "requires_runtime_phase_integration",
+      9
+    ],
+    [
+      "requires_future_evaluator",
+      1
+    ],
+    [
+      "not_yet_supported",
+      1
+    ]
+  ],
+  "field_catalog_schema_version": "staged_recovery_instrumentation_field_catalog_v0",
+  "fields": [
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 0,
+      "category": "provenance",
+      "data_type": "string",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: case id.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "case_id",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 1,
+      "category": "provenance",
+      "data_type": "integer",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: seed.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "seed",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "integer"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 2,
+      "category": "provenance",
+      "data_type": "string",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: implementation commit.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "implementation_commit",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 3,
+      "category": "provenance",
+      "data_type": "string",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: branch state hash.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "branch_state_hash",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 4,
+      "category": "provenance",
+      "data_type": "number",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: simulator configuration hash.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "simulator_configuration_hash",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 5,
+      "category": "provenance",
+      "data_type": "string",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: constants hash.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "constants_hash",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 6,
+      "category": "provenance",
+      "data_type": "integer",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: recovery step.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "recovery_step",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "transition"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 7,
+      "category": "provenance",
+      "data_type": "integer",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: total transition count.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "total_transition_count",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "transition"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 8,
+      "category": "provenance",
+      "data_type": "number",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: simulation time.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "simulation_time",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "s"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "explicit_abort",
+        "hazard_arrest",
+        "nominal_handoff",
+        "recoverability_verification",
+        "retreat",
+        "stabilization_assessment"
+      ],
+      "canonical_order_index": 9,
+      "category": "hazard_and_validity",
+      "data_type": "boolean",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: simulation validity.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "simulation_validity",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "nominal_handoff",
+        "recoverability_verification",
+        "stabilization_assessment"
+      ],
+      "canonical_order_index": 10,
+      "category": "hazard_and_validity",
+      "data_type": "boolean",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: recovery evaluation validity.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "recovery_evaluation_validity",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "explicit_abort",
+        "hazard_arrest",
+        "nominal_handoff",
+        "retreat"
+      ],
+      "canonical_order_index": 11,
+      "category": "hazard_and_validity",
+      "data_type": "boolean",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: overspeed status.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "overspeed_status",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "nominal_handoff",
+        "stabilization_assessment"
+      ],
+      "canonical_order_index": 12,
+      "category": "hazard_and_validity",
+      "data_type": "boolean",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: instability status.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "instability_status",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "nominal_handoff",
+        "stabilization_assessment"
+      ],
+      "canonical_order_index": 13,
+      "category": "hazard_and_validity",
+      "data_type": "boolean",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: unsafe state status.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "unsafe_state_status",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "hazard_arrest"
+      ],
+      "canonical_order_index": 14,
+      "category": "action",
+      "data_type": "string",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: final veto decision.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "final_veto_decision",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "nominal_handoff"
+      ],
+      "canonical_order_index": 15,
+      "category": "action",
+      "data_type": "boolean",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: action rejection status.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "action_rejection_status",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "explicit_abort"
+      ],
+      "canonical_order_index": 16,
+      "category": "phase_and_runtime",
+      "data_type": "boolean",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: explicit abort requested.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "explicit_abort_requested",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 17,
+      "category": "cartesian_state",
+      "data_type": "number",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: position x.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "position_x",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "m"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 18,
+      "category": "cartesian_state",
+      "data_type": "number",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: position y.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "position_y",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "m"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 19,
+      "category": "cartesian_state",
+      "data_type": "number",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: velocity x.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "velocity_x",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "m/s"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 20,
+      "category": "cartesian_state",
+      "data_type": "number",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: velocity y.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "velocity_y",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "m/s"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "radial_recommitment"
+      ],
+      "canonical_order_index": 21,
+      "category": "orbital_geometry",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: radius.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "radius",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "position_x",
+        "position_y"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "m"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 22,
+      "category": "target_state",
+      "data_type": "number",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: target radius.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "target_radius",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "m"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "crossing_preparation",
+        "radial_recommitment"
+      ],
+      "canonical_order_index": 23,
+      "category": "target_state",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: target radius error.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "target_radius_error",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "radius",
+        "target_radius"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "pure_derivation_supported",
+      "units": "m"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "radial_recommitment"
+      ],
+      "canonical_order_index": 24,
+      "category": "orbital_geometry",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: radial velocity.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "radial_velocity",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "velocity_x",
+        "velocity_y",
+        "radial_unit_vector"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "pure_derivation_supported",
+      "units": "m/s"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "tangential_alignment"
+      ],
+      "canonical_order_index": 25,
+      "category": "orbital_geometry",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: tangential velocity.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "tangential_velocity",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "velocity_x",
+        "velocity_y",
+        "tangential_unit_vector"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "pure_derivation_supported",
+      "units": "m/s"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "tangential_alignment"
+      ],
+      "canonical_order_index": 26,
+      "category": "target_state",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: target circular speed.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "target_circular_speed",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "mu",
+        "target_radius"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "m/s"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "crossing_preparation",
+        "radial_recommitment"
+      ],
+      "canonical_order_index": 27,
+      "category": "target_state",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: radial velocity ratio.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "radial_velocity_ratio",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "radial_velocity",
+        "target_circular_speed"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "pure_derivation_supported",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "crossing_preparation",
+        "tangential_alignment"
+      ],
+      "canonical_order_index": 28,
+      "category": "target_state",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: tangential velocity error ratio.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "tangential_velocity_error_ratio",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "tangential_velocity",
+        "target_circular_speed"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "pure_derivation_supported",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "hazard_arrest",
+        "stabilization_assessment"
+      ],
+      "canonical_order_index": 29,
+      "category": "hazard_and_validity",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: realized speed ratio.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "realized_speed_ratio",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "speed_magnitude",
+        "target_circular_speed"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 30,
+      "category": "hazard_and_validity",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: predicted speed ratio.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "predicted_speed_ratio",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "predicted_state",
+        "target_circular_speed"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_predicted_state",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "crossing_preparation",
+        "hazard_arrest",
+        "radial_recommitment",
+        "tangential_alignment"
+      ],
+      "canonical_order_index": 31,
+      "category": "hazard_and_validity",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: overspeed headroom.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "overspeed_headroom",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "realized_speed_ratio"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "pure_derivation_supported",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "radial_recommitment",
+        "tangential_alignment"
+      ],
+      "canonical_order_index": 32,
+      "category": "energy",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: orbital energy or proxy.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "orbital_energy_or_proxy",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "position",
+        "velocity",
+        "mu"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "pure_derivation_supported",
+      "units": "J/kg"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "nominal_handoff",
+        "recoverability_verification"
+      ],
+      "canonical_order_index": 33,
+      "category": "recoverability",
+      "data_type": "boolean",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: target radius crossing.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "target_radius_crossing",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "previous_state",
+        "current_state",
+        "target_radius"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_previous_state",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 34,
+      "category": "recoverability",
+      "data_type": "integer",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: first crossing step.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "first_crossing_step",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_previous_state",
+      "units": "transition"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "nominal_handoff",
+        "recoverability_verification"
+      ],
+      "canonical_order_index": 35,
+      "category": "recoverability",
+      "data_type": "boolean",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: phase34 compatible recoverability.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "phase34_compatible_recoverability",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "radius_error_ratio",
+        "radial_velocity_ratio",
+        "tangential_velocity_error_ratio"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "crossing_preparation",
+        "recoverability_verification",
+        "stabilization_assessment"
+      ],
+      "canonical_order_index": 36,
+      "category": "recoverability",
+      "data_type": "component_vector",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: recoverability component vector.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "recoverability_component_vector",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "nominal_handoff",
+        "recoverability_verification"
+      ],
+      "canonical_order_index": 37,
+      "category": "recoverability",
+      "data_type": "boolean",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: recovery success v0.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "recovery_success_v0",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 38,
+      "category": "phase_and_runtime",
+      "data_type": "integer",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: recovery horizon remaining.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "recovery_horizon_remaining",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_runtime_phase_integration",
+      "units": "transition"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 39,
+      "category": "phase_and_runtime",
+      "data_type": "boolean",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: recovery horizon exhausted.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "recovery_horizon_exhausted",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_runtime_phase_integration",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 40,
+      "category": "phase_and_runtime",
+      "data_type": "integer",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: total horizon remaining.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "total_horizon_remaining",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_runtime_phase_integration",
+      "units": "transition"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 41,
+      "category": "phase_and_runtime",
+      "data_type": "boolean",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: total horizon exhausted.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "total_horizon_exhausted",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_runtime_phase_integration",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "radial_recommitment",
+        "stabilization_assessment",
+        "tangential_alignment"
+      ],
+      "canonical_order_index": 42,
+      "category": "progress",
+      "data_type": "string",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: radial progress.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "radial_progress",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_previous_state",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "radial_recommitment"
+      ],
+      "canonical_order_index": 43,
+      "category": "progress",
+      "data_type": "string",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: radial progress direction.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "radial_progress_direction",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_previous_state",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "radial_recommitment"
+      ],
+      "canonical_order_index": 44,
+      "category": "progress",
+      "data_type": "string",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: radial progress rate.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "radial_progress_rate",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_previous_state",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 45,
+      "category": "progress",
+      "data_type": "string",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: tangential progress.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "tangential_progress",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_previous_state",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "crossing_preparation"
+      ],
+      "canonical_order_index": 46,
+      "category": "progress",
+      "data_type": "string",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: crossing progress.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "crossing_progress",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_previous_state",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "crossing_preparation"
+      ],
+      "canonical_order_index": 47,
+      "category": "recoverability",
+      "data_type": "string",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: predicted crossing direction.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "predicted_crossing_direction",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_predicted_state",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "crossing_preparation"
+      ],
+      "canonical_order_index": 48,
+      "category": "recoverability",
+      "data_type": "string",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: crossing proximity.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "crossing_proximity",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_predicted_state",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 49,
+      "category": "energy",
+      "data_type": "string",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: energy change direction.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "energy_change_direction",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_previous_state",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "radial_recommitment",
+        "retreat"
+      ],
+      "canonical_order_index": 50,
+      "category": "phase_and_runtime",
+      "data_type": "string",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: available correction authority.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "available_correction_authority",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "not_yet_supported",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "tangential_alignment"
+      ],
+      "canonical_order_index": 51,
+      "category": "action",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: action saturation margin.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "action_saturation_margin",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "proposed_action",
+        "action_component_limit"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "normalized_action_component"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "retreat"
+      ],
+      "canonical_order_index": 52,
+      "category": "phase_and_runtime",
+      "data_type": "string",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: no progress status.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "no_progress_status",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_runtime_phase_integration",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 53,
+      "category": "phase_and_runtime",
+      "data_type": "integer",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: phase dwell count.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "phase_dwell_count",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_runtime_phase_integration",
+      "units": "transition"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 54,
+      "category": "phase_and_runtime",
+      "data_type": "integer",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: phase transition count.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "phase_transition_count",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_runtime_phase_integration",
+      "units": "count"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 55,
+      "category": "phase_and_runtime",
+      "data_type": "string_list",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: recent phase history.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "recent_phase_history",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_runtime_phase_integration",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 56,
+      "category": "phase_and_runtime",
+      "data_type": "string",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: phase transition reason.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "phase_transition_reason",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_runtime_phase_integration",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "hazard_arrest"
+      ],
+      "canonical_order_index": 57,
+      "category": "action",
+      "data_type": "vector2",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: proposed action.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "proposed_action",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "normalized_action"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "hazard_arrest"
+      ],
+      "canonical_order_index": 58,
+      "category": "action",
+      "data_type": "vector2",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: executed action.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "executed_action",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "normalized_action"
+    },
+    {
+      "architecture_phases_requiring_it": [
+        "nominal_handoff"
+      ],
+      "canonical_order_index": 59,
+      "category": "phase_and_runtime",
+      "data_type": "boolean",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: handoff readiness.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "handoff_readiness",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_future_evaluator",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 60,
+      "category": "recoverability",
+      "data_type": "boolean",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: simulator success.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "simulator_success",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 61,
+      "category": "orbital_geometry",
+      "data_type": "vector2",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: radial unit vector.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "radial_unit_vector",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "position_x",
+        "position_y",
+        "radius"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 62,
+      "category": "orbital_geometry",
+      "data_type": "vector2",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: tangential unit vector.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "tangential_unit_vector",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "radial_unit_vector"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 63,
+      "category": "orbital_geometry",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: speed magnitude.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "speed_magnitude",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "velocity_x",
+        "velocity_y"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "m/s"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 64,
+      "category": "target_state",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: signed target radius error.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "signed_target_radius_error",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "pure_derivation_supported",
+      "units": "m"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 65,
+      "category": "target_state",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: absolute target radius error.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "absolute_target_radius_error",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "m"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 66,
+      "category": "target_state",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: radius error ratio.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "radius_error_ratio",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "target_radius_error",
+        "target_radius"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 67,
+      "category": "target_state",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: tangential velocity error.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "tangential_velocity_error",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "pure_derivation_supported",
+      "units": "m/s"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 68,
+      "category": "hazard_and_validity",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: predicted overspeed headroom.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "predicted_overspeed_headroom",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "pure_derivation_supported",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 69,
+      "category": "hazard_and_validity",
+      "data_type": "boolean",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: predicted overspeed status.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "predicted_overspeed_status",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 70,
+      "category": "recoverability",
+      "data_type": "string",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: crossing direction.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "crossing_direction",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 71,
+      "category": "recoverability",
+      "data_type": "boolean",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: crossing recovery eligible.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "crossing_recovery_eligible",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 72,
+      "category": "action",
+      "data_type": "string",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: crossing interpolation fraction.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "crossing_interpolation_fraction",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "not_yet_supported",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 73,
+      "category": "recoverability",
+      "data_type": "boolean",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: radius component pass.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "radius_component_pass",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 74,
+      "category": "recoverability",
+      "data_type": "boolean",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: radial velocity component pass.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "radial_velocity_component_pass",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 75,
+      "category": "recoverability",
+      "data_type": "boolean",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: tangential velocity component pass.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "tangential_velocity_component_pass",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 76,
+      "category": "energy",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: specific orbital energy.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "specific_orbital_energy",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "J/kg"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 77,
+      "category": "energy",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: target circular specific energy.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "target_circular_specific_energy",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "J/kg"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 78,
+      "category": "energy",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: specific energy error.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "specific_energy_error",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "pure_derivation_supported",
+      "units": "J/kg"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 79,
+      "category": "energy",
+      "data_type": "string",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: energy model status.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "energy_model_status",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 80,
+      "category": "progress",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: delta signed target radius error.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "delta_signed_target_radius_error",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "previous_signed_target_radius_error",
+        "current_signed_target_radius_error"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "requires_previous_state",
+      "units": "m"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 81,
+      "category": "progress",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: delta absolute target radius error.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "delta_absolute_target_radius_error",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "previous_absolute_target_radius_error",
+        "current_absolute_target_radius_error"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "requires_previous_state",
+      "units": "m"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 82,
+      "category": "progress",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: delta radial velocity.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "delta_radial_velocity",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "previous_radial_velocity",
+        "current_radial_velocity"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "requires_previous_state",
+      "units": "m/s"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 83,
+      "category": "progress",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: delta tangential velocity error.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "delta_tangential_velocity_error",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "previous_tangential_velocity_error",
+        "current_tangential_velocity_error"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "requires_previous_state",
+      "units": "m/s"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 84,
+      "category": "progress",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: delta realized speed ratio.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "delta_realized_speed_ratio",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "previous_realized_speed_ratio",
+        "current_realized_speed_ratio"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "requires_previous_state",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 85,
+      "category": "progress",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: delta overspeed headroom.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "delta_overspeed_headroom",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "previous_overspeed_headroom",
+        "current_overspeed_headroom"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "requires_previous_state",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 86,
+      "category": "energy",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: delta specific orbital energy.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "delta_specific_orbital_energy",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "previous_specific_orbital_energy",
+        "current_specific_orbital_energy"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "requires_previous_state",
+      "units": "J/kg"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 87,
+      "category": "progress",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: delta radius error ratio.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "delta_radius_error_ratio",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "previous_radius_error_ratio",
+        "current_radius_error_ratio"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "requires_previous_state",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 88,
+      "category": "progress",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: delta radial velocity ratio.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "delta_radial_velocity_ratio",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "previous_radial_velocity_ratio",
+        "current_radial_velocity_ratio"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "requires_previous_state",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 89,
+      "category": "progress",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: delta tangential velocity error ratio.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "delta_tangential_velocity_error_ratio",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [
+        "previous_tangential_velocity_error_ratio",
+        "current_tangential_velocity_error_ratio"
+      ],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "signed",
+      "support_classification": "requires_previous_state",
+      "units": "dimensionless"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 90,
+      "category": "progress",
+      "data_type": "integer",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: transition count delta.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "transition_count_delta",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_previous_state",
+      "units": "transition"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 91,
+      "category": "progress",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: elapsed time delta.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "elapsed_time_delta",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_previous_state",
+      "units": "s"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 92,
+      "category": "progress",
+      "data_type": "string",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: progress classification.",
+      "direct_or_derived": "external_or_unresolved",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "progress_classification",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "requires_runtime_phase_integration",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 93,
+      "category": "action",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: proposed action magnitude.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "proposed_action_magnitude",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "normalized_action"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 94,
+      "category": "action",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: executed action magnitude.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "executed_action_magnitude",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "normalized_action"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 95,
+      "category": "action",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: proposed action radial component.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "proposed_action_radial_component",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "normalized_action"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 96,
+      "category": "action",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: proposed action tangential component.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "proposed_action_tangential_component",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "normalized_action"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 97,
+      "category": "action",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: executed action radial component.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "executed_action_radial_component",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "normalized_action"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 98,
+      "category": "action",
+      "data_type": "number",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: executed action tangential component.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "executed_action_tangential_component",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "normalized_action"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 99,
+      "category": "action",
+      "data_type": "boolean",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: proposed equals executed.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "proposed_equals_executed",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 100,
+      "category": "action",
+      "data_type": "boolean",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: action suppression status.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "action_suppression_status",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 101,
+      "category": "action",
+      "data_type": "string",
+      "derivation_source": "runtime_assurance/staged_recovery_instrumentation.py",
+      "description": "Status-bearing staged-recovery field: action geometry status.",
+      "direct_or_derived": "derived",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "action_geometry_status",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "pure_derivation_supported",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 102,
+      "category": "phase_and_runtime",
+      "data_type": "boolean",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: retreat status.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "retreat_status",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "boolean"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 103,
+      "category": "phase_and_runtime",
+      "data_type": "string",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: current phase.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "current_phase",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "categorical"
+    },
+    {
+      "architecture_phases_requiring_it": [],
+      "canonical_order_index": 104,
+      "category": "phase_and_runtime",
+      "data_type": "string",
+      "derivation_source": "explicit_external_input_or_future_contract",
+      "description": "Status-bearing staged-recovery field: previous phase.",
+      "direct_or_derived": "direct",
+      "evidence_status_requirements": [
+        "measured",
+        "derived",
+        "one_step_predicted",
+        "multi_step_predicted",
+        "heuristic",
+        "not_evaluated",
+        "invalid"
+      ],
+      "field_id": "previous_phase",
+      "invalid_value_rule": "null with status invalid and a preserved reason",
+      "missing_value_rule": "null with status not_evaluated; never zero or false",
+      "required_inputs": [],
+      "scientific_interpretation_limitation": "This field is one component only and does not establish safety, recovery, or phase readiness.",
+      "signedness": "not_applicable_or_nonnegative",
+      "support_classification": "direct_input_supported",
+      "units": "categorical"
+    }
+  ],
+  "instrumentation_id": "staged_recovery_instrumentation_v0"
+}

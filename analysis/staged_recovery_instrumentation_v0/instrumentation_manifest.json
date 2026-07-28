@@ -1,0 +1,512 @@
+{
+  "adverse_stop_priority": [
+    "invalid_simulation",
+    "invalid_recovery_evaluation",
+    "overspeed",
+    "instability",
+    "unsafe_state",
+    "action_rejected",
+    "explicit_abort",
+    "recovery_success",
+    "recovery_horizon_exhausted",
+    "total_horizon_exhausted"
+  ],
+  "architecture_signal_coverage": [
+    [
+      "simulation_validity",
+      "direct_input_supported"
+    ],
+    [
+      "recovery_evaluation_validity",
+      "direct_input_supported"
+    ],
+    [
+      "overspeed_status",
+      "pure_derivation_supported"
+    ],
+    [
+      "instability_status",
+      "direct_input_supported"
+    ],
+    [
+      "unsafe_state_status",
+      "direct_input_supported"
+    ],
+    [
+      "final_veto_decision",
+      "direct_input_supported"
+    ],
+    [
+      "action_rejection_status",
+      "direct_input_supported"
+    ],
+    [
+      "explicit_abort_requested",
+      "direct_input_supported"
+    ],
+    [
+      "position_x",
+      "direct_input_supported"
+    ],
+    [
+      "position_y",
+      "direct_input_supported"
+    ],
+    [
+      "velocity_x",
+      "direct_input_supported"
+    ],
+    [
+      "velocity_y",
+      "direct_input_supported"
+    ],
+    [
+      "radius",
+      "pure_derivation_supported"
+    ],
+    [
+      "target_radius",
+      "direct_input_supported"
+    ],
+    [
+      "target_radius_error",
+      "pure_derivation_supported"
+    ],
+    [
+      "radial_velocity",
+      "pure_derivation_supported"
+    ],
+    [
+      "tangential_velocity",
+      "pure_derivation_supported"
+    ],
+    [
+      "target_circular_speed",
+      "pure_derivation_supported"
+    ],
+    [
+      "radial_velocity_ratio",
+      "pure_derivation_supported"
+    ],
+    [
+      "tangential_velocity_error_ratio",
+      "pure_derivation_supported"
+    ],
+    [
+      "realized_speed_ratio",
+      "pure_derivation_supported"
+    ],
+    [
+      "predicted_speed_ratio",
+      "requires_predicted_state"
+    ],
+    [
+      "overspeed_headroom",
+      "pure_derivation_supported"
+    ],
+    [
+      "orbital_energy_or_proxy",
+      "pure_derivation_supported"
+    ],
+    [
+      "target_radius_crossing",
+      "requires_previous_state"
+    ],
+    [
+      "first_crossing_step",
+      "requires_previous_state"
+    ],
+    [
+      "phase34_compatible_recoverability",
+      "pure_derivation_supported"
+    ],
+    [
+      "recoverability_component_vector",
+      "pure_derivation_supported"
+    ],
+    [
+      "recovery_success_v0",
+      "direct_input_supported"
+    ],
+    [
+      "recovery_horizon_remaining",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "recovery_horizon_exhausted",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "total_horizon_remaining",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "total_horizon_exhausted",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "radial_progress",
+      "requires_previous_state"
+    ],
+    [
+      "radial_progress_direction",
+      "requires_previous_state"
+    ],
+    [
+      "radial_progress_rate",
+      "requires_previous_state"
+    ],
+    [
+      "tangential_progress",
+      "requires_previous_state"
+    ],
+    [
+      "crossing_progress",
+      "requires_previous_state"
+    ],
+    [
+      "predicted_crossing_direction",
+      "requires_predicted_state"
+    ],
+    [
+      "crossing_proximity",
+      "requires_predicted_state"
+    ],
+    [
+      "energy_change_direction",
+      "requires_previous_state"
+    ],
+    [
+      "available_correction_authority",
+      "not_yet_supported"
+    ],
+    [
+      "action_saturation_margin",
+      "pure_derivation_supported"
+    ],
+    [
+      "no_progress_status",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "phase_dwell_count",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "phase_transition_count",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "recent_phase_history",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "phase_transition_reason",
+      "requires_runtime_phase_integration"
+    ],
+    [
+      "proposed_action",
+      "direct_input_supported"
+    ],
+    [
+      "executed_action",
+      "direct_input_supported"
+    ],
+    [
+      "handoff_readiness",
+      "requires_future_evaluator"
+    ],
+    [
+      "simulator_success",
+      "direct_input_supported"
+    ]
+  ],
+  "canonical_field_order": [
+    "case_id",
+    "seed",
+    "implementation_commit",
+    "branch_state_hash",
+    "simulator_configuration_hash",
+    "constants_hash",
+    "recovery_step",
+    "total_transition_count",
+    "simulation_time",
+    "simulation_validity",
+    "recovery_evaluation_validity",
+    "overspeed_status",
+    "instability_status",
+    "unsafe_state_status",
+    "final_veto_decision",
+    "action_rejection_status",
+    "explicit_abort_requested",
+    "position_x",
+    "position_y",
+    "velocity_x",
+    "velocity_y",
+    "radius",
+    "target_radius",
+    "target_radius_error",
+    "radial_velocity",
+    "tangential_velocity",
+    "target_circular_speed",
+    "radial_velocity_ratio",
+    "tangential_velocity_error_ratio",
+    "realized_speed_ratio",
+    "predicted_speed_ratio",
+    "overspeed_headroom",
+    "orbital_energy_or_proxy",
+    "target_radius_crossing",
+    "first_crossing_step",
+    "phase34_compatible_recoverability",
+    "recoverability_component_vector",
+    "recovery_success_v0",
+    "recovery_horizon_remaining",
+    "recovery_horizon_exhausted",
+    "total_horizon_remaining",
+    "total_horizon_exhausted",
+    "radial_progress",
+    "radial_progress_direction",
+    "radial_progress_rate",
+    "tangential_progress",
+    "crossing_progress",
+    "predicted_crossing_direction",
+    "crossing_proximity",
+    "energy_change_direction",
+    "available_correction_authority",
+    "action_saturation_margin",
+    "no_progress_status",
+    "phase_dwell_count",
+    "phase_transition_count",
+    "recent_phase_history",
+    "phase_transition_reason",
+    "proposed_action",
+    "executed_action",
+    "handoff_readiness",
+    "simulator_success",
+    "radial_unit_vector",
+    "tangential_unit_vector",
+    "speed_magnitude",
+    "signed_target_radius_error",
+    "absolute_target_radius_error",
+    "radius_error_ratio",
+    "tangential_velocity_error",
+    "predicted_overspeed_headroom",
+    "predicted_overspeed_status",
+    "crossing_direction",
+    "crossing_recovery_eligible",
+    "crossing_interpolation_fraction",
+    "radius_component_pass",
+    "radial_velocity_component_pass",
+    "tangential_velocity_component_pass",
+    "specific_orbital_energy",
+    "target_circular_specific_energy",
+    "specific_energy_error",
+    "energy_model_status",
+    "delta_signed_target_radius_error",
+    "delta_absolute_target_radius_error",
+    "delta_radial_velocity",
+    "delta_tangential_velocity_error",
+    "delta_realized_speed_ratio",
+    "delta_overspeed_headroom",
+    "delta_specific_orbital_energy",
+    "delta_radius_error_ratio",
+    "delta_radial_velocity_ratio",
+    "delta_tangential_velocity_error_ratio",
+    "transition_count_delta",
+    "elapsed_time_delta",
+    "progress_classification",
+    "proposed_action_magnitude",
+    "executed_action_magnitude",
+    "proposed_action_radial_component",
+    "proposed_action_tangential_component",
+    "executed_action_radial_component",
+    "executed_action_tangential_component",
+    "proposed_equals_executed",
+    "action_suppression_status",
+    "action_geometry_status",
+    "retreat_status",
+    "current_phase",
+    "previous_phase"
+  ],
+  "canonical_payload_hash": "c4947e623e7f9a83de16163f58c5a0da7a3f7b10ee3b10ce88f4eae4805f122c",
+  "canonicalization": {
+    "allow_nan": false,
+    "encoding": "utf-8",
+    "hash_algorithm": "sha256",
+    "self_hash_field_excluded": true,
+    "separators": [
+      ",",
+      ":"
+    ],
+    "sort_keys": true,
+    "volatile_provenance_timestamp_excluded_from_record_hash": true
+  },
+  "claim_restrictions": [
+    "no_runtime_instrumentation_completeness_claim",
+    "no_staged_recovery_execution_readiness_claim",
+    "no_recovery_controller_or_phase_action_claim",
+    "no_phase_guard_or_threshold_claim",
+    "no_no_progress_or_hysteresis_parameter_claim",
+    "no_task_recovery_claim",
+    "no_formal_safety_claim",
+    "no_hardware_or_deployment_claim"
+  ],
+  "completed_date": "2026-07-28",
+  "coordinate_convention": {
+    "frame": "inertial_cartesian_2d",
+    "positive_tangential_orientation": "counterclockwise_90_degree_rotation_of_e_r",
+    "positive_tangential_unit_vector": "e_t = (-e_r_y, e_r_x)",
+    "radial_unit_vector": "e_r = (x/r, y/r)",
+    "state_order": [
+      "x",
+      "y",
+      "vx",
+      "vy"
+    ]
+  },
+  "coverage_counts": [
+    [
+      "direct_input_supported",
+      16
+    ],
+    [
+      "pure_derivation_supported",
+      14
+    ],
+    [
+      "requires_previous_state",
+      8
+    ],
+    [
+      "requires_predicted_state",
+      3
+    ],
+    [
+      "requires_runtime_phase_integration",
+      9
+    ],
+    [
+      "requires_future_evaluator",
+      1
+    ],
+    [
+      "not_yet_supported",
+      1
+    ]
+  ],
+  "execution_authorization_reason": "the observation schema and pure derivations are implemented, but no runtime logger integration, phase action law, numerical guard, no-progress threshold, hysteresis parameter, or staged recovery execution path has been frozen",
+  "instrumentation_id": "staged_recovery_instrumentation_v0",
+  "manifest_schema_version": "staged_recovery_instrumentation_manifest_v0",
+  "overspeed_contract": {
+    "comparator": ">",
+    "headroom": "1.90 - speed_ratio",
+    "threshold": 1.9
+  },
+  "phase34_compatible_thresholds": {
+    "comparator": "inclusive_absolute_component_bounds",
+    "radial_velocity_ratio_max": 0.02,
+    "radius_error_ratio_max": 0.0025,
+    "tangential_velocity_error_ratio_max": 0.25
+  },
+  "pure_derivation_status": "implemented",
+  "record_schema_version": "staged_recovery_instrumentation_record_v0",
+  "runtime_logger_integration": "not_implemented",
+  "source_architecture": {
+    "architecture_id": "staged_recovery_architecture_v0",
+    "artifact_hashes": [
+      [
+        "runtime_assurance/staged_recovery_contract.py",
+        "ae32a961b30e5f1c4fcbb59fe9c0902f6d82bb2deafb8576ad36307b90e35b53"
+      ],
+      [
+        "Tests/test_staged_recovery_contract.py",
+        "b4888330860992595603329e6ea4584f4f41715c2da843826e7f30d184504c40"
+      ],
+      [
+        "docs/architecture/staged_recovery_architecture_v0.md",
+        "728f534dab6e68b0913568aa395e21b948670c65eeacd741204ff365c9da1c70"
+      ],
+      [
+        "docs/experiments/staged_recovery_minimal_experiment_plan_v0.md",
+        "3106b5852211729d345341e2ef3f044cea09cc0b42444d0a176195c6811e2b8b"
+      ],
+      [
+        "analysis/staged_recovery_architecture_v0/architecture_manifest.json",
+        "fbad0f6cbfba884a244bdccb9e12693bf3d8b5f8eefbf5a682065f740a7beb7c"
+      ],
+      [
+        "analysis/staged_recovery_architecture_v0/evidence_traceability.json",
+        "e848f9724aea1e114cc81fe65dc198069fc44f2d0ee78f15dcec1b6b958cf499"
+      ],
+      [
+        "analysis/staged_recovery_architecture_v0/summary.md",
+        "809bbb0f8bf9c4492c169bbe0f17bb749fd3b859a286d306cd0093fad2d39746"
+      ]
+    ],
+    "canonical_hash": "22fa7e0f01c7836ecb1f10838ef00c4cafa937d212bba579fffb25e2c8f11971",
+    "commit": "0d416603027e8a27991baf4f89445f6f466b86e6"
+  },
+  "staged_recovery_execution": "not_authorized",
+  "supported_direct_inputs": [
+    "simulation_validity",
+    "recovery_evaluation_validity",
+    "instability_status",
+    "unsafe_state_status",
+    "final_veto_decision",
+    "action_rejection_status",
+    "explicit_abort_requested",
+    "position_x",
+    "position_y",
+    "velocity_x",
+    "velocity_y",
+    "target_radius",
+    "recovery_success_v0",
+    "proposed_action",
+    "executed_action",
+    "simulator_success"
+  ],
+  "supported_pure_derivations": [
+    "overspeed_status",
+    "radius",
+    "target_radius_error",
+    "radial_velocity",
+    "tangential_velocity",
+    "target_circular_speed",
+    "radial_velocity_ratio",
+    "tangential_velocity_error_ratio",
+    "realized_speed_ratio",
+    "overspeed_headroom",
+    "orbital_energy_or_proxy",
+    "phase34_compatible_recoverability",
+    "recoverability_component_vector",
+    "action_saturation_margin"
+  ],
+  "units": {
+    "actions": "normalized_action",
+    "position": "m",
+    "ratios": "dimensionless",
+    "specific_energy": "J/kg",
+    "time": "s",
+    "velocity": "m/s"
+  },
+  "unsupported_runtime_fields": [
+    "recovery_horizon_remaining",
+    "recovery_horizon_exhausted",
+    "total_horizon_remaining",
+    "total_horizon_exhausted",
+    "available_correction_authority",
+    "no_progress_status",
+    "phase_dwell_count",
+    "phase_transition_count",
+    "recent_phase_history",
+    "phase_transition_reason",
+    "handoff_readiness"
+  ],
+  "zero_tolerances": {
+    "position_norm_invalid_at_or_below": 0.0,
+    "ratio_denominator_epsilon": 1e-12,
+    "specific_energy_radius_epsilon": 1e-12,
+    "speed_ratio_denominator_epsilon": 1e-12,
+    "vector_and_tangential_error_zero_tolerance": 1e-12
+  }
+}
