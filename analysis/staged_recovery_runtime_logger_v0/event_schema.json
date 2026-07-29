@@ -1,0 +1,668 @@
+{
+  "action_dispositions": [
+    "executed_unchanged",
+    "executed_modified",
+    "suppressed",
+    "rejected",
+    "zero_action_executed",
+    "no_action",
+    "not_evaluated",
+    "invalid"
+  ],
+  "canonical_payload_hash": "be38cdf254116f40841637260004280ec7d1bf3b4dbfb8026210dfaa29050439",
+  "completed_date": "2026-07-29",
+  "event_schema_version": "staged_recovery_runtime_event_schema_v0",
+  "event_types": [
+    "initial_snapshot",
+    "transition",
+    "terminal"
+  ],
+  "fields": [
+    {
+      "canonical_order": 0,
+      "data_type": "string",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "schema_version",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "logger contract",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "schema"
+    },
+    {
+      "canonical_order": 1,
+      "data_type": "string",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "session_id",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "session header",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "identifier"
+    },
+    {
+      "canonical_order": 2,
+      "data_type": "integer",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "event_index",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "caller sequence",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "event"
+    },
+    {
+      "canonical_order": 3,
+      "data_type": "enum",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "event_type",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "caller API",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "categorical"
+    },
+    {
+      "canonical_order": 4,
+      "data_type": "string",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "case_id",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "session header",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "identifier"
+    },
+    {
+      "canonical_order": 5,
+      "data_type": "integer",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "seed",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "session header",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "seed"
+    },
+    {
+      "canonical_order": 6,
+      "data_type": "string",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "implementation_commit",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "session header",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "git_commit"
+    },
+    {
+      "canonical_order": 7,
+      "data_type": "string",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "source_state_hash",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "session header",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "sha256"
+    },
+    {
+      "canonical_order": 8,
+      "data_type": "string",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "simulator_configuration_hash",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "session header",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "sha256"
+    },
+    {
+      "canonical_order": 9,
+      "data_type": "string",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "constants_hash",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "session header",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "sha256"
+    },
+    {
+      "canonical_order": 10,
+      "data_type": "integer",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "recovery_step",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "caller counter",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "transition"
+    },
+    {
+      "canonical_order": 11,
+      "data_type": "integer",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "total_transition_count",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "caller counter",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "transition"
+    },
+    {
+      "canonical_order": 12,
+      "data_type": "number_or_null",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "simulation_time",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "caller snapshot",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "s"
+    },
+    {
+      "canonical_order": 13,
+      "data_type": "vector2_or_null",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "proposed_action",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "caller decision",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "normalized_action"
+    },
+    {
+      "canonical_order": 14,
+      "data_type": "vector2_or_null",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "executed_action",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "caller execution evidence",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "normalized_action"
+    },
+    {
+      "canonical_order": 15,
+      "data_type": "enum",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "action_disposition",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "caller disposition",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "categorical"
+    },
+    {
+      "canonical_order": 16,
+      "data_type": "boolean",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "transition_executed",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "caller execution evidence",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "boolean"
+    },
+    {
+      "canonical_order": 17,
+      "data_type": "string_or_null",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "transition"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "monitor_decision",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "caller monitor evidence",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "categorical"
+    },
+    {
+      "canonical_order": 18,
+      "data_type": "string_or_null",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "pre_state_hash",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "explicit Cartesian state",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "sha256"
+    },
+    {
+      "canonical_order": 19,
+      "data_type": "string_or_null",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "transition"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "predicted_state_hash",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "explicit predicted state",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "sha256"
+    },
+    {
+      "canonical_order": 20,
+      "data_type": "string_or_null",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "transition"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "realized_state_hash",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "explicit realized state",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "sha256"
+    },
+    {
+      "canonical_order": 21,
+      "data_type": "instrumentation_record_or_null",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "pre_observation",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "Stage 0A",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "mixed"
+    },
+    {
+      "canonical_order": 22,
+      "data_type": "predicted_record_or_null",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "transition"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "predicted_observation",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "Stage 0A",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "mixed"
+    },
+    {
+      "canonical_order": 23,
+      "data_type": "instrumentation_record_or_null",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "transition"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "post_observation",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "Stage 0A",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "mixed"
+    },
+    {
+      "canonical_order": 24,
+      "data_type": "instrumented_value_map",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "progress_sample",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "Stage 0A measured pre/post only",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "mixed"
+    },
+    {
+      "canonical_order": 25,
+      "data_type": "instrumented_value_map",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "action_geometry",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "Stage 0A explicit action and pre-state basis",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "mixed"
+    },
+    {
+      "canonical_order": 26,
+      "data_type": "instrumented_value_map",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "prediction_diagnostics",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "predicted and measured states",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "mixed"
+    },
+    {
+      "canonical_order": 27,
+      "data_type": "instrumented_value_map",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "phase_evidence",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "future phase runtime",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "mixed"
+    },
+    {
+      "canonical_order": 28,
+      "data_type": "instrumented_value_map",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "evaluator_evidence",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "external evaluators",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "mixed"
+    },
+    {
+      "canonical_order": 29,
+      "data_type": "string_or_null",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "terminal_reason",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "caller terminal evidence",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "categorical"
+    },
+    {
+      "canonical_order": 30,
+      "data_type": "boolean",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "terminal",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "event type",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "boolean"
+    },
+    {
+      "canonical_order": 31,
+      "data_type": "string",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "evidence_level",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "caller provenance",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "categorical"
+    },
+    {
+      "canonical_order": 32,
+      "data_type": "boolean",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "event_valid",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "structural/evidence consistency",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "boolean"
+    },
+    {
+      "canonical_order": 33,
+      "data_type": "string_array",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "invalid_reasons",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "consistency validation",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "categorical"
+    },
+    {
+      "canonical_order": 34,
+      "data_type": "string_or_null",
+      "direct_or_derived": "direct",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "volatile_timestamp",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "optional caller provenance",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "timestamp"
+    },
+    {
+      "canonical_order": 35,
+      "data_type": "string",
+      "direct_or_derived": "derived",
+      "event_types_allowed": [
+        "initial_snapshot",
+        "transition",
+        "terminal"
+      ],
+      "evidence_status": "nested physical and evaluator fields use Stage 0A evidence statuses",
+      "field_id": "canonical_event_sha256",
+      "invalid_value_rule": "preserve invalid reason; never repair silently",
+      "missing_value_rule": "preserve null/not_evaluated; never infer",
+      "nullable_behavior": "null only when unavailable under the event contract; unknown is never zero or false",
+      "required_source_input": "canonical scientific payload",
+      "scientific_limitation": "This observational field does not establish action correctness, phase readiness, stop priority, recovery, or safety.",
+      "units": "sha256"
+    }
+  ],
+  "logger_id": "staged_recovery_runtime_logger_v0",
+  "logical_transition_order": [
+    "pre_transition_measured_state",
+    "proposed_action_or_explicit_no_action",
+    "supplied_monitor_decision",
+    "supplied_predicted_next_state_when_available",
+    "supplied_executed_action_or_rejection_or_suppression",
+    "supplied_transition_executed_flag",
+    "supplied_realized_next_state_when_executed",
+    "pure_stage0a_post_state_derivation",
+    "supplied_evaluator_and_phase_provenance"
+  ]
+}

@@ -1,0 +1,1408 @@
+{
+  "architecture_signal_count": 52,
+  "architecture_signal_coverage": [
+    {
+      "field_id": "simulation_validity",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "recovery_evaluation_validity",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "overspeed_status",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "instability_status",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "unsafe_state_status",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "final_veto_decision",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "action_rejection_status",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "explicit_abort_requested",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "position_x",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "position_y",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "velocity_x",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "velocity_y",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "radius",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "target_radius",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "target_radius_error",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "radial_velocity",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "tangential_velocity",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "target_circular_speed",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "radial_velocity_ratio",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "tangential_velocity_error_ratio",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "realized_speed_ratio",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "predicted_speed_ratio",
+      "logger_coverage_classification": "requires_predicted_runtime_state",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_predicted_state"
+    },
+    {
+      "field_id": "overspeed_headroom",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "orbital_energy_or_proxy",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "target_radius_crossing",
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "first_crossing_step",
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "phase34_compatible_recoverability",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "recoverability_component_vector",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "recovery_success_v0",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "recovery_horizon_remaining",
+      "logger_coverage_classification": "requires_phase_runtime",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "recovery_horizon_exhausted",
+      "logger_coverage_classification": "requires_phase_runtime",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "total_horizon_remaining",
+      "logger_coverage_classification": "requires_phase_runtime",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "total_horizon_exhausted",
+      "logger_coverage_classification": "requires_phase_runtime",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "radial_progress",
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "radial_progress_direction",
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "radial_progress_rate",
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "tangential_progress",
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "crossing_progress",
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "predicted_crossing_direction",
+      "logger_coverage_classification": "requires_predicted_runtime_state",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_predicted_state"
+    },
+    {
+      "field_id": "crossing_proximity",
+      "logger_coverage_classification": "requires_predicted_runtime_state",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_predicted_state"
+    },
+    {
+      "field_id": "energy_change_direction",
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "available_correction_authority",
+      "logger_coverage_classification": "unsupported",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "not_yet_supported"
+    },
+    {
+      "field_id": "action_saturation_margin",
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "no_progress_status",
+      "logger_coverage_classification": "requires_phase_runtime",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "phase_dwell_count",
+      "logger_coverage_classification": "requires_phase_runtime",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "phase_transition_count",
+      "logger_coverage_classification": "requires_phase_runtime",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "recent_phase_history",
+      "logger_coverage_classification": "requires_phase_runtime",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "phase_transition_reason",
+      "logger_coverage_classification": "requires_phase_runtime",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "proposed_action",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "executed_action",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "handoff_readiness",
+      "logger_coverage_classification": "requires_future_evaluator",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "requires_future_evaluator"
+    },
+    {
+      "field_id": "simulator_success",
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "real_trace_has_validated": false,
+      "stage0a_support_classification": "direct_input_supported"
+    }
+  ],
+  "canonical_payload_hash": "e1b2652b2dd4c4ba58c246b89c9f55755b593318d1aad8e95309a2d66d084773",
+  "completed_date": "2026-07-29",
+  "field_coverage_schema_version": "staged_recovery_runtime_logger_field_coverage_v0",
+  "interpretation_boundary": "Schema acceptance and pure derivability do not imply that a future runtime supplies the field or that it has appeared in measured evidence.",
+  "logger_coverage_counts": [
+    [
+      "logged_from_direct_runtime_input",
+      28
+    ],
+    [
+      "derived_by_stage0a_during_logging",
+      41
+    ],
+    [
+      "requires_previous_runtime_state",
+      20
+    ],
+    [
+      "requires_predicted_runtime_state",
+      3
+    ],
+    [
+      "requires_phase_runtime",
+      10
+    ],
+    [
+      "requires_future_evaluator",
+      1
+    ],
+    [
+      "unsupported",
+      2
+    ]
+  ],
+  "logger_id": "staged_recovery_runtime_logger_v0",
+  "real_trace_has_validated": false,
+  "real_trace_validated_count": 0,
+  "schema_accepts_count": 105,
+  "stage0a_field_count": 105,
+  "stage0a_field_coverage": [
+    {
+      "field_id": "case_id",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "seed",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "implementation_commit",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "branch_state_hash",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "simulator_configuration_hash",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "constants_hash",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "recovery_step",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "total_transition_count",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "simulation_time",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "simulation_validity",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "recovery_evaluation_validity",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "overspeed_status",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "instability_status",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "unsafe_state_status",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "final_veto_decision",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "action_rejection_status",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "explicit_abort_requested",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "position_x",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "position_y",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "velocity_x",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "velocity_y",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "radius",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "target_radius",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "target_radius_error",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "radial_velocity",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "tangential_velocity",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "target_circular_speed",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "radial_velocity_ratio",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "tangential_velocity_error_ratio",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "realized_speed_ratio",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "predicted_speed_ratio",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_predicted_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_predicted_state"
+    },
+    {
+      "field_id": "overspeed_headroom",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "orbital_energy_or_proxy",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "target_radius_crossing",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "first_crossing_step",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "phase34_compatible_recoverability",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "recoverability_component_vector",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "recovery_success_v0",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "recovery_horizon_remaining",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "requires_phase_runtime",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "recovery_horizon_exhausted",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "requires_phase_runtime",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "total_horizon_remaining",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "requires_phase_runtime",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "total_horizon_exhausted",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "requires_phase_runtime",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "radial_progress",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "radial_progress_direction",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "radial_progress_rate",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "tangential_progress",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "crossing_progress",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "predicted_crossing_direction",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_predicted_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_predicted_state"
+    },
+    {
+      "field_id": "crossing_proximity",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_predicted_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_predicted_state"
+    },
+    {
+      "field_id": "energy_change_direction",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "available_correction_authority",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "unsupported",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "not_yet_supported"
+    },
+    {
+      "field_id": "action_saturation_margin",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "no_progress_status",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "requires_phase_runtime",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "phase_dwell_count",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "requires_phase_runtime",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "phase_transition_count",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "requires_phase_runtime",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "recent_phase_history",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "requires_phase_runtime",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "phase_transition_reason",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "requires_phase_runtime",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "proposed_action",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "executed_action",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "handoff_readiness",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "requires_future_evaluator",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_future_evaluator"
+    },
+    {
+      "field_id": "simulator_success",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "radial_unit_vector",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "tangential_unit_vector",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "speed_magnitude",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "signed_target_radius_error",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "absolute_target_radius_error",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "radius_error_ratio",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "tangential_velocity_error",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "predicted_overspeed_headroom",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "predicted_overspeed_status",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "crossing_direction",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "crossing_recovery_eligible",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "crossing_interpolation_fraction",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "unsupported",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "not_yet_supported"
+    },
+    {
+      "field_id": "radius_component_pass",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "radial_velocity_component_pass",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "tangential_velocity_component_pass",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "specific_orbital_energy",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "target_circular_specific_energy",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "specific_energy_error",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "energy_model_status",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "delta_signed_target_radius_error",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "delta_absolute_target_radius_error",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "delta_radial_velocity",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "delta_tangential_velocity_error",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "delta_realized_speed_ratio",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "delta_overspeed_headroom",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "delta_specific_orbital_energy",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "delta_radius_error_ratio",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "delta_radial_velocity_ratio",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "delta_tangential_velocity_error_ratio",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "transition_count_delta",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "elapsed_time_delta",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "requires_previous_runtime_state",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_previous_state"
+    },
+    {
+      "field_id": "progress_classification",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "requires_phase_runtime",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "requires_runtime_phase_integration"
+    },
+    {
+      "field_id": "proposed_action_magnitude",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "executed_action_magnitude",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "proposed_action_radial_component",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "proposed_action_tangential_component",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "executed_action_radial_component",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "executed_action_tangential_component",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "proposed_equals_executed",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "action_suppression_status",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "action_geometry_status",
+      "future_runtime_must_supply": false,
+      "logger_coverage_classification": "derived_by_stage0a_during_logging",
+      "logger_derives": true,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "pure_derivation_supported"
+    },
+    {
+      "field_id": "retreat_status",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "current_phase",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    },
+    {
+      "field_id": "previous_phase",
+      "future_runtime_must_supply": true,
+      "logger_coverage_classification": "logged_from_direct_runtime_input",
+      "logger_derives": false,
+      "real_trace_has_validated": false,
+      "schema_accepts": true,
+      "scientific_limitation": "Schema acceptance or pure derivability does not establish that this field has been observed in a measured runtime trace.",
+      "stage0a_support_classification": "direct_input_supported"
+    }
+  ]
+}

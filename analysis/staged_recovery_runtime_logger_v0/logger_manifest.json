@@ -1,0 +1,232 @@
+{
+  "action_disposition_vocabulary": [
+    "executed_unchanged",
+    "executed_modified",
+    "suppressed",
+    "rejected",
+    "zero_action_executed",
+    "no_action",
+    "not_evaluated",
+    "invalid"
+  ],
+  "atomic_publication_rule": "validate complete bundle, stage both files in a sibling directory, then publish by same-filesystem directory rename",
+  "bounded_capacity_rule": "caller must explicitly supply a positive max_events; no scientific horizon default exists",
+  "canonical_event_order": [
+    "schema_version",
+    "session_id",
+    "event_index",
+    "event_type",
+    "case_id",
+    "seed",
+    "implementation_commit",
+    "source_state_hash",
+    "simulator_configuration_hash",
+    "constants_hash",
+    "recovery_step",
+    "total_transition_count",
+    "simulation_time",
+    "proposed_action",
+    "executed_action",
+    "action_disposition",
+    "transition_executed",
+    "monitor_decision",
+    "pre_state_hash",
+    "predicted_state_hash",
+    "realized_state_hash",
+    "pre_observation",
+    "predicted_observation",
+    "post_observation",
+    "progress_sample",
+    "action_geometry",
+    "prediction_diagnostics",
+    "phase_evidence",
+    "evaluator_evidence",
+    "terminal_reason",
+    "terminal",
+    "evidence_level",
+    "event_valid",
+    "invalid_reasons",
+    "volatile_timestamp",
+    "canonical_event_sha256"
+  ],
+  "canonical_payload_hash": "b4f7a25e53795845895707b9d5a3d14804431f5323858854e48685f27723d6dd",
+  "canonicalization": {
+    "encoding": "UTF-8",
+    "event_self_hash_excluded": true,
+    "json_keys": "sorted",
+    "json_separators": [
+      ",",
+      ":"
+    ],
+    "volatile_timestamp_excluded_from_scientific_hash": true
+  },
+  "claim_restrictions": [
+    "no_formal_safety_claim",
+    "no_measured_trace_claim",
+    "no_recovery_performance_claim",
+    "no_runtime_completeness_claim",
+    "no_staged_execution_claim"
+  ],
+  "completed_date": "2026-07-29",
+  "event_ordering_states": [
+    "created",
+    "started",
+    "terminal",
+    "finalized"
+  ],
+  "event_schema_version": "staged_recovery_runtime_event_schema_v0",
+  "event_types": [
+    "initial_snapshot",
+    "transition",
+    "terminal"
+  ],
+  "execution_not_authorized_reason": "the logger can record and validate explicitly supplied runtime events, but it has not been connected to an authorized runner, validated on a measured trajectory, or supplied with frozen phase actions, numerical guards, no-progress thresholds, hysteresis parameters, or handoff-readiness logic",
+  "field_coverage_summary": [
+    [
+      "logged_from_direct_runtime_input",
+      28
+    ],
+    [
+      "derived_by_stage0a_during_logging",
+      41
+    ],
+    [
+      "requires_previous_runtime_state",
+      20
+    ],
+    [
+      "requires_predicted_runtime_state",
+      3
+    ],
+    [
+      "requires_phase_runtime",
+      10
+    ],
+    [
+      "requires_future_evaluator",
+      1
+    ],
+    [
+      "unsupported",
+      2
+    ]
+  ],
+  "logger_id": "staged_recovery_runtime_logger_v0",
+  "protected_path_classes": [
+    "Phase34-37 evidence",
+    "Final Veto evidence",
+    "frozen and published recovery evidence",
+    "mechanism diagnosis",
+    "staged architecture",
+    "Stage 0A instrumentation",
+    "Stage 0B contract artifacts",
+    "controller, simulator, and runtime code",
+    "repository root"
+  ],
+  "protected_path_policy_version": "staged_recovery_trace_protected_paths_v0",
+  "real_runner_integration": "not_implemented",
+  "real_trace_validation": "not_performed",
+  "runtime_logging_boundary": "implemented",
+  "schema_version": "staged_recovery_runtime_logger_manifest_v0",
+  "source_architecture": {
+    "architecture_version": "staged_recovery_architecture_v0",
+    "canonical_hash": "22fa7e0f01c7836ecb1f10838ef00c4cafa937d212bba579fffb25e2c8f11971",
+    "commit": "0d416603027e8a27991baf4f89445f6f466b86e6"
+  },
+  "source_artifact_hashes": [
+    {
+      "path": "runtime_assurance/staged_recovery_instrumentation.py",
+      "sha256": "1ab0928858de0ed62f37593d2f104b403f7879452c9973194113fa53e939bed4"
+    },
+    {
+      "path": "analysis/staged_recovery_instrumentation_v0/instrumentation_manifest.json",
+      "sha256": "542f82174737aa97f86ca46f2423621fa9cf0bd4f3e21dba103a25e27453464f"
+    },
+    {
+      "path": "analysis/staged_recovery_instrumentation_v0/field_catalog.json",
+      "sha256": "aaaf93ef49cd812db0e658a71b3018458dd9eb1b298a4683d8b4d4f827f56646"
+    },
+    {
+      "path": "analysis/staged_recovery_instrumentation_v0/derivation_traceability.json",
+      "sha256": "1a3aad1a9d2fb6604dd2090503e35f64bde90e2258a2a84a5b40f93f7ba3f4dd"
+    },
+    {
+      "path": "docs/architecture/staged_recovery_instrumentation_v0.md",
+      "sha256": "ba6347902f0fbc6b1d2959c87b4732b7eda4ef1b039910b1ececea21755d970d"
+    },
+    {
+      "path": "analysis/staged_recovery_instrumentation_v0/summary.md",
+      "sha256": "28fdaf9e721de3e4a83919731dcf996481e43b328c3c956f045701e8b53620c9"
+    },
+    {
+      "path": "scripts/check_staged_recovery_instrumentation.py",
+      "sha256": "48fe3da8cd121fc987bc35055640897a1659b8f54339c77c70eccb7cc7f85c88"
+    },
+    {
+      "path": "Tests/test_staged_recovery_instrumentation.py",
+      "sha256": "1a70b4fecf4057b1e9b7891c41f0afd2d23191cf45a3dec1d69ac6c451347dc2"
+    },
+    {
+      "path": "runtime_assurance/staged_recovery_contract.py",
+      "sha256": "ae32a961b30e5f1c4fcbb59fe9c0902f6d82bb2deafb8576ad36307b90e35b53"
+    },
+    {
+      "path": "Tests/test_staged_recovery_contract.py",
+      "sha256": "b4888330860992595603329e6ea4584f4f41715c2da843826e7f30d184504c40"
+    },
+    {
+      "path": "docs/architecture/staged_recovery_architecture_v0.md",
+      "sha256": "728f534dab6e68b0913568aa395e21b948670c65eeacd741204ff365c9da1c70"
+    },
+    {
+      "path": "docs/experiments/staged_recovery_minimal_experiment_plan_v0.md",
+      "sha256": "3106b5852211729d345341e2ef3f044cea09cc0b42444d0a176195c6811e2b8b"
+    },
+    {
+      "path": "analysis/staged_recovery_architecture_v0/architecture_manifest.json",
+      "sha256": "fbad0f6cbfba884a244bdccb9e12693bf3d8b5f8eefbf5a682065f740a7beb7c"
+    },
+    {
+      "path": "analysis/staged_recovery_architecture_v0/evidence_traceability.json",
+      "sha256": "e848f9724aea1e114cc81fe65dc198069fc44f2d0ee78f15dcec1b6b958cf499"
+    },
+    {
+      "path": "analysis/staged_recovery_architecture_v0/summary.md",
+      "sha256": "809bbb0f8bf9c4492c169bbe0f17bb749fd3b859a286d306cd0093fad2d39746"
+    },
+    {
+      "path": "docs/architecture/decision_log_schema_v0.md",
+      "sha256": "0c7ad9ee535355116eb10366c296187216052c5aeb8215bde45ad7b0bc52bdd1"
+    },
+    {
+      "path": "runtime_assurance/recovery_experiment_artifacts.py",
+      "sha256": "00d0b6bd8db02e06cf27a64d1fcc8c21adf64ee765313a13f09559f2362c75e3"
+    },
+    {
+      "path": "scripts/final_veto_artifacts.py",
+      "sha256": "a5e1369f8b0b62a9b24dd5ce167bd56d3122868b5df9342a9d3a504d36987400"
+    }
+  ],
+  "source_stage0a": {
+    "canonical_hash": "c4947e623e7f9a83de16163f58c5a0da7a3f7b10ee3b10ce88f4eae4805f122c",
+    "commit": "ebc208aedecd11155c6ac9f03bb9b5e40bc69b10",
+    "instrumentation_schema_version": "staged_recovery_instrumentation_record_v0"
+  },
+  "staged_recovery_execution": "not_authorized",
+  "synthetic_trace_validation": "implemented",
+  "trace_bundle_filenames": [
+    "trace_manifest.json",
+    "staged_recovery_trace.jsonl"
+  ],
+  "trace_manifest_schema_version": "staged_recovery_runtime_trace_manifest_v0",
+  "unresolved_runtime_dependencies": [
+    "authorized real runner hook points",
+    "measured trace validation",
+    "phase actions",
+    "numerical phase guards",
+    "no-progress thresholds",
+    "hysteresis parameters",
+    "handoff-readiness evaluator",
+    "available-correction-authority evaluator"
+  ]
+}

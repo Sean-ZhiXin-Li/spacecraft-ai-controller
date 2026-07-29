@@ -1,0 +1,138 @@
+{
+  "canonical_payload_hash": "b01cece64ccb5e9b242837616b4ee262695083685a9339db8e3d96c99b987697",
+  "completed_date": "2026-07-29",
+  "event_contracts": [
+    {
+      "caller_owned_fields": [
+        "measured current state",
+        "configuration",
+        "runtime counters",
+        "phase and evaluator evidence when available"
+      ],
+      "event_type": "initial_snapshot",
+      "forbidden_inferred_fields": [
+        "missing runtime events",
+        "controller actions",
+        "fallback actions",
+        "phase decisions",
+        "stop-condition selection",
+        "Recovery Success decisions",
+        "physical state reconstructed from a hash"
+      ],
+      "logger_derived_fields": [
+        "state hash",
+        "Stage 0A current observation",
+        "canonical event hash"
+      ],
+      "missing_evidence_allowed": true,
+      "optional_fields": [
+        "simulation time",
+        "phase evidence",
+        "evaluator evidence"
+      ],
+      "requires_stage0c_real_validation": true,
+      "structurally_valid_when_missing": true
+    },
+    {
+      "caller_owned_fields": [
+        "measured pre-state",
+        "proposed action",
+        "monitor decision",
+        "predicted state when available",
+        "executed action or disposition",
+        "transition-executed flag",
+        "measured realized state when executed",
+        "runtime counters",
+        "phase and evaluator evidence"
+      ],
+      "event_type": "transition",
+      "forbidden_inferred_fields": [
+        "missing runtime events",
+        "controller actions",
+        "fallback actions",
+        "phase decisions",
+        "stop-condition selection",
+        "Recovery Success decisions",
+        "physical state reconstructed from a hash"
+      ],
+      "logger_derived_fields": [
+        "pre observation",
+        "predicted hazard observation",
+        "post observation",
+        "threshold-free progress",
+        "action geometry",
+        "prediction diagnostics",
+        "canonical event hash"
+      ],
+      "missing_evidence_allowed": true,
+      "optional_fields": [
+        "predicted state",
+        "simulation times",
+        "phase evidence"
+      ],
+      "requires_stage0c_real_validation": true,
+      "structurally_valid_when_missing": "only when the transition/action/counter contract does not require it"
+    },
+    {
+      "caller_owned_fields": [
+        "terminal reason",
+        "final measured state when needed",
+        "unchanged runtime counters",
+        "terminal evaluator and phase evidence"
+      ],
+      "event_type": "terminal",
+      "forbidden_inferred_fields": [
+        "missing runtime events",
+        "controller actions",
+        "fallback actions",
+        "phase decisions",
+        "stop-condition selection",
+        "Recovery Success decisions",
+        "physical state reconstructed from a hash"
+      ],
+      "logger_derived_fields": [
+        "final observation",
+        "terminal structural validation",
+        "canonical event hash"
+      ],
+      "missing_evidence_allowed": true,
+      "optional_fields": [
+        "final measured state after an initialized session"
+      ],
+      "requires_stage0c_real_validation": true,
+      "structurally_valid_when_missing": "yes for optional evaluator/phase evidence; no for terminal reason or required initial state"
+    }
+  ],
+  "failure_behavior": {
+    "capacity_error": "reject extra event and preserve accepted in-memory records",
+    "contradictory_evaluator_evidence": "retain raw evidence and mark event invalid",
+    "missing_event": "do not infer or repair",
+    "ordering_or_counter_error": "reject before append",
+    "publication_error": "publish nothing and remove only task-owned staging directory"
+  },
+  "future_candidate_hook_points": [
+    "before action decision",
+    "after prediction",
+    "after action disposition",
+    "after realized transition",
+    "at terminal decision"
+  ],
+  "integration_contract_schema_version": "staged_recovery_runtime_logger_integration_contract_v0",
+  "logger_id": "staged_recovery_runtime_logger_v0",
+  "real_runner_integration": "not_implemented",
+  "real_trace_validation": "not_performed",
+  "required_call_order": [
+    "create_session",
+    "record_initial_snapshot",
+    "record_zero_or_more_transitions",
+    "record_terminal_event",
+    "finalize_bundle"
+  ],
+  "staged_controller_integration": "not_implemented",
+  "staged_recovery_execution": "not_authorized",
+  "zero_transition_terminal_call_order": [
+    "create_session",
+    "record_terminal_event_with_initial_state",
+    "finalize_bundle"
+  ]
+}
