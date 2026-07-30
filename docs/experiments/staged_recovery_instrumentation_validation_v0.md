@@ -2,11 +2,11 @@
 
 ## Status
 
-Read-only bounded-runtime integration implemented; measured instrumentation validation pending.
+Measured instrumentation-validation trace completed; staged recovery execution not authorized.
 
-Completed: 2026-07-30
+Executed: 2026-07-30
 
-Implementation commit: pending Phase A freeze.
+Implementation commit: `942b8e9108ace5f0c481347898a8ddfb86b92548`.
 
 Staged recovery execution: `not_authorized`.
 
