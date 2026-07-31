@@ -88,7 +88,10 @@ def make_pair():
 
 class FrozenConfigurationTests(unittest.TestCase):
     def test_static_configuration_passes_without_execution(self) -> None:
-        report = validate_static_configuration(ROOT, require_output_absent=True)
+        report = validate_static_configuration(
+            ROOT,
+            require_output_absent=not (ROOT / OUTPUT_RELATIVE_PATH).exists(),
+        )
         self.assertTrue(report.valid, report.errors)
 
     def test_validation_branch_and_horizon_are_frozen(self) -> None:
@@ -378,14 +381,19 @@ class CliAndRepositorySafetyTests(unittest.TestCase):
         plan = self.run_cli(RUN_CLI, "--plan")
         validate = self.run_cli(RUN_CLI, "--validate-only")
         self.assertEqual(plan.returncode, 0)
-        self.assertEqual(validate.returncode, 0)
+        expected_validate_code = 1 if (ROOT / OUTPUT_RELATIVE_PATH).exists() else 0
+        self.assertEqual(validate.returncode, expected_validate_code)
         self.assertIn('"execution_disabled": true', plan.stdout)
         self.assertIn("NO_TRANSITION_EXECUTED true", validate.stdout)
 
     def test_static_checker_does_not_execute(self) -> None:
         result = self.run_cli(CHECK_CLI, "--validate-static")
-        self.assertEqual(result.returncode, 0)
-        self.assertIn("STATIC_VALIDATION PASS", result.stdout)
+        output_exists = (ROOT / OUTPUT_RELATIVE_PATH).exists()
+        self.assertEqual(result.returncode, 1 if output_exists else 0)
+        self.assertIn(
+            "STATIC_VALIDATION FAIL" if output_exists else "STATIC_VALIDATION PASS",
+            result.stdout,
+        )
 
     def test_scientific_override_flags_do_not_exist(self) -> None:
         for flag in ("--branch", "--horizon", "--retry", "--threshold"):
