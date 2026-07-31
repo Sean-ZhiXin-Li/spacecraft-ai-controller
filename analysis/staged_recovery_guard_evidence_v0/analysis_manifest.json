@@ -1,0 +1,166 @@
+{
+  "analysis_classification": "offline_guard_evidence_analysis",
+  "analysis_id": "staged_recovery_guard_evidence_v0",
+  "analyzed_date": "2026-07-31",
+  "artifact_canonical_hashes": {
+    "evidence_traceability.json": "2f2566a070cdccd40762f802de9ebfbeff294b7da3708bcc245291041bf36d00",
+    "guard_atom_inventory.json": "56421e50dcc7d3771d0c48e536628eb4ddedd9f16d218c3aa11bc7ef0da1ec81",
+    "measured_signal_profile.json": "aa49003473c5aac5f4517570f23b749c9203c2f06e02f37ed7c311bcac7e8346",
+    "no_progress_window_profile.json": "8e3db9152afbdc748207be3ffd99c40fede171ef7513181692ea436be5d9be5a",
+    "phase_observability_matrix.json": "e6427790f59d37579dae4a30172b06996d52f9fab76452f6569bb533c75dc5b6"
+  },
+  "canonical_payload_hash": "df96854e1caecd45560f8d7e78136bc751bbf3087eab78a35ee6a0051c5ba648",
+  "completed_date": "2026-07-31",
+  "exact_inherited_guard_atom_ids": [
+    "state_evidence_valid",
+    "instrumentation_evaluation_valid",
+    "recovery_evaluation_valid",
+    "realized_overspeed",
+    "realized_overspeed_clear",
+    "predicted_overspeed",
+    "predicted_overspeed_clear",
+    "recoverability_radius_component_pass",
+    "recoverability_radial_velocity_component_pass",
+    "recoverability_tangential_velocity_component_pass",
+    "phase34_compatible_recoverability_pass",
+    "eligible_target_radius_crossing",
+    "pre_branch_crossing_only",
+    "no_eligible_crossing"
+  ],
+  "exact_inherited_thresholds": {
+    "overspeed": {
+      "comparator": ">",
+      "threshold": 1.9
+    },
+    "phase34_radial_velocity_ratio": {
+      "comparator": "inclusive_absolute_<=",
+      "threshold": 0.02
+    },
+    "phase34_radius_error_ratio": {
+      "comparator": "inclusive_absolute_<=",
+      "threshold": 0.0025
+    },
+    "phase34_tangential_velocity_error_ratio": {
+      "comparator": "inclusive_absolute_<=",
+      "threshold": 0.25
+    }
+  },
+  "generated_artifact_filenames": [
+    "analysis_manifest.json",
+    "measured_signal_profile.json",
+    "guard_atom_inventory.json",
+    "guard_evaluation_trace.jsonl",
+    "phase_observability_matrix.json",
+    "no_progress_window_profile.json",
+    "evidence_traceability.json",
+    "summary.md"
+  ],
+  "guard_atom_count": 47,
+  "guard_evaluation_event_count": 10,
+  "guard_evaluation_trace_aggregate_hash": "49cd0d6c507182c2206b2f0e3fac50754445f6d6c2f4e456eb32549ada4827f3",
+  "guard_status_counts": {
+    "false": 206,
+    "invalid": 0,
+    "not_evaluated": 79,
+    "policy_unresolved": 20,
+    "true": 155,
+    "unsupported": 10
+  },
+  "implementation_commit": "bd2ce386cfdc31e745532b812fcbffdd6660197c",
+  "new_measured_trace": false,
+  "new_runtime_execution": false,
+  "no_progress_window_range": [
+    1,
+    8
+  ],
+  "phase_actions": "not_implemented",
+  "phase_guard_policy": "not_frozen",
+  "phase_observability_summary": {
+    "fully_observable_phases": 0,
+    "future_evaluator_required_phases": 3,
+    "not_observable_phases": 0,
+    "partially_observable_phases": 6,
+    "phases_with_authorized_executable_guards": 0,
+    "phases_with_implemented_action_laws": 0,
+    "phases_with_unsupported_dependencies": 2
+  },
+  "schema_version": "staged_recovery_guard_evidence_manifest_v0",
+  "scientific_claim_restrictions": [
+    "no_recovery_performance_claim",
+    "no_phase_policy_validity_claim",
+    "no_guard_false_positive_or_false_negative_claim",
+    "no_general_noise_estimate_claim",
+    "no_selected_no_progress_threshold",
+    "no_selected_hysteresis_parameter",
+    "no_staged_controller_claim",
+    "no_formal_safety_claim",
+    "no_hardware_or_deployment_claim"
+  ],
+  "signal_profile_summary": {
+    "all_not_evaluated": 146,
+    "boolean": 71,
+    "categorical": 126,
+    "numeric": 209,
+    "with_invalid_evidence": 0,
+    "with_valid_evidence": 260
+  },
+  "source_architecture": {
+    "canonical_hash": "22fa7e0f01c7836ecb1f10838ef00c4cafa937d212bba579fffb25e2c8f11971",
+    "commit": "0d416603027e8a27991baf4f89445f6f466b86e6"
+  },
+  "source_branch": "velocity_opposed_thrust_v0",
+  "source_event_count": 10,
+  "source_nominal_prefix": 27,
+  "source_seed": 0,
+  "source_stage0a": {
+    "canonical_hash": "c4947e623e7f9a83de16163f58c5a0da7a3f7b10ee3b10ce88f4eae4805f122c",
+    "commit": "ebc208aedecd11155c6ac9f03bb9b5e40bc69b10"
+  },
+  "source_stage0b": {
+    "canonical_hash": "b4f7a25e53795845895707b9d5a3d14804431f5323858854e48685f27723d6dd",
+    "commit": "f92b7ffe11ca559764228a0d2500b211ad562ecf"
+  },
+  "source_trace_aggregate_hash": "4f3d700422c47abf4ece93c0dd54770be5f3109a49ef49708485c41ca67e962e",
+  "source_trace_manifest_canonical_hash": "23dd44711641eb2fcae9f1be81f405ee0660146862e8193bb8a0ebd871140680",
+  "source_transition_count": 8,
+  "source_validation_id": "staged_recovery_instrumentation_validation_v0",
+  "stage0c_result_commit": "7844cc5824cf83dc84d8732e96d361d9f4b06aeb",
+  "staged_recovery_execution": "not_authorized",
+  "threshold_free_guard_atom_ids": [
+    "absolute_radius_gap_improving",
+    "absolute_radius_gap_unchanged",
+    "absolute_radius_gap_worsening",
+    "radial_velocity_toward_target",
+    "radial_velocity_away_from_target",
+    "radial_velocity_no_directional_commitment",
+    "absolute_tangential_error_improving",
+    "absolute_tangential_error_unchanged",
+    "absolute_tangential_error_worsening",
+    "overspeed_headroom_improving",
+    "overspeed_headroom_unchanged",
+    "overspeed_headroom_worsening",
+    "recoverability_radius_component_improving",
+    "recoverability_radius_component_unchanged",
+    "recoverability_radius_component_worsening",
+    "recoverability_radial_component_improving",
+    "recoverability_radial_component_unchanged",
+    "recoverability_radial_component_worsening",
+    "recoverability_tangential_component_improving",
+    "recoverability_tangential_component_unchanged",
+    "recoverability_tangential_component_worsening",
+    "absolute_energy_proxy_error_improving",
+    "absolute_energy_proxy_error_unchanged",
+    "absolute_energy_proxy_error_worsening"
+  ],
+  "unresolved_parameter_ids": [
+    "NO_PROGRESS_WINDOW_LENGTH",
+    "NO_PROGRESS_MIN_RADIUS_GAP_IMPROVEMENT",
+    "NO_PROGRESS_MIN_RADIAL_COMPONENT_IMPROVEMENT",
+    "NO_PROGRESS_MIN_TANGENTIAL_COMPONENT_IMPROVEMENT",
+    "NO_PROGRESS_MIN_HEADROOM_IMPROVEMENT",
+    "NO_PROGRESS_REQUIRED_COMPONENT_COUNT",
+    "NO_PROGRESS_CONSECUTIVE_WINDOWS",
+    "NO_PROGRESS_MIN_PHASE_DWELL",
+    "NO_PROGRESS_COOLDOWN"
+  ]
+}

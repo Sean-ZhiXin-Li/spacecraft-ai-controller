@@ -1,0 +1,635 @@
+{
+  "analysis_id": "staged_recovery_guard_evidence_v0",
+  "canonical_payload_hash": "e6427790f59d37579dae4a30172b06996d52f9fab76452f6569bb533c75dc5b6",
+  "existing_branch_actions_reused_as_staged_actions": false,
+  "guard_atom_true_does_not_authorize_transition": true,
+  "phase_count": 9,
+  "phases": [
+    {
+      "action_law_complete": false,
+      "available_guard_atoms": [
+        "predicted_overspeed",
+        "realized_overspeed",
+        "state_evidence_valid",
+        "predicted_overspeed_clear",
+        "realized_overspeed_clear"
+      ],
+      "current_observability_status": "partially_observable",
+      "current_stage0a_schema_support": {
+        "executed_action": "direct_input_supported",
+        "final_veto_decision": "direct_input_supported",
+        "overspeed_headroom": "pure_derivation_supported",
+        "overspeed_status": "pure_derivation_supported",
+        "proposed_action": "direct_input_supported",
+        "realized_speed_ratio": "pure_derivation_supported",
+        "simulation_validity": "direct_input_supported"
+      },
+      "future_evaluator_dependencies": {},
+      "phase_id": "hazard_arrest",
+      "policy_authorization": "not_authorized",
+      "possible_entry_evidence": [
+        "predicted_overspeed",
+        "realized_overspeed"
+      ],
+      "possible_exit_evidence": [
+        "predicted_overspeed_clear",
+        "realized_overspeed_clear"
+      ],
+      "possible_stay_evidence": [
+        "predicted_overspeed",
+        "realized_overspeed",
+        "state_evidence_valid"
+      ],
+      "predicted_state_dependencies": {},
+      "previous_state_dependencies": {},
+      "pure_derivation_availability": [
+        "overspeed_status",
+        "realized_speed_ratio",
+        "overspeed_headroom"
+      ],
+      "required_architecture_signals": [
+        "simulation_validity",
+        "overspeed_status",
+        "final_veto_decision",
+        "proposed_action",
+        "executed_action",
+        "realized_speed_ratio",
+        "overspeed_headroom"
+      ],
+      "runtime_phase_dependencies": {},
+      "stage0c_measured_availability": {
+        "executed_action": true,
+        "final_veto_decision": true,
+        "overspeed_headroom": true,
+        "overspeed_status": true,
+        "proposed_action": true,
+        "realized_speed_ratio": true,
+        "simulation_validity": true
+      },
+      "strongest_permitted_interpretation": "Hazard ratios and monitor evidence are observable, but clear dwell, hysteresis, and an action law are unresolved.",
+      "unavailable_guard_atoms": {},
+      "unresolved_numerical_parameters": [
+        "NO_PROGRESS_CONSECUTIVE_WINDOWS",
+        "NO_PROGRESS_MIN_PHASE_DWELL",
+        "NO_PROGRESS_COOLDOWN"
+      ],
+      "unsupported_dependencies": {}
+    },
+    {
+      "action_law_complete": false,
+      "available_guard_atoms": [
+        "realized_overspeed_clear",
+        "state_evidence_valid",
+        "instrumentation_evaluation_valid",
+        "recovery_evaluation_valid",
+        "radial_velocity_toward_target"
+      ],
+      "current_observability_status": "future_evaluator_required",
+      "current_stage0a_schema_support": {
+        "instability_status": "direct_input_supported",
+        "radial_progress": "requires_previous_state",
+        "realized_speed_ratio": "pure_derivation_supported",
+        "recoverability_component_vector": "pure_derivation_supported",
+        "recovery_evaluation_validity": "direct_input_supported",
+        "simulation_validity": "direct_input_supported",
+        "unsafe_state_status": "direct_input_supported"
+      },
+      "future_evaluator_dependencies": {},
+      "phase_id": "stabilization_assessment",
+      "policy_authorization": "not_authorized",
+      "possible_entry_evidence": [
+        "realized_overspeed_clear",
+        "state_evidence_valid"
+      ],
+      "possible_exit_evidence": [
+        "radial_velocity_toward_target"
+      ],
+      "possible_stay_evidence": [
+        "instrumentation_evaluation_valid",
+        "recovery_evaluation_valid"
+      ],
+      "predicted_state_dependencies": {},
+      "previous_state_dependencies": [
+        "radial_progress"
+      ],
+      "pure_derivation_availability": [
+        "realized_speed_ratio",
+        "recoverability_component_vector",
+        "radial_progress"
+      ],
+      "required_architecture_signals": [
+        "simulation_validity",
+        "recovery_evaluation_validity",
+        "instability_status",
+        "unsafe_state_status",
+        "realized_speed_ratio",
+        "recoverability_component_vector",
+        "radial_progress"
+      ],
+      "runtime_phase_dependencies": {},
+      "stage0c_measured_availability": {
+        "instability_status": false,
+        "radial_progress": false,
+        "realized_speed_ratio": true,
+        "recoverability_component_vector": true,
+        "recovery_evaluation_validity": true,
+        "simulation_validity": true,
+        "unsafe_state_status": false
+      },
+      "strongest_permitted_interpretation": "Validity and kinematics are visible, while instability, unsafe-state, and stabilization criteria require future evaluators.",
+      "unavailable_guard_atoms": {},
+      "unresolved_numerical_parameters": [
+        "NO_PROGRESS_WINDOW_LENGTH",
+        "NO_PROGRESS_CONSECUTIVE_WINDOWS",
+        "NO_PROGRESS_MIN_PHASE_DWELL"
+      ],
+      "unsupported_dependencies": {}
+    },
+    {
+      "action_law_complete": false,
+      "available_guard_atoms": [
+        "radial_velocity_away_from_target",
+        "absolute_radius_gap_worsening",
+        "radial_velocity_toward_target",
+        "absolute_radius_gap_improving"
+      ],
+      "current_observability_status": "partially_observable",
+      "current_stage0a_schema_support": {
+        "available_correction_authority": "not_yet_supported",
+        "orbital_energy_or_proxy": "pure_derivation_supported",
+        "overspeed_headroom": "pure_derivation_supported",
+        "radial_progress": "requires_previous_state",
+        "radial_progress_direction": "requires_previous_state",
+        "radial_progress_rate": "requires_previous_state",
+        "radial_velocity": "pure_derivation_supported",
+        "radial_velocity_ratio": "pure_derivation_supported",
+        "radius": "pure_derivation_supported",
+        "target_radius_error": "pure_derivation_supported"
+      },
+      "future_evaluator_dependencies": {},
+      "phase_id": "radial_recommitment",
+      "policy_authorization": "not_authorized",
+      "possible_entry_evidence": [
+        "radial_velocity_away_from_target",
+        "absolute_radius_gap_worsening"
+      ],
+      "possible_exit_evidence": [
+        "recoverability_radial_component_pass"
+      ],
+      "possible_stay_evidence": [
+        "radial_velocity_toward_target",
+        "absolute_radius_gap_improving"
+      ],
+      "predicted_state_dependencies": {},
+      "previous_state_dependencies": [
+        "radial_progress",
+        "radial_progress_direction",
+        "radial_progress_rate"
+      ],
+      "pure_derivation_availability": [
+        "radius",
+        "target_radius_error",
+        "radial_velocity",
+        "radial_velocity_ratio",
+        "radial_progress",
+        "radial_progress_direction",
+        "radial_progress_rate",
+        "overspeed_headroom",
+        "orbital_energy_or_proxy"
+      ],
+      "required_architecture_signals": [
+        "radius",
+        "target_radius_error",
+        "radial_velocity",
+        "radial_velocity_ratio",
+        "radial_progress",
+        "radial_progress_direction",
+        "radial_progress_rate",
+        "overspeed_headroom",
+        "available_correction_authority",
+        "orbital_energy_or_proxy"
+      ],
+      "runtime_phase_dependencies": {},
+      "stage0c_measured_availability": {
+        "available_correction_authority": false,
+        "orbital_energy_or_proxy": true,
+        "overspeed_headroom": true,
+        "radial_progress": false,
+        "radial_progress_direction": false,
+        "radial_progress_rate": false,
+        "radial_velocity": true,
+        "radial_velocity_ratio": true,
+        "radius": true,
+        "target_radius_error": true
+      },
+      "strongest_permitted_interpretation": "Radius gap and radial direction are observable; adequate commitment magnitude, authority, dwell, and action law are unresolved.",
+      "unavailable_guard_atoms": [
+        "recoverability_radial_component_pass"
+      ],
+      "unresolved_numerical_parameters": [
+        "NO_PROGRESS_WINDOW_LENGTH",
+        "NO_PROGRESS_MIN_RADIUS_GAP_IMPROVEMENT",
+        "NO_PROGRESS_MIN_RADIAL_COMPONENT_IMPROVEMENT",
+        "NO_PROGRESS_MIN_PHASE_DWELL"
+      ],
+      "unsupported_dependencies": [
+        "available_correction_authority"
+      ]
+    },
+    {
+      "action_law_complete": false,
+      "available_guard_atoms": [
+        "recoverability_tangential_velocity_component_pass",
+        "absolute_tangential_error_improving",
+        "overspeed_headroom_improving"
+      ],
+      "current_observability_status": "partially_observable",
+      "current_stage0a_schema_support": {
+        "action_saturation_margin": "pure_derivation_supported",
+        "orbital_energy_or_proxy": "pure_derivation_supported",
+        "overspeed_headroom": "pure_derivation_supported",
+        "radial_progress": "requires_previous_state",
+        "tangential_velocity": "pure_derivation_supported",
+        "tangential_velocity_error_ratio": "pure_derivation_supported",
+        "target_circular_speed": "pure_derivation_supported"
+      },
+      "future_evaluator_dependencies": {},
+      "phase_id": "tangential_alignment",
+      "policy_authorization": "not_authorized",
+      "possible_entry_evidence": [
+        "recoverability_tangential_velocity_component_pass"
+      ],
+      "possible_exit_evidence": [
+        "recoverability_tangential_velocity_component_pass"
+      ],
+      "possible_stay_evidence": [
+        "absolute_tangential_error_improving",
+        "overspeed_headroom_improving"
+      ],
+      "predicted_state_dependencies": {},
+      "previous_state_dependencies": [
+        "radial_progress"
+      ],
+      "pure_derivation_availability": [
+        "tangential_velocity",
+        "target_circular_speed",
+        "tangential_velocity_error_ratio",
+        "radial_progress",
+        "overspeed_headroom",
+        "orbital_energy_or_proxy",
+        "action_saturation_margin"
+      ],
+      "required_architecture_signals": [
+        "tangential_velocity",
+        "target_circular_speed",
+        "tangential_velocity_error_ratio",
+        "radial_progress",
+        "overspeed_headroom",
+        "orbital_energy_or_proxy",
+        "action_saturation_margin"
+      ],
+      "runtime_phase_dependencies": {},
+      "stage0c_measured_availability": {
+        "action_saturation_margin": true,
+        "orbital_energy_or_proxy": true,
+        "overspeed_headroom": true,
+        "radial_progress": false,
+        "tangential_velocity": true,
+        "tangential_velocity_error_ratio": true,
+        "target_circular_speed": true
+      },
+      "strongest_permitted_interpretation": "Tangential component value and trend are observable; allowed radial degradation, guards, and action law are unresolved.",
+      "unavailable_guard_atoms": {},
+      "unresolved_numerical_parameters": [
+        "NO_PROGRESS_WINDOW_LENGTH",
+        "NO_PROGRESS_MIN_TANGENTIAL_COMPONENT_IMPROVEMENT",
+        "NO_PROGRESS_MIN_PHASE_DWELL"
+      ],
+      "unsupported_dependencies": {}
+    },
+    {
+      "action_law_complete": false,
+      "available_guard_atoms": [
+        "recoverability_radius_component_improving",
+        "radial_velocity_toward_target",
+        "no_eligible_crossing",
+        "realized_overspeed_clear",
+        "eligible_target_radius_crossing"
+      ],
+      "current_observability_status": "partially_observable",
+      "current_stage0a_schema_support": {
+        "crossing_progress": "requires_previous_state",
+        "crossing_proximity": "requires_predicted_state",
+        "overspeed_headroom": "pure_derivation_supported",
+        "predicted_crossing_direction": "requires_predicted_state",
+        "radial_velocity_ratio": "pure_derivation_supported",
+        "recoverability_component_vector": "pure_derivation_supported",
+        "tangential_velocity_error_ratio": "pure_derivation_supported",
+        "target_radius_error": "pure_derivation_supported"
+      },
+      "future_evaluator_dependencies": {},
+      "phase_id": "crossing_preparation",
+      "policy_authorization": "not_authorized",
+      "possible_entry_evidence": [
+        "recoverability_radius_component_improving",
+        "radial_velocity_toward_target"
+      ],
+      "possible_exit_evidence": [
+        "eligible_target_radius_crossing"
+      ],
+      "possible_stay_evidence": [
+        "no_eligible_crossing",
+        "realized_overspeed_clear"
+      ],
+      "predicted_state_dependencies": [
+        "predicted_crossing_direction",
+        "crossing_proximity"
+      ],
+      "previous_state_dependencies": [
+        "crossing_progress"
+      ],
+      "pure_derivation_availability": [
+        "target_radius_error",
+        "radial_velocity_ratio",
+        "tangential_velocity_error_ratio",
+        "crossing_progress",
+        "predicted_crossing_direction",
+        "crossing_proximity",
+        "overspeed_headroom",
+        "recoverability_component_vector"
+      ],
+      "required_architecture_signals": [
+        "target_radius_error",
+        "radial_velocity_ratio",
+        "tangential_velocity_error_ratio",
+        "crossing_progress",
+        "predicted_crossing_direction",
+        "crossing_proximity",
+        "overspeed_headroom",
+        "recoverability_component_vector"
+      ],
+      "runtime_phase_dependencies": {},
+      "stage0c_measured_availability": {
+        "crossing_progress": false,
+        "crossing_proximity": false,
+        "overspeed_headroom": true,
+        "predicted_crossing_direction": false,
+        "radial_velocity_ratio": true,
+        "recoverability_component_vector": true,
+        "tangential_velocity_error_ratio": true,
+        "target_radius_error": true
+      },
+      "strongest_permitted_interpretation": "Measured gap and crossing evidence are visible; reliable future crossing prediction and correction authority are unavailable.",
+      "unavailable_guard_atoms": {},
+      "unresolved_numerical_parameters": [
+        "NO_PROGRESS_WINDOW_LENGTH",
+        "NO_PROGRESS_REQUIRED_COMPONENT_COUNT",
+        "NO_PROGRESS_CONSECUTIVE_WINDOWS"
+      ],
+      "unsupported_dependencies": {}
+    },
+    {
+      "action_law_complete": false,
+      "available_guard_atoms": [
+        "eligible_target_radius_crossing",
+        "phase34_compatible_recoverability_pass"
+      ],
+      "current_observability_status": "partially_observable",
+      "current_stage0a_schema_support": {
+        "phase34_compatible_recoverability": "pure_derivation_supported",
+        "recoverability_component_vector": "pure_derivation_supported",
+        "recovery_evaluation_validity": "direct_input_supported",
+        "recovery_success_v0": "direct_input_supported",
+        "simulation_validity": "direct_input_supported",
+        "target_radius_crossing": "requires_previous_state"
+      },
+      "future_evaluator_dependencies": {},
+      "phase_id": "recoverability_verification",
+      "policy_authorization": "not_authorized",
+      "possible_entry_evidence": [
+        "eligible_target_radius_crossing"
+      ],
+      "possible_exit_evidence": [
+        "phase34_compatible_recoverability_pass"
+      ],
+      "possible_stay_evidence": [
+        "phase34_compatible_recoverability_pass"
+      ],
+      "predicted_state_dependencies": {},
+      "previous_state_dependencies": [
+        "target_radius_crossing"
+      ],
+      "pure_derivation_availability": [
+        "target_radius_crossing",
+        "phase34_compatible_recoverability",
+        "recoverability_component_vector"
+      ],
+      "required_architecture_signals": [
+        "target_radius_crossing",
+        "phase34_compatible_recoverability",
+        "recoverability_component_vector",
+        "recovery_success_v0",
+        "simulation_validity",
+        "recovery_evaluation_validity"
+      ],
+      "runtime_phase_dependencies": {},
+      "stage0c_measured_availability": {
+        "phase34_compatible_recoverability": true,
+        "recoverability_component_vector": true,
+        "recovery_evaluation_validity": true,
+        "recovery_success_v0": false,
+        "simulation_validity": true,
+        "target_radius_crossing": true
+      },
+      "strongest_permitted_interpretation": "Existing component values, pass atoms, and crossing evidence are observable; verification dwell and handoff compatibility are unresolved.",
+      "unavailable_guard_atoms": {},
+      "unresolved_numerical_parameters": [
+        "NO_PROGRESS_CONSECUTIVE_WINDOWS",
+        "NO_PROGRESS_MIN_PHASE_DWELL"
+      ],
+      "unsupported_dependencies": {}
+    },
+    {
+      "action_law_complete": false,
+      "available_guard_atoms": [
+        "phase34_compatible_recoverability_pass",
+        "state_evidence_valid"
+      ],
+      "current_observability_status": "future_evaluator_required",
+      "current_stage0a_schema_support": {
+        "action_rejection_status": "direct_input_supported",
+        "handoff_readiness": "requires_future_evaluator",
+        "instability_status": "direct_input_supported",
+        "overspeed_status": "pure_derivation_supported",
+        "phase34_compatible_recoverability": "pure_derivation_supported",
+        "recovery_evaluation_validity": "direct_input_supported",
+        "recovery_success_v0": "direct_input_supported",
+        "simulation_validity": "direct_input_supported",
+        "target_radius_crossing": "requires_previous_state",
+        "unsafe_state_status": "direct_input_supported"
+      },
+      "future_evaluator_dependencies": [
+        "handoff_readiness"
+      ],
+      "phase_id": "nominal_handoff",
+      "policy_authorization": "not_authorized",
+      "possible_entry_evidence": [
+        "phase34_compatible_recoverability_pass",
+        "handoff_readiness_available"
+      ],
+      "possible_exit_evidence": {},
+      "possible_stay_evidence": [
+        "state_evidence_valid"
+      ],
+      "predicted_state_dependencies": {},
+      "previous_state_dependencies": [
+        "target_radius_crossing"
+      ],
+      "pure_derivation_availability": [
+        "overspeed_status",
+        "target_radius_crossing",
+        "phase34_compatible_recoverability"
+      ],
+      "required_architecture_signals": [
+        "simulation_validity",
+        "recovery_evaluation_validity",
+        "overspeed_status",
+        "instability_status",
+        "unsafe_state_status",
+        "action_rejection_status",
+        "target_radius_crossing",
+        "phase34_compatible_recoverability",
+        "recovery_success_v0",
+        "handoff_readiness"
+      ],
+      "runtime_phase_dependencies": {},
+      "stage0c_measured_availability": {
+        "action_rejection_status": true,
+        "handoff_readiness": false,
+        "instability_status": false,
+        "overspeed_status": true,
+        "phase34_compatible_recoverability": true,
+        "recovery_evaluation_validity": true,
+        "recovery_success_v0": false,
+        "simulation_validity": true,
+        "target_radius_crossing": true,
+        "unsafe_state_status": false
+      },
+      "strongest_permitted_interpretation": "Existing recoverability evidence is insufficient because handoff readiness and nominal-controller acceptance are not implemented.",
+      "unavailable_guard_atoms": [
+        "handoff_readiness_available"
+      ],
+      "unresolved_numerical_parameters": [
+        "NO_PROGRESS_CONSECUTIVE_WINDOWS"
+      ],
+      "unsupported_dependencies": {}
+    },
+    {
+      "action_law_complete": false,
+      "available_guard_atoms": [
+        "state_evidence_valid"
+      ],
+      "current_observability_status": "future_evaluator_required",
+      "current_stage0a_schema_support": {
+        "available_correction_authority": "not_yet_supported",
+        "no_progress_status": "requires_runtime_phase_integration",
+        "overspeed_status": "pure_derivation_supported",
+        "simulation_validity": "direct_input_supported"
+      },
+      "future_evaluator_dependencies": {},
+      "phase_id": "retreat",
+      "policy_authorization": "not_authorized",
+      "possible_entry_evidence": [
+        "no_progress_policy_evaluable",
+        "correction_authority_available"
+      ],
+      "possible_exit_evidence": {},
+      "possible_stay_evidence": [
+        "state_evidence_valid"
+      ],
+      "predicted_state_dependencies": {},
+      "previous_state_dependencies": {},
+      "pure_derivation_availability": [
+        "overspeed_status"
+      ],
+      "required_architecture_signals": [
+        "simulation_validity",
+        "overspeed_status",
+        "available_correction_authority",
+        "no_progress_status"
+      ],
+      "runtime_phase_dependencies": [
+        "no_progress_status"
+      ],
+      "stage0c_measured_availability": {
+        "available_correction_authority": false,
+        "no_progress_status": false,
+        "overspeed_status": true,
+        "simulation_validity": true
+      },
+      "strongest_permitted_interpretation": "Some adverse and progress inputs are observable, but retreat authority, target, action, and success evaluator are unavailable.",
+      "unavailable_guard_atoms": [
+        "no_progress_policy_evaluable",
+        "correction_authority_available"
+      ],
+      "unresolved_numerical_parameters": [
+        "NO_PROGRESS_WINDOW_LENGTH",
+        "NO_PROGRESS_REQUIRED_COMPONENT_COUNT",
+        "NO_PROGRESS_COOLDOWN"
+      ],
+      "unsupported_dependencies": [
+        "available_correction_authority"
+      ]
+    },
+    {
+      "action_law_complete": false,
+      "available_guard_atoms": [
+        "explicit_abort_requested"
+      ],
+      "current_observability_status": "partially_observable",
+      "current_stage0a_schema_support": {
+        "explicit_abort_requested": "direct_input_supported",
+        "overspeed_status": "pure_derivation_supported",
+        "simulation_validity": "direct_input_supported"
+      },
+      "future_evaluator_dependencies": {},
+      "phase_id": "explicit_abort",
+      "policy_authorization": "not_authorized",
+      "possible_entry_evidence": [
+        "explicit_abort_requested"
+      ],
+      "possible_exit_evidence": {},
+      "possible_stay_evidence": {},
+      "predicted_state_dependencies": {},
+      "previous_state_dependencies": {},
+      "pure_derivation_availability": [
+        "overspeed_status"
+      ],
+      "required_architecture_signals": [
+        "explicit_abort_requested",
+        "simulation_validity",
+        "overspeed_status"
+      ],
+      "runtime_phase_dependencies": {},
+      "stage0c_measured_availability": {
+        "explicit_abort_requested": true,
+        "overspeed_status": true,
+        "simulation_validity": true
+      },
+      "strongest_permitted_interpretation": "Externally supplied abort evidence can be recorded, but Stage 1A defines no autonomous abort policy.",
+      "unavailable_guard_atoms": {},
+      "unresolved_numerical_parameters": {},
+      "unsupported_dependencies": {}
+    }
+  ],
+  "schema_version": "staged_recovery_phase_observability_matrix_v0",
+  "totals": {
+    "fully_observable_phases": 0,
+    "future_evaluator_required_phases": 3,
+    "not_observable_phases": 0,
+    "partially_observable_phases": 6,
+    "phases_with_authorized_executable_guards": 0,
+    "phases_with_implemented_action_laws": 0,
+    "phases_with_unsupported_dependencies": 2
+  }
+}

@@ -1,0 +1,1397 @@
+{
+  "all_candidate_guard_authorizations": "not_authorized",
+  "analysis_id": "staged_recovery_guard_evidence_v0",
+  "artifact_classification": "offline_guard_evidence_analysis",
+  "canonical_payload_hash": "56421e50dcc7d3771d0c48e536628eb4ddedd9f16d218c3aa11bc7ef0da1ec81",
+  "category_counts": {
+    "action": 3,
+    "authority": 1,
+    "crossing": 3,
+    "handoff": 2,
+    "hazard": 7,
+    "kinematic_direction": 9,
+    "phase_runtime": 2,
+    "progress": 4,
+    "recoverability": 13,
+    "validity": 3
+  },
+  "exact_inherited_guard_atom_count": 14,
+  "exact_inherited_guard_atom_ids": [
+    "state_evidence_valid",
+    "instrumentation_evaluation_valid",
+    "recovery_evaluation_valid",
+    "realized_overspeed",
+    "realized_overspeed_clear",
+    "predicted_overspeed",
+    "predicted_overspeed_clear",
+    "recoverability_radius_component_pass",
+    "recoverability_radial_velocity_component_pass",
+    "recoverability_tangential_velocity_component_pass",
+    "phase34_compatible_recoverability_pass",
+    "eligible_target_radius_crossing",
+    "pre_branch_crossing_only",
+    "no_eligible_crossing"
+  ],
+  "guard_atom_count": 47,
+  "guard_atoms": [
+    {
+      "category": "validity",
+      "comparator": "is_true",
+      "description": "The supplied runtime event and selected state evidence are structurally valid.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "measured",
+      "fixed_threshold": null,
+      "guard_atom_id": "state_evidence_valid",
+      "non_meaning": "Validity alone does not establish stabilization, recovery, or phase readiness.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment",
+        "radial_recommitment",
+        "tangential_alignment",
+        "crossing_preparation",
+        "recoverability_verification",
+        "nominal_handoff",
+        "retreat",
+        "explicit_abort"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "event_valid"
+      ],
+      "result_meaning": "This evidence item is valid at this event.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "event_valid",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "validity",
+      "comparator": "is_true",
+      "description": "The selected instrumentation observation contains no invalid evidence.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "measured",
+      "fixed_threshold": null,
+      "guard_atom_id": "instrumentation_evaluation_valid",
+      "non_meaning": "Validity alone does not establish stabilization, recovery, or phase readiness.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment",
+        "radial_recommitment",
+        "tangential_alignment",
+        "crossing_preparation",
+        "recoverability_verification",
+        "nominal_handoff",
+        "retreat",
+        "explicit_abort"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "selected_observation"
+      ],
+      "result_meaning": "This evidence item is valid at this event.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "selected_observation",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "validity",
+      "comparator": "is_true",
+      "description": "The externally supplied recovery-evaluation validity evidence is true.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "measured",
+      "fixed_threshold": null,
+      "guard_atom_id": "recovery_evaluation_valid",
+      "non_meaning": "Validity alone does not establish stabilization, recovery, or phase readiness.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment",
+        "radial_recommitment",
+        "tangential_alignment",
+        "crossing_preparation",
+        "recoverability_verification",
+        "nominal_handoff",
+        "retreat",
+        "explicit_abort"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "recovery_evaluation_validity"
+      ],
+      "result_meaning": "This evidence item is valid at this event.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "recovery_evaluation_validity",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "hazard",
+      "comparator": ">",
+      "description": "Realized speed ratio exceeds the frozen strict hazard threshold.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": 1.9,
+      "guard_atom_id": "realized_overspeed",
+      "non_meaning": "A clear atom is not a general safety or recovery claim; predicted and realized evidence remain separate.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "realized_speed_ratio"
+      ],
+      "result_meaning": "The selected realized or predicted ratio satisfies this one threshold comparison.",
+      "source_path": "runtime_assurance/staged_recovery_instrumentation.py",
+      "source_symbol": "derive_orbital_state/derive_predicted_hazard_state",
+      "threshold_source": "analysis/recovery_action_branching_nonformal_v0/manifest.json:hazard_definition",
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "hazard",
+      "comparator": "<=",
+      "description": "Realized speed ratio does not exceed the frozen strict hazard threshold.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": 1.9,
+      "guard_atom_id": "realized_overspeed_clear",
+      "non_meaning": "A clear atom is not a general safety or recovery claim; predicted and realized evidence remain separate.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "realized_speed_ratio"
+      ],
+      "result_meaning": "The selected realized or predicted ratio satisfies this one threshold comparison.",
+      "source_path": "runtime_assurance/staged_recovery_instrumentation.py",
+      "source_symbol": "derive_orbital_state/derive_predicted_hazard_state",
+      "threshold_source": "analysis/recovery_action_branching_nonformal_v0/manifest.json:hazard_definition",
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "hazard",
+      "comparator": ">",
+      "description": "One-step predicted speed ratio exceeds the frozen strict hazard threshold.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": 1.9,
+      "guard_atom_id": "predicted_overspeed",
+      "non_meaning": "A clear atom is not a general safety or recovery claim; predicted and realized evidence remain separate.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "predicted_speed_ratio"
+      ],
+      "result_meaning": "The selected realized or predicted ratio satisfies this one threshold comparison.",
+      "source_path": "runtime_assurance/staged_recovery_instrumentation.py",
+      "source_symbol": "derive_orbital_state/derive_predicted_hazard_state",
+      "threshold_source": "analysis/recovery_action_branching_nonformal_v0/manifest.json:hazard_definition",
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "hazard",
+      "comparator": "<=",
+      "description": "One-step predicted speed ratio does not exceed the frozen strict hazard threshold.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": 1.9,
+      "guard_atom_id": "predicted_overspeed_clear",
+      "non_meaning": "A clear atom is not a general safety or recovery claim; predicted and realized evidence remain separate.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "predicted_speed_ratio"
+      ],
+      "result_meaning": "The selected realized or predicted ratio satisfies this one threshold comparison.",
+      "source_path": "runtime_assurance/staged_recovery_instrumentation.py",
+      "source_symbol": "derive_orbital_state/derive_predicted_hazard_state",
+      "threshold_source": "analysis/recovery_action_branching_nonformal_v0/manifest.json:hazard_definition",
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "absolute_value_<=",
+      "description": "Absolute radius_error_ratio satisfies the existing inclusive Phase34-compatible bound.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": 0.0025,
+      "guard_atom_id": "recoverability_radius_component_pass",
+      "non_meaning": "One passing component does not establish combined recoverability or handoff readiness.",
+      "phase_relevance": [
+        "crossing_preparation",
+        "recoverability_verification",
+        "nominal_handoff"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "radius_error_ratio"
+      ],
+      "result_meaning": "This single Phase34-compatible component is inside its inherited inclusive bound.",
+      "source_path": "runtime_assurance/recovery_evaluators.py",
+      "source_symbol": "evaluate_phase34_compatible_recoverability",
+      "threshold_source": "runtime_assurance/recovery_evaluators.py:PHASE34_RECOVERABLE_R_ERROR_RATIO_MAX",
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "absolute_value_<=",
+      "description": "Absolute radial_velocity_ratio satisfies the existing inclusive Phase34-compatible bound.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": 0.02,
+      "guard_atom_id": "recoverability_radial_velocity_component_pass",
+      "non_meaning": "One passing component does not establish combined recoverability or handoff readiness.",
+      "phase_relevance": [
+        "crossing_preparation",
+        "recoverability_verification",
+        "nominal_handoff"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "radial_velocity_ratio"
+      ],
+      "result_meaning": "This single Phase34-compatible component is inside its inherited inclusive bound.",
+      "source_path": "runtime_assurance/recovery_evaluators.py",
+      "source_symbol": "evaluate_phase34_compatible_recoverability",
+      "threshold_source": "runtime_assurance/recovery_evaluators.py:PHASE34_RECOVERABLE_VR_RATIO_MAX",
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "absolute_value_<=",
+      "description": "Absolute tangential_velocity_error_ratio satisfies the existing inclusive Phase34-compatible bound.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": 0.25,
+      "guard_atom_id": "recoverability_tangential_velocity_component_pass",
+      "non_meaning": "One passing component does not establish combined recoverability or handoff readiness.",
+      "phase_relevance": [
+        "crossing_preparation",
+        "recoverability_verification",
+        "nominal_handoff"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "tangential_velocity_error_ratio"
+      ],
+      "result_meaning": "This single Phase34-compatible component is inside its inherited inclusive bound.",
+      "source_path": "runtime_assurance/recovery_evaluators.py",
+      "source_symbol": "evaluate_phase34_compatible_recoverability",
+      "threshold_source": "runtime_assurance/recovery_evaluators.py:PHASE34_RECOVERABLE_VT_ERROR_RATIO_MAX",
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "all_inclusive_absolute_component_bounds",
+      "description": "All three absolute Phase34-compatible component bounds pass inclusively.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "phase34_compatible_recoverability_pass",
+      "non_meaning": "This is not crossing, Recovery Success v0, nominal handoff readiness, or simulator success.",
+      "phase_relevance": [
+        "recoverability_verification",
+        "nominal_handoff"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "radius_error_ratio",
+        "radial_velocity_ratio",
+        "tangential_velocity_error_ratio"
+      ],
+      "result_meaning": "The measured state satisfies the existing component predicate.",
+      "source_path": "runtime_assurance/recovery_evaluators.py",
+      "source_symbol": "evaluate_phase34_compatible_recoverability",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "crossing",
+      "comparator": "phase34_signed_radius_error_transition_rule",
+      "description": "A measured crossing occurred at or after the branch boundary.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "eligible_target_radius_crossing",
+      "non_meaning": "No interpolation, future crossing, or recovery outcome is inferred.",
+      "phase_relevance": [
+        "crossing_preparation",
+        "recoverability_verification"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "target_radius_crossing",
+        "crossing_recovery_eligible"
+      ],
+      "result_meaning": "This describes discrete measured crossing evidence for one transition.",
+      "source_path": "runtime_assurance/staged_recovery_instrumentation.py",
+      "source_symbol": "derive_crossing_event",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "crossing",
+      "comparator": "phase34_signed_radius_error_transition_rule",
+      "description": "Crossing evidence exists but is ineligible because it predates the branch boundary.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "pre_branch_crossing_only",
+      "non_meaning": "No interpolation, future crossing, or recovery outcome is inferred.",
+      "phase_relevance": [
+        "crossing_preparation",
+        "recoverability_verification"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "target_radius_crossing",
+        "crossing_recovery_eligible"
+      ],
+      "result_meaning": "This describes discrete measured crossing evidence for one transition.",
+      "source_path": "runtime_assurance/staged_recovery_instrumentation.py",
+      "source_symbol": "derive_crossing_event",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "crossing",
+      "comparator": "phase34_signed_radius_error_transition_rule",
+      "description": "The evaluated measured state pair contains no eligible crossing.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "no_eligible_crossing",
+      "non_meaning": "No interpolation, future crossing, or recovery outcome is inferred.",
+      "phase_relevance": [
+        "crossing_preparation",
+        "recoverability_verification"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "target_radius_crossing",
+        "crossing_recovery_eligible"
+      ],
+      "result_meaning": "This describes discrete measured crossing evidence for one transition.",
+      "source_path": "runtime_assurance/staged_recovery_instrumentation.py",
+      "source_symbol": "derive_crossing_event",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "kinematic_direction",
+      "comparator": "absolute_current_< _absolute_previous",
+      "description": "Consecutive measured absolute_target_radius_error evidence is improving under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "absolute_radius_gap_improving",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "radial_recommitment",
+        "crossing_preparation"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.absolute_target_radius_error",
+        "current.absolute_target_radius_error"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "kinematic_direction",
+      "comparator": "exact_equal",
+      "description": "Consecutive measured absolute_target_radius_error evidence is unchanged under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "absolute_radius_gap_unchanged",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "radial_recommitment",
+        "crossing_preparation"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.absolute_target_radius_error",
+        "current.absolute_target_radius_error"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "kinematic_direction",
+      "comparator": "absolute_current_>_absolute_previous",
+      "description": "Consecutive measured absolute_target_radius_error evidence is worsening under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "absolute_radius_gap_worsening",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "radial_recommitment",
+        "crossing_preparation"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.absolute_target_radius_error",
+        "current.absolute_target_radius_error"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "kinematic_direction",
+      "comparator": "absolute_current_< _absolute_previous",
+      "description": "Consecutive measured tangential_velocity_error evidence is improving under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "absolute_tangential_error_improving",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "tangential_alignment",
+        "crossing_preparation"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.tangential_velocity_error",
+        "current.tangential_velocity_error"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "kinematic_direction",
+      "comparator": "exact_equal",
+      "description": "Consecutive measured tangential_velocity_error evidence is unchanged under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "absolute_tangential_error_unchanged",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "tangential_alignment",
+        "crossing_preparation"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.tangential_velocity_error",
+        "current.tangential_velocity_error"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "kinematic_direction",
+      "comparator": "absolute_current_>_absolute_previous",
+      "description": "Consecutive measured tangential_velocity_error evidence is worsening under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "absolute_tangential_error_worsening",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "tangential_alignment",
+        "crossing_preparation"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.tangential_velocity_error",
+        "current.tangential_velocity_error"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "hazard",
+      "comparator": ">",
+      "description": "Consecutive measured overspeed_headroom evidence is improving under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "overspeed_headroom_improving",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.overspeed_headroom",
+        "current.overspeed_headroom"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "hazard",
+      "comparator": "exact_equal",
+      "description": "Consecutive measured overspeed_headroom evidence is unchanged under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "overspeed_headroom_unchanged",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.overspeed_headroom",
+        "current.overspeed_headroom"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "hazard",
+      "comparator": "<",
+      "description": "Consecutive measured overspeed_headroom evidence is worsening under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "overspeed_headroom_worsening",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.overspeed_headroom",
+        "current.overspeed_headroom"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "absolute_current_< _absolute_previous",
+      "description": "Consecutive measured radius_error_ratio evidence is improving under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "recoverability_radius_component_improving",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "crossing_preparation",
+        "recoverability_verification"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.radius_error_ratio",
+        "current.radius_error_ratio"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "exact_equal",
+      "description": "Consecutive measured radius_error_ratio evidence is unchanged under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "recoverability_radius_component_unchanged",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "crossing_preparation",
+        "recoverability_verification"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.radius_error_ratio",
+        "current.radius_error_ratio"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "absolute_current_>_absolute_previous",
+      "description": "Consecutive measured radius_error_ratio evidence is worsening under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "recoverability_radius_component_worsening",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "crossing_preparation",
+        "recoverability_verification"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.radius_error_ratio",
+        "current.radius_error_ratio"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "absolute_current_< _absolute_previous",
+      "description": "Consecutive measured radial_velocity_ratio evidence is improving under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "recoverability_radial_component_improving",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "radial_recommitment",
+        "recoverability_verification"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.radial_velocity_ratio",
+        "current.radial_velocity_ratio"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "exact_equal",
+      "description": "Consecutive measured radial_velocity_ratio evidence is unchanged under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "recoverability_radial_component_unchanged",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "radial_recommitment",
+        "recoverability_verification"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.radial_velocity_ratio",
+        "current.radial_velocity_ratio"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "absolute_current_>_absolute_previous",
+      "description": "Consecutive measured radial_velocity_ratio evidence is worsening under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "recoverability_radial_component_worsening",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "radial_recommitment",
+        "recoverability_verification"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.radial_velocity_ratio",
+        "current.radial_velocity_ratio"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "absolute_current_< _absolute_previous",
+      "description": "Consecutive measured tangential_velocity_error_ratio evidence is improving under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "recoverability_tangential_component_improving",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "tangential_alignment",
+        "recoverability_verification"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.tangential_velocity_error_ratio",
+        "current.tangential_velocity_error_ratio"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "exact_equal",
+      "description": "Consecutive measured tangential_velocity_error_ratio evidence is unchanged under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "recoverability_tangential_component_unchanged",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "tangential_alignment",
+        "recoverability_verification"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.tangential_velocity_error_ratio",
+        "current.tangential_velocity_error_ratio"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "recoverability",
+      "comparator": "absolute_current_>_absolute_previous",
+      "description": "Consecutive measured tangential_velocity_error_ratio evidence is worsening under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "recoverability_tangential_component_worsening",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "tangential_alignment",
+        "recoverability_verification"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.tangential_velocity_error_ratio",
+        "current.tangential_velocity_error_ratio"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "progress",
+      "comparator": "absolute_current_< _absolute_previous",
+      "description": "Consecutive measured specific_energy_error evidence is improving under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "diagnostic_proxy",
+      "fixed_threshold": null,
+      "guard_atom_id": "absolute_energy_proxy_error_improving",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "radial_recommitment",
+        "tangential_alignment"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.specific_energy_error",
+        "current.specific_energy_error"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "progress",
+      "comparator": "exact_equal",
+      "description": "Consecutive measured specific_energy_error evidence is unchanged under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "diagnostic_proxy",
+      "fixed_threshold": null,
+      "guard_atom_id": "absolute_energy_proxy_error_unchanged",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "radial_recommitment",
+        "tangential_alignment"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.specific_energy_error",
+        "current.specific_energy_error"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "progress",
+      "comparator": "absolute_current_>_absolute_previous",
+      "description": "Consecutive measured specific_energy_error evidence is worsening under its explicit target direction.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "diagnostic_proxy",
+      "fixed_threshold": null,
+      "guard_atom_id": "absolute_energy_proxy_error_worsening",
+      "non_meaning": "One component direction does not establish adequate progress, recovery, or a phase transition.",
+      "phase_relevance": [
+        "radial_recommitment",
+        "tangential_alignment"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "previous.specific_energy_error",
+        "current.specific_energy_error"
+      ],
+      "result_meaning": "This component changed in the named direction over one measured transition.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_consecutive_state_comparison",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "kinematic_direction",
+      "comparator": "signed_radius_error*radial_velocity<0",
+      "description": "The signed radius error and radial velocity point toward the target radius.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "radial_velocity_toward_target",
+      "non_meaning": "The sign condition does not establish adequate magnitude, recoverability, or future crossing.",
+      "phase_relevance": [
+        "radial_recommitment",
+        "crossing_preparation"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "signed_target_radius_error",
+        "radial_velocity"
+      ],
+      "result_meaning": "The current measured radial motion has the stated direction relative to target radius.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_radial_direction_product",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "kinematic_direction",
+      "comparator": "signed_radius_error*radial_velocity>0",
+      "description": "The signed radius error and radial velocity point away from the target radius.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "radial_velocity_away_from_target",
+      "non_meaning": "The sign condition does not establish adequate magnitude, recoverability, or future crossing.",
+      "phase_relevance": [
+        "radial_recommitment",
+        "crossing_preparation"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "signed_target_radius_error",
+        "radial_velocity"
+      ],
+      "result_meaning": "The current measured radial motion has the stated direction relative to target radius.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_radial_direction_product",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "kinematic_direction",
+      "comparator": "signed_radius_error*radial_velocity==0",
+      "description": "The sign product provides no directional commitment.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "derived",
+      "fixed_threshold": null,
+      "guard_atom_id": "radial_velocity_no_directional_commitment",
+      "non_meaning": "The sign condition does not establish adequate magnitude, recoverability, or future crossing.",
+      "phase_relevance": [
+        "radial_recommitment",
+        "crossing_preparation"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "signed_target_radius_error",
+        "radial_velocity"
+      ],
+      "result_meaning": "The current measured radial motion has the stated direction relative to target radius.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "threshold_free_radial_direction_product",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "action",
+      "comparator": "equals_allow",
+      "description": "The externally supplied monitor decision allowed this proposal.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "externally_supplied",
+      "fixed_threshold": null,
+      "guard_atom_id": "final_veto_allow",
+      "non_meaning": "This does not establish action quality or task progress.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment",
+        "radial_recommitment",
+        "tangential_alignment",
+        "crossing_preparation",
+        "recoverability_verification",
+        "nominal_handoff",
+        "retreat",
+        "explicit_abort"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "final_veto_decision"
+      ],
+      "result_meaning": "The externally supplied monitor decision allowed this proposal.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "final_veto_decision",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "action",
+      "comparator": "is_true",
+      "description": "The supplied proposed and executed vectors are exactly equal.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "externally_supplied",
+      "fixed_threshold": null,
+      "guard_atom_id": "action_executed_unchanged",
+      "non_meaning": "Equality does not establish action optimality or recovery.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment",
+        "radial_recommitment",
+        "tangential_alignment",
+        "crossing_preparation",
+        "recoverability_verification",
+        "nominal_handoff",
+        "retreat",
+        "explicit_abort"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "proposed_equals_executed"
+      ],
+      "result_meaning": "The supplied proposed and executed vectors are exactly equal.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "proposed_equals_executed",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "action",
+      "comparator": "is_false",
+      "description": "The supplied action-rejection status is false.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "externally_supplied",
+      "fixed_threshold": null,
+      "guard_atom_id": "action_not_rejected",
+      "non_meaning": "No rejection does not authorize phase progression.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment",
+        "radial_recommitment",
+        "tangential_alignment",
+        "crossing_preparation",
+        "recoverability_verification",
+        "nominal_handoff",
+        "retreat",
+        "explicit_abort"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "action_rejection_status"
+      ],
+      "result_meaning": "The supplied action-rejection status is false.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "action_rejection_status",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "phase_runtime",
+      "comparator": "evidence_available",
+      "description": "A compatible staged phase identity was externally supplied.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "externally_supplied",
+      "fixed_threshold": null,
+      "guard_atom_id": "phase_runtime_available",
+      "non_meaning": "Availability would not validate phase policy.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment",
+        "radial_recommitment",
+        "tangential_alignment",
+        "crossing_preparation",
+        "recoverability_verification",
+        "nominal_handoff",
+        "retreat",
+        "explicit_abort"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "current_phase"
+      ],
+      "result_meaning": "A compatible staged phase identity was externally supplied.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "current_phase",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "handoff",
+      "comparator": "evidence_available",
+      "description": "A handoff-readiness evaluator supplied evidence.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "externally_supplied",
+      "fixed_threshold": null,
+      "guard_atom_id": "handoff_readiness_available",
+      "non_meaning": "Availability alone would not authorize handoff.",
+      "phase_relevance": [
+        "nominal_handoff"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "handoff_readiness"
+      ],
+      "result_meaning": "A handoff-readiness evaluator supplied evidence.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "handoff_readiness",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "authority",
+      "comparator": "evidence_available",
+      "description": "A correction-authority evaluator supplied evidence.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "externally_supplied",
+      "fixed_threshold": null,
+      "guard_atom_id": "correction_authority_available",
+      "non_meaning": "Availability alone would not establish sufficient control authority.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment",
+        "radial_recommitment",
+        "tangential_alignment",
+        "crossing_preparation",
+        "recoverability_verification",
+        "nominal_handoff",
+        "retreat",
+        "explicit_abort"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "available_correction_authority"
+      ],
+      "result_meaning": "A correction-authority evaluator supplied evidence.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "available_correction_authority",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "progress",
+      "comparator": "requires_frozen_parameters",
+      "description": "A complete frozen no-progress policy could be evaluated.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "externally_supplied",
+      "fixed_threshold": null,
+      "guard_atom_id": "no_progress_policy_evaluable",
+      "non_meaning": "Component samples do not select a no-progress policy.",
+      "phase_relevance": [
+        "hazard_arrest",
+        "stabilization_assessment",
+        "radial_recommitment",
+        "tangential_alignment",
+        "crossing_preparation",
+        "recoverability_verification",
+        "nominal_handoff",
+        "retreat",
+        "explicit_abort"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "no_progress_status"
+      ],
+      "result_meaning": "A complete frozen no-progress policy could be evaluated.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "no_progress_status",
+      "threshold_source": null,
+      "unresolved_parameter_ids": [
+        "NO_PROGRESS_WINDOW_LENGTH",
+        "NO_PROGRESS_MIN_RADIUS_GAP_IMPROVEMENT",
+        "NO_PROGRESS_MIN_RADIAL_COMPONENT_IMPROVEMENT",
+        "NO_PROGRESS_MIN_TANGENTIAL_COMPONENT_IMPROVEMENT",
+        "NO_PROGRESS_MIN_HEADROOM_IMPROVEMENT",
+        "NO_PROGRESS_REQUIRED_COMPONENT_COUNT",
+        "NO_PROGRESS_CONSECUTIVE_WINDOWS",
+        "NO_PROGRESS_MIN_PHASE_DWELL",
+        "NO_PROGRESS_COOLDOWN"
+      ]
+    },
+    {
+      "category": "handoff",
+      "comparator": "requires_frozen_policy",
+      "description": "A complete policy authorized nominal handoff.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "externally_supplied",
+      "fixed_threshold": null,
+      "guard_atom_id": "nominal_handoff_authorized",
+      "non_meaning": "No Stage 1A evidence authorizes handoff.",
+      "phase_relevance": [
+        "nominal_handoff"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "recovery_success_v0",
+        "handoff_readiness"
+      ],
+      "result_meaning": "A complete policy authorized nominal handoff.",
+      "source_path": "analysis/staged_recovery_instrumentation_validation_v0/staged_recovery_trace.jsonl",
+      "source_symbol": "recovery_success_v0",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    },
+    {
+      "category": "phase_runtime",
+      "comparator": "is_true",
+      "description": "The externally supplied explicit-abort request is true.",
+      "evaluation_scope": "one checked-in eight-transition Stage 0C validation trace",
+      "evidence_level": "externally_supplied",
+      "fixed_threshold": null,
+      "guard_atom_id": "explicit_abort_requested",
+      "non_meaning": "A false or unavailable value does not define an autonomous abort policy.",
+      "phase_relevance": [
+        "explicit_abort"
+      ],
+      "policy_authorization_status": "not_authorized",
+      "required_fields": [
+        "explicit_abort_requested"
+      ],
+      "result_meaning": "The runtime evidence explicitly records an abort request at this event.",
+      "source_path": "runtime_assurance/staged_recovery_instrumentation.py",
+      "source_symbol": "build_instrumentation_record.explicit_abort_requested",
+      "threshold_source": null,
+      "unresolved_parameter_ids": {}
+    }
+  ],
+  "phase_transition_policy": "not_frozen",
+  "schema_version": "staged_recovery_guard_atom_inventory_v0",
+  "threshold_free_directional_guard_atom_count": 24,
+  "threshold_free_directional_guard_atom_ids": [
+    "absolute_radius_gap_improving",
+    "absolute_radius_gap_unchanged",
+    "absolute_radius_gap_worsening",
+    "radial_velocity_toward_target",
+    "radial_velocity_away_from_target",
+    "radial_velocity_no_directional_commitment",
+    "absolute_tangential_error_improving",
+    "absolute_tangential_error_unchanged",
+    "absolute_tangential_error_worsening",
+    "overspeed_headroom_improving",
+    "overspeed_headroom_unchanged",
+    "overspeed_headroom_worsening",
+    "recoverability_radius_component_improving",
+    "recoverability_radius_component_unchanged",
+    "recoverability_radius_component_worsening",
+    "recoverability_radial_component_improving",
+    "recoverability_radial_component_unchanged",
+    "recoverability_radial_component_worsening",
+    "recoverability_tangential_component_improving",
+    "recoverability_tangential_component_unchanged",
+    "recoverability_tangential_component_worsening",
+    "absolute_energy_proxy_error_improving",
+    "absolute_energy_proxy_error_unchanged",
+    "absolute_energy_proxy_error_worsening"
+  ],
+  "unresolved_parameter_count": 9,
+  "unresolved_parameters": [
+    {
+      "authorization_status": "not_authorized",
+      "available_stage0c_evidence": "eight consecutive measured state transitions permit structural window evaluation only",
+      "current_status": "unresolved",
+      "missing_evidence": "one eight-transition trace cannot estimate general temporal variability or false-trigger behavior",
+      "next_experiment_needed": "Stage 1B multi-trace guard calibration dataset",
+      "observable_supporting_signals": [
+        "radius gap",
+        "radial velocity",
+        "tangential error",
+        "headroom",
+        "energy proxy"
+      ],
+      "observed_ranges_are_recommendations": false,
+      "parameter_id": "NO_PROGRESS_WINDOW_LENGTH",
+      "required_by_architecture_contract": "RecoveryNoProgressContract.observation_window",
+      "selected_value": null,
+      "why_eight_transitions_are_structural_only": "all integer windows can be enumerated, but this single path does not support parameter selection"
+    },
+    {
+      "authorization_status": "not_authorized",
+      "available_stage0c_evidence": "eight consecutive measured state transitions permit structural window evaluation only",
+      "current_status": "unresolved",
+      "missing_evidence": "observed adjacent changes are not a noise floor or transferable threshold",
+      "next_experiment_needed": "multi-trace radius-progress calibration with repeated cases",
+      "observable_supporting_signals": [
+        "absolute target-radius error"
+      ],
+      "observed_ranges_are_recommendations": false,
+      "parameter_id": "NO_PROGRESS_MIN_RADIUS_GAP_IMPROVEMENT",
+      "required_by_architecture_contract": "RecoveryNoProgressContract.minimum_meaningful_improvement",
+      "selected_value": null,
+      "why_eight_transitions_are_structural_only": "all integer windows can be enumerated, but this single path does not support parameter selection"
+    },
+    {
+      "authorization_status": "not_authorized",
+      "available_stage0c_evidence": "eight consecutive measured state transitions permit structural window evaluation only",
+      "current_status": "unresolved",
+      "missing_evidence": "one response mode cannot establish adequate radial commitment magnitude",
+      "next_experiment_needed": "multi-trace radial-commitment observational set",
+      "observable_supporting_signals": [
+        "radial velocity",
+        "radial velocity ratio",
+        "radial direction product"
+      ],
+      "observed_ranges_are_recommendations": false,
+      "parameter_id": "NO_PROGRESS_MIN_RADIAL_COMPONENT_IMPROVEMENT",
+      "required_by_architecture_contract": "RecoveryNoProgressContract.minimum_meaningful_improvement",
+      "selected_value": null,
+      "why_eight_transitions_are_structural_only": "all integer windows can be enumerated, but this single path does not support parameter selection"
+    },
+    {
+      "authorization_status": "not_authorized",
+      "available_stage0c_evidence": "eight consecutive measured state transitions permit structural window evaluation only",
+      "current_status": "unresolved",
+      "missing_evidence": "the trace crosses zero and then worsens in magnitude, but provides no general threshold distribution",
+      "next_experiment_needed": "multi-trace tangential-alignment observational set",
+      "observable_supporting_signals": [
+        "absolute tangential velocity error",
+        "tangential velocity error ratio"
+      ],
+      "observed_ranges_are_recommendations": false,
+      "parameter_id": "NO_PROGRESS_MIN_TANGENTIAL_COMPONENT_IMPROVEMENT",
+      "required_by_architecture_contract": "RecoveryNoProgressContract.minimum_meaningful_improvement",
+      "selected_value": null,
+      "why_eight_transitions_are_structural_only": "all integer windows can be enumerated, but this single path does not support parameter selection"
+    },
+    {
+      "authorization_status": "not_authorized",
+      "available_stage0c_evidence": "eight consecutive measured state transitions permit structural window evaluation only",
+      "current_status": "unresolved",
+      "missing_evidence": "one monotone trace cannot establish a meaningful minimum improvement",
+      "next_experiment_needed": "hazard-arrest/stabilization observational trace set",
+      "observable_supporting_signals": [
+        "realized overspeed headroom",
+        "predicted overspeed headroom"
+      ],
+      "observed_ranges_are_recommendations": false,
+      "parameter_id": "NO_PROGRESS_MIN_HEADROOM_IMPROVEMENT",
+      "required_by_architecture_contract": "RecoveryNoProgressContract.minimum_meaningful_improvement",
+      "selected_value": null,
+      "why_eight_transitions_are_structural_only": "all integer windows can be enumerated, but this single path does not support parameter selection"
+    },
+    {
+      "authorization_status": "not_authorized",
+      "available_stage0c_evidence": "eight consecutive measured state transitions permit structural window evaluation only",
+      "current_status": "unresolved",
+      "missing_evidence": "component signals must not be silently combined and no validated aggregation rule exists",
+      "next_experiment_needed": "predeclared multi-component guard study",
+      "observable_supporting_signals": [
+        "separate component directions"
+      ],
+      "observed_ranges_are_recommendations": false,
+      "parameter_id": "NO_PROGRESS_REQUIRED_COMPONENT_COUNT",
+      "required_by_architecture_contract": "RecoveryNoProgressContract.monitored_progress_signal",
+      "selected_value": null,
+      "why_eight_transitions_are_structural_only": "all integer windows can be enumerated, but this single path does not support parameter selection"
+    },
+    {
+      "authorization_status": "not_authorized",
+      "available_stage0c_evidence": "eight consecutive measured state transitions permit structural window evaluation only",
+      "current_status": "unresolved",
+      "missing_evidence": "one short sequence cannot calibrate repeated-window evidence",
+      "next_experiment_needed": "multi-trace repeated-window calibration",
+      "observable_supporting_signals": [
+        "all window endpoints for lengths one through eight"
+      ],
+      "observed_ranges_are_recommendations": false,
+      "parameter_id": "NO_PROGRESS_CONSECUTIVE_WINDOWS",
+      "required_by_architecture_contract": "RecoveryHysteresisContract.consecutive_evidence_count",
+      "selected_value": null,
+      "why_eight_transitions_are_structural_only": "all integer windows can be enumerated, but this single path does not support parameter selection"
+    },
+    {
+      "authorization_status": "not_authorized",
+      "available_stage0c_evidence": "eight consecutive measured state transitions permit structural window evaluation only",
+      "current_status": "unresolved",
+      "missing_evidence": "no staged phase runtime or measured phase dwell exists",
+      "next_experiment_needed": "bounded phase-runtime instrumentation validation",
+      "observable_supporting_signals": [
+        "runtime counters only"
+      ],
+      "observed_ranges_are_recommendations": false,
+      "parameter_id": "NO_PROGRESS_MIN_PHASE_DWELL",
+      "required_by_architecture_contract": "RecoveryNoProgressContract.phase_specific_dwell_limit",
+      "selected_value": null,
+      "why_eight_transitions_are_structural_only": "all integer windows can be enumerated, but this single path does not support parameter selection"
+    },
+    {
+      "authorization_status": "not_authorized",
+      "available_stage0c_evidence": "eight consecutive measured state transitions permit structural window evaluation only",
+      "current_status": "unresolved",
+      "missing_evidence": "no staged phase transition has been executed or observed",
+      "next_experiment_needed": "bounded phase-runtime anti-chatter validation",
+      "observable_supporting_signals": [
+        "event ordering only"
+      ],
+      "observed_ranges_are_recommendations": false,
+      "parameter_id": "NO_PROGRESS_COOLDOWN",
+      "required_by_architecture_contract": "RecoveryHysteresisContract.transition_cooldown",
+      "selected_value": null,
+      "why_eight_transitions_are_structural_only": "all integer windows can be enumerated, but this single path does not support parameter selection"
+    }
+  ]
+}
