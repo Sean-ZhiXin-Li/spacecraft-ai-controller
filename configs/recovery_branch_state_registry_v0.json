@@ -1,0 +1,36 @@
+{
+  "artifact_classification": "deterministically_generated_branch_state_registry",
+  "branch_step": 28,
+  "completed_date": "2026-08-02",
+  "execution_contract": {
+    "automatic_retry": false,
+    "branch_action_after_extraction": false,
+    "candidate_discovery": "all eligible noncanonical cases",
+    "canonical_reproduction": true,
+    "fresh_initialization_per_execution": true,
+    "selected_case_reproduction": true
+  },
+  "nominal_prefix_transition_count": 27,
+  "output_path": "analysis/recovery_branch_state_registry_v0",
+  "overspeed_comparator": ">",
+  "overspeed_threshold": 1.9,
+  "prefix_contract": {
+    "boundary": "after_27_realized_nominal_transitions_before_step_28_action_execution",
+    "count_source": "analysis/recovery_action_branching_nonformal_v0/branch_state.json",
+    "counter_semantics_source": "runtime_assurance/final_veto_runner_types.py:PreTransitionActionContext.step",
+    "physical_policy": "existing_case_nominal_controller",
+    "transition_source": "simulator/phase34_35_transition.py:step_phase34_35_transition"
+  },
+  "registry_id": "recovery_branch_state_registry_v0",
+  "schema_version": "recovery_branch_state_registry_config_v0",
+  "selection_contract": {
+    "member_a": "legacy canonical member",
+    "member_b": "maximum predicted speed ratio less than or equal to 1.90 among eligible noncanonical cases",
+    "member_c": "minimum predicted speed ratio greater than 1.90 among eligible noncanonical cases",
+    "member_d": "maximum absolute tangential velocity error ratio among remaining eligible cases",
+    "required_distinct_case_count": 4
+  },
+  "source_case_count": 13,
+  "source_inventory_path": "analysis/final_veto_ablation_v0/manifest.json",
+  "state_origin": "deterministic_nominal_prefix_execution"
+}

@@ -331,7 +331,7 @@ def _generate_action(
     raise RecoveryBranchExecutorError(f"unsupported recovery branch: {branch_id!r}")
 
 
-def execute_recovery_branch(
+def _execute_recovery_branch_core(
     branch_state: Mapping[str, object],
     branch_id: str,
     horizon_steps: int = 1,
@@ -348,7 +348,6 @@ def execute_recovery_branch(
         raise RecoveryBranchExecutorError(
             "Recovery Branch Executor v0 permits exactly one transition"
         )
-    validate_branch_state_integrity(branch_state)
     previous_state = (
         _state_from_document(branch_state)
         if current_state is None
@@ -459,6 +458,45 @@ def execute_recovery_branch(
     )
 
 
+def execute_recovery_branch(
+    branch_state: Mapping[str, object],
+    branch_id: str,
+    horizon_steps: int = 1,
+    *,
+    current_state: CartesianState2D | None = None,
+) -> RecoveryBranchExecutionResult:
+    """Execute one legacy-canonical recovery transition exactly as before."""
+    validate_branch_state_integrity(branch_state)
+    return _execute_recovery_branch_core(
+        branch_state,
+        branch_id,
+        horizon_steps,
+        current_state=current_state,
+    )
+
+
+def execute_registered_recovery_branch(
+    registry_member_id: str,
+    branch_id: str,
+    horizon_steps: int = 1,
+    *,
+    current_state: CartesianState2D | None = None,
+) -> RecoveryBranchExecutionResult:
+    """Execute a registered member without accepting an arbitrary artifact path."""
+    from runtime_assurance.recovery_branch_state_registry import (
+        load_registered_branch_state,
+    )
+
+    repository_root = Path(__file__).resolve().parents[1]
+    registered = load_registered_branch_state(repository_root, registry_member_id)
+    return _execute_recovery_branch_core(
+        registered.as_document(),
+        branch_id,
+        horizon_steps,
+        current_state=current_state,
+    )
+
+
 __all__ = [
     "ACTION_MAGNITUDE",
     "DEFAULT_BRANCH_STATE_PATH",
@@ -467,6 +505,7 @@ __all__ = [
     "RecoveryBranchExecutionResult",
     "RecoveryBranchExecutorError",
     "execute_recovery_branch",
+    "execute_registered_recovery_branch",
     "generate_explicit_abort",
     "generate_tangential_correction_action",
     "generate_velocity_opposed_action",
