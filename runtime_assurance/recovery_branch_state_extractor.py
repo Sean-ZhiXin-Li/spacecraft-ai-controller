@@ -1885,6 +1885,35 @@ def _document_hash_valid(document: Mapping[str, object]) -> bool:
     return supplied == canonical_sha256(payload)
 
 
+def _registry_local_payload_key(artifact_path: str) -> str:
+    artifact = PurePosixPath(artifact_path)
+    output_root = PurePosixPath(OUTPUT_PATH.as_posix())
+    if artifact.as_posix() != artifact_path:
+        raise BranchStateExtractionError(
+            "generated registry artifact path is not normalized"
+        )
+    try:
+        relative = artifact.relative_to(output_root)
+    except ValueError as exc:
+        raise BranchStateExtractionError(
+            "generated registry artifact is outside the registry output: "
+            f"{artifact.as_posix()}"
+        ) from exc
+    if len(relative.parts) < 2:
+        raise BranchStateExtractionError(
+            "generated registry artifact does not name a payload file"
+        )
+    if any(part in {"", ".", ".."} for part in relative.parts):
+        raise BranchStateExtractionError(
+            "generated registry artifact path is not normalized"
+        )
+    if relative.parts[0] != "branch_states":
+        raise BranchStateExtractionError(
+            "generated registry member is outside branch_states"
+        )
+    return relative.as_posix()
+
+
 def validate_registry_payloads(
     repository_root: Path,
     payloads: Mapping[str, bytes],
@@ -1898,7 +1927,7 @@ def validate_registry_payloads(
     expected = set(RESULT_ARTIFACT_FILENAMES)
     for member in members:
         if not member.legacy_member:
-            expected.add(PurePosixPath(member.artifact_path).relative_to(OUTPUT_PATH).as_posix())
+            expected.add(_registry_local_payload_key(member.artifact_path))
     if set(payloads) != expected:
         raise BranchStateExtractionError("registry payload artifact set is not exact")
     if manifest.get("canonical_manifest_hash") != canonical_sha256(
@@ -1914,7 +1943,7 @@ def validate_registry_payloads(
             if file_sha256(root / LEGACY_ARTIFACT_PATH) != member.raw_artifact_hash:
                 raise BranchStateExtractionError("legacy raw artifact hash mismatch")
         else:
-            key = PurePosixPath(member.artifact_path).relative_to(OUTPUT_PATH).as_posix()
+            key = _registry_local_payload_key(member.artifact_path)
             raw = payloads[key]
             if hashlib.sha256(raw).hexdigest() != member.raw_artifact_hash:
                 raise BranchStateExtractionError("generated raw artifact hash mismatch")

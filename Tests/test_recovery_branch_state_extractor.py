@@ -8,9 +8,10 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from unittest import mock
 
+import runtime_assurance.recovery_branch_state_extractor as extractor_module
 from runtime_assurance.final_veto_runner_types import (
     PostTransitionObservation,
     RolloutCaseContext,
@@ -30,6 +31,7 @@ from runtime_assurance.recovery_branch_state_extractor import (
     SourceCaseDefinition,
     _FixedPrefixHook,
     _MonitorOffPreterminalHook,
+    _registry_local_payload_key,
     build_source_case_inventory,
     compare_prefix_results,
     execute_nominal_prefix,
@@ -182,6 +184,38 @@ class RecoveryBranchStateExtractorTests(unittest.TestCase):
         serialized = (ROOT / CONFIG_PATH).read_text(encoding="utf-8")
         self.assertNotIn('"position"', serialized)
         self.assertNotIn('"velocity"', serialized)
+
+    def test_registry_local_payload_key_is_canonical_posix_on_windows(self) -> None:
+        artifact = (
+            "analysis/recovery_branch_state_registry_v0/branch_states/"
+            "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000.json"
+        )
+        expected = (
+            "branch_states/"
+            "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000.json"
+        )
+        self.assertEqual(_registry_local_payload_key(artifact), expected)
+        with mock.patch.object(
+            extractor_module,
+            "OUTPUT_PATH",
+            PureWindowsPath(r"analysis\recovery_branch_state_registry_v0"),
+        ):
+            self.assertEqual(_registry_local_payload_key(artifact), expected)
+
+    def test_registry_local_payload_key_rejects_nonlocal_or_unnormalized_paths(self) -> None:
+        invalid = (
+            "analysis/recovery_branch_state_registry_v0/example.json",
+            "analysis/outside/branch_states/example.json",
+            "analysis/recovery_branch_state_registry_v0_fake/branch_states/example.json",
+            "analysis/recovery_branch_state_registry_v0/branch_states/../example.json",
+            "/analysis/recovery_branch_state_registry_v0/branch_states/example.json",
+            "C:/analysis/recovery_branch_state_registry_v0/branch_states/example.json",
+            "analysis/recovery_branch_state_registry_v0/branch_states//example.json",
+        )
+        for artifact in invalid:
+            with self.subTest(artifact=artifact):
+                with self.assertRaises(BranchStateExtractionError):
+                    _registry_local_payload_key(artifact)
 
     def test_source_inventory_enumerates_all_final_veto_cases(self) -> None:
         cases = build_source_case_inventory(ROOT)

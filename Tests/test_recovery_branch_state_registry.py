@@ -18,6 +18,7 @@ from runtime_assurance.recovery_branch_executor import (
 from runtime_assurance.recovery_branch_state_extractor import (
     BranchStateExtractionError,
     publish_registry_payloads,
+    validate_registry_payloads,
 )
 from runtime_assurance.recovery_branch_state_registry import (
     BRANCH_STEP,
@@ -186,13 +187,22 @@ def generated_document(case_id: str = "synthetic_case", member_id: str = "member
     return attach_generated_hashes(document)
 
 
-def registry_member(document: dict[str, object], *, index: int) -> RegistryMember:
+def registry_member(
+    document: dict[str, object],
+    *,
+    index: int,
+    artifact_filename: str | None = None,
+) -> RegistryMember:
     raw = canonical_json_file_bytes(document)
+    filename = artifact_filename or f"case_{index}.json"
     return RegistryMember(
         registry_member_id=str(document["registry_member_id"]),
         case_id=str(document["case_id"]),
         seed=0,
-        artifact_path=f"analysis/recovery_branch_state_registry_v0/branch_states/case_{index}.json",
+        artifact_path=(
+            "analysis/recovery_branch_state_registry_v0/branch_states/"
+            f"{filename}"
+        ),
         artifact_scope="registry_local_artifact",
         state_origin="deterministic_nominal_prefix_execution",
         source_case_artifact="analysis/final_veto_ablation_v0/manifest.json",
@@ -252,9 +262,91 @@ def manifest_document(members: list[RegistryMember]) -> dict[str, object]:
     return document
 
 
+def hashed_document(document: dict[str, object]) -> dict[str, object]:
+    result = copy.deepcopy(document)
+    result["canonical_payload_hash"] = canonical_sha256(result)
+    return result
+
+
+def valid_in_memory_payloads() -> tuple[dict[str, bytes], list[RegistryMember]]:
+    regression_filename = (
+        "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000.json"
+    )
+    documents = [generated_document(f"case_{i}", f"member_{i}") for i in range(3)]
+    generated_members = [
+        registry_member(
+            documents[0],
+            index=0,
+            artifact_filename=regression_filename,
+        ),
+        registry_member(documents[1], index=1),
+        registry_member(documents[2], index=2),
+    ]
+    members = [legacy_member(), *generated_members]
+    manifest = manifest_document(members)
+    manifest["registry_aggregate_hash"] = registry_aggregate_hash(members)
+    manifest["canonical_manifest_hash"] = canonical_sha256(
+        manifest_scientific_payload(manifest)
+    )
+    payloads = {
+        "registry_manifest.json": canonical_json_file_bytes(manifest),
+        "source_case_inventory.json": canonical_json_file_bytes(
+            hashed_document({"source_case_count": 13})
+        ),
+        "selection_report.json": canonical_json_file_bytes(
+            hashed_document({"selection_rules_frozen_before_execution": True})
+        ),
+        "determinism_report.json": canonical_json_file_bytes(
+            hashed_document({"determinism_failure_count": 0})
+        ),
+        "prefix_execution_report.json": canonical_json_file_bytes(
+            hashed_document(
+                {
+                    "automatic_retry_count": 0,
+                    "recovery_branch_execution_count": 0,
+                    "total_nominal_prefix_execution_count": 0,
+                }
+            )
+        ),
+        "branch_state_index.json": canonical_json_file_bytes(
+            hashed_document({"member_count": 4})
+        ),
+        "summary.md": b"This registry does not demonstrate recovery performance.\n",
+    }
+    for member, document in zip(generated_members, documents):
+        payloads[member.artifact_path.rsplit(
+            "analysis/recovery_branch_state_registry_v0/", 1
+        )[1]] = canonical_json_file_bytes(document)
+    return payloads, members
+
+
 class RecoveryBranchStateRegistryTests(unittest.TestCase):
     def test_generated_state_schema_and_hashes_validate(self) -> None:
         self.assertGreaterEqual(len(validate_generated_branch_state_document(generated_document())), 4)
+
+    def test_in_memory_payload_validation_accepts_generated_posix_member_paths(self) -> None:
+        payloads, members = valid_in_memory_payloads()
+        original_paths = tuple(member.artifact_path for member in members)
+        manifest_hash, aggregate_hash, member_count = validate_registry_payloads(
+            ROOT, payloads
+        )
+        regression_key = (
+            "branch_states/"
+            "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000.json"
+        )
+        self.assertIn(regression_key, payloads)
+        self.assertEqual(member_count, 4)
+        self.assertEqual(aggregate_hash, registry_aggregate_hash(members))
+        self.assertEqual(len(manifest_hash), 64)
+        self.assertEqual(original_paths, tuple(member.artifact_path for member in members))
+
+    def test_in_memory_payload_artifact_set_remains_exact(self) -> None:
+        payloads, _ = valid_in_memory_payloads()
+        payloads["branch_states/unexpected.json"] = b"{}\n"
+        with self.assertRaisesRegex(
+            BranchStateExtractionError, "artifact set is not exact"
+        ):
+            validate_registry_payloads(ROOT, payloads)
 
     def test_all_cartesian_fields_are_required_and_nonfinite_rejected(self) -> None:
         for field in ("position_x", "position_y", "velocity_x", "velocity_y"):
