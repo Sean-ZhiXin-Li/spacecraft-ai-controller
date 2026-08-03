@@ -47,8 +47,14 @@ def _print_plan() -> None:
     print("SELECTION_MEMBER_B closest predicted ratio <= 1.90")
     print("SELECTION_MEMBER_C closest predicted ratio > 1.90")
     print("SELECTION_MEMBER_D strongest remaining absolute tangential error ratio")
-    print(f"PREFIX_TRANSITIONS {config['nominal_prefix_transition_count']}")
-    print(f"BRANCH_STEP {config['branch_step']}")
+    print(f"BOUNDARY_REGISTRY {config['boundary_registry_path']}")
+    for case in cases:
+        print(
+            f"BOUNDARY {case.case_id} type={case.boundary.boundary_type} "
+            f"transition={case.boundary.boundary_transition_count} "
+            f"terminal={case.boundary.terminal_transition_count}"
+        )
+    print("GLOBAL_PREFIX_DEFAULT none")
     print(f"OUTPUT_DIRECTORY {OUTPUT_PATH.as_posix()}")
     print(f"ELIGIBLE_STATIC_COUNT {sum(item.eligible_for_generation for item in cases)}")
     print("RECOVERY_BRANCH_EXECUTION false")

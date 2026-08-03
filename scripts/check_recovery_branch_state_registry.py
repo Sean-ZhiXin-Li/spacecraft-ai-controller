@@ -88,6 +88,9 @@ def main(argv: list[str] | None = None) -> int:
             for item in document["cases"]:
                 print(
                     f"{item['case_id']} eligible={str(item['eligible_for_generation']).lower()} "
+                    f"boundary={item.get('boundary_type')} "
+                    f"transition={item.get('boundary_transition_count')} "
+                    f"terminal={item.get('terminal_transition_count')} "
                     f"predicted={item.get('predicted_speed_ratio_if_available')}"
                 )
             print(f"SOURCE_CASE_COUNT {document['source_case_count']}")

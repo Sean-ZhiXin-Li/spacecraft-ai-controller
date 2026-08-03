@@ -12,14 +12,24 @@ from pathlib import Path
 from unittest import mock
 
 from runtime_assurance.final_veto_runner_types import (
+    PostTransitionObservation,
     RolloutCaseContext,
     PreTransitionActionContext,
+)
+from runtime_assurance.recovery_branch_boundary_registry import (
+    MONITOR_OFF_PRETERMINAL_STATE,
+    PRETERMINAL_INDEXING_SEMANTICS,
+    PRETERMINAL_STATE_SEMANTICS,
+    SOURCE_DECLARED_FIXED_PREFIX,
+    RecoveryBranchBoundary,
+    load_recovery_branch_boundary_registry,
 )
 from runtime_assurance.recovery_branch_state_extractor import (
     BranchStateExtractionError,
     PrefixExecutionResult,
     SourceCaseDefinition,
     _FixedPrefixHook,
+    _MonitorOffPreterminalHook,
     build_source_case_inventory,
     compare_prefix_results,
     execute_nominal_prefix,
@@ -48,7 +58,40 @@ from simulator.phase34_35_transition import (
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def source_case(case_id: str, *, upstream: str | None = None) -> SourceCaseDefinition:
+def source_case(
+    case_id: str,
+    *,
+    upstream: str | None = None,
+    boundary_type: str = SOURCE_DECLARED_FIXED_PREFIX,
+    boundary_transition_count: int = PREFIX_TRANSITION_COUNT,
+    terminal_reason: str = "success",
+) -> SourceCaseDefinition:
+    boundary = RecoveryBranchBoundary.from_mapping(
+        {
+            "case_id": case_id,
+            "seed": 0,
+            "boundary_type": boundary_type,
+            "boundary_status": "frozen",
+            "boundary_transition_count": boundary_transition_count,
+            "terminal_transition_count": boundary_transition_count + 1,
+            "preterminal_state_transition_count": boundary_transition_count,
+            "terminal_reason": terminal_reason,
+            "source_artifact": "analysis/final_veto_ablation_v0/results.csv",
+            "source_artifact_hash": "a" * 64,
+            "source_json_path": "csv_rows[synthetic]",
+            "source_configuration_hash": "2" * 64,
+            "simulator_configuration_hash": "b" * 64,
+            "controller_configuration_hash": "4" * 64,
+            "indexing_semantics": PRETERMINAL_INDEXING_SEMANTICS,
+            "boundary_state_semantics": PRETERMINAL_STATE_SEMANTICS,
+            "terminal_evidence_source": "analysis/final_veto_ablation_v0/results.csv",
+            "terminal_evidence_hash": "c" * 64,
+            "terminal_evidence_record_hash": "d" * 64,
+            "terminal_evidence_path": "csv_rows[synthetic]",
+            "eligibility": True,
+            "ineligibility_reason": None,
+        }
+    )
     return SourceCaseDefinition(
         case_id=case_id,
         subset_id="synthetic_subset",
@@ -66,8 +109,9 @@ def source_case(case_id: str, *, upstream: str | None = None) -> SourceCaseDefin
         source_case_artifact="analysis/final_veto_ablation_v0/manifest.json",
         source_case_hash="1" * 64,
         source_configuration_hash="2" * 64,
+        boundary=boundary,
+        boundary_registry_hash="e" * 64,
         source_commit="3" * 40,
-        nominal_prefix_transition_count=PREFIX_TRANSITION_COUNT,
         nominal_controller_hash="4" * 64,
         transition_implementation_hash="5" * 64,
         eligible_for_generation=True,
@@ -113,6 +157,10 @@ def result(
         canonical_payload_hash=(case_id.encode().hex() + "0" * 64)[:64],
         predicted_speed_ratio=predicted,
         tangential_velocity_error_ratio=tangential,
+        boundary_type=SOURCE_DECLARED_FIXED_PREFIX,
+        boundary_transition_count=PREFIX_TRANSITION_COUNT,
+        terminal_transition_count=BRANCH_STEP,
+        terminal_reason="success",
     )
 
 
@@ -121,10 +169,16 @@ class RecoveryBranchStateExtractorTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.legacy_bytes = (ROOT / LEGACY_ARTIFACT_PATH).read_bytes()
 
-    def test_config_freezes_prefix_and_has_no_state_override(self) -> None:
+    def test_config_uses_case_specific_boundaries_and_has_no_state_override(self) -> None:
         config = load_registry_config(ROOT)
-        self.assertEqual(config["nominal_prefix_transition_count"], 27)
-        self.assertEqual(config["branch_step"], 28)
+        self.assertNotIn("nominal_prefix_transition_count", config)
+        self.assertNotIn("branch_step", config)
+        self.assertEqual(config["legacy_nominal_prefix_transition_count"], 27)
+        self.assertEqual(config["legacy_branch_step"], 28)
+        self.assertEqual(
+            config["boundary_registry_path"],
+            "configs/recovery_branch_boundary_registry_v0.json",
+        )
         serialized = (ROOT / CONFIG_PATH).read_text(encoding="utf-8")
         self.assertNotIn('"position"', serialized)
         self.assertNotIn('"velocity"', serialized)
@@ -136,6 +190,7 @@ class RecoveryBranchStateExtractorTests(unittest.TestCase):
         self.assertTrue(all(item.source_case_hash for item in cases))
         self.assertTrue(all(item.source_configuration_hash for item in cases))
         self.assertTrue(all(item.eligible_for_generation for item in cases))
+        self.assertTrue(all(item.boundary.eligibility for item in cases))
         self.assertIn(LEGACY_CASE_ID, {item.case_id for item in cases})
 
     def test_source_inventory_is_deterministic_and_case_id_alone_is_insufficient(self) -> None:
@@ -147,6 +202,8 @@ class RecoveryBranchStateExtractorTests(unittest.TestCase):
             self.assertTrue(item["simulator_configuration_available"])
             self.assertTrue(item["controller_configuration_available"])
             self.assertTrue(item["configuration_hash"])
+            self.assertTrue(item["boundary_evidence_available"])
+            self.assertIsNotNone(item["boundary_transition_count"])
 
     def test_static_validation_executes_no_prefix(self) -> None:
         with mock.patch(
@@ -234,6 +291,64 @@ class RecoveryBranchStateExtractorTests(unittest.TestCase):
             hook(context)
         self.assertEqual(len(hook.actions), PREFIX_TRANSITION_COUNT)
 
+    def test_preterminal_hook_maps_terminal_step_to_prior_realized_count(self) -> None:
+        case = source_case(
+            "synthetic_preterminal",
+            boundary_type=MONITOR_OFF_PRETERMINAL_STATE,
+            boundary_transition_count=2,
+        )
+        hook = _MonitorOffPreterminalHook(case)
+        dynamics = Phase3435DynamicsContext(mu=1.0, dt=1.0, mass=1.0, thrust_scale=1.0)
+        state = CartesianState2D(1.0, 0.0, 0.0, 1.0)
+        case_context = RolloutCaseContext(
+            case_id=case.case_id,
+            controller_id=case.controller_id,
+            controller_family="explicit_controller",
+            r0_over_target=1.0,
+            initial_velocity_angle_deg=150.0,
+            thrust_scale=1.0,
+            target_radius=1.0,
+            target_circular_speed=1.0,
+            post_cross_mode="radius_priority",
+        )
+        for step in range(1, 4):
+            context = PreTransitionActionContext(
+                step=step,
+                phase="DESCENT",
+                active_stage="burn_a",
+                current_state=state,
+                nominal_action=(0.0, 0.0),
+                predict_transition=lambda current, action: step_phase34_35_transition(
+                    current, NormalizedAction2D(*action), dynamics
+                ),
+                compute_speed_ratio=lambda current: math.hypot(current.vx, current.vy),
+                case=case_context,
+            )
+            interception = hook(context)
+            transition = context.predict_transition(state, interception.executed_action)
+            hook.post_transition(
+                PostTransitionObservation(
+                    step=step,
+                    phase="DESCENT",
+                    active_stage="burn_a",
+                    previous_state=state,
+                    nominal_action=(0.0, 0.0),
+                    executed_action=(0.0, 0.0),
+                    realized_next_state=transition.next_state,
+                    realized_next_speed_ratio=math.hypot(
+                        transition.next_state.vx, transition.next_state.vy
+                    ),
+                    intervention_applied=False,
+                    decision_metadata=None,
+                    case=case_context,
+                )
+            )
+            state = transition.next_state
+        self.assertEqual(len(hook.actions), 2)
+        self.assertEqual(len(hook.states), 3)
+        self.assertEqual(hook.captured.context.step, 3)
+        self.assertEqual(hook.terminal_observation.step, 3)
+
     def test_execute_nominal_prefix_uses_existing_rollout_and_extracts_complete_state(self) -> None:
         case = source_case("synthetic_phase34")
         target = 7.5e12
@@ -311,6 +426,110 @@ class RecoveryBranchStateExtractorTests(unittest.TestCase):
                     case,
                     execution_role="candidate_discovery",
                     execution_id="early",
+                    implementation_commit="a" * 40,
+                )
+
+    def test_monitor_off_preterminal_execution_verifies_terminal_metadata(self) -> None:
+        case = source_case(
+            "synthetic_phase34",
+            boundary_type=MONITOR_OFF_PRETERMINAL_STATE,
+            boundary_transition_count=2,
+            terminal_reason="success",
+        )
+        target = 7.5e12
+        target_speed = math.sqrt(1.3275182699999999e20 / target)
+
+        def fake_rollout(_mode: object, _r0: float, _angle: float, _thrust: float, **kwargs: object) -> dict[str, object]:
+            pre_hook = kwargs["pre_transition_action_hook"]
+            post_hook = kwargs["post_transition_observation_hook"]
+            state = CartesianState2D(0.0, target, -target_speed, 0.0)
+            dynamics = Phase3435DynamicsContext(
+                mu=1.3275182699999999e20,
+                dt=100.0,
+                mass=722.0,
+                thrust_scale=8000.0,
+            )
+            case_context = RolloutCaseContext(
+                case_id=case.case_id,
+                controller_id=case.controller_id,
+                controller_family="explicit_controller",
+                r0_over_target=1.0,
+                initial_velocity_angle_deg=150.0,
+                thrust_scale=8000.0,
+                target_radius=target,
+                target_circular_speed=target_speed,
+                post_cross_mode="radius_priority",
+            )
+            for step in range(1, 4):
+                context = PreTransitionActionContext(
+                    step=step,
+                    phase="DESCENT",
+                    active_stage="burn_a",
+                    current_state=state,
+                    nominal_action=(0.0, 0.0),
+                    predict_transition=lambda current, action: step_phase34_35_transition(
+                        current, NormalizedAction2D(*action), dynamics
+                    ),
+                    compute_speed_ratio=lambda current: math.hypot(current.vx, current.vy)
+                    / (target_speed + 1.0e-12),
+                    case=case_context,
+                )
+                interception = pre_hook(context)
+                transition = context.predict_transition(state, interception.executed_action)
+                post_hook(
+                    PostTransitionObservation(
+                        step=step,
+                        phase="DESCENT",
+                        active_stage="burn_a",
+                        previous_state=state,
+                        nominal_action=(0.0, 0.0),
+                        executed_action=interception.executed_action,
+                        realized_next_state=transition.next_state,
+                        realized_next_speed_ratio=context.compute_speed_ratio(
+                            transition.next_state
+                        ),
+                        intervention_applied=False,
+                        decision_metadata=None,
+                        case=case_context,
+                    )
+                )
+                state = transition.next_state
+            return {"steps": 3, "termination_reason": "success"}
+
+        with mock.patch(
+            "scripts.explicit_controller_phase34_post_cross_sync.rollout_phase34_case",
+            side_effect=fake_rollout,
+        ):
+            extracted = execute_nominal_prefix(
+                ROOT,
+                case,
+                execution_role="candidate_discovery",
+                execution_id="preterminal_discovery",
+                implementation_commit="a" * 40,
+            )
+        document = extracted.document()
+        self.assertEqual(extracted.boundary_transition_count, 2)
+        self.assertEqual(extracted.terminal_transition_count, 3)
+        self.assertEqual(extracted.actual_transition_count, 3)
+        self.assertEqual(document["prefix_action_count"], 2)
+        self.assertTrue(document["terminal_transition_executed_for_validation"])
+
+    def test_terminal_count_or_reason_mismatch_rejects_preterminal_extraction(self) -> None:
+        case = source_case(
+            "synthetic_phase34",
+            boundary_type=MONITOR_OFF_PRETERMINAL_STATE,
+            boundary_transition_count=2,
+        )
+        with mock.patch(
+            "scripts.explicit_controller_phase34_post_cross_sync.rollout_phase34_case",
+            return_value={"steps": 2, "termination_reason": "success"},
+        ):
+            with self.assertRaises(BranchStateExtractionError):
+                execute_nominal_prefix(
+                    ROOT,
+                    case,
+                    execution_role="candidate_discovery",
+                    execution_id="terminal_mismatch",
                     implementation_commit="a" * 40,
                 )
 

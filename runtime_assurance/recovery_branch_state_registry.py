@@ -24,7 +24,7 @@ REGISTRY_ID = "recovery_branch_state_registry_v0"
 REGISTRY_SCHEMA_VERSION = "recovery_branch_state_registry_manifest_v0"
 REGISTRY_MEMBER_SCHEMA_VERSION = "recovery_branch_state_registry_member_v0"
 CONFIG_SCHEMA_VERSION = "recovery_branch_state_registry_config_v0"
-COMPLETED_DATE = "2026-08-02"
+COMPLETED_DATE = "2026-08-03"
 
 LEGACY_MEMBER_ID = "legacy_canonical"
 LEGACY_CASE_ID = (
@@ -261,14 +261,53 @@ def validate_generated_branch_state_document(
         "nominal_prefix_transition_count",
         minimum=1,
     )
-    if prefix_count != PREFIX_TRANSITION_COUNT:
-        raise BranchStateRegistryError("generated state does not use the frozen prefix count")
-    if _integer(document.get("actual_transition_count"), "actual_transition_count") != prefix_count:
-        raise BranchStateRegistryError("actual transition count does not equal prefix count")
+    boundary_type = document.get("boundary_type")
+    if boundary_type not in {
+        "source_declared_fixed_prefix",
+        "monitor_off_preterminal_state",
+    }:
+        raise BranchStateRegistryError("generated state boundary type is unsupported")
+    if document.get("boundary_status") != "frozen":
+        raise BranchStateRegistryError("generated state boundary is not frozen")
+    if _integer(
+        document.get("boundary_transition_count"),
+        "boundary_transition_count",
+        minimum=1,
+    ) != prefix_count:
+        raise BranchStateRegistryError("boundary transition count differs from prefix count")
+    actual_count = _integer(
+        document.get("actual_transition_count"), "actual_transition_count"
+    )
     if _integer(document.get("prefix_action_count"), "prefix_action_count") != prefix_count:
         raise BranchStateRegistryError("prefix action count does not equal prefix count")
-    if _integer(document.get("branch_step"), "branch_step", minimum=1) != BRANCH_STEP:
-        raise BranchStateRegistryError("branch step does not follow the frozen prefix")
+    if _integer(document.get("branch_step"), "branch_step", minimum=1) != prefix_count + 1:
+        raise BranchStateRegistryError("branch step does not follow the case-specific boundary")
+    terminal_count = _integer(
+        document.get("terminal_transition_count"),
+        "terminal_transition_count",
+        minimum=1,
+    )
+    if document.get("preterminal_state_transition_count") != prefix_count:
+        raise BranchStateRegistryError("preterminal state count differs from boundary count")
+    if document.get("boundary_state_semantics") != (
+        "last_complete_valid_pre_transition_state_before_the_frozen_terminal_transition"
+    ):
+        raise BranchStateRegistryError("boundary state semantics mismatch")
+    if document.get("boundary_indexing_semantics") != (
+        "pre_transition_step_N_state_equals_state_after_N_minus_1_realized_transitions;"
+        "transition_N_executes_next;terminal_predicates_evaluate_on_transition_N_next_state"
+    ):
+        raise BranchStateRegistryError("boundary indexing semantics mismatch")
+    terminal_reason = document.get("terminal_reason")
+    if not isinstance(terminal_reason, str) or not terminal_reason:
+        raise BranchStateRegistryError("terminal reason is required")
+    if boundary_type == "monitor_off_preterminal_state":
+        if terminal_count != prefix_count + 1 or actual_count != terminal_count:
+            raise BranchStateRegistryError("preterminal terminal-count relation is invalid")
+        if document.get("terminal_transition_executed_for_validation") is not True:
+            raise BranchStateRegistryError("preterminal boundary lacks terminal reproduction")
+    elif actual_count != prefix_count:
+        raise BranchStateRegistryError("fixed-prefix execution count differs from prefix count")
     if document.get("terminal_before_branch") is not False:
         raise BranchStateRegistryError("source trajectory terminated before extraction")
     if document.get("terminal_reason_before_branch") is not None:
@@ -283,6 +322,10 @@ def validate_generated_branch_state_document(
         "constants_hash",
         "transition_implementation_hash",
         "nominal_controller_hash",
+        "boundary_registry_hash",
+        "boundary_source_artifact_hash",
+        "terminal_evidence_hash",
+        "terminal_evidence_record_hash",
         "canonical_payload_hash",
         "raw_artifact_hash",
     ):
@@ -395,10 +438,8 @@ class RegistryMember:
             raise BranchStateRegistryError("unsupported generation status")
         if member.state_origin != "deterministic_nominal_prefix_execution":
             raise BranchStateRegistryError("registry member state origin is unsupported")
-        if member.nominal_prefix_transition_count != PREFIX_TRANSITION_COUNT:
-            raise BranchStateRegistryError("registry member prefix count is not frozen")
-        if member.branch_step != BRANCH_STEP:
-            raise BranchStateRegistryError("registry member branch step is not frozen")
+        if member.branch_step != member.nominal_prefix_transition_count + 1:
+            raise BranchStateRegistryError("registry member branch step does not follow its boundary")
         if member.determinism_status != "passed" or member.executable_status != "validated":
             raise BranchStateRegistryError("published member is not deterministic and executable")
         if not isinstance(value.get("legacy_member"), bool):
@@ -407,6 +448,8 @@ class RegistryMember:
             if (
                 member.registry_member_id != LEGACY_MEMBER_ID
                 or member.case_id != LEGACY_CASE_ID
+                or member.nominal_prefix_transition_count != PREFIX_TRANSITION_COUNT
+                or member.branch_step != BRANCH_STEP
                 or member.artifact_scope != "legacy_external_artifact"
                 or member.generation_status != "legacy_validated"
             ):

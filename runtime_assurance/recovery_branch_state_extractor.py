@@ -21,7 +21,17 @@ from runtime_assurance.final_veto_monitor import (
 )
 from runtime_assurance.final_veto_runner_types import (
     ActionInterceptionResult,
+    PostTransitionObservation,
     PreTransitionActionContext,
+)
+from runtime_assurance.recovery_branch_boundary_registry import (
+    BOUNDARY_CONFIG_PATH,
+    LEGACY_FIXED_PREFIX,
+    MONITOR_OFF_PRETERMINAL_STATE,
+    SOURCE_DECLARED_FIXED_PREFIX,
+    RecoveryBranchBoundary,
+    RecoveryBranchBoundaryError,
+    load_recovery_branch_boundary_registry,
 )
 from runtime_assurance.recovery_branch_state_registry import (
     BRANCH_STEP,
@@ -191,8 +201,9 @@ class SourceCaseDefinition:
     source_case_artifact: str
     source_case_hash: str
     source_configuration_hash: str
+    boundary: RecoveryBranchBoundary
+    boundary_registry_hash: str
     source_commit: str
-    nominal_prefix_transition_count: int
     nominal_controller_hash: str
     transition_implementation_hash: str
     eligible_for_generation: bool
@@ -215,8 +226,19 @@ class SourceCaseDefinition:
             "configuration_hash": self.source_configuration_hash,
             "predicted_speed_ratio_if_available": None,
             "overspeed_class_if_available": None,
-            "nominal_prefix_contract_available": self.nominal_prefix_transition_count
-            == PREFIX_TRANSITION_COUNT,
+            "boundary_evidence_available": self.boundary.boundary_status == "frozen",
+            "boundary_type": self.boundary.boundary_type,
+            "boundary_registry_hash": self.boundary_registry_hash,
+            "boundary_transition_count": self.boundary.boundary_transition_count,
+            "terminal_transition_count": self.boundary.terminal_transition_count,
+            "preterminal_state_transition_count": self.boundary.preterminal_state_transition_count,
+            "terminal_reason": self.boundary.terminal_reason,
+            "boundary_source_artifact": self.boundary.source_artifact,
+            "boundary_source_artifact_hash": self.boundary.source_artifact_hash,
+            "boundary_source_json_path": self.boundary.source_json_path,
+            "boundary_source_configuration_hash": self.boundary.source_configuration_hash,
+            "boundary_indexing_semantics": self.boundary.indexing_semantics,
+            "nominal_prefix_contract_available": self.boundary.eligibility,
             "initialization_available": self.eligible_for_generation,
             "simulator_configuration_available": self.eligible_for_generation,
             "controller_configuration_available": self.eligible_for_generation,
@@ -233,6 +255,12 @@ class SourceCaseDefinition:
             "transition_implementation_hash": self.transition_implementation_hash,
         }
 
+    @property
+    def nominal_prefix_transition_count(self) -> int:
+        if self.boundary.boundary_transition_count is None:
+            raise BranchStateExtractionError("ineligible source case has no boundary count")
+        return self.boundary.boundary_transition_count
+
 
 @dataclass(frozen=True, slots=True)
 class PrefixExecutionResult:
@@ -248,6 +276,10 @@ class PrefixExecutionResult:
     canonical_payload_hash: str
     predicted_speed_ratio: float
     tangential_velocity_error_ratio: float
+    boundary_type: str
+    boundary_transition_count: int
+    terminal_transition_count: int
+    terminal_reason: str
 
     def document(self) -> dict[str, object]:
         value = json.loads(self.document_json)
@@ -347,10 +379,14 @@ def load_registry_config(repository_root: Path) -> dict[str, object]:
         raise BranchStateExtractionError("registry configuration must be an object")
     if value.get("schema_version") != CONFIG_SCHEMA_VERSION:
         raise BranchStateExtractionError("registry configuration schema mismatch")
-    if value.get("nominal_prefix_transition_count") != PREFIX_TRANSITION_COUNT:
-        raise BranchStateExtractionError("registry configuration prefix count mismatch")
-    if value.get("branch_step") != BRANCH_STEP:
-        raise BranchStateExtractionError("registry configuration branch step mismatch")
+    if value.get("boundary_registry_path") != BOUNDARY_CONFIG_PATH.as_posix():
+        raise BranchStateExtractionError("registry boundary source mismatch")
+    if value.get("legacy_nominal_prefix_transition_count") != PREFIX_TRANSITION_COUNT:
+        raise BranchStateExtractionError("legacy registry prefix count mismatch")
+    if value.get("legacy_branch_step") != BRANCH_STEP:
+        raise BranchStateExtractionError("legacy registry branch step mismatch")
+    if "nominal_prefix_transition_count" in value or "branch_step" in value:
+        raise BranchStateExtractionError("global branch prefix defaults are forbidden")
     if value.get("source_case_count") != SOURCE_CASE_COUNT:
         raise BranchStateExtractionError("registry configuration source-case count mismatch")
     if value.get("overspeed_threshold") != OVERSPEED_THRESHOLD:
@@ -364,7 +400,8 @@ def build_source_case_inventory(
     repository_root: Path,
 ) -> tuple[SourceCaseDefinition, ...]:
     root = repository_root.resolve()
-    config = load_registry_config(root)
+    load_registry_config(root)
+    boundary_registry = load_recovery_branch_boundary_registry(root)
     manifest = load_frozen_manifest(root)
     jobs = build_planned_jobs(manifest)
     monitor_off = sorted(
@@ -379,8 +416,12 @@ def build_source_case_inventory(
     if not source_commit:
         raise BranchStateExtractionError("Final Veto source commit is missing")
     transition_hash = _aggregate_file_hash(root, (TRANSITION_IMPLEMENTATION_PATH,))
+    legacy_document = json.loads((root / LEGACY_ARTIFACT_PATH).read_text(encoding="utf-8"))
+    if not isinstance(legacy_document, dict):
+        raise BranchStateExtractionError("legacy branch state is not an object")
     definitions: list[SourceCaseDefinition] = []
     for job in monitor_off:
+        boundary = boundary_registry.for_case(job.case_id)
         controller_path = (
             PHASE34_CONTROLLER_SOURCE_PATH
             if job.upstream_variant is None
@@ -394,6 +435,12 @@ def build_source_case_inventory(
             root / TRANSITION_IMPLEMENTATION_PATH,
             root / controller_path,
         ]
+        expected_boundary_configuration_hash = (
+            str(legacy_document.get("case_configuration_hash"))
+            if job.case_id == LEGACY_CASE_ID
+            else job.case_config_hash
+        )
+        simulator_configuration = _simulator_configuration_for_thrust(job.thrust_scale)
         eligible = (
             all(path.is_file() for path in required)
             and job.seed == 0
@@ -404,8 +451,20 @@ def build_source_case_inventory(
                 job.upstream_variant is None
                 or job.upstream_variant == "radial_energy_push"
             )
+            and boundary.eligibility
+            and boundary.seed == job.seed
+            and boundary.source_configuration_hash
+            == expected_boundary_configuration_hash
+            and boundary.simulator_configuration_hash
+            == canonical_sha256(simulator_configuration)
+            and boundary.controller_configuration_hash == controller_hash
         )
-        reason = None if eligible else "complete frozen initialization or controller provenance unavailable"
+        reason = (
+            None
+            if eligible
+            else boundary.ineligibility_reason
+            or "complete frozen initialization, boundary, or controller provenance unavailable"
+        )
         definitions.append(
             SourceCaseDefinition(
                 case_id=job.case_id,
@@ -420,10 +479,9 @@ def build_source_case_inventory(
                 source_case_artifact=FINAL_VETO_MANIFEST_PATH.as_posix(),
                 source_case_hash=canonical_sha256(_case_payload(job, source_commit)),
                 source_configuration_hash=job.case_config_hash,
+                boundary=boundary,
+                boundary_registry_hash=boundary_registry.canonical_payload_hash,
                 source_commit=source_commit,
-                nominal_prefix_transition_count=int(
-                    config["nominal_prefix_transition_count"]
-                ),
                 nominal_controller_hash=controller_hash,
                 transition_implementation_hash=transition_hash,
                 eligible_for_generation=eligible,
@@ -444,6 +502,8 @@ def source_inventory_document(repository_root: Path) -> dict[str, object]:
         "schema_version": "recovery_branch_state_source_inventory_v0",
         "source_artifact": FINAL_VETO_MANIFEST_PATH.as_posix(),
         "source_artifact_hash": file_sha256(root / FINAL_VETO_MANIFEST_PATH),
+        "boundary_registry_artifact": BOUNDARY_CONFIG_PATH.as_posix(),
+        "boundary_registry_hash": file_sha256(root / BOUNDARY_CONFIG_PATH),
         "source_case_count": len(cases),
         "eligible_case_count": eligible,
         "ineligible_case_count": len(cases) - eligible,
@@ -453,7 +513,7 @@ def source_inventory_document(repository_root: Path) -> dict[str, object]:
     return document
 
 
-def _simulator_configuration(case: SourceCaseDefinition) -> dict[str, object]:
+def _simulator_configuration_for_thrust(thrust_scale: float) -> dict[str, object]:
     from scripts import explicit_controller_phase21_orbital_transfer_planner as phase21
 
     target_radius = phase21.DEFAULT_TARGET_RADIUS * phase21.TARGET_RADIUS_SCALE
@@ -477,7 +537,11 @@ def _simulator_configuration(case: SourceCaseDefinition) -> dict[str, object]:
             "simulator.phase34_35_transition.step_phase34_35_transition"
         ),
     }
-    return {"simulator_constants": constants, "thrust_scale": case.thrust_scale}
+    return {"simulator_constants": constants, "thrust_scale": thrust_scale}
+
+
+def _simulator_configuration(case: SourceCaseDefinition) -> dict[str, object]:
+    return _simulator_configuration_for_thrust(case.thrust_scale)
 
 
 def _state_document(state: CartesianState2D) -> dict[str, float]:
@@ -497,10 +561,36 @@ class _PrefixCaptured(RuntimeError):
         super().__init__("frozen nominal-prefix boundary captured")
 
 
+def _evaluate_boundary_context(context: PreTransitionActionContext) -> _PrefixCaptured:
+    nominal_prediction: OneStepPrediction | None = None
+
+    def predictor(state: CartesianState2D, action: tuple[float, float]) -> OneStepPrediction:
+        nonlocal nominal_prediction
+        transition = context.predict_transition(state, action)
+        prediction = OneStepPrediction(
+            next_state=transition.next_state,
+            speed_ratio=context.compute_speed_ratio(transition.next_state),
+        )
+        if state == context.current_state and action == context.nominal_action:
+            nominal_prediction = prediction
+        return prediction
+
+    decision = evaluate_overspeed_veto(
+        context.current_state,
+        context.nominal_action,
+        predictor,
+        threshold=OVERSPEED_THRESHOLD,
+    )
+    if nominal_prediction is None:
+        raise BranchStateExtractionError("branch prediction was not captured")
+    return _PrefixCaptured(context, decision, nominal_prediction)
+
+
 class _FixedPrefixHook:
     def __init__(self, case: SourceCaseDefinition):
         self.case = case
         self.expected_step = 1
+        self.boundary_step = case.boundary.branch_step
         self.states: list[dict[str, float]] = []
         self.actions: list[list[float]] = []
 
@@ -510,30 +600,9 @@ class _FixedPrefixHook:
         if context.step != self.expected_step:
             raise BranchStateExtractionError("prefix transition steps are not sequential")
         self.states.append(_state_document(context.current_state))
-        if context.step == BRANCH_STEP:
-            nominal_prediction: OneStepPrediction | None = None
-
-            def predictor(state: CartesianState2D, action: tuple[float, float]) -> OneStepPrediction:
-                nonlocal nominal_prediction
-                transition = context.predict_transition(state, action)
-                prediction = OneStepPrediction(
-                    next_state=transition.next_state,
-                    speed_ratio=context.compute_speed_ratio(transition.next_state),
-                )
-                if state == context.current_state and action == context.nominal_action:
-                    nominal_prediction = prediction
-                return prediction
-
-            decision = evaluate_overspeed_veto(
-                context.current_state,
-                context.nominal_action,
-                predictor,
-                threshold=OVERSPEED_THRESHOLD,
-            )
-            if nominal_prediction is None:
-                raise BranchStateExtractionError("branch prediction was not captured")
-            raise _PrefixCaptured(context, decision, nominal_prediction)
-        if context.step > BRANCH_STEP:
+        if context.step == self.boundary_step:
+            raise _evaluate_boundary_context(context)
+        if context.step > self.boundary_step:
             raise BranchStateExtractionError("prefix execution passed extraction boundary")
         self.actions.append([context.nominal_action[0], context.nominal_action[1]])
         self.expected_step += 1
@@ -543,6 +612,50 @@ class _FixedPrefixHook:
             intervention_applied=False,
             decision_metadata=None,
         )
+
+
+class _MonitorOffPreterminalHook:
+    def __init__(self, case: SourceCaseDefinition):
+        self.case = case
+        terminal_count = case.boundary.terminal_transition_count
+        if terminal_count is None:
+            raise BranchStateExtractionError("preterminal boundary lacks terminal count")
+        self.terminal_step = terminal_count
+        self.expected_step = 1
+        self.states: list[dict[str, float]] = []
+        self.actions: list[list[float]] = []
+        self.captured: _PrefixCaptured | None = None
+        self.terminal_observation: PostTransitionObservation | None = None
+
+    def __call__(self, context: PreTransitionActionContext) -> ActionInterceptionResult:
+        if context.case.case_id != self.case.case_id:
+            raise BranchStateExtractionError("preterminal hook received wrong source case")
+        if context.step != self.expected_step:
+            raise BranchStateExtractionError("preterminal transition steps are not sequential")
+        if context.step > self.terminal_step:
+            raise BranchStateExtractionError("source execution passed its frozen terminal transition")
+        self.states.append(_state_document(context.current_state))
+        if context.step == self.terminal_step:
+            self.captured = _evaluate_boundary_context(context)
+        else:
+            self.actions.append([context.nominal_action[0], context.nominal_action[1]])
+        self.expected_step += 1
+        return ActionInterceptionResult(
+            nominal_action=context.nominal_action,
+            executed_action=context.nominal_action,
+            intervention_applied=False,
+            decision_metadata=None,
+        )
+
+    def post_transition(self, observation: PostTransitionObservation) -> None:
+        if observation.case.case_id != self.case.case_id:
+            raise BranchStateExtractionError("terminal observation received wrong source case")
+        if observation.step == self.terminal_step:
+            if self.terminal_observation is not None:
+                raise BranchStateExtractionError("terminal transition was observed twice")
+            self.terminal_observation = observation
+        elif observation.step > self.terminal_step:
+            raise BranchStateExtractionError("post-transition stream passed frozen terminal")
 
 
 def _derived_values(
@@ -600,9 +713,12 @@ def _derived_values(
 
 def _build_generated_document(
     case: SourceCaseDefinition,
-    hook: _FixedPrefixHook,
+    hook: _FixedPrefixHook | _MonitorOffPreterminalHook,
     captured: _PrefixCaptured,
     implementation_commit: str,
+    *,
+    actual_transition_count: int,
+    terminal_observation: PostTransitionObservation | None,
 ) -> dict[str, object]:
     context = captured.context
     current = context.current_state
@@ -622,6 +738,12 @@ def _build_generated_document(
         "upstream_variant": case.upstream_variant,
     }
     decision = captured.decision
+    boundary = case.boundary
+    terminal_state_hash = (
+        None
+        if terminal_observation is None
+        else canonical_sha256(_state_document(terminal_observation.realized_next_state))
+    )
     document: dict[str, object] = {
         "schema_version": REGISTRY_MEMBER_SCHEMA_VERSION,
         "registry_member_id": case.registry_member_id,
@@ -634,9 +756,28 @@ def _build_generated_document(
         "source_commit": case.source_commit,
         "generation_implementation_commit": implementation_commit,
         "generated_date": COMPLETED_DATE,
-        "nominal_prefix_transition_count": PREFIX_TRANSITION_COUNT,
-        "actual_transition_count": len(hook.actions),
+        "nominal_prefix_transition_count": case.nominal_prefix_transition_count,
+        "actual_transition_count": actual_transition_count,
         "branch_step": context.step,
+        "boundary_type": boundary.boundary_type,
+        "boundary_status": boundary.boundary_status,
+        "boundary_transition_count": boundary.boundary_transition_count,
+        "preterminal_state_transition_count": boundary.preterminal_state_transition_count,
+        "boundary_state_semantics": boundary.boundary_state_semantics,
+        "boundary_indexing_semantics": boundary.indexing_semantics,
+        "boundary_registry_hash": case.boundary_registry_hash,
+        "boundary_source_artifact": boundary.source_artifact,
+        "boundary_source_artifact_hash": boundary.source_artifact_hash,
+        "boundary_source_json_path": boundary.source_json_path,
+        "terminal_transition_count": boundary.terminal_transition_count,
+        "terminal_reason": boundary.terminal_reason,
+        "terminal_evidence_source": boundary.terminal_evidence_source,
+        "terminal_evidence_hash": boundary.terminal_evidence_hash,
+        "terminal_evidence_record_hash": boundary.terminal_evidence_record_hash,
+        "terminal_evidence_path": boundary.terminal_evidence_path,
+        "terminal_transition_executed_for_validation": terminal_observation is not None,
+        "terminal_validation_status": "passed",
+        "terminal_realized_state_hash": terminal_state_hash,
         "initial_state_hash": canonical_sha256(hook.states[0]),
         "prefix_action_count": len(hook.actions),
         "prefix_action_trace_hash": canonical_sha256(hook.actions),
@@ -679,11 +820,15 @@ def _build_generated_document(
         "transition_implementation_hash": case.transition_implementation_hash,
         "nominal_controller_hash": case.nominal_controller_hash,
         "branch_ordering": {
-            "capture_boundary": "after_27_realized_nominal_transitions_before_step_28_action_execution",
+            "capture_boundary": (
+                f"after_{case.nominal_prefix_transition_count}_realized_nominal_transitions_"
+                f"before_step_{context.step}_action_execution"
+            ),
             "before_nominal_action_execution": True,
             "monitor_evaluation_completed": True,
             "nominal_action_executed": False,
-            "realized_prefix_transition_count": PREFIX_TRANSITION_COUNT,
+            "realized_prefix_transition_count": case.nominal_prefix_transition_count,
+            "multi_boundary_calibration_registry": True,
         },
     }
     document.update(_derived_values(current, simulator))
@@ -702,13 +847,22 @@ def execute_nominal_prefix(
         raise BranchStateExtractionError("unsupported generated prefix execution role")
     if not case.eligible_for_generation:
         raise BranchStateExtractionError("ineligible source case cannot execute")
-    hook = _FixedPrefixHook(case)
+    if case.boundary.boundary_type in {
+        LEGACY_FIXED_PREFIX,
+        SOURCE_DECLARED_FIXED_PREFIX,
+    }:
+        hook: _FixedPrefixHook | _MonitorOffPreterminalHook = _FixedPrefixHook(case)
+    elif case.boundary.boundary_type == MONITOR_OFF_PRETERMINAL_STATE:
+        hook = _MonitorOffPreterminalHook(case)
+    else:
+        raise BranchStateExtractionError("source case has no executable boundary")
+    rollout_result: object | None = None
     try:
         if case.upstream_variant is None:
             from scripts import explicit_controller_phase34_post_cross_sync as phase34
 
             mode = next(item for item in phase34.MODES if item.name == case.post_cross_mode)
-            phase34.rollout_phase34_case(
+            rollout_result = phase34.rollout_phase34_case(
                 mode,
                 case.r0_over_target,
                 case.initial_velocity_angle_deg,
@@ -716,13 +870,18 @@ def execute_nominal_prefix(
                 record_trajectory=False,
                 case_id=case.case_id,
                 pre_transition_action_hook=hook,
+                post_transition_observation_hook=(
+                    hook.post_transition
+                    if isinstance(hook, _MonitorOffPreterminalHook)
+                    else None
+                ),
             )
         else:
             from scripts import explicit_controller_phase35_crossing_basin_expansion as phase35
 
             variant = next(item for item in phase35.VARIANTS if item.name == case.upstream_variant)
             mode = next(item for item in phase35.PHASE34_MODES if item.name == case.post_cross_mode)
-            phase35.rollout_phase35_case(
+            rollout_result = phase35.rollout_phase35_case(
                 variant,
                 mode,
                 case.r0_over_target,
@@ -731,30 +890,85 @@ def execute_nominal_prefix(
                 record_trajectory=False,
                 case_id=case.case_id,
                 pre_transition_action_hook=hook,
+                post_transition_observation_hook=(
+                    hook.post_transition
+                    if isinstance(hook, _MonitorOffPreterminalHook)
+                    else None
+                ),
             )
     except _PrefixCaptured as captured:
+        if not isinstance(hook, _FixedPrefixHook):
+            raise BranchStateExtractionError("preterminal boundary stopped before terminal validation")
         document = _build_generated_document(
-            case, hook, captured, implementation_commit
-        )
-        validate_generated_branch_state_document(document)
-        return PrefixExecutionResult(
-            execution_id=execution_id,
-            case=case,
-            execution_role=execution_role,
-            document_json=canonical_json_bytes(document).decode("utf-8"),
+            case,
+            hook,
+            captured,
+            implementation_commit,
             actual_transition_count=len(hook.actions),
-            branch_step=int(document["branch_step"]),
-            initial_state_hash=str(document["initial_state_hash"]),
-            prefix_action_trace_hash=str(document["prefix_action_trace_hash"]),
-            prefix_state_trace_hash=str(document["prefix_state_trace_hash"]),
-            canonical_payload_hash=str(document["canonical_payload_hash"]),
-            predicted_speed_ratio=float(document["predicted_speed_ratio"]),
-            tangential_velocity_error_ratio=float(
-                document["tangential_velocity_error_ratio"]
-            ),
+            terminal_observation=None,
         )
-    raise BranchStateExtractionError(
-        f"source case terminated before fixed branch step {BRANCH_STEP}: {case.case_id}"
+        return _prefix_execution_result(execution_id, execution_role, case, document)
+
+    if not isinstance(hook, _MonitorOffPreterminalHook):
+        raise BranchStateExtractionError(
+            f"source case terminated before fixed branch step {case.boundary.branch_step}: "
+            f"{case.case_id}"
+        )
+    if not isinstance(rollout_result, dict):
+        raise BranchStateExtractionError("preterminal source execution did not return a result")
+    captured = hook.captured
+    terminal_observation = hook.terminal_observation
+    if captured is None or terminal_observation is None:
+        raise BranchStateExtractionError("frozen preterminal or terminal evidence was not observed")
+    observed_count = int(rollout_result.get("steps", -1))
+    observed_reason = str(rollout_result.get("termination_reason", ""))
+    if observed_count != case.boundary.terminal_transition_count:
+        raise BranchStateExtractionError(
+            f"terminal transition count did not reproduce: {case.case_id}"
+        )
+    if observed_reason != case.boundary.terminal_reason:
+        raise BranchStateExtractionError(f"terminal reason did not reproduce: {case.case_id}")
+    if terminal_observation.step != observed_count:
+        raise BranchStateExtractionError("terminal observation index does not match result count")
+    if terminal_observation.realized_next_state != captured.predicted.next_state:
+        raise BranchStateExtractionError("terminal prediction differs from realized terminal state")
+    document = _build_generated_document(
+        case,
+        hook,
+        captured,
+        implementation_commit,
+        actual_transition_count=observed_count,
+        terminal_observation=terminal_observation,
+    )
+    return _prefix_execution_result(execution_id, execution_role, case, document)
+
+
+def _prefix_execution_result(
+    execution_id: str,
+    execution_role: str,
+    case: SourceCaseDefinition,
+    document: Mapping[str, object],
+) -> PrefixExecutionResult:
+    validate_generated_branch_state_document(document)
+    return PrefixExecutionResult(
+        execution_id=execution_id,
+        case=case,
+        execution_role=execution_role,
+        document_json=canonical_json_bytes(document).decode("utf-8"),
+        actual_transition_count=int(document["actual_transition_count"]),
+        branch_step=int(document["branch_step"]),
+        initial_state_hash=str(document["initial_state_hash"]),
+        prefix_action_trace_hash=str(document["prefix_action_trace_hash"]),
+        prefix_state_trace_hash=str(document["prefix_state_trace_hash"]),
+        canonical_payload_hash=str(document["canonical_payload_hash"]),
+        predicted_speed_ratio=float(document["predicted_speed_ratio"]),
+        tangential_velocity_error_ratio=float(
+            document["tangential_velocity_error_ratio"]
+        ),
+        boundary_type=str(document["boundary_type"]),
+        boundary_transition_count=int(document["boundary_transition_count"]),
+        terminal_transition_count=int(document["terminal_transition_count"]),
+        terminal_reason=str(document["terminal_reason"]),
     )
 
 
@@ -900,7 +1114,6 @@ def compare_prefix_results(
         raise BranchStateExtractionError("determinism comparison case mismatch")
     left = discovery.document()
     right = reproduction.document()
-    ignored = {"generation_implementation_commit"}
     canonical_equal = discovery.canonical_payload_hash == reproduction.canonical_payload_hash
     cartesian_fields = ("position_x", "position_y", "velocity_x", "velocity_y")
     derived_fields = (
@@ -934,8 +1147,13 @@ def compare_prefix_results(
         "transition_count_equal": discovery.actual_transition_count
         == reproduction.actual_transition_count,
         "branch_step_equal": discovery.branch_step == reproduction.branch_step,
+        "boundary_type_equal": discovery.boundary_type == reproduction.boundary_type,
+        "boundary_transition_count_equal": discovery.boundary_transition_count
+        == reproduction.boundary_transition_count,
+        "terminal_transition_count_equal": discovery.terminal_transition_count
+        == reproduction.terminal_transition_count,
+        "terminal_reason_equal": discovery.terminal_reason == reproduction.terminal_reason,
     }
-    del ignored
     report["determinism_status"] = (
         "passed"
         if all(value is True for key, value in report.items() if key.endswith("_equal"))
@@ -1018,7 +1236,11 @@ def validate_static_contract(
             errors.append("legacy_case_missing_from_source_inventory")
         if config.get("output_path") != OUTPUT_PATH.as_posix():
             errors.append("configured_output_path_mismatch")
-    except (BranchStateExtractionError, BranchStateRegistryError) as exc:
+    except (
+        BranchStateExtractionError,
+        BranchStateRegistryError,
+        RecoveryBranchBoundaryError,
+    ) as exc:
         inventory = ()
         errors.append(str(exc))
     try:
@@ -1049,14 +1271,18 @@ def validate_static_contract(
         errors.append("registry_output_already_exists")
     required_files = (
         "runtime_assurance/recovery_branch_state_registry.py",
+        "runtime_assurance/recovery_branch_boundary_registry.py",
         "runtime_assurance/recovery_branch_state_extractor.py",
         "scripts/generate_recovery_branch_state_registry_v0.py",
         "scripts/check_recovery_branch_state_registry.py",
         "Tests/test_recovery_branch_state_registry.py",
         "Tests/test_recovery_branch_state_extractor.py",
+        "Tests/test_recovery_branch_boundary_registry.py",
+        "docs/architecture/recovery_branch_boundary_registry_v0.md",
         "docs/architecture/recovery_branch_state_registry_v0.md",
         "docs/experiments/recovery_branch_state_registry_v0.md",
         CONFIG_PATH.as_posix(),
+        BOUNDARY_CONFIG_PATH.as_posix(),
     )
     for relative in required_files:
         if not (root / relative).is_file():
@@ -1099,9 +1325,9 @@ def _legacy_member(
         artifact_path=LEGACY_ARTIFACT_PATH.as_posix(),
         artifact_scope="legacy_external_artifact",
         state_origin="deterministic_nominal_prefix_execution",
-        source_case_artifact=source_case.source_case_artifact,
+        source_case_artifact=source_case.boundary.source_artifact,
         source_case_hash=source_case.source_case_hash,
-        source_configuration_hash=source_case.source_configuration_hash,
+        source_configuration_hash=str(legacy_document["case_configuration_hash"]),
         simulator_configuration_hash=str(legacy_document["simulator_configuration_hash"]),
         constants_hash=str(legacy_document["simulator_constants_hash"]),
         transition_implementation_hash=source_case.transition_implementation_hash,
@@ -1139,7 +1365,7 @@ def _generated_member(
         transition_implementation_hash=result.case.transition_implementation_hash,
         nominal_controller_hash=result.case.nominal_controller_hash,
         source_commit=result.case.source_commit,
-        nominal_prefix_transition_count=result.actual_transition_count,
+        nominal_prefix_transition_count=result.boundary_transition_count,
         branch_step=result.branch_step,
         canonical_branch_state_hash=result.canonical_payload_hash,
         raw_artifact_hash=hashlib.sha256(artifact_bytes).hexdigest(),
@@ -1176,6 +1402,9 @@ def _selection_report(
                 "above" if legacy_predicted_speed_ratio > OVERSPEED_THRESHOLD else "below_or_equal"
             ),
             "absolute_tangential_velocity_error_ratio": abs(legacy_tangential_velocity_error_ratio),
+            "boundary_type": LEGACY_FIXED_PREFIX,
+            "boundary_transition_count": PREFIX_TRANSITION_COUNT,
+            "selection_metric_transition_count": PREFIX_TRANSITION_COUNT,
             "below_selection_rank": None,
             "above_selection_rank": None,
             "tangential_selection_rank": None,
@@ -1210,6 +1439,9 @@ def _selection_report(
                 "predicted_speed_ratio": item.predicted_speed_ratio,
                 "overspeed_class": "above" if item.predicted_speed_ratio > OVERSPEED_THRESHOLD else "below_or_equal",
                 "absolute_tangential_velocity_error_ratio": abs(item.tangential_velocity_error_ratio),
+                "boundary_type": item.boundary_type,
+                "boundary_transition_count": item.boundary_transition_count,
+                "selection_metric_transition_count": item.boundary_transition_count,
                 "below_selection_rank": (below_order.index(item) + 1) if item in below_order else None,
                 "above_selection_rank": (above_order.index(item) + 1) if item in above_order else None,
                 "tangential_selection_rank": tangential_order.index(item) + 1,
@@ -1223,8 +1455,10 @@ def _selection_report(
             "schema_version": "recovery_branch_state_selection_report_v0",
             "selection_rules_frozen_before_execution": True,
             "configuration_hash": config_hash,
-            "overspeed_boundary_metric_source": "generated step-28 one-step Final Veto prediction",
+            "overspeed_boundary_metric_source": "case-specific-boundary one-step Final Veto prediction",
             "tangential_challenge_metric_source": "generated branch-state tangential_velocity_error_ratio",
+            "multi_boundary_calibration_registry": True,
+            "synchronized_physical_time": False,
             "tie_break": ["case_id lexical order", "seed", "source configuration or generated-state hash"],
             "eligible_candidates": candidates,
             "ineligible_cases": [],
@@ -1245,6 +1479,13 @@ def _execution_record(
     state_hash: str,
     final_hash: str,
     published: bool,
+    *,
+    boundary_type: str,
+    boundary_transition_count: int,
+    actual_transition_count: int,
+    branch_step: int,
+    terminal_transition_count: int,
+    terminal_reason: str,
 ) -> dict[str, object]:
     return {
         "execution_id": execution_id,
@@ -1252,11 +1493,18 @@ def _execution_record(
         "execution_role": role,
         "fresh_initialization": True,
         "seed": 0,
-        "nominal_prefix_transition_count": PREFIX_TRANSITION_COUNT,
-        "actual_transition_count": PREFIX_TRANSITION_COUNT,
-        "branch_step": BRANCH_STEP,
+        "boundary_type": boundary_type,
+        "boundary_transition_count": boundary_transition_count,
+        "nominal_prefix_transition_count": boundary_transition_count,
+        "actual_transition_count": actual_transition_count,
+        "branch_step": branch_step,
         "terminated_early": False,
-        "terminal_reason": None,
+        "terminal_transition_count": terminal_transition_count,
+        "terminal_reason": terminal_reason,
+        "terminal_transition_executed_for_validation": (
+            actual_transition_count == terminal_transition_count
+            and terminal_transition_count == boundary_transition_count + 1
+        ),
         "initial_state_hash": initial_state_hash,
         "prefix_action_trace_hash": action_hash,
         "prefix_state_trace_hash": state_hash,
@@ -1274,6 +1522,8 @@ def build_frozen_registry_payloads(
     root = repository_root.resolve()
     config = load_registry_config(root)
     config_hash = file_sha256(root / CONFIG_PATH)
+    boundary_registry = load_recovery_branch_boundary_registry(root)
+    boundary_config_hash = file_sha256(root / BOUNDARY_CONFIG_PATH)
     inventory = build_source_case_inventory(root)
     eligible = tuple(item for item in inventory if item.eligible_for_generation)
     if len(eligible) != SOURCE_CASE_COUNT:
@@ -1332,6 +1582,18 @@ def build_frozen_registry_payloads(
             "prefix_trace_limitation": "legacy artifact did not store trace hashes; fresh reproduction established them without a second canonical execution",
             "transition_count_equal": legacy_reproduction.actual_transition_count == PREFIX_TRANSITION_COUNT,
             "branch_step_equal": legacy_reproduction.branch_step == BRANCH_STEP,
+            "boundary_type_equal": case_map[LEGACY_CASE_ID].boundary.boundary_type
+            == LEGACY_FIXED_PREFIX,
+            "boundary_transition_count_equal": case_map[
+                LEGACY_CASE_ID
+            ].boundary.boundary_transition_count
+            == PREFIX_TRANSITION_COUNT,
+            "terminal_transition_count_equal": case_map[
+                LEGACY_CASE_ID
+            ].boundary.terminal_transition_count
+            == 28,
+            "terminal_reason_equal": case_map[LEGACY_CASE_ID].boundary.terminal_reason
+            == "overspeed",
             "determinism_status": "passed",
         }
     ]
@@ -1430,6 +1692,12 @@ def build_frozen_registry_payloads(
             legacy_reproduction.prefix_state_trace_hash,
             legacy_hash,
             True,
+            boundary_type=LEGACY_FIXED_PREFIX,
+            boundary_transition_count=PREFIX_TRANSITION_COUNT,
+            actual_transition_count=legacy_reproduction.actual_transition_count,
+            branch_step=legacy_reproduction.branch_step,
+            terminal_transition_count=int(case_map[LEGACY_CASE_ID].boundary.terminal_transition_count),
+            terminal_reason=str(case_map[LEGACY_CASE_ID].boundary.terminal_reason),
         )
     ]
     selected_set = set(selection.generated_case_ids)
@@ -1444,6 +1712,12 @@ def build_frozen_registry_payloads(
                 item.prefix_state_trace_hash,
                 item.canonical_payload_hash,
                 item.case.case_id in selected_set,
+                boundary_type=item.boundary_type,
+                boundary_transition_count=item.boundary_transition_count,
+                actual_transition_count=item.actual_transition_count,
+                branch_step=item.branch_step,
+                terminal_transition_count=item.terminal_transition_count,
+                terminal_reason=item.terminal_reason,
             )
         )
     for item in reproductions:
@@ -1457,6 +1731,12 @@ def build_frozen_registry_payloads(
                 item.prefix_state_trace_hash,
                 item.canonical_payload_hash,
                 False,
+                boundary_type=item.boundary_type,
+                boundary_transition_count=item.boundary_transition_count,
+                actual_transition_count=item.actual_transition_count,
+                branch_step=item.branch_step,
+                terminal_transition_count=item.terminal_transition_count,
+                terminal_reason=item.terminal_reason,
             )
         )
     prefix_document = _attach_document_hash(
@@ -1501,6 +1781,11 @@ def build_frozen_registry_payloads(
         "generated_member_count": sum(not member.legacy_member for member in members),
         "selection_contract": config["selection_contract"],
         "prefix_contract": config["prefix_contract"],
+        "boundary_registry_id": boundary_registry.registry_id,
+        "boundary_registry_canonical_hash": boundary_registry.canonical_payload_hash,
+        "boundary_registry_raw_hash": boundary_config_hash,
+        "multi_boundary_calibration_registry": True,
+        "synchronized_physical_time": False,
         "canonical_reproduction_execution_count": 1,
         "discovery_execution_count": len(discoveries),
         "selected_reproduction_execution_count": len(reproductions),
@@ -1534,21 +1819,21 @@ def build_frozen_registry_payloads(
     summary = (
         "# Multi-Case Recovery Branch-State Registry v0\n\n"
         "Status: Multi-case recovery branch-state registry frozen and validated; Stage 1B multi-case source-state prerequisite satisfied.\n\n"
-        "Completed: 2026-08-02\n\n"
+        "Completed: 2026-08-03\n\n"
         "This registry contains complete, provenance-bound branch-point states produced by deterministic execution of existing frozen nominal-prefix behavior. The states were not reconstructed from incomplete logs, manually authored, or created by perturbing the legacy canonical state. Registry membership enables multi-case bounded recovery and shadow-runtime experiments, but does not demonstrate recovery performance, controller improvement, phase-policy validity, formal safety, or deployment readiness.\n\n"
         "## Status\n\nFour deterministic, executable members are registered.\n\n"
         "## Original Stage 1B blocker\n\nThe previous single-state executor could not satisfy a four-case trace contract.\n\n"
         "## Purpose\n\nFreeze complete multi-case branch-point inputs without executing a recovery branch.\n\n"
         "## Legacy canonical member\n\nThe published canonical artifact remains external and byte-identical.\n\n"
         "## Source-case inventory\n\nAll 13 Final Veto cases were provenance-complete and eligible.\n\n"
-        "## Prefix extraction contract\n\nEach discovery stops after 27 nominal transitions, before the step-28 action.\n\n"
+        "## Prefix extraction contract\n\nEach case uses its repository-backed boundary. The legacy member remains after transition 27; generated members use the last valid state before their frozen monitor-off terminal transition.\n\n"
         "## Candidate discovery\n\nTwelve noncanonical cases were executed once for deterministic discovery.\n\n"
-        "## Frozen selection rules\n\nClosest below, closest above, and strongest remaining tangential challenge were selected without post-result rule changes.\n\n"
+        "## Frozen selection rules\n\nClosest below, closest above, and strongest remaining tangential challenge were selected at each case's own frozen boundary without post-result rule changes. These are multi-boundary calibration inputs, not synchronized-time samples.\n\n"
         "## Selected members\n\n"
         f"- Member A: `{selection.member_a_case_id}`\n"
-        f"- Member B: `{selection.member_b_case_id}` at predicted ratio `{selected_metrics[selection.member_b_case_id].predicted_speed_ratio}`\n"
-        f"- Member C: `{selection.member_c_case_id}` at predicted ratio `{selected_metrics[selection.member_c_case_id].predicted_speed_ratio}`\n"
-        f"- Member D: `{selection.member_d_case_id}` at tangential error ratio `{selected_metrics[selection.member_d_case_id].tangential_velocity_error_ratio}`\n\n"
+        f"- Member B: `{selection.member_b_case_id}` at transition `{selected_metrics[selection.member_b_case_id].boundary_transition_count}` and predicted ratio `{selected_metrics[selection.member_b_case_id].predicted_speed_ratio}`\n"
+        f"- Member C: `{selection.member_c_case_id}` at transition `{selected_metrics[selection.member_c_case_id].boundary_transition_count}` and predicted ratio `{selected_metrics[selection.member_c_case_id].predicted_speed_ratio}`\n"
+        f"- Member D: `{selection.member_d_case_id}` at transition `{selected_metrics[selection.member_d_case_id].boundary_transition_count}` and tangential error ratio `{selected_metrics[selection.member_d_case_id].tangential_velocity_error_ratio}`\n\n"
         "## Cartesian state completeness\n\nAll four members provide finite x, y, vx, and vy state values.\n\n"
         "## Provenance\n\nEvery generated member binds source case, configuration, simulator, constants, transition, controller, action-trace, and state-trace hashes.\n\n"
         "## Determinism validation\n\nEach generated member exactly matched an independent fresh reproduction.\n\n"

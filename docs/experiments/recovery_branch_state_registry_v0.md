@@ -1,16 +1,18 @@
 # Recovery Branch-State Registry v0 Generation
 
-Status: Frozen generation protocol defined; registry generation not yet executed.
+Status: Case-specific frozen generation protocol defined; registry generation not yet executed.
 
-Completed: 2026-08-02
+Completed: 2026-08-03
 
 ## Source inventory
 
 The source inventory is the 13-case Final Veto manifest. Eligibility requires a complete frozen initialization, supported existing Phase34 or Phase35 nominal controller, simulator configuration, source configuration hash, seed, transition implementation, and controller-source hash. A case ID alone is insufficient.
 
-## Prefix contract
+## Boundary contract
 
-The common engineering boundary copies the legacy canonical state contract: 27 realized nominal transitions, then capture before execution of the step-28 nominal action. The count is fixed before generation and is not selected from observed outcomes.
+No common transition count is used. The canonical member preserves its published transition-27 boundary. Every other case uses the last valid pre-transition state before its frozen monitor-off terminal transition. Counts and reasons are fixed in `configs/recovery_branch_boundary_registry_v0.json` from checked-in evidence before generation.
+
+`PreTransitionActionContext(step=N)` contains the state after `N-1` realized transitions. The transition-22 overspeed case therefore branches from the step-22 pre-transition state after 21 realized transitions; transition 22 is executed only to reproduce the frozen terminal evidence.
 
 ## Generation command
 
@@ -18,19 +20,21 @@ The common engineering boundary copies the legacy canonical state contract: 27 r
 python scripts/generate_recovery_branch_state_registry_v0.py --execute-frozen-registry-generation
 ```
 
-The command permits no case, seed, prefix, state, threshold, output, retry, or resume override.
+The command permits no case, seed, boundary, state, threshold, output, retry, or resume override.
 
 ## Discovery procedure
 
-The command freshly reproduces the legacy canonical state, executes one discovery prefix for every eligible noncanonical case, computes branch-state and selection metrics, then selects three distinct generated members.
+The command freshly reproduces the legacy canonical state, executes each eligible noncanonical case to its own frozen boundary and terminal-validation point, computes branch-state and selection metrics, then selects three distinct generated members.
 
 ## Selection
 
 Member A is the legacy canonical state. Member B is the maximum predicted speed ratio at or below `1.90`. Member C is the minimum predicted speed ratio above `1.90`. Member D is the largest absolute tangential velocity error ratio among remaining eligible cases. Frozen lexical and hash tie-breaks apply.
 
+Metrics are measured at different source transition counts. The registry is a multi-boundary calibration registry, not a synchronized-time experiment.
+
 ## Determinism
 
-Every selected generated case is initialized again from frozen inputs. Discovery and reproduction must match in Cartesian state, derived state, prediction, action-trace hash, state-trace hash, transition count, branch step, and canonical payload hash. The legacy complete canonical document must reproduce exactly.
+Every selected generated case is initialized again from frozen inputs. Discovery and reproduction must match in boundary type and count, terminal metadata, Cartesian state, derived state, prediction, action-trace hash, state-trace hash, transition count, branch step, and canonical payload hash. The legacy complete canonical document must reproduce exactly.
 
 ## Execution count
 

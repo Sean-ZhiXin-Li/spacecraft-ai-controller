@@ -1,7 +1,7 @@
 {
   "artifact_classification": "deterministically_generated_branch_state_registry",
-  "branch_step": 28,
-  "completed_date": "2026-08-02",
+  "boundary_registry_path": "configs/recovery_branch_boundary_registry_v0.json",
+  "completed_date": "2026-08-03",
   "execution_contract": {
     "automatic_retry": false,
     "branch_action_after_extraction": false,
@@ -10,14 +10,22 @@
     "fresh_initialization_per_execution": true,
     "selected_case_reproduction": true
   },
-  "nominal_prefix_transition_count": 27,
+  "legacy_branch_step": 28,
+  "legacy_nominal_prefix_transition_count": 27,
   "output_path": "analysis/recovery_branch_state_registry_v0",
   "overspeed_comparator": ">",
   "overspeed_threshold": 1.9,
   "prefix_contract": {
-    "boundary": "after_27_realized_nominal_transitions_before_step_28_action_execution",
-    "count_source": "analysis/recovery_action_branching_nonformal_v0/branch_state.json",
+    "boundary": "case_specific_repository_backed_boundary",
+    "boundary_types": [
+      "legacy_fixed_prefix",
+      "source_declared_fixed_prefix",
+      "monitor_off_preterminal_state",
+      "ineligible"
+    ],
+    "count_source": "configs/recovery_branch_boundary_registry_v0.json",
     "counter_semantics_source": "runtime_assurance/final_veto_runner_types.py:PreTransitionActionContext.step",
+    "multi_boundary_calibration_registry": true,
     "physical_policy": "existing_case_nominal_controller",
     "transition_source": "simulator/phase34_35_transition.py:step_phase34_35_transition"
   },
