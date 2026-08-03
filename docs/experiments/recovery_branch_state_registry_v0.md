@@ -1,6 +1,6 @@
 # Recovery Branch-State Registry v0 Generation
 
-Status: Case-specific frozen generation protocol defined; registry generation not yet executed.
+Status: Case-specific frozen generation completed; four deterministic branch-state members published.
 
 Completed: 2026-08-03
 

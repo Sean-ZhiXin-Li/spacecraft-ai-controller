@@ -1,6 +1,6 @@
 # Recovery Branch-State Registry v0
 
-Status: Registry infrastructure implemented; final member artifacts not yet generated.
+Status: Registry infrastructure implemented and four deterministic branch-state members frozen.
 
 Completed: 2026-08-02
 

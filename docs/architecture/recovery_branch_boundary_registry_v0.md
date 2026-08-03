@@ -1,6 +1,6 @@
 # Recovery Branch Boundary Registry v0
 
-Status: Repository-backed case-specific branch boundaries implemented; frozen registry generation not yet executed.
+Status: Repository-backed case-specific branch boundaries implemented and four deterministic branch-state members frozen.
 
 Completed: 2026-08-03
 
