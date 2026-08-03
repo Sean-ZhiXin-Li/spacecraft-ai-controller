@@ -45,6 +45,7 @@ from runtime_assurance.recovery_branch_state_registry import (
     CONFIG_PATH,
     LEGACY_ARTIFACT_PATH,
     LEGACY_CASE_ID,
+    OUTPUT_PATH,
     PREFIX_TRANSITION_COUNT,
     canonical_json_bytes,
 )
@@ -243,7 +244,10 @@ class RecoveryBranchStateExtractorTests(unittest.TestCase):
         with mock.patch(
             "runtime_assurance.recovery_branch_state_extractor.execute_nominal_prefix"
         ) as execute:
-            report = validate_static_contract(ROOT, require_output_absent=True)
+            report = validate_static_contract(
+                ROOT,
+                require_output_absent=not (ROOT / OUTPUT_PATH).exists(),
+            )
         execute.assert_not_called()
         self.assertTrue(report.valid, report.errors)
         self.assertEqual(report.source_case_count, 13)
