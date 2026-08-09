@@ -1,0 +1,43 @@
+{
+  "baseline_traces_published": 0,
+  "observed_traces_published": 4,
+  "schema_version": "staged_recovery_shadow_runtime_v0",
+  "traces": [
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "event_count": 34,
+      "registry_member_id": "legacy_canonical",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_path": "traces/phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000.jsonl",
+      "trace_sha256": "1f8fb485a06a5eb768b9938b4da8e7d91c0606f99cd0b2cf66098346ccafad02",
+      "transition_count": 32
+    },
+    {
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+      "event_count": 34,
+      "registry_member_id": "member__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_path": "traces/phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000.jsonl",
+      "trace_sha256": "a14228be1b7f62a7162e93765c2aa2e287892f94feb54beee60ca8f02caf1caf",
+      "transition_count": 32
+    },
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "event_count": 34,
+      "registry_member_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_path": "traces/phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000.jsonl",
+      "trace_sha256": "f177892a066a1ebe433d0b788950e27f30cf3938d159bb53e0cd61dacab08047",
+      "transition_count": 32
+    },
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "event_count": 34,
+      "registry_member_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_path": "traces/phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000.jsonl",
+      "trace_sha256": "1b7e7507c7fab85af49ecc0b4e6a90177886efd22adc931302f7b770aa1c2763",
+      "transition_count": 32
+    }
+  ]
+}

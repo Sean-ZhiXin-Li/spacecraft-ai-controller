@@ -1,0 +1,24 @@
+{
+  "case_execution_status": "4/4 passed",
+  "graph_blocks": 0,
+  "invalid_guards": 0,
+  "nominal_handoff_recommendations": 0,
+  "repeated_reasons": 0,
+  "schema_version": "staged_recovery_shadow_runtime_v0",
+  "shadow_phase_entries": {
+    "crossing_preparation": 0,
+    "explicit_abort": 0,
+    "hazard_arrest": 0,
+    "nominal_handoff": 0,
+    "radial_recommitment": 3,
+    "recoverability_verification": 1,
+    "retreat": 0,
+    "stabilization_assessment": 0,
+    "tangential_alignment": 1
+  },
+  "shadow_transition_count": 1,
+  "transition_budget_exhaustion": 0,
+  "two_cycles": 0,
+  "unauthorized_physical_effects": 0,
+  "unavailable_guards": 916
+}

@@ -1,0 +1,99 @@
+{
+  "all_pairs_equivalent": true,
+  "pairs": [
+    {
+      "all_equivalence_checks": true,
+      "baseline_trace_published": false,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "checks": {
+        "same_branch_id": true,
+        "same_branch_state_hash": true,
+        "same_case_id": true,
+        "same_evaluator_status_sequence": true,
+        "same_executed_action_sequence": true,
+        "same_final_state_hash": true,
+        "same_final_veto_decision_sequence": true,
+        "same_initial_state": true,
+        "same_initial_state_hash": true,
+        "same_realized_state_hash_sequence": true,
+        "same_realized_state_sequence": true,
+        "same_seed": true,
+        "same_terminal_reason": true,
+        "same_transition_count": true
+      },
+      "observed_trace_published": true,
+      "registry_member_id": "legacy_canonical"
+    },
+    {
+      "all_equivalence_checks": true,
+      "baseline_trace_published": false,
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+      "checks": {
+        "same_branch_id": true,
+        "same_branch_state_hash": true,
+        "same_case_id": true,
+        "same_evaluator_status_sequence": true,
+        "same_executed_action_sequence": true,
+        "same_final_state_hash": true,
+        "same_final_veto_decision_sequence": true,
+        "same_initial_state": true,
+        "same_initial_state_hash": true,
+        "same_realized_state_hash_sequence": true,
+        "same_realized_state_sequence": true,
+        "same_seed": true,
+        "same_terminal_reason": true,
+        "same_transition_count": true
+      },
+      "observed_trace_published": true,
+      "registry_member_id": "member__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000"
+    },
+    {
+      "all_equivalence_checks": true,
+      "baseline_trace_published": false,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "checks": {
+        "same_branch_id": true,
+        "same_branch_state_hash": true,
+        "same_case_id": true,
+        "same_evaluator_status_sequence": true,
+        "same_executed_action_sequence": true,
+        "same_final_state_hash": true,
+        "same_final_veto_decision_sequence": true,
+        "same_initial_state": true,
+        "same_initial_state_hash": true,
+        "same_realized_state_hash_sequence": true,
+        "same_realized_state_sequence": true,
+        "same_seed": true,
+        "same_terminal_reason": true,
+        "same_transition_count": true
+      },
+      "observed_trace_published": true,
+      "registry_member_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000"
+    },
+    {
+      "all_equivalence_checks": true,
+      "baseline_trace_published": false,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "checks": {
+        "same_branch_id": true,
+        "same_branch_state_hash": true,
+        "same_case_id": true,
+        "same_evaluator_status_sequence": true,
+        "same_executed_action_sequence": true,
+        "same_final_state_hash": true,
+        "same_final_veto_decision_sequence": true,
+        "same_initial_state": true,
+        "same_initial_state_hash": true,
+        "same_realized_state_hash_sequence": true,
+        "same_realized_state_sequence": true,
+        "same_seed": true,
+        "same_terminal_reason": true,
+        "same_transition_count": true
+      },
+      "observed_trace_published": true,
+      "registry_member_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000"
+    }
+  ],
+  "physical_equivalence_failures": 0,
+  "schema_version": "staged_recovery_shadow_runtime_v0"
+}
