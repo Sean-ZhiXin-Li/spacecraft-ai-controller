@@ -4,6 +4,7 @@ import copy
 import json
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 from runtime_assurance.final_veto_monitor import FinalVetoDecision
@@ -119,6 +120,18 @@ class ShadowRuntimeBoundaryTests(unittest.TestCase):
                 horizon_steps=1, step_executor=executor,
             )
         self.assertFalse(called)
+
+    def test_frozen_existing_branch_can_be_selected_without_shadow_control(self) -> None:
+        calls = []
+        def executor(member_id, branch_id, horizon_steps=1, *, current_state=None):
+            calls.append(branch_id)
+            result = self.fake_executor(member_id, PHYSICAL_BRANCH_ID, horizon_steps, current_state=current_state)
+            return replace(result, branch_id=branch_id)
+        run_registered_bounded_shadow_path(
+            self.registered, implementation_commit="a" * 40,
+            branch_id="zero_action_reference_v0", step_executor=executor,
+        )
+        self.assertEqual(set(calls), {"zero_action_reference_v0"})
 
 
 class ShadowPublicationTests(unittest.TestCase):

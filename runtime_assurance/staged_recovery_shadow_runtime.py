@@ -26,6 +26,7 @@ from runtime_assurance.recovery_stop_conditions import (
 )
 from runtime_assurance.staged_recovery_contract import EXECUTION_NOT_AUTHORIZED
 from runtime_assurance.staged_recovery_guard_evidence import (
+    GuardAtomEvaluation,
     evaluate_guard_atoms_for_event,
     guard_atom_definitions,
 )
@@ -45,6 +46,7 @@ from runtime_assurance.staged_recovery_runtime_logger import (
 from runtime_assurance.staged_recovery_shadow_guard import (
     SHADOW_OUTPUT_CONSUMED_BY_PHYSICAL_RUNTIME,
     SHADOW_POLICY_ID,
+    ShadowGuardParameters,
     ShadowPhaseMachine,
     ShadowTransitionRecord,
     architecture_phase_ids,
@@ -108,6 +110,7 @@ def build_registered_runtime_identity(
     registered: RegisteredBranchState,
     *,
     implementation_commit: str,
+    branch_id: str = PHYSICAL_BRANCH_ID,
 ) -> tuple[BoundedRuntimeIdentity, CartesianState2D]:
     if not implementation_commit:
         raise ShadowRuntimeError("implementation commit is required")
@@ -125,7 +128,7 @@ def build_registered_runtime_identity(
     identity = BoundedRuntimeIdentity(
         case_id=member.case_id,
         seed=member.seed,
-        branch_id=PHYSICAL_BRANCH_ID,
+        branch_id=branch_id,
         branch_state_hash=member.canonical_branch_state_hash,
         simulator_configuration_hash=member.simulator_configuration_hash,
         constants_hash=member.constants_hash,
@@ -199,6 +202,7 @@ def run_registered_bounded_shadow_path(
     registered: RegisteredBranchState,
     *,
     implementation_commit: str,
+    branch_id: str = PHYSICAL_BRANCH_ID,
     observer: RuntimeObserver | None = None,
     horizon_steps: int = MAXIMUM_RECOVERY_TRANSITIONS,
     step_executor: RegisteredStepExecutor = execute_registered_recovery_branch,
@@ -206,7 +210,7 @@ def run_registered_bounded_shadow_path(
     if horizon_steps != MAXIMUM_RECOVERY_TRANSITIONS:
         raise ShadowRuntimeError("Stage 1B-A smoke horizon is frozen at 32 transitions")
     identity, initial_state = build_registered_runtime_identity(
-        registered, implementation_commit=implementation_commit
+        registered, implementation_commit=implementation_commit, branch_id=branch_id
     )
     initial_hash = runtime_state_hash(initial_state)
     initial = BoundedRuntimeSnapshot(
@@ -228,11 +232,15 @@ def run_registered_bounded_shadow_path(
     for attempted in range(1, horizon_steps + 1):
         execution = step_executor(
             registered.registry_member_id,
-            PHYSICAL_BRANCH_ID,
+            branch_id,
             horizon_steps=1,
             current_state=current,
         )
-        if not isinstance(execution, RecoveryBranchExecutionResult) or not execution.valid:
+        if (
+            not isinstance(execution, RecoveryBranchExecutionResult)
+            or not execution.valid
+            or execution.branch_id != branch_id
+        ):
             raise ShadowRuntimeError(f"registered executor failed at attempted step {attempted}")
         if execution.previous_state != current or execution.previous_state_hash != runtime_state_hash(current):
             raise ShadowRuntimeError("registered executor did not use the current continuation state")
@@ -369,13 +377,20 @@ def compare_physical_runs(
 
 
 class ShadowObservationAdapter:
-    def __init__(self, identity: BoundedRuntimeIdentity, *, trace_id: str) -> None:
+    def __init__(
+        self,
+        identity: BoundedRuntimeIdentity,
+        *,
+        trace_id: str,
+        parameters: ShadowGuardParameters | None = None,
+    ) -> None:
         self._logger = Stage0BValidationLoggerAdapter(
             identity, session_id=f"{SHADOW_SMOKE_ID}__{trace_id}", max_events=34
         )
-        self._machine = ShadowPhaseMachine()
+        self._machine = ShadowPhaseMachine(parameters)
         self._records: list[ShadowTransitionRecord] = []
         self._source_documents: list[dict[str, object]] = []
+        self._guard_evaluations: list[tuple[GuardAtomEvaluation, ...]] = []
         self._definitions = guard_atom_definitions()
 
     @property
@@ -385,6 +400,10 @@ class ShadowObservationAdapter:
     @property
     def source_documents(self) -> tuple[dict[str, object], ...]:
         return tuple(copy.deepcopy(item) for item in self._source_documents)
+
+    @property
+    def guard_evaluations(self) -> tuple[tuple[GuardAtomEvaluation, ...], ...]:
+        return tuple(self._guard_evaluations)
 
     def __call__(self, snapshot: BoundedRuntimeSnapshot) -> None:
         self._logger.observe(snapshot)
@@ -400,6 +419,7 @@ class ShadowObservationAdapter:
             terminal_event=snapshot.snapshot_type == RuntimeSnapshotType.TERMINAL,
         )
         self._source_documents.append(source)
+        self._guard_evaluations.append(evaluations)
         self._records.append(record)
         if snapshot.snapshot_type == RuntimeSnapshotType.TERMINAL:
             self._logger.finalize()
@@ -428,7 +448,7 @@ def run_shadow_smoke_case(
     baseline = runner(baseline_state, implementation_commit=implementation_commit)
     observed_state = loader(repository_root, registry_member_id)
     identity, _ = build_registered_runtime_identity(
-        observed_state, implementation_commit=implementation_commit
+        observed_state, implementation_commit=implementation_commit, branch_id=PHYSICAL_BRANCH_ID
     )
     adapter = ShadowObservationAdapter(identity, trace_id=registry_member_id)
     observed = runner(

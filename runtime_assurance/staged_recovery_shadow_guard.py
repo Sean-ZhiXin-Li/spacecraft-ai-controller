@@ -58,18 +58,17 @@ class ShadowGuardParameters:
     maximum_shadow_transitions_per_trace: int = MAXIMUM_SHADOW_TRANSITIONS_PER_TRACE
 
     def __post_init__(self) -> None:
-        expected = (
-            MINIMUM_PHASE_DWELL_STEPS,
-            TRANSITION_COOLDOWN_STEPS,
-            MAXIMUM_SHADOW_TRANSITIONS_PER_TRACE,
-        )
-        supplied = (
-            self.minimum_phase_dwell_steps,
-            self.transition_cooldown_steps,
-            self.maximum_shadow_transitions_per_trace,
-        )
-        if supplied != expected:
-            raise ShadowGuardError("Stage 1B-A shadow parameters are frozen")
+        for value, name, minimum in (
+            (self.minimum_phase_dwell_steps, "minimum_phase_dwell_steps", 1),
+            (self.transition_cooldown_steps, "transition_cooldown_steps", 0),
+            (
+                self.maximum_shadow_transitions_per_trace,
+                "maximum_shadow_transitions_per_trace",
+                1,
+            ),
+        ):
+            if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+                raise ShadowGuardError(f"{name} must be an integer >= {minimum}")
 
 
 @dataclass(frozen=True, slots=True)
@@ -137,6 +136,8 @@ class ShadowTransitionRecord:
     transition_budget_used: int
     transition_budget_remaining: int
     two_cycle_detected: bool
+    three_cycle_detected: bool
+    rapid_reversal_detected: bool
     repeated_transition_reason: bool
     true_guard_atoms: tuple[str, ...]
     false_guard_atoms: tuple[str, ...]
@@ -306,6 +307,7 @@ class ShadowPhaseMachine:
             )
 
         two_cycle = len(state.phase_history) >= 3 and state.phase_history[-1] == state.phase_history[-3]
+        three_cycle = len(state.phase_history) >= 4 and state.phase_history[-1] == state.phase_history[-4]
         repeated = (
             transitioned
             and len(state.transition_reason_history) >= 2
@@ -333,6 +335,8 @@ class ShadowPhaseMachine:
             transition_budget_used=state.shadow_transition_count,
             transition_budget_remaining=remaining,
             two_cycle_detected=two_cycle,
+            three_cycle_detected=three_cycle,
+            rapid_reversal_detected=two_cycle,
             repeated_transition_reason=repeated,
             true_guard_atoms=resolution.true_guard_atoms,
             false_guard_atoms=resolution.false_guard_atoms,
