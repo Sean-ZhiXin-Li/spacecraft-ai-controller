@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import tempfile
 import unittest
@@ -20,6 +21,7 @@ from runtime_assurance.staged_recovery_shadow_calibration import (
     NO_PROGRESS_COMPONENTS,
     CalibrationCandidate,
     CandidateReplayResult,
+    ExplicitAbortTerminalShadowAdapter,
     ShadowCalibrationError,
     analyze_candidates,
     atomic_publish_new_directory,
@@ -31,8 +33,15 @@ from runtime_assurance.staged_recovery_shadow_calibration import (
     load_and_validate_config,
     ranking_tuple,
     replay_candidate,
+    run_explicit_abort_terminal_path,
     trace_definitions,
     validate_trace_set_payloads,
+)
+from runtime_assurance.recovery_branch_state_registry import load_registered_branch_state
+from runtime_assurance.staged_recovery_logger_adapter import RuntimeSnapshotType
+from runtime_assurance.staged_recovery_shadow_runtime import (
+    build_registered_runtime_identity,
+    compare_physical_runs,
 )
 
 
@@ -158,6 +167,95 @@ class TraceMatrixTests(unittest.TestCase):
         restored = guard_evaluation_from_document(guard_evaluation_document(source))
         self.assertEqual(restored, source)
         self.assertIsNone(restored.value)
+
+
+class ExplicitAbortTerminalAdapterTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.registered = load_registered_branch_state(ROOT, "legacy_canonical")
+        cls.commit = "a" * 40
+
+    def test_explicit_abort_uses_initial_then_terminal_lifecycle(self) -> None:
+        run = run_explicit_abort_terminal_path(
+            self.registered, implementation_commit=self.commit
+        )
+        self.assertEqual(
+            tuple(snapshot.snapshot_type for snapshot in run.snapshots),
+            (RuntimeSnapshotType.INITIAL, RuntimeSnapshotType.TERMINAL),
+        )
+        self.assertEqual(len(run.transition_snapshots), 0)
+        self.assertEqual(run.recovery_transition_count, 0)
+        self.assertEqual(run.runtime_terminal_reason, "explicit_abort")
+
+    def test_terminal_event_has_explicit_abort_and_no_action(self) -> None:
+        identity, _ = build_registered_runtime_identity(
+            self.registered,
+            implementation_commit=self.commit,
+            branch_id="explicit_abort_v0",
+        )
+        adapter = ExplicitAbortTerminalShadowAdapter(
+            identity, trace_id="explicit_abort_fixture"
+        )
+        run = run_explicit_abort_terminal_path(
+            self.registered, implementation_commit=self.commit, observer=adapter
+        )
+        documents = adapter.source_documents
+        self.assertEqual([item["event_type"] for item in documents], ["initial_snapshot", "terminal"])
+        terminal = documents[-1]
+        self.assertEqual(terminal["action_disposition"], "no_action")
+        self.assertIsNone(terminal["proposed_action"])
+        self.assertIsNone(terminal["executed_action"])
+        terminal_guards = {item.guard_atom_id: item for item in adapter.guard_evaluations[-1]}
+        self.assertEqual(terminal_guards["explicit_abort_requested"].status, GuardEvidenceStatus.TRUE)
+        self.assertEqual(adapter.records[-1].desired_shadow_phase, "explicit_abort")
+        self.assertFalse(adapter.records[-1].nominal_handoff_recommended)
+        self.assertEqual(run.final_state, run.initial_state)
+
+    def test_baseline_and_observed_explicit_abort_are_physically_equivalent(self) -> None:
+        baseline = run_explicit_abort_terminal_path(
+            self.registered, implementation_commit=self.commit
+        )
+        identity, _ = build_registered_runtime_identity(
+            self.registered,
+            implementation_commit=self.commit,
+            branch_id="explicit_abort_v0",
+        )
+        adapter = ExplicitAbortTerminalShadowAdapter(
+            identity, trace_id="equivalence_fixture"
+        )
+        observed = run_explicit_abort_terminal_path(
+            self.registered, implementation_commit=self.commit, observer=adapter
+        )
+        report = compare_physical_runs(baseline, observed)
+        self.assertTrue(report["all_equivalence_checks"])
+        self.assertEqual(report["checks"]["same_executed_action_sequence"], True)
+        self.assertEqual(len(baseline.transition_snapshots), 0)
+        self.assertEqual(len(observed.transition_snapshots), 0)
+
+    def test_stage0b_logger_contract_bytes_are_unchanged(self) -> None:
+        digest = hashlib.sha256(
+            (ROOT / "runtime_assurance/staged_recovery_runtime_logger.py").read_bytes()
+        ).hexdigest()
+        self.assertEqual(
+            digest,
+            "bc85351542f1cb75c7999dbd8f71b18e0519aa6468bb4202240fac8e83c905d6",
+        )
+
+    def test_other_twelve_definitions_are_unchanged(self) -> None:
+        ordinary = tuple(item for item in trace_definitions(ROOT) if not item.explicit_abort)
+        self.assertEqual(len(ordinary), 12)
+        self.assertEqual(
+            {item.branch_id for item in ordinary},
+            {
+                "zero_action_reference_v0",
+                "velocity_opposed_thrust_v0",
+                "tangential_error_correction_v0",
+            },
+        )
+
+    def test_fix_phase_has_no_result_publication(self) -> None:
+        self.assertFalse((ROOT / "analysis/staged_recovery_shadow_calibration_trace_set_v0").exists())
+        self.assertFalse((ROOT / CALIBRATION_OUTPUT_PATH).exists())
 
 
 class OfflineReplayTests(unittest.TestCase):

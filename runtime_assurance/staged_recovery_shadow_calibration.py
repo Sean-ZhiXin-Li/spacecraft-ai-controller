@@ -13,9 +13,11 @@ from pathlib import Path
 from typing import Callable, Mapping, Sequence
 
 from runtime_assurance.recovery_branch_state_registry import (
+    RegisteredBranchState,
     load_branch_state_registry,
     load_registered_branch_state,
 )
+from runtime_assurance.recovery_stop_conditions import evaluate_recovery_stop_conditions
 from runtime_assurance.staged_recovery_contract import EXECUTION_NOT_AUTHORIZED, RecoveryPhase
 from runtime_assurance.staged_recovery_guard_evidence import (
     GuardAtomEvaluation,
@@ -42,6 +44,14 @@ from runtime_assurance.staged_recovery_shadow_runtime import (
     compare_physical_runs,
     run_registered_bounded_shadow_path,
 )
+from runtime_assurance.staged_recovery_logger_adapter import (
+    BoundedRecoveryValidationRun,
+    BoundedRuntimeSnapshot,
+    ObserverIntegrationError,
+    RuntimeSnapshotType,
+    runtime_state_hash,
+)
+from runtime_assurance.staged_recovery_runtime_logger import ActionDisposition
 
 
 CALIBRATION_ID = "staged_recovery_shadow_calibration_v0"
@@ -285,6 +295,130 @@ class CapturedCalibrationTrace:
     records: tuple[dict[str, object], ...]
 
 
+class ExplicitAbortTerminalShadowAdapter(ShadowObservationAdapter):
+    """Preserve Stage 0B explicit-abort terminal semantics for calibration."""
+
+    def __call__(self, snapshot: BoundedRuntimeSnapshot) -> None:
+        logger_snapshot = snapshot
+        if snapshot.snapshot_type == RuntimeSnapshotType.TERMINAL:
+            if snapshot.runtime_terminal_reason not in {
+                "explicit_abort",
+                "explicit_recovery_abort",
+            }:
+                raise ShadowCalibrationError(
+                    "explicit-abort terminal snapshot lacks the frozen abort reason"
+                )
+            if (
+                snapshot.action_disposition != ActionDisposition.NO_ACTION
+                or snapshot.proposed_action is not None
+                or snapshot.executed_action is not None
+                or snapshot.transition_executed
+            ):
+                raise ShadowCalibrationError(
+                    "explicit-abort terminal snapshot must contain no physical action or transition"
+                )
+            logger_snapshot = replace(
+                snapshot,
+                validation_terminal_reason=snapshot.runtime_terminal_reason,
+            )
+        return super().__call__(logger_snapshot)
+
+
+def _observe_terminal_boundary(
+    observer: Callable[[BoundedRuntimeSnapshot], None] | None,
+    snapshot: BoundedRuntimeSnapshot,
+) -> None:
+    if observer is None:
+        return
+    try:
+        result = observer(snapshot)
+    except Exception as exc:
+        raise ObserverIntegrationError(
+            f"explicit-abort observer failed at event {snapshot.event_index}: "
+            f"{type(exc).__name__}: {exc}",
+            event_index=snapshot.event_index,
+            recovery_step=snapshot.recovery_step,
+            physical_transitions=0,
+        ) from exc
+    if result is not None:
+        raise ObserverIntegrationError(
+            "explicit-abort observer return values are forbidden",
+            event_index=snapshot.event_index,
+            recovery_step=snapshot.recovery_step,
+            physical_transitions=0,
+        )
+
+
+def run_explicit_abort_terminal_path(
+    registered: RegisteredBranchState,
+    *,
+    implementation_commit: str,
+    observer: Callable[[BoundedRuntimeSnapshot], None] | None = None,
+) -> BoundedRecoveryValidationRun:
+    """Record an externally supplied abort without proposing or executing an action."""
+    identity, initial_state = build_registered_runtime_identity(
+        registered,
+        implementation_commit=implementation_commit,
+        branch_id=EXPLICIT_ABORT_BRANCH,
+    )
+    initial_hash = runtime_state_hash(initial_state)
+    initial = BoundedRuntimeSnapshot(
+        snapshot_type=RuntimeSnapshotType.INITIAL,
+        event_index=0,
+        identity=identity,
+        recovery_step=0,
+        total_transition_count=identity.nominal_prefix_transition_count,
+        pre_state=initial_state,
+        pre_state_hash=initial_hash,
+    )
+    _observe_terminal_boundary(observer, initial)
+    target_speed = math.sqrt(identity.mu / identity.target_radius)
+    realized_ratio = math.hypot(initial_state.vx, initial_state.vy) / (
+        target_speed + identity.ratio_denominator_epsilon
+    )
+    stop_report = evaluate_recovery_stop_conditions(
+        execution_terminal_reason="explicit_recovery_abort",
+        next_state=initial_state,
+        realized_speed_ratio=realized_ratio,
+        overspeed_threshold=identity.overspeed_threshold,
+        recovery_transition_count=0,
+        recovery_horizon_steps=MAXIMUM_RECOVERY_TRANSITIONS,
+        total_transition_count=identity.nominal_prefix_transition_count,
+        total_horizon_steps=identity.total_horizon,
+    )
+    if stop_report.terminal_reason != "explicit_abort":
+        raise ShadowCalibrationError(
+            "externally supplied explicit abort did not retain the frozen terminal reason"
+        )
+    terminal = BoundedRuntimeSnapshot(
+        snapshot_type=RuntimeSnapshotType.TERMINAL,
+        event_index=1,
+        identity=identity,
+        recovery_step=0,
+        total_transition_count=identity.nominal_prefix_transition_count,
+        pre_state=initial_state,
+        pre_state_hash=initial_hash,
+        action_disposition=ActionDisposition.NO_ACTION,
+        transition_executed=False,
+        evaluator_statuses=stop_report.statuses,
+        runtime_terminal_reason=stop_report.terminal_reason,
+        validation_terminal_reason="shadow_calibration_explicit_abort_observed",
+    )
+    _observe_terminal_boundary(observer, terminal)
+    return BoundedRecoveryValidationRun(
+        identity=identity,
+        initial_state=initial_state,
+        initial_state_hash=initial_hash,
+        snapshots=(initial, terminal),
+        transition_snapshots=(),
+        recovery_transition_count=0,
+        final_state=initial_state,
+        final_state_hash=initial_hash,
+        runtime_terminal_reason=stop_report.terminal_reason,
+        validation_terminal_reason="shadow_calibration_explicit_abort_observed",
+    )
+
+
 def capture_trace_pair(
     repository_root: Path,
     definition: CalibrationTraceDefinition,
@@ -292,24 +426,42 @@ def capture_trace_pair(
     implementation_commit: str,
 ) -> CapturedCalibrationTrace:
     baseline_state = load_registered_branch_state(repository_root, definition.registry_member_id)
-    baseline = run_registered_bounded_shadow_path(
-        baseline_state,
-        implementation_commit=implementation_commit,
-        branch_id=definition.branch_id,
-    )
+    if definition.explicit_abort:
+        baseline = run_explicit_abort_terminal_path(
+            baseline_state, implementation_commit=implementation_commit
+        )
+    else:
+        baseline = run_registered_bounded_shadow_path(
+            baseline_state,
+            implementation_commit=implementation_commit,
+            branch_id=definition.branch_id,
+        )
     observed_state = load_registered_branch_state(repository_root, definition.registry_member_id)
     identity, _ = build_registered_runtime_identity(
         observed_state,
         implementation_commit=implementation_commit,
         branch_id=definition.branch_id,
     )
-    adapter = ShadowObservationAdapter(identity, trace_id=definition.trace_id)
-    observed = run_registered_bounded_shadow_path(
-        observed_state,
-        implementation_commit=implementation_commit,
-        branch_id=definition.branch_id,
-        observer=adapter,
-    )
+    adapter: ShadowObservationAdapter
+    if definition.explicit_abort:
+        adapter = ExplicitAbortTerminalShadowAdapter(
+            identity, trace_id=definition.trace_id
+        )
+    else:
+        adapter = ShadowObservationAdapter(identity, trace_id=definition.trace_id)
+    if definition.explicit_abort:
+        observed = run_explicit_abort_terminal_path(
+            observed_state,
+            implementation_commit=implementation_commit,
+            observer=adapter,
+        )
+    else:
+        observed = run_registered_bounded_shadow_path(
+            observed_state,
+            implementation_commit=implementation_commit,
+            branch_id=definition.branch_id,
+            observer=adapter,
+        )
     equivalence = compare_physical_runs(baseline, observed)
     if equivalence.get("all_equivalence_checks") is not True:
         raise ShadowCalibrationError(f"physical equivalence failed for {definition.trace_id}")
@@ -1044,11 +1196,13 @@ __all__ = [
     "EXPECTED_PHYSICAL_EXECUTION_COUNT", "EXPECTED_SMOKE_MANIFEST_HASH", "EXPECTED_TRACE_COUNT",
     "EXPLICIT_ABORT_BRANCH", "NO_PROGRESS_COMPONENTS", "PHYSICAL_BRANCHES", "SCHEMA_VERSION",
     "TRACE_SET_OUTPUT_PATH", "CalibrationCandidate", "CalibrationTraceDefinition",
-    "CandidateReplayResult", "CapturedCalibrationTrace", "ShadowCalibrationError",
+    "CandidateReplayResult", "CapturedCalibrationTrace", "ExplicitAbortTerminalShadowAdapter",
+    "ShadowCalibrationError",
     "analyze_candidates", "atomic_publish_new_directory", "build_calibration_payloads",
     "build_trace_set_payloads", "calibration_candidates", "capture_trace_pair", "candidate_id",
     "config_canonical_hash", "guard_evaluation_document", "guard_evaluation_from_document",
     "load_and_validate_config", "load_trace_set", "ranking_tuple", "replay_candidate",
+    "run_explicit_abort_terminal_path",
     "sha256_bytes", "trace_definitions", "trace_jsonl_bytes", "validate_calibration_payloads",
     "validate_trace_set_payloads",
 ]
