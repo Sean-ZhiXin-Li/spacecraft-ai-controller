@@ -1,0 +1,161 @@
+{
+  "schema_version": "staged_recovery_shadow_calibration_v0",
+  "traces": [
+    {
+      "branch_id": "explicit_abort_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "event_count": 2,
+      "explicit_abort": true,
+      "registry_member_id": "legacy_canonical",
+      "terminal_reason": "explicit_abort",
+      "trace_id": "legacy_canonical__explicit_abort_v0",
+      "trace_path": "traces/legacy_canonical__explicit_abort_v0.jsonl",
+      "trace_sha256": "733edb716433bad3979caa82315ff6b24649489e552d204e38157bee2ad3dbda",
+      "transition_count": 0
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "event_count": 34,
+      "explicit_abort": false,
+      "registry_member_id": "legacy_canonical",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_id": "legacy_canonical__tangential_error_correction_v0",
+      "trace_path": "traces/legacy_canonical__tangential_error_correction_v0.jsonl",
+      "trace_sha256": "7203a4001ba2e7123554fd6f03139470da07290453262947f8da3a801b72b6c3",
+      "transition_count": 32
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "event_count": 34,
+      "explicit_abort": false,
+      "registry_member_id": "legacy_canonical",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_id": "legacy_canonical__velocity_opposed_thrust_v0",
+      "trace_path": "traces/legacy_canonical__velocity_opposed_thrust_v0.jsonl",
+      "trace_sha256": "faa82b9959aada5fde1ed7f560b63d6eee6e405d81ebdaf28c988e995708c250",
+      "transition_count": 32
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "event_count": 34,
+      "explicit_abort": false,
+      "registry_member_id": "legacy_canonical",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_id": "legacy_canonical__zero_action_reference_v0",
+      "trace_path": "traces/legacy_canonical__zero_action_reference_v0.jsonl",
+      "trace_sha256": "280499e8bc7c0849c335877f013c32cdddf2e81cddf79f673a88befe07b0669e",
+      "transition_count": 32
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+      "event_count": 34,
+      "explicit_abort": false,
+      "registry_member_id": "member__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_id": "member__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000__tangential_error_correction_v0",
+      "trace_path": "traces/member__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000__tangential_error_correction_v0.jsonl",
+      "trace_sha256": "e5420ac283549ba6d68b310634ecc5ee6a8245290faeac8d6aa7839bd3f5430b",
+      "transition_count": 32
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+      "event_count": 34,
+      "explicit_abort": false,
+      "registry_member_id": "member__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_id": "member__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000__velocity_opposed_thrust_v0",
+      "trace_path": "traces/member__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000__velocity_opposed_thrust_v0.jsonl",
+      "trace_sha256": "9d69908abff26a4e1802e56ae7010aa5f452f59c88c00808cb4d8e37bdda77a9",
+      "transition_count": 32
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+      "event_count": 34,
+      "explicit_abort": false,
+      "registry_member_id": "member__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_id": "member__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000__zero_action_reference_v0",
+      "trace_path": "traces/member__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000__zero_action_reference_v0.jsonl",
+      "trace_sha256": "1478299725afbbd5414f552be4c8c9baa8d16386ffde1c8482d81533ddf6fe5e",
+      "transition_count": 32
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "event_count": 34,
+      "explicit_abort": false,
+      "registry_member_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000__tangential_error_correction_v0",
+      "trace_path": "traces/member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000__tangential_error_correction_v0.jsonl",
+      "trace_sha256": "533bfef2da44e7ccc795c71c96eb837a3a6c00859b8d41c0d07ef29df9fe2697",
+      "transition_count": 32
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "event_count": 34,
+      "explicit_abort": false,
+      "registry_member_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000__velocity_opposed_thrust_v0",
+      "trace_path": "traces/member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000__velocity_opposed_thrust_v0.jsonl",
+      "trace_sha256": "76a8bffecf62fb4448809fe9b5f7831ac8f05958cbf0795d15557e4384b39149",
+      "transition_count": 32
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "event_count": 34,
+      "explicit_abort": false,
+      "registry_member_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000__zero_action_reference_v0",
+      "trace_path": "traces/member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000__zero_action_reference_v0.jsonl",
+      "trace_sha256": "458f939571d03771749335ff52104f70c87f70caf6746a4661349d34bccecc54",
+      "transition_count": 32
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "event_count": 34,
+      "explicit_abort": false,
+      "registry_member_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000__tangential_error_correction_v0",
+      "trace_path": "traces/member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000__tangential_error_correction_v0.jsonl",
+      "trace_sha256": "74f5c263367797e2cc28f9a8c0bdde864ab1a2859b185c4365f657e0dba3e4c8",
+      "transition_count": 32
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "event_count": 34,
+      "explicit_abort": false,
+      "registry_member_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000__velocity_opposed_thrust_v0",
+      "trace_path": "traces/member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000__velocity_opposed_thrust_v0.jsonl",
+      "trace_sha256": "a54d93fbaa3ed69a7bd7d2caae20df1189b9c401b844c437a6a0b3346833fca9",
+      "transition_count": 32
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "event_count": 34,
+      "explicit_abort": false,
+      "registry_member_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "terminal_reason": "recovery_horizon_exhausted",
+      "trace_id": "member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000__zero_action_reference_v0",
+      "trace_path": "traces/member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000__zero_action_reference_v0.jsonl",
+      "trace_sha256": "54b25fad4a7e3edb93b9a6f6a92726c2a560c028211385a27e539ff9a412d33e",
+      "transition_count": 32
+    }
+  ]
+}

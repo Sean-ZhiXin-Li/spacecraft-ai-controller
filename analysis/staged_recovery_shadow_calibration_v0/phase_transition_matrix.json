@@ -1,0 +1,571 @@
+{
+  "matrix": [
+    {
+      "blocked_count": 0,
+      "desired_phase": "hazard_arrest",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "hazard_arrest"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "stabilization_assessment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "hazard_arrest"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "radial_recommitment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "hazard_arrest"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "tangential_alignment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "hazard_arrest"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "crossing_preparation",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "hazard_arrest"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "recoverability_verification",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "hazard_arrest"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "nominal_handoff",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "hazard_arrest"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "retreat",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "hazard_arrest"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "explicit_abort",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "hazard_arrest"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "hazard_arrest",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "stabilization_assessment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "stabilization_assessment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 12,
+      "source_phase": "stabilization_assessment"
+    },
+    {
+      "blocked_count": 18,
+      "desired_phase": "radial_recommitment",
+      "executed_shadow_transition_count": 9,
+      "recommendation_count": 27,
+      "source_phase": "stabilization_assessment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "tangential_alignment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "stabilization_assessment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "crossing_preparation",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "stabilization_assessment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "recoverability_verification",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "stabilization_assessment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "nominal_handoff",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "stabilization_assessment"
+    },
+    {
+      "blocked_count": 6,
+      "desired_phase": "retreat",
+      "executed_shadow_transition_count": 3,
+      "recommendation_count": 9,
+      "source_phase": "stabilization_assessment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "explicit_abort",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 1,
+      "source_phase": "stabilization_assessment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "hazard_arrest",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "radial_recommitment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "stabilization_assessment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 5,
+      "source_phase": "radial_recommitment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "radial_recommitment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 207,
+      "source_phase": "radial_recommitment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "tangential_alignment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "radial_recommitment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "crossing_preparation",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "radial_recommitment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "recoverability_verification",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "radial_recommitment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "nominal_handoff",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "radial_recommitment"
+    },
+    {
+      "blocked_count": 1,
+      "desired_phase": "retreat",
+      "executed_shadow_transition_count": 4,
+      "recommendation_count": 5,
+      "source_phase": "radial_recommitment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "explicit_abort",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "radial_recommitment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "hazard_arrest",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "tangential_alignment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "stabilization_assessment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "tangential_alignment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "radial_recommitment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "tangential_alignment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "tangential_alignment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "tangential_alignment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "crossing_preparation",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "tangential_alignment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "recoverability_verification",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "tangential_alignment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "nominal_handoff",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "tangential_alignment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "retreat",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "tangential_alignment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "explicit_abort",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "tangential_alignment"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "hazard_arrest",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "crossing_preparation"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "stabilization_assessment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "crossing_preparation"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "radial_recommitment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "crossing_preparation"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "tangential_alignment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "crossing_preparation"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "crossing_preparation",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "crossing_preparation"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "recoverability_verification",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "crossing_preparation"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "nominal_handoff",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "crossing_preparation"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "retreat",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "crossing_preparation"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "explicit_abort",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "crossing_preparation"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "hazard_arrest",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "recoverability_verification"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "stabilization_assessment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "recoverability_verification"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "radial_recommitment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "recoverability_verification"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "tangential_alignment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "recoverability_verification"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "crossing_preparation",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "recoverability_verification"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "recoverability_verification",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "recoverability_verification"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "nominal_handoff",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "recoverability_verification"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "retreat",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "recoverability_verification"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "explicit_abort",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "recoverability_verification"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "hazard_arrest",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "nominal_handoff"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "stabilization_assessment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "nominal_handoff"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "radial_recommitment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "nominal_handoff"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "tangential_alignment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "nominal_handoff"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "crossing_preparation",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "nominal_handoff"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "recoverability_verification",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "nominal_handoff"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "nominal_handoff",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "nominal_handoff"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "retreat",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "nominal_handoff"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "explicit_abort",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "nominal_handoff"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "hazard_arrest",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "retreat"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "stabilization_assessment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 7,
+      "source_phase": "retreat"
+    },
+    {
+      "blocked_count": 13,
+      "desired_phase": "radial_recommitment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 13,
+      "source_phase": "retreat"
+    },
+    {
+      "blocked_count": 8,
+      "desired_phase": "tangential_alignment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 8,
+      "source_phase": "retreat"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "crossing_preparation",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "retreat"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "recoverability_verification",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "retreat"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "nominal_handoff",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "retreat"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "retreat",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 103,
+      "source_phase": "retreat"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "explicit_abort",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "retreat"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "hazard_arrest",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "explicit_abort"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "stabilization_assessment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "explicit_abort"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "radial_recommitment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "explicit_abort"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "tangential_alignment",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "explicit_abort"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "crossing_preparation",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "explicit_abort"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "recoverability_verification",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "explicit_abort"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "nominal_handoff",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "explicit_abort"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "retreat",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "explicit_abort"
+    },
+    {
+      "blocked_count": 0,
+      "desired_phase": "explicit_abort",
+      "executed_shadow_transition_count": 0,
+      "recommendation_count": 0,
+      "source_phase": "explicit_abort"
+    }
+  ]
+}
