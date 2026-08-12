@@ -1,0 +1,77 @@
+{
+  "active_authority_granted": false,
+  "allowed_future_active_phase": "hazard_arrest",
+  "authority_boundary_id": "stage2a_active_hazard_arrest_authority_boundary_v0",
+  "completed_date": "2026-08-12",
+  "current_control_authority": false,
+  "current_staged_recovery_execution": "not_authorized",
+  "existing_normal_authority": "predeclared_existing_recovery_branch",
+  "explicit_abort_semantics": {
+    "physical_action": null,
+    "physical_transition_count": 0,
+    "semantics": "externally_supplied_terminal_evidence"
+  },
+  "final_veto": {
+    "comparator": ">",
+    "decision_on_exceedance": "veto",
+    "monitor_id": "one_step_overspeed_veto_v0",
+    "must_remain_active": true,
+    "recovery_executor_veto_result": "recovery_action_rejected_with_zero_transition_and_no_fallback_execution",
+    "threshold": 1.9
+  },
+  "future_authority_scope": {
+    "active_phase": "hazard_arrest_only",
+    "entry_contract": "valid normal-branch predicted_speed_ratio > 1.90 while current realized_speed_ratio <= 1.90",
+    "intervention_action_source": "velocity_opposed_thrust_v0",
+    "intervention_action_status": "provisional_mapping_not_implemented_or_authorized",
+    "maximum_intervention_proposals_per_trace": 1,
+    "realized_overspeed_handling": "existing_adverse_terminal_condition_not_active_entry_authority",
+    "release_contract": "after one allowed intervention, fresh valid realized_speed_ratio <= 1.90 and resumed-branch predicted_speed_ratio <= 1.90 with no adverse stop; otherwise no second intervention",
+    "return_authority_to": "exact_predeclared_existing_recovery_branch",
+    "shadow_output_is_control_input": false
+  },
+  "future_entry_contract_status": "requires_separate_freeze_and_authorization",
+  "future_release_contract_status": "requires_separate_freeze_and_authorization",
+  "immediate_block_conditions": [
+    "missing_or_invalid_required_evidence",
+    "nonfinite_or_inconsistent_state",
+    "provenance_or_registry_hash_failure",
+    "action_mapping_mismatch",
+    "prediction_failure",
+    "final_veto_rejection",
+    "action_contract_or_clipping_mismatch",
+    "authority_request_for_non_hazard_phase",
+    "intervention_or_experiment_bound_exhausted"
+  ],
+  "preserved_adverse_stop_priority": [
+    "invalid_simulation",
+    "invalid_recovery_evaluation",
+    "overspeed",
+    "instability",
+    "unsafe_state",
+    "action_rejected",
+    "explicit_abort",
+    "recovery_success",
+    "recovery_horizon_exhausted",
+    "total_horizon_exhausted"
+  ],
+  "prohibited_active_phases": [
+    "stabilization_assessment",
+    "radial_recommitment",
+    "tangential_alignment",
+    "crossing_preparation",
+    "recoverability_verification",
+    "nominal_handoff",
+    "retreat"
+  ],
+  "scientific_thresholds_frozen": false,
+  "shadow_candidate_consumed_as_active_policy": false,
+  "source_paths": [
+    "runtime_assurance/final_veto_monitor.py",
+    "runtime_assurance/recovery_branch_executor.py",
+    "runtime_assurance/recovery_stop_conditions.py",
+    "runtime_assurance/staged_recovery_contract.py",
+    "runtime_assurance/staged_recovery_shadow_guard.py",
+    "analysis/staged_recovery_shadow_calibration_v0/engineering_candidate.json"
+  ]
+}

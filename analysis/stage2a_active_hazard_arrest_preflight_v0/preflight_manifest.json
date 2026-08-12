@@ -1,0 +1,30 @@
+{
+  "active_authority_granted": false,
+  "artifact_classification": "read_only_active_authority_boundary_preflight",
+  "artifact_filenames": [
+    "authority_boundary.json",
+    "evidence_readiness.json",
+    "preflight_manifest.json",
+    "summary.md"
+  ],
+  "canonical_manifest_hash": "24b91373343d8381f980c08cd23c34b9671ee618a27bdadb680830cd670f44a2",
+  "claim_restrictions": [
+    "no controller or recovery improvement claim",
+    "no active threshold validation claim",
+    "no stability or optimality claim",
+    "no handoff retreat formal safety hardware or deployment claim"
+  ],
+  "completed_date": "2026-08-12",
+  "engineering_candidate_hash": "0b0291ac20b3f74c1b10a61ab206d33f14b1284ef94c9d9c227d0dd7fccb9d06",
+  "final_veto_changed": false,
+  "new_active_controller": false,
+  "new_physical_execution": false,
+  "preflight_id": "stage2a_active_hazard_arrest_preflight_v0",
+  "schema_version": "stage2a_active_hazard_arrest_preflight_v0",
+  "source_candidate_id": "shadow_candidate_hc2_d4_w2_r3_n1_cd0_tb8",
+  "source_commit": "1c6aa31d1d9e576d0b9c0ce222c4f7196f25d700",
+  "source_stage1b_calibration_manifest_hash": "5340737abf4a52ec54b9e57ec89ccb83e17b57bf2f4f26fb183236d7e21739e9",
+  "source_trace_set_aggregate_hash": "ab4fd8a70e2aa446e4996126a53685999f55a24baa2522a688ed72b0c2d5cfa0",
+  "staged_recovery_execution": "not_authorized",
+  "status": "authority_contract_frozen_for_future_implementation_review"
+}

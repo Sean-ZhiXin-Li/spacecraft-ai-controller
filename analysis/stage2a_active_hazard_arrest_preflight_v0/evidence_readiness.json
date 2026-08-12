@@ -1,0 +1,89 @@
+{
+  "completed_date": "2026-08-12",
+  "evidence_items": [
+    {
+      "active_trigger_authorized": false,
+      "evidence_id": "measured_cartesian_state",
+      "evidence_level": "measured",
+      "readiness": "ready_now",
+      "source": "runtime_assurance/staged_recovery_instrumentation.py"
+    },
+    {
+      "active_trigger_authorized": false,
+      "comparator": ">",
+      "evidence_id": "realized_overspeed",
+      "evidence_level": "derived_from_measured_state",
+      "readiness": "ready_now",
+      "threshold": 1.9
+    },
+    {
+      "active_trigger_authorized": false,
+      "comparator": ">",
+      "evidence_id": "predicted_overspeed",
+      "evidence_level": "predicted",
+      "readiness": "ready_now_for_final_veto_not_active_phase_authority",
+      "threshold": 1.9
+    },
+    {
+      "active_trigger_authorized": false,
+      "evidence_id": "overspeed_headroom",
+      "evidence_level": "derived",
+      "readiness": "ready_now_diagnostic_only"
+    },
+    {
+      "active_trigger_authorized": false,
+      "evidence_id": "final_veto_decision",
+      "evidence_level": "externally_supplied_measured_runtime_decision",
+      "readiness": "ready_now_existing_authority"
+    },
+    {
+      "active_trigger_authorized": false,
+      "evidence_id": "state_and_instrumentation_validity",
+      "evidence_level": "measured_and_derived_status",
+      "readiness": "ready_now_as_blocking_precondition"
+    },
+    {
+      "active_trigger_authorized": false,
+      "evidence_id": "instability_and_unsafe_state",
+      "evidence_level": "externally_supplied",
+      "readiness": "not_ready_when_evaluator_output_is_unavailable"
+    },
+    {
+      "active_trigger_authorized": false,
+      "evidence_id": "available_correction_authority",
+      "evidence_level": "unsupported",
+      "readiness": "not_ready"
+    },
+    {
+      "active_trigger_authorized": false,
+      "evidence_id": "handoff_readiness",
+      "evidence_level": "not_evaluated",
+      "readiness": "not_ready"
+    },
+    {
+      "active_trigger_authorized": false,
+      "evidence_id": "shadow_phase_and_engineering_parameters",
+      "evidence_level": "shadow_derived_engineering_only",
+      "readiness": "prohibited_as_active_evidence"
+    }
+  ],
+  "invalid_evidence_policy": "block_active_use_and_preserve_invalid_status",
+  "missing_evidence_policy": "do_not_convert_to_false_true_zero_pass_or_fail",
+  "preflight_id": "stage2a_active_hazard_arrest_preflight_v0",
+  "selected_candidate_context": {
+    "active_authority": false,
+    "hazard_arrest_entries": 0,
+    "invalid_guard_count": 0,
+    "scientific_threshold_validation": "not_performed",
+    "shadow_only": true,
+    "source_candidate_id": "shadow_candidate_hc2_d4_w2_r3_n1_cd0_tb8",
+    "staged_recovery_execution": "not_authorized",
+    "unavailable_guard_count": 2817
+  },
+  "strict_overspeed_semantics": {
+    "exactly_at_threshold_is_clear": true,
+    "predicted_and_realized_are_separate": true,
+    "threshold": 1.9,
+    "trigger_comparator": ">"
+  }
+}
