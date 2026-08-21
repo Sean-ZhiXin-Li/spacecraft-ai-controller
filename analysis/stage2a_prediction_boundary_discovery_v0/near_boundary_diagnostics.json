@@ -1,0 +1,793 @@
+{
+  "diagnostic_bins": {
+    "predicted_ratio_1p80_to_lt_1p85": "1.80 <= predicted_speed_ratio < 1.85",
+    "predicted_ratio_1p85_to_1p90_inclusive": "1.85 <= predicted_speed_ratio <= 1.90",
+    "predicted_ratio_gt_1p90": "predicted_speed_ratio > 1.90",
+    "predicted_ratio_lt_1p80": "predicted_speed_ratio < 1.80"
+  },
+  "diagnostic_bins_are_new_thresholds": false,
+  "schema_version": "stage2a_prediction_boundary_discovery_v0",
+  "trajectories": [
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000000497,
+      "closest_approach_predicted_state_hash": "ecf2acaaafe2d57f6ce7fbc6b5c52d7512e8d70b43fcc860a9f953822905e876",
+      "closest_approach_state_hash": "ea9a76b81b4d22c698330a7405867e698d79771f93d5cba04900ae16ab680f36",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000000497,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000484,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999999502,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_10000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        -0.24999999995843328,
+        -4.558878174408856e-06
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000001834,
+      "closest_approach_predicted_state_hash": "15194ec6c08c5ed54d6e1a46228e1e47adcce699daabd00f53bef7b1d17cebe1",
+      "closest_approach_state_hash": "42f888504b72b577c31c4fe0acaa66ad2a603e8d2dc901a85fa4d44430bd0e75",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000001834,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000001645,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999998165,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_10000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.24999999996569047,
+        4.141830468694618e-06
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 0.9176974693044023,
+      "closest_approach_predicted_state_hash": "5c4d1e0d65d606d3eea5deb45c9e9ce2bdaa4e35e4dc3242dc3638cdb1dcc3b8",
+      "closest_approach_state_hash": "4e5eba44cbdfcb85daa3053e363869a5f3882c95abbe34f9c06cf8311971b34e",
+      "maximum_normal_predicted_speed_ratio": 0.9176974693044023,
+      "maximum_realized_speed_ratio_while_clear": 1.000000000000005,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.9823025306955976,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_10000__velocity_opposed_thrust_v0"
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000000544,
+      "closest_approach_predicted_state_hash": "a0bc071a7edbea922508336c7d44bb44042e74312f62bc2d81344b1ca4647ebd",
+      "closest_approach_state_hash": "8d94144cde642f09cbdfea83e690a4feaa89742c25587da2cc97251d265e798c",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000000544,
+      "maximum_realized_speed_ratio_while_clear": 1.000000000000053,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999999455,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_8000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        -0.24999999994847458,
+        -5.0756978343265235e-06
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000001619,
+      "closest_approach_predicted_state_hash": "1a5cd72c2c77b738d068611093abf134bed85fa9fb5af9db8e6c7acd71a3cb6a",
+      "closest_approach_state_hash": "b95ee7c1a2c8ed78d81de130ec88f2ee11d106d7aa2a5f251561bdb39df10bf4",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000001619,
+      "maximum_realized_speed_ratio_while_clear": 1.000000000000146,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.899999999999838,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_8000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.24999999995665512,
+        4.655366584572677e-06
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 0.934157975443525,
+      "closest_approach_predicted_state_hash": "dc1f778c7a0ab3b10cf849fbf16859538c50f9e560e29869612a1af831bb8784",
+      "closest_approach_state_hash": "02293431143833493e0e4e08315e1e9d42d57fed1ee3cba3155b8bd67bae75d6",
+      "maximum_normal_predicted_speed_ratio": 0.934157975443525,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000069,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.9658420245564749,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_8000__velocity_opposed_thrust_v0"
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000000537,
+      "closest_approach_predicted_state_hash": "286e6d178872fbe64121115a9b34542a708ab018c919d6d0d33dba4958d3cc47",
+      "closest_approach_state_hash": "476c5fa6d03b345df8f918a52d1a204387017dc80e04ad60e1ecb81dfc7f5740",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000000537,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000524,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999999462,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_10000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        -0.24999999996593186,
+        -4.127234867336824e-06
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000001867,
+      "closest_approach_predicted_state_hash": "4af46aec75ef16ef0713ab8390f9144e47a83930b5ab63be615ae0e5e97af64c",
+      "closest_approach_state_hash": "44840fe9b0339adbce3e2bbb7ecf0e91a65379ad9e00ee6a36dd2a20a4cb629a",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000001867,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000001676,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999998132,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_10000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.2499999999724624,
+        3.7106344614793754e-06
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 0.9176974693044028,
+      "closest_approach_predicted_state_hash": "14b48a9a8203c54a94e4e0fc4ae798150952863451db276188739f78b910c7b2",
+      "closest_approach_state_hash": "a7390d4d979c87b9660afe73c0dbf0163f62800de5b97d8dcadc91890087f859",
+      "maximum_normal_predicted_speed_ratio": 0.9176974693044028,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000053,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.9823025306955971,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_10000__velocity_opposed_thrust_v0"
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000000568,
+      "closest_approach_predicted_state_hash": "62c076addb8e52a871c13ed8fc314fa971e90adec412cffd41c92b24422e8da2",
+      "closest_approach_state_hash": "b0bc8f279b1aeb7f55cc7d55f687dd145f13e4a06149a96ad3bec4282fe6a653",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000000568,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000555,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999999431,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_8000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        -0.2499999999579654,
+        -4.58446384142311e-06
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000001648,
+      "closest_approach_predicted_state_hash": "fb02db2d89b430e44d70ca2de950cee2f5e713da0f25a75e414f42b626462b79",
+      "closest_approach_state_hash": "64289ae279aee9c0edca3642b29dab5391b96b5960a02ce58ea4bfe7b0e297ef",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000001648,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000001488,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999998352,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_8000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.2499999999653153,
+        4.1644147180021054e-06
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 0.9341579754435256,
+      "closest_approach_predicted_state_hash": "d89b2b45be7f3012df1f34dc06101ac3081505ded5ff8cfd6ebf874e7742e844",
+      "closest_approach_state_hash": "38d77bd15418026190c1244cad10298a6a32a730a47ce5c824ad1b6acc770d0e",
+      "maximum_normal_predicted_speed_ratio": 0.9341579754435256,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000073,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.9658420245564743,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_8000__velocity_opposed_thrust_v0"
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000000557,
+      "closest_approach_predicted_state_hash": "43ab16d3685dec58d581e3b9c808e62c84a75fad54b0b47cb7416caf0caba659",
+      "closest_approach_state_hash": "c03379aed0bfa2484ecb0746c5d2828c215f802707b1dae217a102e8794d0aca",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000000557,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000542,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999999442,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_10000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        -0.24999999996694136,
+        -4.065625455163459e-06
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000001894,
+      "closest_approach_predicted_state_hash": "5567673386c3f71561cf535f995cfca6082188d424a8a3cda019cb7067e4b62a",
+      "closest_approach_state_hash": "ab0d7b61e729a4fe94d5af763de35c9bf6b46747e33b2c2cb44f0a2c69c25bba",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000001894,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000001703,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999998105,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_10000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.2499999999733646,
+        3.6493404288033185e-06
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 0.9176974693044031,
+      "closest_approach_predicted_state_hash": "386bcd8b3762a8fe6d28267bfbd85e3272d5378c5c8123dadec5ef2b97bc1034",
+      "closest_approach_state_hash": "72351b6cf96357c6687bca594a8f9259f4fd0287dd615534a83d934b338e3ce8",
+      "maximum_normal_predicted_speed_ratio": 0.9176974693044031,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000058,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.9823025306955968,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_10000__velocity_opposed_thrust_v0"
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000000546,
+      "closest_approach_predicted_state_hash": "9f9e5c02da81e1ac17b4f20bdab2d24e4b5049f4bc85cc21463ce042688b8392",
+      "closest_approach_state_hash": "0e0fb6acff36c6238a023fb10a0e5034f77e22ecc88c640f78abf0896b47d81a",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000000546,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000533,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999999453,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_8000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        -0.24999999996576755,
+        -4.137175352911695e-06
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000001628,
+      "closest_approach_predicted_state_hash": "1835b04f355611adc53bb5da78dbb5876fb3152d76ea934a1961acc8712f58c0",
+      "closest_approach_state_hash": "b32dd6f12aaa6f34718754d83f32324fb28b528fb3bf75a906e59ef2cff9e81f",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000001628,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000001468,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999998372,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_8000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.24999999997236932,
+        3.7168981178107357e-06
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 0.9341579754435251,
+      "closest_approach_predicted_state_hash": "4392b1106f96fcbd33021a3c679b66facdc8b8fdf46dc2a860c4eb27a2dcbbc6",
+      "closest_approach_state_hash": "d3b05d23fa267f36c61e75c0db0296e1788a2983c1209685310c361ffe250d77",
+      "maximum_normal_predicted_speed_ratio": 0.9341579754435251,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000069,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.9658420245564748,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_8000__velocity_opposed_thrust_v0"
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000000564,
+      "closest_approach_predicted_state_hash": "1c57e7cf1116d7e0069ec21c249377fb444bd7cfe258b2144fbbf2110454bece",
+      "closest_approach_state_hash": "2fbd49b2fd82b511618bd575f4ea636d950d6d05c1a8c11418620f7d969d2fe9",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000000564,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000548,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999999435,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_10000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        -0.24999999996768169,
+        -4.019846985975544e-06
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000001898,
+      "closest_approach_predicted_state_hash": "111f41e0aca2255388fd3967f33771dab5a731d7048b845de589e7eb423b1d37",
+      "closest_approach_state_hash": "bb26fe8b9549b642c5d348c512cbee51100db6cbef2b2b4cbc7d52faa169466d",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000001898,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000001705,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999998101,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_10000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.24999999997402855,
+        3.60357225261872e-06
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 0.9176974693044032,
+      "closest_approach_predicted_state_hash": "1f0cc8ce46dc636809e1db9a8e82396c1f7fad3bc8cfb50bb97b64ab6b616716",
+      "closest_approach_state_hash": "424672806442bc35d0f63bba38f10264e49f11b128cc1ae64db08ded0e2b631b",
+      "maximum_normal_predicted_speed_ratio": 0.9176974693044032,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000058,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.9823025306955967,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_10000__velocity_opposed_thrust_v0"
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000000577,
+      "closest_approach_predicted_state_hash": "ca8a18afe14718129d6d756cc393db83d21afbc69244126bfe66a8346667faf5",
+      "closest_approach_state_hash": "d64ac8b1b13eae892fe348f58e3bd13214737728e05bd85e87a8222d74d9f6b0",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000000577,
+      "maximum_realized_speed_ratio_while_clear": 1.000000000000056,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999999422,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        -0.2499999999033355,
+        -6.952140212472811e-06
+      ],
+      "closest_approach_event_index": 31,
+      "closest_approach_predicted_speed_ratio": 1.0000000000001648,
+      "closest_approach_predicted_state_hash": "5c76b41a75d5432c7d25de9ebabc08f3d5d6ddade7fde12184623ccb43380a44",
+      "closest_approach_state_hash": "a9d52990cdc213983e4f2982a41ab584ddc74719910726f47cca824156e83cc8",
+      "maximum_normal_predicted_speed_ratio": 1.0000000000001648,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000001485,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.8999999999998352,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase34_known_recoverable_preservation_v1",
+      "case_id": "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.24999999991466143,
+        6.532173156781103e-06
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 0.9341579754435256,
+      "closest_approach_predicted_state_hash": "7a0bccfe393642877c6fb8a2e7a36e283235ada88e75c74d94b5474f75bca97d",
+      "closest_approach_state_hash": "0767ff119be28b3b442bb39f79c9efe6cabdb37f32aabd92e95d8e4bfce2ada5",
+      "maximum_normal_predicted_speed_ratio": 0.9341579754435256,
+      "maximum_realized_speed_ratio_while_clear": 1.0000000000000073,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.9658420245564743,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000__velocity_opposed_thrust_v0"
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.8783279282796317,
+      "closest_approach_predicted_state_hash": "ded46e55ae0f35c9ce5b87ddfd62e26a8dd8955dc6284f2a4194f8dce380913d",
+      "closest_approach_state_hash": "93e9088f40324cc00273e39a74d8b0e3d24bb306bdf4c0558b9990f1cc3e8153",
+      "maximum_normal_predicted_speed_ratio": 1.8783279282796317,
+      "maximum_realized_speed_ratio_while_clear": 1.8783279728150262,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.021672071720368224,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.24999999999978073,
+        3.311061265260781e-07
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.8261560717041665,
+      "closest_approach_predicted_state_hash": "5776080530056571f6cae6aa0729b20ee23d2fd0f3397db8eaea518e0ec3744d",
+      "closest_approach_state_hash": "93e9088f40324cc00273e39a74d8b0e3d24bb306bdf4c0558b9990f1cc3e8153",
+      "maximum_normal_predicted_speed_ratio": 1.8261560717041665,
+      "maximum_realized_speed_ratio_while_clear": 1.8783279728150262,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.07384392829583342,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.16175233217041332,
+        -0.1906205210291701
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.7960253975840275,
+      "closest_approach_predicted_state_hash": "f46120fecf1ed3ba8276199635aff3f5a1d6135550e190a841b917d9d04355e5",
+      "closest_approach_state_hash": "93e9088f40324cc00273e39a74d8b0e3d24bb306bdf4c0558b9990f1cc3e8153",
+      "maximum_normal_predicted_speed_ratio": 1.7960253975840275,
+      "maximum_realized_speed_ratio_while_clear": 1.8783279728150262,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.10397460241597245,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000__velocity_opposed_thrust_v0"
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.8906024003603095,
+      "closest_approach_predicted_state_hash": "801e8f138bdacdf9ef79d8e13141ac108e048e95ed2beea820a8bc6cc314ff75",
+      "closest_approach_state_hash": "636847a9a1972cb5d07a8434778c7bae883a0ee591b43dc34082650d34b8ecc1",
+      "maximum_normal_predicted_speed_ratio": 1.8906024003603095,
+      "maximum_realized_speed_ratio_while_clear": 1.8906024454524528,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.009397599639690446,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.24999999999963954,
+        4.245380780436667e-07
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.8494516264933416,
+      "closest_approach_predicted_state_hash": "9eb96d838090990878a41f4e5325987a25348b9ac3f788fe742f26f77e559662",
+      "closest_approach_state_hash": "636847a9a1972cb5d07a8434778c7bae883a0ee591b43dc34082650d34b8ecc1",
+      "maximum_normal_predicted_speed_ratio": 1.8494516264933416,
+      "maximum_realized_speed_ratio_while_clear": 1.8906024454524528,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.050548373506658306,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.1589012563475844,
+        -0.19300360289683524
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.824760375803826,
+      "closest_approach_predicted_state_hash": "7919deb16bc3af422bca3f2b45f32bb6e9cb97fc7b7c2045ebcbe22d6cdd2a1d",
+      "closest_approach_state_hash": "636847a9a1972cb5d07a8434778c7bae883a0ee591b43dc34082650d34b8ecc1",
+      "maximum_normal_predicted_speed_ratio": 1.824760375803826,
+      "maximum_realized_speed_ratio_while_clear": 1.8906024454524528,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.07523962419617392,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000__velocity_opposed_thrust_v0"
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.8832193641318504,
+      "closest_approach_predicted_state_hash": "0a8e34feb34b1e60432c2e43a9ef1564eaf776701b58f2bb6e4338fc98f21d0e",
+      "closest_approach_state_hash": "707008f69c03782a2b84fef93f0bf3682cc265a720843ce903c9dc1106e836f5",
+      "maximum_normal_predicted_speed_ratio": 1.8832193641318504,
+      "maximum_realized_speed_ratio_while_clear": 1.88321940520396,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.016780635868149485,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.24999999999964573,
+        4.2088102578350855e-07
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.8256195496538605,
+      "closest_approach_predicted_state_hash": "8dfdb424c63dff600f3aa31c816f7ab2f030c4b726a74437e779252d59212f8f",
+      "closest_approach_state_hash": "707008f69c03782a2b84fef93f0bf3682cc265a720843ce903c9dc1106e836f5",
+      "maximum_normal_predicted_speed_ratio": 1.8256195496538605,
+      "maximum_realized_speed_ratio_while_clear": 1.88321940520396,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.07438045034613938,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.17775115563289792,
+        -0.17579683350723158
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.8009168334362462,
+      "closest_approach_predicted_state_hash": "68f59ff16a818eeb8d6d0175f1e31b16eca615706b32f92548ddada85879532e",
+      "closest_approach_state_hash": "707008f69c03782a2b84fef93f0bf3682cc265a720843ce903c9dc1106e836f5",
+      "maximum_normal_predicted_speed_ratio": 1.8009168334362462,
+      "maximum_realized_speed_ratio_while_clear": 1.88321940520396,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.09908316656375371,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000__velocity_opposed_thrust_v0"
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.885065281807118,
+      "closest_approach_predicted_state_hash": "f7355cc406fa388997736dc19642c270d78d3c28dbbbb8d88bc4bda56d5679cd",
+      "closest_approach_state_hash": "56cf2a1722911ffc77074a1b21b64209fa742c6b7e062c28d3c11214af7ff53d",
+      "maximum_normal_predicted_speed_ratio": 1.885065281807118,
+      "maximum_realized_speed_ratio_while_clear": 1.8850653215706912,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.014934718192881835,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.24999999999959535,
+        4.4979755739982056e-07
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.8256400803089328,
+      "closest_approach_predicted_state_hash": "bcd9ddfbdd96b3653ca6111c565273a8d5fc54b02fd5d917041df9a94c46dae9",
+      "closest_approach_state_hash": "56cf2a1722911ffc77074a1b21b64209fa742c6b7e062c28d3c11214af7ff53d",
+      "maximum_normal_predicted_speed_ratio": 1.8256400803089328,
+      "maximum_realized_speed_ratio_while_clear": 1.8850653215706912,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.07435991969106714,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.18312107494325033,
+        -0.17019598089152543
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.802762751111514,
+      "closest_approach_predicted_state_hash": "d5b4261f7c01fea33ff55c564a94ffb0c386fbddc58418499090e2b894acdce2",
+      "closest_approach_state_hash": "56cf2a1722911ffc77074a1b21b64209fa742c6b7e062c28d3c11214af7ff53d",
+      "maximum_normal_predicted_speed_ratio": 1.802762751111514,
+      "maximum_realized_speed_ratio_while_clear": 1.8850653215706912,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.09723724888848584,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000__velocity_opposed_thrust_v0"
+    },
+    {
+      "branch_id": "zero_action_reference_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.0,
+        0.0
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.8823116157555728,
+      "closest_approach_predicted_state_hash": "c6b9b391c0016106d840b17c147be13d6e451576e0866d4ba03e698bf85f027a",
+      "closest_approach_state_hash": "a9105f791b17a3d1356a50942f316200bb66dd9274c3a20ec9468a0eb2eb2ff6",
+      "maximum_normal_predicted_speed_ratio": 1.8823116157555728,
+      "maximum_realized_speed_ratio_while_clear": 1.8823116542734124,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.01768838424442709,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000__zero_action_reference_v0"
+    },
+    {
+      "branch_id": "tangential_error_correction_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.24999999999954536,
+        4.7676879878406646e-07
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.8212502385150744,
+      "closest_approach_predicted_state_hash": "7149e481e5d8b147bf3e22707cfe550993ba57a632e10048f257c27471889a54",
+      "closest_approach_state_hash": "a9105f791b17a3d1356a50942f316200bb66dd9274c3a20ec9468a0eb2eb2ff6",
+      "maximum_normal_predicted_speed_ratio": 1.8212502385150744,
+      "maximum_realized_speed_ratio_while_clear": 1.8823116542734124,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.07874976148492552,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000__tangential_error_correction_v0"
+    },
+    {
+      "branch_id": "velocity_opposed_thrust_v0",
+      "candidate_boundary_count": 0,
+      "case_family": "phase35_radial_energy_push_overspeed_stress_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "closest_approach_Final_Veto_decision": "allow",
+      "closest_approach_action": [
+        0.1879358444069937,
+        -0.1648639390134491
+      ],
+      "closest_approach_event_index": 0,
+      "closest_approach_predicted_speed_ratio": 1.8000090850599684,
+      "closest_approach_predicted_state_hash": "38011cb8fcdd90747b2227319720c646b872b383e58bcbc3409eb920c0cd366e",
+      "closest_approach_state_hash": "a9105f791b17a3d1356a50942f316200bb66dd9274c3a20ec9468a0eb2eb2ff6",
+      "maximum_normal_predicted_speed_ratio": 1.8000090850599684,
+      "maximum_realized_speed_ratio_while_clear": 1.8823116542734124,
+      "minimum_predicted_overspeed_headroom_while_current_clear": 0.09999091494003154,
+      "scientific_limitation": "The 1.80 and 1.85 bins are diagnostics only and are not authority thresholds.",
+      "trajectory_id": "discovery__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000__velocity_opposed_thrust_v0"
+    }
+  ],
+  "trajectory_count": 39
+}

@@ -1,0 +1,39 @@
+{
+  "Final_Veto_rejection_count": 0,
+  "active_authority_granted": false,
+  "automatic_retry_count": 0,
+  "candidate_boundary_count": 0,
+  "candidate_counts_by_branch": {
+    "tangential_error_correction_v0": 0,
+    "velocity_opposed_thrust_v0": 0,
+    "zero_action_reference_v0": 0
+  },
+  "candidate_counts_by_case_family": {
+    "phase34_known_recoverable_preservation_v1": 0,
+    "phase35_radial_energy_push_overspeed_stress_v0": 0
+  },
+  "closest_below_threshold_predicted_speed_ratio": 1.8906024003603095,
+  "completed_trajectory_count": 39,
+  "diagnostic_bins_are_authority_thresholds": false,
+  "hazard_arrest_interventions": 0,
+  "maximum_predicted_speed_ratio": 1.8906024003603095,
+  "normal_branch_execution_counts": {
+    "tangential_error_correction_v0": 416,
+    "velocity_opposed_thrust_v0": 416,
+    "zero_action_reference_v0": 416
+  },
+  "normal_branch_physical_transition_count": 1248,
+  "planned_trajectory_count": 39,
+  "predicted_speed_ratio_diagnostic_bins": {
+    "predicted_ratio_1p80_to_lt_1p85": 10,
+    "predicted_ratio_1p85_to_1p90_inclusive": 160,
+    "predicted_ratio_gt_1p90": 0,
+    "predicted_ratio_lt_1p80": 1078
+  },
+  "prefix_physical_transition_count": 11454,
+  "schema_version": "stage2a_prediction_boundary_discovery_v0",
+  "source_case_count": 13,
+  "started_trajectory_count": 39,
+  "states_evaluated": 1248,
+  "total_physical_transition_count": 12702
+}

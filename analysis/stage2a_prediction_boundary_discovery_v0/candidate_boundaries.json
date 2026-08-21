@@ -1,0 +1,11 @@
+{
+  "candidate_boundaries": [],
+  "candidate_boundary_count": 0,
+  "candidate_definition": {
+    "current_realized_speed_ratio": "<=1.90",
+    "first_candidate_terminates_trajectory": true,
+    "normal_predicted_speed_ratio": ">1.90",
+    "ordering": "before_normal_action_execution"
+  },
+  "schema_version": "stage2a_prediction_boundary_discovery_v0"
+}

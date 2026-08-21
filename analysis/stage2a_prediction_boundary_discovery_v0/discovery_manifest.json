@@ -1,0 +1,50 @@
+{
+  "Final_Veto_rejection_count": 0,
+  "active_authority_granted": false,
+  "artifact_filenames": [
+    "candidate_boundaries.json",
+    "coverage_summary.json",
+    "discovery_manifest.json",
+    "discovery_plan.json",
+    "near_boundary_diagnostics.json",
+    "protected_evidence_report.json",
+    "summary.md",
+    "trajectory_index.json"
+  ],
+  "artifact_hashes": {
+    "candidate_boundaries.json": "4f405f9b0d4284be1ff88f5662ab45917608df77d30d2acf8f7cddd219c86511",
+    "coverage_summary.json": "215f615e398a23ac0221d776ca40729b4c306c387fc7d547897ee39ba1d39ef4",
+    "discovery_plan.json": "ebcbb71c8d6926f5f9b144178cb4ac0c7f04140cdc7e8c80c1fcfc5c82ab7839",
+    "near_boundary_diagnostics.json": "3ee2ab2144443e3dc1d109dca5e502fe0bd9dfefa1f9d38d04de12a3a56c6769",
+    "protected_evidence_report.json": "b6fa81358a8117726d9c9450717a09e79962deb27bd5279976047f7ea10bbdef",
+    "summary.md": "e9fa8f3a84054e6a7f4aa4db53f478e61086296565e487c010ad094a8e768a9b",
+    "trajectory_index.json": "526ab1490f316fc2d76f76afd94ba83c2584901c96c07489a9c52291e6fe4fdb"
+  },
+  "automatic_retry_count": 0,
+  "candidate_boundary_count": 0,
+  "canonical_manifest_hash": "a288271e615b465e9dbda5c1234df7b6963d8badd83148bb68c9b32367998860",
+  "completed_date": "2026-08-21",
+  "completed_trajectory_count": 39,
+  "discovery_aggregate_hash": "0f90421ea027458e0c2798f7080e0268b4c62bdecfa245e139e186b5cdac6c84",
+  "discovery_id": "stage2a_prediction_boundary_discovery_v0",
+  "discovery_implementation_commit": "8f4bb0875714b4368d1003f015209ca56355e6be",
+  "discovery_plan_hash": "fd6634648f6d3f690c15466bd95cbbe6dde35e162f247ea39fff49727e0080eb",
+  "hazard_arrest_interventions": 0,
+  "maximum_physical_transitions_per_trajectory": 32,
+  "normal_action_sources": [
+    "zero_action_reference_v0",
+    "tangential_error_correction_v0",
+    "velocity_opposed_thrust_v0"
+  ],
+  "normal_branch_physical_transition_count": 1248,
+  "overspeed_comparator": ">",
+  "overspeed_threshold": 1.9,
+  "planned_trajectory_count": 39,
+  "prefix_physical_transition_count": 11454,
+  "schema_version": "stage2a_prediction_boundary_discovery_v0",
+  "scientific_claim": "bounded natural prediction-boundary coverage under existing physical semantics",
+  "source_case_count": 13,
+  "started_trajectory_count": 39,
+  "states_evaluated": 1248,
+  "total_physical_transition_count": 12702
+}

@@ -1,0 +1,85 @@
+{
+  "active_authority_granted": false,
+  "candidate_boundary_definition": {
+    "current_realized_speed_ratio": "<=1.90",
+    "first_candidate_terminates_trajectory": true,
+    "normal_predicted_speed_ratio": ">1.90",
+    "ordering": "before_normal_action_execution"
+  },
+  "canonical_plan_hash": "fd6634648f6d3f690c15466bd95cbbe6dde35e162f247ea39fff49727e0080eb",
+  "case_boundaries": "repository_backed_case_specific_branch_boundaries_v0",
+  "completed_date": "2026-08-21",
+  "diagnostic_bins": [
+    "predicted_speed_ratio < 1.80",
+    "1.80 <= predicted_speed_ratio < 1.85",
+    "1.85 <= predicted_speed_ratio <= 1.90",
+    "predicted_speed_ratio > 1.90"
+  ],
+  "diagnostic_bins_are_authority_thresholds": false,
+  "discovery_id": "stage2a_prediction_boundary_discovery_v0",
+  "discovery_implementation_commit": "recorded_from_clean_pushed_HEAD_at_execution",
+  "hazard_arrest_interventions": 0,
+  "maximum_physical_transitions_per_trajectory": 32,
+  "overspeed_comparator": ">",
+  "overspeed_threshold": 1.9,
+  "parameter_dimensions": {
+    "initial_radius_ratio": [
+      0.98,
+      1.0
+    ],
+    "initial_velocity_angle_deg": [
+      150.0,
+      165.0,
+      170.0,
+      175.0
+    ],
+    "seed": [
+      0
+    ],
+    "source_case_family": [
+      "phase34_known_recoverable_preservation_v1",
+      "phase35_radial_energy_push_overspeed_stress_v0"
+    ],
+    "thrust_scale": [
+      8000.0,
+      10000.0
+    ]
+  },
+  "parameter_matrix_semantics": "only_the_13_explicit_source_case_ids_are_valid_not_the_cartesian_product",
+  "recovery_branches": [
+    "zero_action_reference_v0",
+    "tangential_error_correction_v0",
+    "velocity_opposed_thrust_v0"
+  ],
+  "result_publication_path": "analysis/stage2a_prediction_boundary_discovery_v0",
+  "schema_version": "stage2a_prediction_boundary_discovery_v0",
+  "source_case_ids": [
+    "phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_10000",
+    "phase34_known_recoverable_preservation_v1__r0_1p00__angle_150__thrust_8000",
+    "phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_10000",
+    "phase34_known_recoverable_preservation_v1__r0_1p00__angle_165__thrust_8000",
+    "phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_10000",
+    "phase34_known_recoverable_preservation_v1__r0_1p00__angle_170__thrust_8000",
+    "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_10000",
+    "phase34_known_recoverable_preservation_v1__r0_1p00__angle_175__thrust_8000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000"
+  ],
+  "source_hashes": {
+    "boundary_registry_raw_hash": "6b6d6fb693b0ca42bd2fa75147736e64b4a6c5ad76f5577509e68d206f4e144e",
+    "final_veto_manifest_raw_hash": "5e4387ed375855e0eb79d3b01599c421360ec33235000d4be7fe076794cda3a3",
+    "registry_aggregate_hash": "228dae3661e79178ed55e30ec15308ce1d86acc010877605fde61f2d5012a3bd",
+    "registry_manifest_canonical_hash": "b800735062af8426045e40117044056d545f5ff2ebbc3795fdbf52266ba8a980",
+    "simulator_configuration_hash_thrust_10000": "cac97994bf382994d4627c7cf308f5a00df9cb232253530fbaef787eded88c25",
+    "simulator_configuration_hash_thrust_8000": "0f0d94ba21a16747a8d6b3a23e7e28256967507522f4540533b927cd22248f46",
+    "simulator_constants_hash": "f0416ba079a40b60641fa51fa35c8ee0d21a5a4d55a2add2916e17a673d59b97",
+    "source_inventory_canonical_hash": "5f46408197c21c4e0ca702163de4ccc8def490d31150c6c6b96b1d69987c46ac"
+  },
+  "target_speed_semantics": "speed_magnitude_divided_by_target_circular_speed_plus_frozen_epsilon",
+  "total_planned_trajectory_count": 39,
+  "trajectory_ordering": "case_id_lexical_then_declared_branch_order",
+  "velocity_opposed_branch_role": "ordinary_existing_recovery_branch_not_hazard_authority"
+}
