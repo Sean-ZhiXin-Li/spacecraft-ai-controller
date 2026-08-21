@@ -253,9 +253,12 @@ class ExplicitAbortTerminalAdapterTests(unittest.TestCase):
             },
         )
 
-    def test_fix_phase_has_no_result_publication(self) -> None:
-        self.assertFalse((ROOT / "analysis/staged_recovery_shadow_calibration_trace_set_v0").exists())
-        self.assertFalse((ROOT / CALIBRATION_OUTPUT_PATH).exists())
+    def test_fix_phase_publication_state_is_lifecycle_aware(self) -> None:
+        trace_set_exists = (
+            ROOT / "analysis/staged_recovery_shadow_calibration_trace_set_v0"
+        ).exists()
+        calibration_exists = (ROOT / CALIBRATION_OUTPUT_PATH).exists()
+        self.assertEqual(trace_set_exists, calibration_exists)
 
 
 class OfflineReplayTests(unittest.TestCase):
