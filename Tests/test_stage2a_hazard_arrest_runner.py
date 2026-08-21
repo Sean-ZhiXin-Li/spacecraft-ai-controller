@@ -31,6 +31,7 @@ from runtime_assurance.stage2a_hazard_arrest_runner import (
     load_selected_experiment,
     reproduce_selected_prefix,
     sha256_bytes,
+    source_trace_state_hash,
     state_document,
     validate_experiment_payloads,
     validate_qualification_payloads,
@@ -160,14 +161,29 @@ class Stage2ARunnerTests(unittest.TestCase):
                 self.registered, self.state, "velocity_opposed_clone"
             )
 
+    def test_frozen_stage1b_source_hash_schema_is_preserved(self) -> None:
+        state = CartesianState2D(
+            -12481438.746593231,
+            7350011337081.66,
+            -5055.651850370408,
+            6140.662726914771,
+        )
+        self.assertEqual(
+            source_trace_state_hash(state),
+            "d33c32a027051dc9a1bc6640de97fe4827bd13cd4b0dbfd45f1bba74a257b8a5",
+        )
+        self.assertNotEqual(source_trace_state_hash(state), runtime_state_hash(state))
+
     def test_prefix_replay_detects_source_mismatch_without_retry(self) -> None:
         selected = self._source_selected(prefix_count=1)
         initial = {
-            "source_event": {"pre_state_hash": runtime_state_hash(self.state)}
+            "source_event": {
+                "pre_state_hash": source_trace_state_hash(self.state)
+            }
         }
         source = {
             "source_event": {
-                "pre_state_hash": runtime_state_hash(self.state),
+                "pre_state_hash": source_trace_state_hash(self.state),
                 "proposed_action": [0.0, 0.0],
                 "monitor_decision": "allow",
                 "predicted_state_hash": "1" * 64,
@@ -256,7 +272,8 @@ class Stage2ARunnerTests(unittest.TestCase):
             "source_trace_sha256": "f" * 64,
             "prefix_branch_id": "zero_action_reference_v0",
             "prefix_transition_count": prefix_count,
-            "boundary_state_hash": runtime_state_hash(self.state),
+            "boundary_state_hash": source_trace_state_hash(self.state),
+            "runtime_boundary_state_hash": runtime_state_hash(self.state),
         }
 
 
@@ -290,7 +307,9 @@ class Stage2AMeasuredBoundaryTests(unittest.TestCase):
             "prefix_branch_id": "zero_action_reference_v0",
             "prefix_transition_count": 0,
             "normal_branch_id": "zero_action_reference_v0",
-            "boundary_state_hash": runtime_state_hash(self.state),
+            "boundary_state_hash": source_trace_state_hash(self.state),
+            "boundary_state_hash_schema": "stage1b_cartesian_xy_vx_vy_v0",
+            "runtime_boundary_state_hash": runtime_state_hash(self.state),
             "normal_action_hash": normal.action_hash,
             "normal_predicted_state_hash": normal.predicted_state_hash,
             "normal_predicted_speed_ratio": normal.predicted_speed_ratio,
@@ -415,7 +434,7 @@ class Stage2AArtifactTests(unittest.TestCase):
             selected=selected,
             baseline_summary={"boundary_transition_count": 0, "final_veto_decision": "veto", "normal_predicted_speed_ratio": 1.91},
             active_summary={"boundary_transition_count": 1, "hazard_final_veto_decision": "allow"},
-            boundary_equivalence={"checks": {"same_prefix": True}, "same_boundary_state_hash": True, "same_normal_action_hash": True, "same_normal_prediction_hash": True, "all_required_prefix_checks": True},
+            boundary_equivalence={"checks": {"same_prefix": True}, "same_boundary_state_hash": True, "same_runtime_boundary_state_hash": True, "same_normal_action_hash": True, "same_normal_prediction_hash": True, "all_required_prefix_checks": True},
             authority_report={"requested_phase": "hazard_arrest", "proposal_generated": True, "proposal_count": 1, "proposal_consumed": True, "second_intervention_count": 0, "unauthorized_phase_count": 0, "authority_leakage_count": 0, "invalid_evidence_consumption_count": 0},
             final_veto_report={"baseline_decision": "veto", "hazard_decision": "allow", "final_veto_bypass_count": 0, "fallback_execution_count": 0},
             intervention_effect={"prediction_realization_equal": True},

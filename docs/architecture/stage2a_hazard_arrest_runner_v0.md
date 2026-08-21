@@ -76,6 +76,11 @@ action, Final Veto decision, predicted state hash, realized state hash, and
 transition status must match the frozen Stage 1B trace. A mismatch is an
 infrastructure failure.
 
+Stage 1B trace state hashes use their frozen `{x,y,vx,vy}` canonical payload.
+The current runtime identity hash uses descriptive Cartesian field names. The
+runner validates and records both schemas independently; it never compares one
+schema's digest as though it were the other.
+
 ## Baseline And Active Runs
 
 The baseline submits the selected normal action at the boundary. Its predicted

@@ -73,6 +73,7 @@ from simulator.phase34_35_transition import (
 
 STAGE2A_EXPERIMENT_ID = "stage2a_one_intervention_hazard_arrest_v0"
 STAGE2A_SCHEMA_VERSION = "stage2a_one_intervention_hazard_arrest_v0"
+SOURCE_TRACE_STATE_HASH_SCHEMA = "stage1b_cartesian_xy_vx_vy_v0"
 COMPLETED_DATE = "2026-08-21"
 QUALIFICATION_OUTPUT_PATH = Path("analysis/stage2a_hazard_arrest_qualification_v0")
 EXPERIMENT_OUTPUT_PATH = Path("analysis/stage2a_hazard_arrest_experiment_v0")
@@ -152,6 +153,13 @@ def sha256_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
+def source_trace_state_hash(state: CartesianState2D) -> str:
+    """Recompute the exact Cartesian hash schema frozen in Stage 1B traces."""
+    return canonical_sha256(
+        {"x": state.x, "y": state.y, "vx": state.vx, "vy": state.vy}
+    )
+
+
 def _finite(value: object, name: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise Stage2AHazardArrestRunnerError(f"{name} must be finite")
@@ -201,7 +209,7 @@ def _state_from_source_event(event: Mapping[str, object]) -> CartesianState2D:
         vx=_field_number(fields, "velocity_x"),
         vy=_field_number(fields, "velocity_y"),
     )
-    if runtime_state_hash(state) != event.get("pre_state_hash"):
+    if source_trace_state_hash(state) != event.get("pre_state_hash"):
         raise Stage2AHazardArrestRunnerError("source boundary state hash mismatch")
     return state
 
@@ -435,7 +443,9 @@ def qualify_frozen_stage1b_boundaries(
                     "prefix_transition_count": prefix_count,
                     "boundary_event_index": event_index,
                     "boundary_state": state_document(state),
-                    "boundary_state_hash": runtime_state_hash(state),
+                    "boundary_state_hash": str(source["pre_state_hash"]),
+                    "boundary_state_hash_schema": SOURCE_TRACE_STATE_HASH_SCHEMA,
+                    "runtime_boundary_state_hash": runtime_state_hash(state),
                     "current_realized_speed_ratio": realized_ratio,
                     "current_realized_headroom": OVERSPEED_THRESHOLD - realized_ratio,
                     "normal_branch_id": normal_branch_id,
@@ -719,7 +729,7 @@ def reproduce_selected_prefix(
     )
     source_rows = _source_trace(repository_root, selected)
     initial_source = _mapping(source_rows[0].get("source_event"), "initial source")
-    if runtime_state_hash(current) != initial_source.get("pre_state_hash"):
+    if source_trace_state_hash(current) != initial_source.get("pre_state_hash"):
         raise Stage2AHazardArrestRunnerError("prefix initial state mismatch")
     records: list[dict[str, object]] = []
     prefix_count = int(selected["prefix_transition_count"])
@@ -733,16 +743,17 @@ def reproduce_selected_prefix(
         )
         monitor = execution.monitor_decision
         checks = {
-            "pre_state_hash": execution.previous_state_hash
+            "pre_state_hash": source_trace_state_hash(execution.previous_state)
             == source.get("pre_state_hash"),
             "proposed_action": list(execution.action or ())
             == source.get("proposed_action"),
             "monitor_decision": monitor is not None
             and monitor.decision == source.get("monitor_decision"),
             "predicted_state_hash": execution.predicted_nominal_state is not None
-            and runtime_state_hash(execution.predicted_nominal_state)
+            and source_trace_state_hash(execution.predicted_nominal_state)
             == source.get("predicted_state_hash"),
-            "realized_state_hash": execution.next_state_hash
+            "realized_state_hash": execution.next_state is not None
+            and source_trace_state_hash(execution.next_state)
             == source.get("realized_state_hash"),
             "transition_executed": execution.executed is True
             and source.get("transition_executed") is True,
@@ -757,20 +768,28 @@ def reproduce_selected_prefix(
                     "event_type": "prefix_transition",
                     "prefix_transition_index": step,
                     "source_event_hash": source["canonical_event_sha256"],
-                    "pre_state_hash": execution.previous_state_hash,
+                    "pre_state_hash": source_trace_state_hash(
+                        execution.previous_state
+                    ),
                     "proposed_action": list(execution.action),
                     "final_veto_decision": monitor.decision,
-                    "predicted_state_hash": runtime_state_hash(
+                    "predicted_state_hash": source_trace_state_hash(
                         execution.predicted_nominal_state
                     ),
-                    "realized_state_hash": execution.next_state_hash,
+                    "realized_state_hash": source_trace_state_hash(
+                        execution.next_state
+                    ),
                     "physical_transition_count": 1,
                 }
             )
         )
         current = execution.next_state
-    if runtime_state_hash(current) != selected.get("boundary_state_hash"):
+    if source_trace_state_hash(current) != selected.get("boundary_state_hash"):
         raise Stage2AHazardArrestRunnerError("reproduced boundary state mismatch")
+    if runtime_state_hash(current) != selected.get("runtime_boundary_state_hash"):
+        raise Stage2AHazardArrestRunnerError(
+            "reproduced runtime boundary state mismatch"
+        )
     return PrefixReplay(
         final_state=current,
         records=tuple(records),
@@ -1117,8 +1136,10 @@ def execute_selected_experiment(
     }
     boundary_equivalence = {
         "checks": prefix_checks,
-        "same_boundary_state_hash": runtime_state_hash(boundary_state)
+        "same_boundary_state_hash": source_trace_state_hash(boundary_state)
         == selected["boundary_state_hash"],
+        "same_runtime_boundary_state_hash": runtime_state_hash(boundary_state)
+        == selected["runtime_boundary_state_hash"],
         "same_normal_action_hash": normal_prediction.action_hash
         == selected["normal_action_hash"],
         "same_normal_prediction_hash": normal_prediction.predicted_state_hash
@@ -1440,6 +1461,7 @@ def validate_experiment_payloads(payloads: Mapping[str, bytes]) -> None:
         boundary.get(field) is not True
         for field in (
             "same_boundary_state_hash",
+            "same_runtime_boundary_state_hash",
             "same_normal_action_hash",
             "same_normal_prediction_hash",
         )
@@ -1515,6 +1537,13 @@ def validate_static_sources(repository_root: Path) -> dict[str, object]:
     index, rows = load_trace_set(repository_root)
     if len(rows) != 13:
         raise Stage2AHazardArrestRunnerError("Stage 1B trace count mismatch")
+    source_states_validated = 0
+    for trace in rows:
+        for row in trace:
+            source = _mapping(row.get("source_event"), "source_event")
+            if source.get("event_type") == "transition":
+                _state_from_source_event(source)
+                source_states_validated += 1
     manifest = json.loads(
         (
             repository_root
@@ -1534,6 +1563,8 @@ def validate_static_sources(repository_root: Path) -> dict[str, object]:
         "preflight_manifest_hash": supplied,
         "overspeed_threshold": OVERSPEED_THRESHOLD,
         "overspeed_comparator": OVERSPEED_COMPARATOR,
+        "source_state_hash_schema": SOURCE_TRACE_STATE_HASH_SCHEMA,
+        "source_states_validated": source_states_validated,
         "physical_executions": 0,
     }
 
@@ -1551,6 +1582,7 @@ __all__ = [
     "QUALIFICATION_OUTPUT_PATH",
     "RELEASE_AUTHORIZED",
     "RELEASE_NOT_AUTHORIZED",
+    "SOURCE_TRACE_STATE_HASH_SCHEMA",
     "STAGE2A_EXPERIMENT_ID",
     "STAGE2A_SCHEMA_VERSION",
     "Stage2AHazardArrestRunnerError",
@@ -1568,6 +1600,7 @@ __all__ = [
     "qualify_frozen_stage1b_boundaries",
     "reproduce_selected_prefix",
     "sha256_bytes",
+    "source_trace_state_hash",
     "state_document",
     "validate_experiment_payloads",
     "validate_qualification_payloads",
