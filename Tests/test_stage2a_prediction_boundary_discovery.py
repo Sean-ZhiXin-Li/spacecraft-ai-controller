@@ -1,35 +1,49 @@
 from __future__ import annotations
 
 import copy
+import inspect
 import json
 import subprocess
 import sys
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
 
 from runtime_assurance.final_veto_monitor import FinalVetoDecision
 from runtime_assurance.recovery_branch_state_extractor import (
+    LegacyReproductionResult,
     PrefixExecutionResult,
     build_source_case_inventory,
 )
-from runtime_assurance.recovery_branch_state_registry import canonical_sha256
+from runtime_assurance.recovery_branch_boundary_registry import LEGACY_FIXED_PREFIX
+from runtime_assurance.recovery_branch_state_registry import (
+    LEGACY_CASE_ID,
+    LEGACY_MEMBER_ID,
+    canonical_json_bytes,
+    canonical_sha256,
+    load_registered_branch_state,
+)
 from runtime_assurance.stage2a_prediction_boundary_discovery import (
     DISCOVERY_BRANCH_IDS,
     MAXIMUM_PHYSICAL_TRANSITIONS_PER_TRAJECTORY,
     OUTPUT_PATH,
     PLAN_PATH,
     PLANNED_TRAJECTORY_COUNT,
+    DiscoverySource,
     DiscoveryTrajectoryResult,
     NormalActionEvaluation,
     PredictionBoundaryDiscoveryError,
     build_discovery_payloads,
     build_trajectory_definitions,
     evaluate_normal_action,
+    generated_discovery_source,
     is_prediction_boundary_candidate,
     load_discovery_plan,
+    prepare_discovery_sources,
+    prepare_legacy_discovery_source,
     run_discovery_trajectory,
     trajectory_id,
     validate_discovery_payloads,
@@ -136,7 +150,10 @@ def evaluation(
     )
 
 
-def prefix_for_case(case: object, state: CartesianState2D | None = None) -> PrefixExecutionResult:
+def prefix_result_for_case(
+    case: object,
+    state: CartesianState2D | None = None,
+) -> PrefixExecutionResult:
     document = branch_document(state)
     document.update(
         {
@@ -161,6 +178,34 @@ def prefix_for_case(case: object, state: CartesianState2D | None = None) -> Pref
         boundary_transition_count=int(case.nominal_prefix_transition_count),
         terminal_transition_count=int(case.boundary.terminal_transition_count),
         terminal_reason=str(case.boundary.terminal_reason),
+    )
+
+
+def source_for_case(
+    case: object,
+    state: CartesianState2D | None = None,
+) -> DiscoverySource:
+    prefix = prefix_result_for_case(case, state)
+    legacy = prefix.boundary_type == LEGACY_FIXED_PREFIX
+    return DiscoverySource(
+        case=prefix.case,
+        provenance_kind=(
+            "legacy_canonical_registered_reproduction"
+            if legacy
+            else "generated_registry_member"
+        ),
+        registry_member_id=LEGACY_MEMBER_ID if legacy else None,
+        document_json=prefix.document_json,
+        boundary_type=prefix.boundary_type,
+        boundary_transition_count=prefix.boundary_transition_count,
+        actual_transition_count=prefix.actual_transition_count,
+        branch_step=prefix.branch_step,
+        initial_state_hash=prefix.initial_state_hash,
+        prefix_action_trace_hash=prefix.prefix_action_trace_hash,
+        prefix_state_trace_hash=prefix.prefix_state_trace_hash,
+        canonical_source_hash=prefix.canonical_payload_hash,
+        source_configuration_hash=prefix.case.source_configuration_hash,
+        source_equivalence_checks=(("generated_member_validation", True),),
     )
 
 
@@ -210,7 +255,7 @@ class PredictionBoundaryDiscoveryTests(unittest.TestCase):
                 terminal_reason="not_applicable",
             ),
         )
-        prefix = prefix_for_case(case)
+        prefix = source_for_case(case)
         candidate = evaluation(
             CartesianState2D(1.0, 0.0, 1.0, 0.0),
             predicted_ratio=2.0,
@@ -245,7 +290,7 @@ class PredictionBoundaryDiscoveryTests(unittest.TestCase):
                 terminal_reason="not_applicable",
             ),
         )
-        prefix = prefix_for_case(case)
+        prefix = source_for_case(case)
         calls = 0
 
         def evaluator(document, state, branch_id):
@@ -284,7 +329,7 @@ class PredictionBoundaryDiscoveryTests(unittest.TestCase):
                 terminal_reason="not_applicable",
             ),
         )
-        prefix = prefix_for_case(case, CartesianState2D(1.0, 0.0, 2.0, 0.0))
+        prefix = source_for_case(case, CartesianState2D(1.0, 0.0, 2.0, 0.0))
         item = evaluation(
             CartesianState2D(1.0, 0.0, 2.0, 0.0),
             predicted_ratio=2.0,
@@ -341,6 +386,10 @@ class PredictionBoundaryDiscoveryTests(unittest.TestCase):
     def test_plan_hash_and_sources_validate(self) -> None:
         plan = load_discovery_plan(ROOT)
         validate_discovery_plan(ROOT, plan)
+        self.assertEqual(
+            plan["canonical_plan_hash"],
+            "fd6634648f6d3f690c15466bd95cbbe6dde35e162f247ea39fff49727e0080eb",
+        )
         self.assertEqual(plan["overspeed_threshold"], 1.90)
         self.assertEqual(plan["overspeed_comparator"], ">")
         self.assertFalse(plan["active_authority_granted"])
@@ -367,7 +416,7 @@ class PredictionBoundaryDiscoveryTests(unittest.TestCase):
 
     def test_payloads_are_deterministic_and_exact(self) -> None:
         cases = build_source_case_inventory(ROOT)
-        prefixes = tuple(prefix_for_case(case) for case in sorted(cases, key=lambda item: item.case_id))
+        prefixes = tuple(source_for_case(case) for case in sorted(cases, key=lambda item: item.case_id))
         trajectories = tuple(
             self._empty_trajectory(prefix, branch)
             for prefix in prefixes
@@ -404,7 +453,7 @@ class PredictionBoundaryDiscoveryTests(unittest.TestCase):
 
     def test_payload_mutation_is_rejected(self) -> None:
         cases = build_source_case_inventory(ROOT)
-        prefixes = tuple(prefix_for_case(case) for case in sorted(cases, key=lambda item: item.case_id))
+        prefixes = tuple(source_for_case(case) for case in sorted(cases, key=lambda item: item.case_id))
         trajectories = tuple(
             self._empty_trajectory(prefix, branch)
             for prefix in prefixes
@@ -496,9 +545,189 @@ class PredictionBoundaryDiscoveryTests(unittest.TestCase):
         self.assertEqual(source.count("atomic_publish_new_directory"), 0)
         self.assertIn("OUTPUT_PATH = Path(\"analysis/stage2a_prediction_boundary_discovery_v0\")", source)
 
+    def test_generated_boundary_types_retain_generated_validation(self) -> None:
+        cases = build_source_case_inventory(ROOT)
+        monitor_case = next(
+            case
+            for case in cases
+            if case.boundary.boundary_type == "monitor_off_preterminal_state"
+        )
+        generated = {
+            "monitor_off_preterminal_state": monitor_case,
+            "source_declared_fixed_prefix": replace(
+                monitor_case,
+                boundary=replace(
+                    monitor_case.boundary,
+                    boundary_type="source_declared_fixed_prefix",
+                ),
+            ),
+        }
+        for boundary_type in (
+            "source_declared_fixed_prefix",
+            "monitor_off_preterminal_state",
+        ):
+            with self.subTest(boundary_type=boundary_type):
+                prefix = prefix_result_for_case(generated[boundary_type])
+                with mock.patch(
+                    "runtime_assurance.stage2a_prediction_boundary_discovery."
+                    "validate_generated_branch_state_document"
+                ) as validator:
+                    source = generated_discovery_source(prefix)
+                validator.assert_called_once_with(prefix.document())
+                self.assertEqual(source.boundary_type, boundary_type)
+                self.assertEqual(source.provenance_kind, "generated_registry_member")
+
+    def test_legacy_fixed_prefix_never_uses_generated_validation(self) -> None:
+        case = self._legacy_case()
+        prefix = prefix_result_for_case(case)
+        with mock.patch(
+            "runtime_assurance.stage2a_prediction_boundary_discovery."
+            "validate_generated_branch_state_document"
+        ) as validator:
+            with self.assertRaises(PredictionBoundaryDiscoveryError):
+                generated_discovery_source(prefix)
+        validator.assert_not_called()
+
+    def test_legacy_source_uses_fixed_member_and_reproduction_contract(self) -> None:
+        case = self._legacy_case()
+        registered, reproduction, evidence = self._legacy_fixture()
+        loader = mock.Mock(return_value=registered)
+        reproducer = mock.Mock(return_value=reproduction)
+        source = prepare_legacy_discovery_source(
+            ROOT,
+            case,
+            registered_loader=loader,
+            legacy_reproducer=reproducer,
+            frozen_prefix_evidence_loader=mock.Mock(return_value=evidence),
+        )
+        loader.assert_called_once_with(ROOT, LEGACY_MEMBER_ID)
+        reproducer.assert_called_once_with(ROOT)
+        self.assertEqual(source.registry_member_id, LEGACY_MEMBER_ID)
+        self.assertEqual(source.boundary_type, LEGACY_FIXED_PREFIX)
+        self.assertEqual(
+            source.provenance_kind,
+            "legacy_canonical_registered_reproduction",
+        )
+        self.assertTrue(all(passed for _, passed in source.source_equivalence_checks))
+
+    def test_arbitrary_legacy_artifact_path_substitution_is_not_exposed(self) -> None:
+        parameters = inspect.signature(prepare_legacy_discovery_source).parameters
+        self.assertNotIn("artifact_path", parameters)
+        self.assertNotIn("legacy_path", parameters)
+        registered, reproduction, evidence = self._legacy_fixture()
+        loader = mock.Mock(return_value=registered)
+        prepare_legacy_discovery_source(
+            ROOT,
+            self._legacy_case(),
+            registered_loader=loader,
+            legacy_reproducer=mock.Mock(return_value=reproduction),
+            frozen_prefix_evidence_loader=mock.Mock(return_value=evidence),
+        )
+        self.assertEqual(loader.call_args.args[1], LEGACY_MEMBER_ID)
+
+    def test_corrupted_legacy_reproduction_fails_closed(self) -> None:
+        registered, reproduction, evidence = self._legacy_fixture()
+        changed = reproduction.document()
+        changed["state"]["velocity_y"] = float(changed["state"]["velocity_y"]) + 1.0
+        corrupted = LegacyReproductionResult(
+            document_json=canonical_json_bytes(changed).decode("utf-8"),
+            initial_state_hash=reproduction.initial_state_hash,
+            prefix_action_trace_hash=reproduction.prefix_action_trace_hash,
+            prefix_state_trace_hash=reproduction.prefix_state_trace_hash,
+            actual_transition_count=reproduction.actual_transition_count,
+            branch_step=reproduction.branch_step,
+        )
+        with self.assertRaisesRegex(
+            PredictionBoundaryDiscoveryError,
+            "legacy discovery source reproduction mismatch",
+        ):
+            prepare_legacy_discovery_source(
+                ROOT,
+                self._legacy_case(),
+                registered_loader=mock.Mock(return_value=registered),
+                legacy_reproducer=mock.Mock(return_value=corrupted),
+                frozen_prefix_evidence_loader=mock.Mock(return_value=evidence),
+            )
+
+    def test_source_routing_separates_legacy_and_generated_contracts(self) -> None:
+        cases = build_source_case_inventory(ROOT)
+        legacy = self._legacy_case()
+        generated_cases = tuple(
+            case
+            for case in cases
+            if case.boundary.boundary_type != LEGACY_FIXED_PREFIX
+        )[:2]
+        legacy_source = source_for_case(legacy)
+        legacy_source = DiscoverySource(
+            case=legacy_source.case,
+            provenance_kind="legacy_canonical_registered_reproduction",
+            registry_member_id=LEGACY_MEMBER_ID,
+            document_json=legacy_source.document_json,
+            boundary_type=LEGACY_FIXED_PREFIX,
+            boundary_transition_count=legacy_source.boundary_transition_count,
+            actual_transition_count=legacy_source.actual_transition_count,
+            branch_step=legacy_source.branch_step,
+            initial_state_hash=legacy_source.initial_state_hash,
+            prefix_action_trace_hash=legacy_source.prefix_action_trace_hash,
+            prefix_state_trace_hash=legacy_source.prefix_state_trace_hash,
+            canonical_source_hash=legacy_source.canonical_source_hash,
+            source_configuration_hash=legacy_source.source_configuration_hash,
+            source_equivalence_checks=(("legacy_contract", True),),
+        )
+        prefix_executor = mock.Mock(
+            side_effect=lambda root, case, **kwargs: prefix_result_for_case(case)
+        )
+        legacy_preparer = mock.Mock(return_value=legacy_source)
+        with mock.patch(
+            "runtime_assurance.stage2a_prediction_boundary_discovery."
+            "validate_generated_branch_state_document"
+        ) as validator:
+            sources = prepare_discovery_sources(
+                ROOT,
+                (legacy, *generated_cases),
+                implementation_commit="1" * 40,
+                prefix_executor=prefix_executor,
+                legacy_source_preparer=legacy_preparer,
+            )
+        legacy_preparer.assert_called_once_with(ROOT, legacy)
+        self.assertEqual(prefix_executor.call_count, 2)
+        self.assertEqual(validator.call_count, 2)
+        self.assertEqual(len(sources), 3)
+
+    @staticmethod
+    def _legacy_case():
+        return next(
+            case
+            for case in build_source_case_inventory(ROOT)
+            if case.case_id == LEGACY_CASE_ID
+        )
+
+    @staticmethod
+    def _legacy_fixture():
+        registered = load_registered_branch_state(ROOT, LEGACY_MEMBER_ID)
+        report = json.loads(
+            (ROOT / "analysis/recovery_branch_state_registry_v0/prefix_execution_report.json")
+            .read_text(encoding="utf-8")
+        )
+        evidence = next(
+            item
+            for item in report["executions"]
+            if item["execution_role"] == "canonical_reproduction"
+            and item["case_id"] == LEGACY_CASE_ID
+        )
+        reproduction = LegacyReproductionResult(
+            document_json=canonical_json_bytes(registered.as_document()).decode("utf-8"),
+            initial_state_hash=evidence["initial_state_hash"],
+            prefix_action_trace_hash=evidence["prefix_action_trace_hash"],
+            prefix_state_trace_hash=evidence["prefix_state_trace_hash"],
+            actual_transition_count=evidence["actual_transition_count"],
+            branch_step=evidence["branch_step"],
+        )
+        return registered, reproduction, evidence
+
     @staticmethod
     def _empty_trajectory(
-        prefix: PrefixExecutionResult,
+        prefix: DiscoverySource,
         branch: str,
     ) -> DiscoveryTrajectoryResult:
         document = prefix.document()
@@ -516,7 +745,13 @@ class PredictionBoundaryDiscoveryTests(unittest.TestCase):
             "trajectory_id": trajectory_id(prefix.case.case_id, branch),
             "case_id": prefix.case.case_id,
             "branch_id": branch,
-            "source_configuration_hash": prefix.case.source_configuration_hash,
+            "source_provenance_kind": prefix.provenance_kind,
+            "source_registry_member_id": prefix.registry_member_id,
+            "source_canonical_hash": prefix.canonical_source_hash,
+            "source_equivalence_checks": [
+                list(item) for item in prefix.source_equivalence_checks
+            ],
+            "source_configuration_hash": prefix.source_configuration_hash,
             "boundary_type": prefix.boundary_type,
             "prefix_transition_count": prefix.boundary_transition_count,
             "prefix_actual_transition_count": prefix.actual_transition_count,
@@ -532,7 +767,11 @@ class PredictionBoundaryDiscoveryTests(unittest.TestCase):
             case_id=prefix.case.case_id,
             case_family=prefix.case.case_id.split("__r0_", 1)[0],
             branch_id=branch,
-            source_configuration_hash=prefix.case.source_configuration_hash,
+            source_provenance_kind=prefix.provenance_kind,
+            source_registry_member_id=prefix.registry_member_id,
+            source_canonical_hash=prefix.canonical_source_hash,
+            source_equivalence_checks=prefix.source_equivalence_checks,
+            source_configuration_hash=prefix.source_configuration_hash,
             simulator_configuration_hash=str(document["simulator_configuration_hash"]),
             constants_hash=str(document["constants_hash"]),
             transition_implementation_hash=prefix.case.transition_implementation_hash,

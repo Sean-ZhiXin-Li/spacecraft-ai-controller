@@ -20,20 +20,28 @@ from runtime_assurance.recovery_branch_executor import (
     generate_zero_action,
 )
 from runtime_assurance.recovery_branch_state_extractor import (
+    LegacyReproductionResult,
     PrefixExecutionResult,
     SourceCaseDefinition,
     _simulator_configuration_for_thrust,
     build_source_case_inventory,
     execute_nominal_prefix,
     protected_evidence_hashes as historical_protected_evidence_hashes,
+    reproduce_legacy_canonical,
     source_inventory_document,
 )
+from runtime_assurance.recovery_branch_boundary_registry import LEGACY_FIXED_PREFIX
 from runtime_assurance.recovery_branch_state_registry import (
+    LEGACY_CASE_ID,
+    LEGACY_MEMBER_ID,
+    RegisteredBranchState,
     canonical_json_bytes,
     canonical_sha256,
     file_sha256,
     load_branch_state_registry,
+    load_registered_branch_state,
     registry_aggregate_hash,
+    validate_generated_branch_state_document,
 )
 from runtime_assurance.staged_recovery_logger_adapter import runtime_state_hash
 from simulator.phase34_35_transition import (
@@ -73,6 +81,9 @@ DIAGNOSTIC_BINS = (
     "predicted_ratio_1p80_to_lt_1p85",
     "predicted_ratio_1p85_to_1p90_inclusive",
     "predicted_ratio_gt_1p90",
+)
+LEGACY_PREFIX_REPORT_PATH = Path(
+    "analysis/recovery_branch_state_registry_v0/prefix_execution_report.json"
 )
 NEWER_PROTECTED_PATHS: dict[str, tuple[str, ...]] = {
     "recovery_branch_state_registry_v0": (
@@ -151,11 +162,17 @@ def state_document(state: CartesianState2D) -> dict[str, float]:
 
 
 def state_from_branch_document(document: Mapping[str, object]) -> CartesianState2D:
+    source = document
+    if not all(
+        field in document
+        for field in ("position_x", "position_y", "velocity_x", "velocity_y")
+    ):
+        source = _mapping(document.get("state"), "state")
     state = CartesianState2D(
-        x=_finite(document.get("position_x"), "position_x"),
-        y=_finite(document.get("position_y"), "position_y"),
-        vx=_finite(document.get("velocity_x"), "velocity_x"),
-        vy=_finite(document.get("velocity_y"), "velocity_y"),
+        x=_finite(source.get("position_x"), "position_x"),
+        y=_finite(source.get("position_y"), "position_y"),
+        vx=_finite(source.get("velocity_x"), "velocity_x"),
+        vy=_finite(source.get("velocity_y"), "velocity_y"),
     )
     return state
 
@@ -253,6 +270,246 @@ class NormalActionEvaluation:
             "active_authority_granted": self.active_authority_granted,
             "hazard_arrest_interventions": self.hazard_arrest_interventions,
         }
+
+
+@dataclass(frozen=True, slots=True)
+class DiscoverySource:
+    case: SourceCaseDefinition
+    provenance_kind: str
+    registry_member_id: str | None
+    document_json: str
+    boundary_type: str
+    boundary_transition_count: int
+    actual_transition_count: int
+    branch_step: int
+    initial_state_hash: str
+    prefix_action_trace_hash: str
+    prefix_state_trace_hash: str
+    canonical_source_hash: str
+    source_configuration_hash: str
+    source_equivalence_checks: tuple[tuple[str, bool], ...]
+
+    def document(self) -> dict[str, object]:
+        value = json.loads(self.document_json)
+        return _mapping(value, "discovery source document")
+
+
+def generated_discovery_source(prefix: PrefixExecutionResult) -> DiscoverySource:
+    if prefix.boundary_type == LEGACY_FIXED_PREFIX:
+        raise PredictionBoundaryDiscoveryError(
+            "legacy fixed prefix cannot use generated discovery-source validation"
+        )
+    document = prefix.document()
+    validate_generated_branch_state_document(document)
+    return DiscoverySource(
+        case=prefix.case,
+        provenance_kind="generated_registry_member",
+        registry_member_id=None,
+        document_json=canonical_json_bytes(document).decode("utf-8"),
+        boundary_type=prefix.boundary_type,
+        boundary_transition_count=prefix.boundary_transition_count,
+        actual_transition_count=prefix.actual_transition_count,
+        branch_step=prefix.branch_step,
+        initial_state_hash=prefix.initial_state_hash,
+        prefix_action_trace_hash=prefix.prefix_action_trace_hash,
+        prefix_state_trace_hash=prefix.prefix_state_trace_hash,
+        canonical_source_hash=prefix.canonical_payload_hash,
+        source_configuration_hash=prefix.case.source_configuration_hash,
+        source_equivalence_checks=(("generated_member_validation", True),),
+    )
+
+
+def _load_frozen_legacy_prefix_evidence(
+    repository_root: Path,
+) -> dict[str, object]:
+    path = repository_root.resolve() / LEGACY_PREFIX_REPORT_PATH
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise PredictionBoundaryDiscoveryError(
+            "frozen legacy prefix evidence is unavailable"
+        ) from exc
+    report = _mapping(document, "legacy prefix report")
+    supplied = report.get("canonical_payload_hash")
+    payload = dict(report)
+    payload.pop("canonical_payload_hash", None)
+    if supplied != canonical_sha256(payload):
+        raise PredictionBoundaryDiscoveryError(
+            "frozen legacy prefix report hash mismatch"
+        )
+    executions = report.get("executions")
+    if not isinstance(executions, list):
+        raise PredictionBoundaryDiscoveryError("legacy prefix executions are missing")
+    matches = [
+        _mapping(item, "legacy prefix execution")
+        for item in executions
+        if isinstance(item, Mapping)
+        and item.get("execution_role") == "canonical_reproduction"
+        and item.get("case_id") == LEGACY_CASE_ID
+    ]
+    if len(matches) != 1:
+        raise PredictionBoundaryDiscoveryError(
+            "frozen canonical reproduction evidence is not unique"
+        )
+    return matches[0]
+
+
+def prepare_legacy_discovery_source(
+    repository_root: Path,
+    case: SourceCaseDefinition,
+    *,
+    registered_loader: Callable[[Path, str], RegisteredBranchState] = (
+        load_registered_branch_state
+    ),
+    legacy_reproducer: Callable[[Path], LegacyReproductionResult] = (
+        reproduce_legacy_canonical
+    ),
+    frozen_prefix_evidence_loader: Callable[[Path], Mapping[str, object]] = (
+        _load_frozen_legacy_prefix_evidence
+    ),
+) -> DiscoverySource:
+    if case.case_id != LEGACY_CASE_ID or case.boundary.boundary_type != LEGACY_FIXED_PREFIX:
+        raise PredictionBoundaryDiscoveryError(
+            "legacy discovery source requires the frozen canonical case"
+        )
+    registered = registered_loader(repository_root, LEGACY_MEMBER_ID)
+    if (
+        registered.registry_member_id != LEGACY_MEMBER_ID
+        or registered.case_id != LEGACY_CASE_ID
+        or not registered.member.legacy_member
+        or registered.member.artifact_scope != "legacy_external_artifact"
+        or registered.member.generation_status != "legacy_validated"
+    ):
+        raise PredictionBoundaryDiscoveryError(
+            "registered legacy discovery source identity mismatch"
+        )
+    published = registered.as_document()
+    reproduction = legacy_reproducer(repository_root)
+    reproduced = reproduction.document()
+    prefix_evidence = _mapping(
+        frozen_prefix_evidence_loader(repository_root), "legacy prefix evidence"
+    )
+    published_ordering = _mapping(
+        published.get("branch_ordering"), "legacy branch ordering"
+    )
+    reproduced_ordering = _mapping(
+        reproduced.get("branch_ordering"), "reproduced branch ordering"
+    )
+    published_state = _mapping(published.get("state"), "legacy state")
+    reproduced_state = _mapping(reproduced.get("state"), "reproduced state")
+    published_monitor = _mapping(
+        published.get("monitor_decision"), "legacy monitor decision"
+    )
+    reproduced_monitor = _mapping(
+        reproduced.get("monitor_decision"), "reproduced monitor decision"
+    )
+    checks = {
+        "registered_member_id": registered.registry_member_id == LEGACY_MEMBER_ID,
+        "case_id": (
+            published.get("case_id")
+            == reproduced.get("case_id")
+            == case.case_id
+            == LEGACY_CASE_ID
+        ),
+        "branch_step": (
+            published.get("branch_step")
+            == reproduced.get("branch_step")
+            == reproduction.branch_step
+            == registered.member.branch_step
+            == case.boundary.branch_step
+        ),
+        "realized_prefix_transition_count": (
+            published_ordering.get("realized_prefix_transition_count")
+            == reproduced_ordering.get("realized_prefix_transition_count")
+            == reproduction.actual_transition_count
+            == registered.member.nominal_prefix_transition_count
+            == case.nominal_prefix_transition_count
+        ),
+        "Cartesian_boundary_state": published_state == reproduced_state,
+        "source_configuration_identity": (
+            published.get("case_configuration_hash")
+            == reproduced.get("case_configuration_hash")
+            == registered.member.source_configuration_hash
+        ),
+        "simulator_configuration_identity": (
+            published.get("simulator_configuration_hash")
+            == reproduced.get("simulator_configuration_hash")
+            == registered.member.simulator_configuration_hash
+        ),
+        "simulator_constants_identity": (
+            published.get("simulator_constants_hash")
+            == reproduced.get("simulator_constants_hash")
+            == registered.member.constants_hash
+        ),
+        "overspeed_threshold": (
+            published.get("threshold")
+            == reproduced.get("threshold")
+            == OVERSPEED_THRESHOLD
+        ),
+        "overspeed_comparator": (
+            published.get("comparator")
+            == reproduced.get("comparator")
+            == OVERSPEED_COMPARATOR
+        ),
+        "nominal_action_identity": (
+            published.get("nominal_action") == reproduced.get("nominal_action")
+        ),
+        "predicted_state_identity": (
+            published.get("predicted_next_state")
+            == reproduced.get("predicted_next_state")
+        ),
+        "predicted_speed_ratio": (
+            published.get("predicted_speed_ratio")
+            == reproduced.get("predicted_speed_ratio")
+        ),
+        "monitor_decision_identity": published_monitor == reproduced_monitor,
+        "canonical_legacy_document": published == reproduced,
+        "canonical_legacy_hash": (
+            published.get("canonical_branch_state_hash")
+            == reproduced.get("canonical_branch_state_hash")
+            == registered.member.canonical_branch_state_hash
+        ),
+        "initial_state_hash": (
+            reproduction.initial_state_hash
+            == prefix_evidence.get("initial_state_hash")
+        ),
+        "prefix_action_trace_hash": (
+            reproduction.prefix_action_trace_hash
+            == prefix_evidence.get("prefix_action_trace_hash")
+        ),
+        "prefix_state_trace_hash": (
+            reproduction.prefix_state_trace_hash
+            == prefix_evidence.get("prefix_state_trace_hash")
+        ),
+        "frozen_prefix_actual_transition_count": (
+            reproduction.actual_transition_count
+            == prefix_evidence.get("actual_transition_count")
+        ),
+        "frozen_prefix_branch_step": (
+            reproduction.branch_step == prefix_evidence.get("branch_step")
+        ),
+    }
+    failed = [name for name, passed in checks.items() if not passed]
+    if failed:
+        raise PredictionBoundaryDiscoveryError(
+            "legacy discovery source reproduction mismatch: " + ", ".join(failed)
+        )
+    return DiscoverySource(
+        case=case,
+        provenance_kind="legacy_canonical_registered_reproduction",
+        registry_member_id=LEGACY_MEMBER_ID,
+        document_json=canonical_json_bytes(published).decode("utf-8"),
+        boundary_type=LEGACY_FIXED_PREFIX,
+        boundary_transition_count=case.nominal_prefix_transition_count,
+        actual_transition_count=reproduction.actual_transition_count,
+        branch_step=reproduction.branch_step,
+        initial_state_hash=reproduction.initial_state_hash,
+        prefix_action_trace_hash=reproduction.prefix_action_trace_hash,
+        prefix_state_trace_hash=reproduction.prefix_state_trace_hash,
+        canonical_source_hash=str(published["canonical_branch_state_hash"]),
+        source_configuration_hash=registered.member.source_configuration_hash,
+        source_equivalence_checks=tuple(sorted(checks.items())),
+    )
 
 
 def evaluate_normal_action(
@@ -353,6 +610,10 @@ class DiscoveryTrajectoryResult:
     case_id: str
     case_family: str
     branch_id: str
+    source_provenance_kind: str
+    source_registry_member_id: str | None
+    source_canonical_hash: str
+    source_equivalence_checks: tuple[tuple[str, bool], ...]
     source_configuration_hash: str
     simulator_configuration_hash: str
     constants_hash: str
@@ -430,7 +691,7 @@ def _record(
 
 
 def run_discovery_trajectory(
-    prefix: PrefixExecutionResult,
+    source: DiscoverySource,
     branch_id: str,
     *,
     maximum_physical_transitions: int = MAXIMUM_PHYSICAL_TRANSITIONS_PER_TRAJECTORY,
@@ -446,7 +707,7 @@ def run_discovery_trajectory(
     )
     if limit != MAXIMUM_PHYSICAL_TRANSITIONS_PER_TRAJECTORY:
         raise PredictionBoundaryDiscoveryError("discovery horizon must remain exactly 32")
-    document = prefix.document()
+    document = source.document()
     state = state_from_branch_document(document)
     records: list[dict[str, object]] = []
     executed_actions: list[list[float]] = []
@@ -527,15 +788,21 @@ def run_discovery_trajectory(
     action_trace_hash = canonical_sha256(executed_actions)
     state_trace_hash = canonical_sha256(realized_states)
     identity = {
-        "trajectory_id": trajectory_id(prefix.case.case_id, branch_id),
-        "case_id": prefix.case.case_id,
+        "trajectory_id": trajectory_id(source.case.case_id, branch_id),
+        "case_id": source.case.case_id,
         "branch_id": branch_id,
-        "source_configuration_hash": prefix.case.source_configuration_hash,
-        "boundary_type": prefix.boundary_type,
-        "prefix_transition_count": prefix.boundary_transition_count,
-        "prefix_actual_transition_count": prefix.actual_transition_count,
-        "prefix_action_trace_hash": prefix.prefix_action_trace_hash,
-        "prefix_state_trace_hash": prefix.prefix_state_trace_hash,
+        "source_provenance_kind": source.provenance_kind,
+        "source_registry_member_id": source.registry_member_id,
+        "source_canonical_hash": source.canonical_source_hash,
+        "source_equivalence_checks": [
+            list(item) for item in source.source_equivalence_checks
+        ],
+        "source_configuration_hash": source.source_configuration_hash,
+        "boundary_type": source.boundary_type,
+        "prefix_transition_count": source.boundary_transition_count,
+        "prefix_actual_transition_count": source.actual_transition_count,
+        "prefix_action_trace_hash": source.prefix_action_trace_hash,
+        "prefix_state_trace_hash": source.prefix_state_trace_hash,
         "source_boundary_state_hash": runtime_state_hash(
             state_from_branch_document(document)
         ),
@@ -546,19 +813,25 @@ def run_discovery_trajectory(
     source_trajectory_hash = canonical_sha256(identity)
     return DiscoveryTrajectoryResult(
         trajectory_id=str(identity["trajectory_id"]),
-        case_id=prefix.case.case_id,
-        case_family=_case_family(prefix.case.case_id),
+        case_id=source.case.case_id,
+        case_family=_case_family(source.case.case_id),
         branch_id=branch_id,
-        source_configuration_hash=prefix.case.source_configuration_hash,
+        source_provenance_kind=source.provenance_kind,
+        source_registry_member_id=source.registry_member_id,
+        source_canonical_hash=source.canonical_source_hash,
+        source_equivalence_checks=source.source_equivalence_checks,
+        source_configuration_hash=source.source_configuration_hash,
         simulator_configuration_hash=str(document["simulator_configuration_hash"]),
-        constants_hash=str(document["constants_hash"]),
-        transition_implementation_hash=prefix.case.transition_implementation_hash,
-        nominal_controller_hash=prefix.case.nominal_controller_hash,
-        boundary_type=prefix.boundary_type,
-        prefix_transition_count=prefix.boundary_transition_count,
-        prefix_actual_transition_count=prefix.actual_transition_count,
-        prefix_action_trace_hash=prefix.prefix_action_trace_hash,
-        prefix_state_trace_hash=prefix.prefix_state_trace_hash,
+        constants_hash=str(
+            document.get("constants_hash", document.get("simulator_constants_hash"))
+        ),
+        transition_implementation_hash=source.case.transition_implementation_hash,
+        nominal_controller_hash=source.case.nominal_controller_hash,
+        boundary_type=source.boundary_type,
+        prefix_transition_count=source.boundary_transition_count,
+        prefix_actual_transition_count=source.actual_transition_count,
+        prefix_action_trace_hash=source.prefix_action_trace_hash,
+        prefix_state_trace_hash=source.prefix_state_trace_hash,
         source_boundary_state_hash=str(identity["source_boundary_state_hash"]),
         records=record_tuple,
         action_trace_hash=action_trace_hash,
@@ -572,31 +845,57 @@ def run_discovery_trajectory(
     )
 
 
+def prepare_discovery_sources(
+    repository_root: Path,
+    cases: Sequence[SourceCaseDefinition],
+    *,
+    implementation_commit: str,
+    prefix_executor: Callable[..., PrefixExecutionResult] = execute_nominal_prefix,
+    legacy_source_preparer: Callable[..., DiscoverySource] = (
+        prepare_legacy_discovery_source
+    ),
+) -> tuple[DiscoverySource, ...]:
+    sources: list[DiscoverySource] = []
+    for index, case in enumerate(sorted(cases, key=lambda item: item.case_id), start=1):
+        if case.boundary.boundary_type == LEGACY_FIXED_PREFIX:
+            source = legacy_source_preparer(repository_root, case)
+        else:
+            prefix = prefix_executor(
+                repository_root,
+                case,
+                execution_role="candidate_discovery",
+                execution_id=f"discovery_prefix_{index:02d}",
+                implementation_commit=implementation_commit,
+            )
+            source = generated_discovery_source(prefix)
+        sources.append(source)
+    return tuple(sources)
+
+
 def execute_frozen_discovery(
     repository_root: Path,
     *,
     implementation_commit: str,
     prefix_executor: Callable[..., PrefixExecutionResult] = execute_nominal_prefix,
-) -> tuple[tuple[PrefixExecutionResult, ...], tuple[DiscoveryTrajectoryResult, ...]]:
+    legacy_source_preparer: Callable[..., DiscoverySource] = (
+        prepare_legacy_discovery_source
+    ),
+) -> tuple[tuple[DiscoverySource, ...], tuple[DiscoveryTrajectoryResult, ...]]:
     cases = build_source_case_inventory(repository_root)
     definitions = build_trajectory_definitions(cases)
-    prefixes: list[PrefixExecutionResult] = []
-    by_case: dict[str, PrefixExecutionResult] = {}
-    for index, case in enumerate(sorted(cases, key=lambda item: item.case_id), start=1):
-        result = prefix_executor(
-            repository_root,
-            case,
-            execution_role="candidate_discovery",
-            execution_id=f"discovery_prefix_{index:02d}",
-            implementation_commit=implementation_commit,
-        )
-        prefixes.append(result)
-        by_case[case.case_id] = result
+    sources = prepare_discovery_sources(
+        repository_root,
+        cases,
+        implementation_commit=implementation_commit,
+        prefix_executor=prefix_executor,
+        legacy_source_preparer=legacy_source_preparer,
+    )
+    by_case = {source.case.case_id: source for source in sources}
     trajectories = tuple(
         run_discovery_trajectory(by_case[case.case_id], branch_id)
         for case, branch_id in definitions
     )
-    return tuple(prefixes), trajectories
+    return sources, trajectories
 
 
 def plan_scientific_payload(document: Mapping[str, object]) -> dict[str, object]:
@@ -693,6 +992,10 @@ def _trajectory_index_entry(result: DiscoveryTrajectoryResult) -> dict[str, obje
         "case_id": result.case_id,
         "case_family": result.case_family,
         "branch_id": result.branch_id,
+        "source_provenance_kind": result.source_provenance_kind,
+        "source_registry_member_id": result.source_registry_member_id,
+        "source_canonical_hash": result.source_canonical_hash,
+        "source_equivalence_checks": [list(item) for item in result.source_equivalence_checks],
         "source_configuration_hash": result.source_configuration_hash,
         "simulator_configuration_hash": result.simulator_configuration_hash,
         "constants_hash": result.constants_hash,
@@ -847,7 +1150,7 @@ def _json_bytes(value: object) -> bytes:
 
 def build_discovery_payloads(
     repository_root: Path,
-    prefixes: Sequence[PrefixExecutionResult],
+    sources: Sequence[DiscoverySource],
     trajectories: Sequence[DiscoveryTrajectoryResult],
     *,
     implementation_commit: str,
@@ -866,7 +1169,7 @@ def build_discovery_payloads(
     ]
     if [item.trajectory_id for item in trajectories] != expected_order:
         raise PredictionBoundaryDiscoveryError("trajectory ordering changed")
-    if len(prefixes) != SOURCE_CASE_COUNT or len(trajectories) != PLANNED_TRAJECTORY_COUNT:
+    if len(sources) != SOURCE_CASE_COUNT or len(trajectories) != PLANNED_TRAJECTORY_COUNT:
         raise PredictionBoundaryDiscoveryError("discovery execution count mismatch")
 
     index_entries = [_trajectory_index_entry(item) for item in trajectories]
@@ -902,18 +1205,18 @@ def build_discovery_payloads(
         branch: sum(item["branch_id"] == branch for item in candidates)
         for branch in DISCOVERY_BRANCH_IDS
     }
-    families = sorted({_case_family(prefix.case.case_id) for prefix in prefixes})
+    families = sorted({_case_family(source.case.case_id) for source in sources})
     candidate_by_family = {
         family: sum(item["case_family"] == family for item in candidates)
         for family in families
     }
-    prefix_physical_transitions = sum(item.actual_transition_count for item in prefixes)
+    prefix_physical_transitions = sum(item.actual_transition_count for item in sources)
     branch_physical_transitions = sum(item.physical_transition_count for item in trajectories)
     states_evaluated = len(all_records)
     veto_rejections = sum(item.final_veto_rejection_count for item in trajectories)
     coverage = {
         "schema_version": DISCOVERY_SCHEMA_VERSION,
-        "source_case_count": len(prefixes),
+        "source_case_count": len(sources),
         "planned_trajectory_count": PLANNED_TRAJECTORY_COUNT,
         "started_trajectory_count": len(trajectories),
         "completed_trajectory_count": len(trajectories),
@@ -1015,7 +1318,7 @@ def build_discovery_payloads(
         "completed_date": COMPLETED_DATE,
         "discovery_implementation_commit": implementation_commit,
         "discovery_plan_hash": plan_hash,
-        "source_case_count": len(prefixes),
+        "source_case_count": len(sources),
         "planned_trajectory_count": PLANNED_TRAJECTORY_COUNT,
         "started_trajectory_count": len(trajectories),
         "completed_trajectory_count": len(trajectories),
@@ -1163,6 +1466,10 @@ def validate_discovery_payloads(
             "trajectory_id": item["trajectory_id"],
             "case_id": item["case_id"],
             "branch_id": item["branch_id"],
+            "source_provenance_kind": item["source_provenance_kind"],
+            "source_registry_member_id": item["source_registry_member_id"],
+            "source_canonical_hash": item["source_canonical_hash"],
+            "source_equivalence_checks": item["source_equivalence_checks"],
             "source_configuration_hash": item["source_configuration_hash"],
             "boundary_type": item["boundary_type"],
             "prefix_transition_count": item["prefix_transition_count"],
@@ -1176,6 +1483,32 @@ def validate_discovery_payloads(
         }
         if item.get("source_trajectory_hash") != canonical_sha256(identity):
             raise PredictionBoundaryDiscoveryError("source trajectory hash mismatch")
+        checks = item.get("source_equivalence_checks")
+        if not isinstance(checks, list) or not checks or any(
+            not isinstance(check, list)
+            or len(check) != 2
+            or not isinstance(check[0], str)
+            or check[1] is not True
+            for check in checks
+        ):
+            raise PredictionBoundaryDiscoveryError("source equivalence checks failed")
+        if item.get("boundary_type") == LEGACY_FIXED_PREFIX:
+            if (
+                item.get("case_id") != LEGACY_CASE_ID
+                or item.get("source_provenance_kind")
+                != "legacy_canonical_registered_reproduction"
+                or item.get("source_registry_member_id") != LEGACY_MEMBER_ID
+            ):
+                raise PredictionBoundaryDiscoveryError(
+                    "legacy trajectory source provenance mismatch"
+                )
+        elif (
+            item.get("source_provenance_kind") != "generated_registry_member"
+            or item.get("source_registry_member_id") is not None
+        ):
+            raise PredictionBoundaryDiscoveryError(
+                "generated trajectory source provenance mismatch"
+            )
 
     candidate_doc = _mapping(
         json.loads(payloads["candidate_boundaries.json"]), "candidate boundaries"
@@ -1375,6 +1708,7 @@ __all__ = [
     "DISCOVERY_BRANCH_IDS",
     "DISCOVERY_ID",
     "DISCOVERY_SCHEMA_VERSION",
+    "DiscoverySource",
     "DiscoveryTrajectoryResult",
     "MAXIMUM_PHYSICAL_TRANSITIONS_PER_TRAJECTORY",
     "NormalActionEvaluation",
@@ -1388,10 +1722,13 @@ __all__ = [
     "evaluate_normal_action",
     "execute_allowed_normal_transition",
     "execute_frozen_discovery",
+    "generated_discovery_source",
     "is_prediction_boundary_candidate",
     "load_discovery_plan",
     "load_published_payloads",
     "protected_evidence_hashes",
+    "prepare_discovery_sources",
+    "prepare_legacy_discovery_source",
     "run_discovery_trajectory",
     "sha256_bytes",
     "state_document",

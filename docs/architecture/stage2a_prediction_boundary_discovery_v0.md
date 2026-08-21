@@ -56,6 +56,14 @@ The implementation reuses:
 
 No orbital dynamics, action law, or veto implementation is duplicated.
 
+## Legacy Source Routing
+
+Discovery source preparation follows each case's frozen provenance contract. Generated `source_declared_fixed_prefix` and `monitor_off_preterminal_state` cases continue through `execute_nominal_prefix` and `validate_generated_branch_state_document`. The `legacy_fixed_prefix` canonical case is not a generated registry member: it is loaded only as `legacy_canonical` through `load_registered_branch_state`, then independently reproduced through `reproduce_legacy_canonical`.
+
+The legacy route requires exact agreement for case identity, branch step, realized prefix count, Cartesian boundary state, source configuration, simulator configuration and constants, strict overspeed threshold and comparator, available action/prediction/monitor evidence, initial-state hash, and frozen prefix action/state trace hashes. It fails closed and does not rewrite the legacy artifact into a generated-member schema.
+
+The first formal invocation stopped during source preparation after ten prefix executions and 11,376 prefix transitions because the legacy case was incorrectly sent to generated-member validation. No discovery trajectory, discovery branch transition, Stage 2A intervention, or result publication occurred. Those counts are aborted-invocation diagnostics only and are not a completed discovery result.
+
 ## Ordering and Termination
 
 At each opportunity, the discovery computes the current ratio, existing branch action, one-step prediction, predicted ratio, and Final Veto result. A candidate or any veto stops the trajectory before physical execution. Current realized overspeed remains an adverse terminal condition. Allowed actions execute through the existing transition function, and predicted versus realized transition equality is required.
