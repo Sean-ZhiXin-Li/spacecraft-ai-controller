@@ -1,0 +1,28 @@
+{
+  "active_authority_executed": false,
+  "artifact_filenames": [
+    "eligible_boundaries.json",
+    "qualification_manifest.json",
+    "selected_experiment.json",
+    "summary.md"
+  ],
+  "automatic_retry": false,
+  "canonical_manifest_hash": "a1fa8d2ae7d0d1759f158275f10ed04f589643bbdc280ddfc14affe054ed25c3",
+  "completed_date": "2026-08-21",
+  "eligible_boundary_count": 0,
+  "hazard_prediction_evaluations": 0,
+  "implementation_commit": "e54c121c3e5e4205ebf824fb3933f65ee8e385b4",
+  "normal_prediction_evaluations": 768,
+  "offline_prediction_evaluations": 768,
+  "physical_executions": 0,
+  "qualification_id": "stage2a_hazard_arrest_qualification_v0",
+  "registry_aggregate_hash": "228dae3661e79178ed55e30ec15308ce1d86acc010877605fde61f2d5012a3bd",
+  "registry_manifest_hash": "b800735062af8426045e40117044056d545f5ff2ebbc3795fdbf52266ba8a980",
+  "schema_version": "stage2a_one_intervention_hazard_arrest_v0",
+  "scientific_thresholds_added": false,
+  "selected_experiment_hash": "04e86fecf84c03d46e76710fff9ed70ef14533736736f82e1f9f893d953fd9c4",
+  "selection_status": "no_eligible_boundary",
+  "source_trace_set_aggregate_hash": "ab4fd8a70e2aa446e4996126a53685999f55a24baa2522a688ed72b0c2d5cfa0",
+  "source_trace_set_path": "analysis/staged_recovery_shadow_calibration_trace_set_v0",
+  "states_inspected": 384
+}

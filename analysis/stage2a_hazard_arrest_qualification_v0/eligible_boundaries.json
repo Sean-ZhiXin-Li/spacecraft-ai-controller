@@ -1,0 +1,13 @@
+{
+  "eligibility_contract": {
+    "hazard_action_final_veto": "allow",
+    "hazard_action_source": "velocity_opposed_thrust_v0",
+    "maximum_physical_transitions_per_run": 32,
+    "normal_action_final_veto": "veto",
+    "normal_predicted_speed_ratio": ">1.90",
+    "realized_speed_ratio": "<=1.90"
+  },
+  "eligible_boundaries": [],
+  "eligible_boundary_count": 0,
+  "schema_version": "stage2a_one_intervention_hazard_arrest_v0"
+}
