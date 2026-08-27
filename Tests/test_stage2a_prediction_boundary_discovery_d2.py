@@ -347,13 +347,14 @@ class Stage2ATargetedDiscoveryD2Tests(unittest.TestCase):
     def test_default_clis_do_not_execute_or_read_results(self) -> None:
         from scripts import check_stage2a_prediction_boundary_discovery_d2_v0 as checker
         from scripts import run_stage2a_prediction_boundary_discovery_d2_v0 as runner
+        output_existed_before = (ROOT / OUTPUT_PATH).exists()
         with mock.patch.object(runner, "_execute") as execute:
             self.assertEqual(runner.main([]), 0)
         execute.assert_not_called()
         with mock.patch.object(checker, "load_published_payloads") as load:
             self.assertEqual(checker.main([]), 0)
         load.assert_not_called()
-        self.assertFalse((ROOT / OUTPUT_PATH).exists())
+        self.assertEqual((ROOT / OUTPUT_PATH).exists(), output_existed_before)
 
 
 if __name__ == "__main__":
