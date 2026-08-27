@@ -1,0 +1,19 @@
+{
+  "active_authority_granted": false,
+  "automatic_retry_count": 0,
+  "candidate_Final_Veto_rejection_count": 0,
+  "candidate_boundary_count": 0,
+  "fallback_execution_count": 0,
+  "hazard_arrest_interventions": 0,
+  "recovery_physical_transition_count": 16,
+  "recovery_trajectory_completed_count": 2,
+  "recovery_trajectory_started_count": 2,
+  "schema_version": "stage2a_prediction_boundary_discovery_d2_v0",
+  "source_boundary_Final_Veto_rejection_count": 2,
+  "states_evaluated": 16,
+  "total_physical_transition_count": 700071,
+  "unavailable_source_boundary_count": 7,
+  "upstream_prefix_physical_transition_count": 700055,
+  "upstream_source_execution_count": 9,
+  "valid_source_boundary_count": 2
+}

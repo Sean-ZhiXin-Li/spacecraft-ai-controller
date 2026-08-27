@@ -1,0 +1,6 @@
+{
+  "candidate_boundaries": [],
+  "candidate_boundary_count": 0,
+  "candidate_ordering": "angle_then_recovery_event_index_then_candidate_id",
+  "schema_version": "stage2a_prediction_boundary_discovery_d2_v0"
+}

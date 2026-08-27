@@ -1,0 +1,27 @@
+{
+  "angle_trend": [
+    {
+      "closest_event_index": 0,
+      "closest_predicted_headroom": 0.009397599639690446,
+      "initial_velocity_angle_deg": 150.0,
+      "maximum_zero_action_predicted_speed_ratio": 1.8906024003603095,
+      "source_boundary_status": "available",
+      "source_state_realized_speed_ratio": 1.8906024454524528
+    },
+    {
+      "closest_event_index": 0,
+      "closest_predicted_headroom": 0.014919355235842424,
+      "initial_velocity_angle_deg": 155.0,
+      "maximum_zero_action_predicted_speed_ratio": 1.8850806447641575,
+      "source_boundary_status": "available",
+      "source_state_realized_speed_ratio": 1.8850806886924645
+    }
+  ],
+  "closest_angle": 150.0,
+  "closest_event_index": 0,
+  "closest_headroom": 0.009397599639690446,
+  "maximum_zero_action_predicted_speed_ratio": 1.8906024003603095,
+  "schema_version": "stage2a_prediction_boundary_discovery_d2_v0",
+  "scientific_limitation": "This bounded angle trend is source-geometry discovery, not threshold tuning or active authority evidence.",
+  "source_state_realized_speed_ratio_at_closest": 1.8906024454524528
+}

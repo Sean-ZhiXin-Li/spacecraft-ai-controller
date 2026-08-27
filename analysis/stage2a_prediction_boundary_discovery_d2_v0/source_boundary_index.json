@@ -1,0 +1,724 @@
+{
+  "recovery_trajectories": [
+    {
+      "Final_Veto_rejection_count": 0,
+      "candidate_count": 0,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "closest_event_index": 0,
+      "closest_predicted_headroom": 0.009397599639690446,
+      "closest_predicted_state_hash": "801e8f138bdacdf9ef79d8e13141ac108e048e95ed2beea820a8bc6cc314ff75",
+      "closest_state_hash": "636847a9a1972cb5d07a8434778c7bae883a0ee591b43dc34082650d34b8ecc1",
+      "fallback_execution_count": 0,
+      "initial_velocity_angle_deg": 150.0,
+      "maximum_realized_speed_ratio_while_clear": 1.8906024454524528,
+      "maximum_zero_action_predicted_speed_ratio": 1.8906024003603095,
+      "records": [
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "6e4a5c880754e101a14f2214a9f0002c9dc9a44f230a499189547a59f9d083cc",
+          "current_state": {
+            "position_x": -12481438.746593231,
+            "position_y": 7350011337081.66,
+            "velocity_x": -5055.651850370408,
+            "velocity_y": 6140.662726914771
+          },
+          "current_state_hash": "636847a9a1972cb5d07a8434778c7bae883a0ee591b43dc34082650d34b8ecc1",
+          "event_index": 0,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 0,
+          "predicted_headroom": 0.009397599639690446,
+          "predicted_speed_ratio": 1.8906024003603095,
+          "predicted_state": {
+            "position_x": -12987003.93163023,
+            "position_y": 7350011951147.908,
+            "velocity_x": -5055.651850369991,
+            "velocity_y": 6140.662481181202
+          },
+          "predicted_state_hash": "801e8f138bdacdf9ef79d8e13141ac108e048e95ed2beea820a8bc6cc314ff75",
+          "realized_next_state": {
+            "position_x": -12987003.93163023,
+            "position_y": 7350011951147.908,
+            "velocity_x": -5055.651850369991,
+            "velocity_y": 6140.662481181202
+          },
+          "realized_next_state_hash": "801e8f138bdacdf9ef79d8e13141ac108e048e95ed2beea820a8bc6cc314ff75",
+          "realized_speed_ratio": 1.8906024454524528,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "1cc2f3f308f4033c9e5f3e9fd8c749c400d59b818a0d9cb53319df3b92a284c5",
+          "current_state": {
+            "position_x": -12987003.93163023,
+            "position_y": 7350011951147.908,
+            "velocity_x": -5055.651850369991,
+            "velocity_y": 6140.662481181202
+          },
+          "current_state_hash": "801e8f138bdacdf9ef79d8e13141ac108e048e95ed2beea820a8bc6cc314ff75",
+          "event_index": 1,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 1,
+          "predicted_headroom": 0.009397644731828025,
+          "predicted_speed_ratio": 1.8906023552681719,
+          "predicted_state": {
+            "position_x": -13492569.116667185,
+            "position_y": 7350012565214.132,
+            "velocity_x": -5055.651850369557,
+            "velocity_y": 6140.662235447673
+          },
+          "predicted_state_hash": "3cbbbb08fd1797ec97aed100dde7122493b64dcd77ff1857d8a248ba86c85a13",
+          "realized_next_state": {
+            "position_x": -13492569.116667185,
+            "position_y": 7350012565214.132,
+            "velocity_x": -5055.651850369557,
+            "velocity_y": 6140.662235447673
+          },
+          "realized_next_state_hash": "3cbbbb08fd1797ec97aed100dde7122493b64dcd77ff1857d8a248ba86c85a13",
+          "realized_speed_ratio": 1.8906024003603095,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "0fa001f368f7461af242687d7a74a96a927bdbf616ed7bc1993689d9218829fc",
+          "current_state": {
+            "position_x": -13492569.116667185,
+            "position_y": 7350012565214.132,
+            "velocity_x": -5055.651850369557,
+            "velocity_y": 6140.662235447673
+          },
+          "current_state_hash": "3cbbbb08fd1797ec97aed100dde7122493b64dcd77ff1857d8a248ba86c85a13",
+          "event_index": 2,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 2,
+          "predicted_headroom": 0.009397689823959832,
+          "predicted_speed_ratio": 1.89060231017604,
+          "predicted_state": {
+            "position_x": -13998134.301704096,
+            "position_y": 7350013179280.331,
+            "velocity_x": -5055.651850369106,
+            "velocity_y": 6140.661989714186
+          },
+          "predicted_state_hash": "7575f3a4f0d753a378b0bb47c3c3763c0d591e4c41761427067fea1569aaa05d",
+          "realized_next_state": {
+            "position_x": -13998134.301704096,
+            "position_y": 7350013179280.331,
+            "velocity_x": -5055.651850369106,
+            "velocity_y": 6140.661989714186
+          },
+          "realized_next_state_hash": "7575f3a4f0d753a378b0bb47c3c3763c0d591e4c41761427067fea1569aaa05d",
+          "realized_speed_ratio": 1.8906023552681719,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "ad45f735d82e630eb995961afce63063624a22ba5b34dd9673bafd827d7fd403",
+          "current_state": {
+            "position_x": -13998134.301704096,
+            "position_y": 7350013179280.331,
+            "velocity_x": -5055.651850369106,
+            "velocity_y": 6140.661989714186
+          },
+          "current_state_hash": "7575f3a4f0d753a378b0bb47c3c3763c0d591e4c41761427067fea1569aaa05d",
+          "event_index": 3,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 3,
+          "predicted_headroom": 0.009397734916086087,
+          "predicted_speed_ratio": 1.8906022650839138,
+          "predicted_state": {
+            "position_x": -14503699.48674096,
+            "position_y": 7350013793346.506,
+            "velocity_x": -5055.6518503686375,
+            "velocity_y": 6140.6617439807405
+          },
+          "predicted_state_hash": "a49027af0a383bd7ca32214ebdbff3981d7e7c78105683d7b648e62d337730ab",
+          "realized_next_state": {
+            "position_x": -14503699.48674096,
+            "position_y": 7350013793346.506,
+            "velocity_x": -5055.6518503686375,
+            "velocity_y": 6140.6617439807405
+          },
+          "realized_next_state_hash": "a49027af0a383bd7ca32214ebdbff3981d7e7c78105683d7b648e62d337730ab",
+          "realized_speed_ratio": 1.89060231017604,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "e0431d8858a6a5782c5a4cf8e5f1262ac5c13180ea6879e48d1f434ba80cb3b9",
+          "current_state": {
+            "position_x": -14503699.48674096,
+            "position_y": 7350013793346.506,
+            "velocity_x": -5055.6518503686375,
+            "velocity_y": 6140.6617439807405
+          },
+          "current_state_hash": "a49027af0a383bd7ca32214ebdbff3981d7e7c78105683d7b648e62d337730ab",
+          "event_index": 4,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 4,
+          "predicted_headroom": 0.009397780008206347,
+          "predicted_speed_ratio": 1.8906022199917936,
+          "predicted_state": {
+            "position_x": -15009264.671777776,
+            "position_y": 7350014407412.655,
+            "velocity_x": -5055.651850368153,
+            "velocity_y": 6140.661498247336
+          },
+          "predicted_state_hash": "da1a164c84f2184ff26c29d0f252e0063c9d6c85f71b51a219ecaa744c573f2a",
+          "realized_next_state": {
+            "position_x": -15009264.671777776,
+            "position_y": 7350014407412.655,
+            "velocity_x": -5055.651850368153,
+            "velocity_y": 6140.661498247336
+          },
+          "realized_next_state_hash": "da1a164c84f2184ff26c29d0f252e0063c9d6c85f71b51a219ecaa744c573f2a",
+          "realized_speed_ratio": 1.8906022650839138,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "8796a76bd8ed5bd1605dc3ca0a5b96f34afb0a7dff3305f0b75d03c0d95bc04c",
+          "current_state": {
+            "position_x": -15009264.671777776,
+            "position_y": 7350014407412.655,
+            "velocity_x": -5055.651850368153,
+            "velocity_y": 6140.661498247336
+          },
+          "current_state_hash": "da1a164c84f2184ff26c29d0f252e0063c9d6c85f71b51a219ecaa744c573f2a",
+          "event_index": 5,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 5,
+          "predicted_headroom": 0.009397825100321278,
+          "predicted_speed_ratio": 1.8906021748996786,
+          "predicted_state": {
+            "position_x": -15514829.85681454,
+            "position_y": 7350015021478.78,
+            "velocity_x": -5055.651850367651,
+            "velocity_y": 6140.661252513972
+          },
+          "predicted_state_hash": "a7c3d155c181164651e2310bb3ae9da34442ba36e234479b41bb4089038e1240",
+          "realized_next_state": {
+            "position_x": -15514829.85681454,
+            "position_y": 7350015021478.78,
+            "velocity_x": -5055.651850367651,
+            "velocity_y": 6140.661252513972
+          },
+          "realized_next_state_hash": "a7c3d155c181164651e2310bb3ae9da34442ba36e234479b41bb4089038e1240",
+          "realized_speed_ratio": 1.8906022199917936,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "d1747c8db2e935aca423ed816e8421f3f9ce754e7dc54c947fb4ce74e7e684c8",
+          "current_state": {
+            "position_x": -15514829.85681454,
+            "position_y": 7350015021478.78,
+            "velocity_x": -5055.651850367651,
+            "velocity_y": 6140.661252513972
+          },
+          "current_state_hash": "a7c3d155c181164651e2310bb3ae9da34442ba36e234479b41bb4089038e1240",
+          "event_index": 6,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 6,
+          "predicted_headroom": 0.009397870192430213,
+          "predicted_speed_ratio": 1.8906021298075697,
+          "predicted_state": {
+            "position_x": -16020395.041851254,
+            "position_y": 7350015635544.881,
+            "velocity_x": -5055.651850367132,
+            "velocity_y": 6140.661006780649
+          },
+          "predicted_state_hash": "12389a9da16332c895797509df881dbda99b5201b28d8c782961ffa19ddaa3d9",
+          "realized_next_state": {
+            "position_x": -16020395.041851254,
+            "position_y": 7350015635544.881,
+            "velocity_x": -5055.651850367132,
+            "velocity_y": 6140.661006780649
+          },
+          "realized_next_state_hash": "12389a9da16332c895797509df881dbda99b5201b28d8c782961ffa19ddaa3d9",
+          "realized_speed_ratio": 1.8906021748996786,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "ef5fc24e3723e9c79d85e03153a360b67c735d256bb1eb6d1cd4d77f94e12117",
+          "current_state": {
+            "position_x": -16020395.041851254,
+            "position_y": 7350015635544.881,
+            "velocity_x": -5055.651850367132,
+            "velocity_y": 6140.661006780649
+          },
+          "current_state_hash": "12389a9da16332c895797509df881dbda99b5201b28d8c782961ffa19ddaa3d9",
+          "event_index": 7,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 7,
+          "predicted_headroom": 0.009397915284533598,
+          "predicted_speed_ratio": 1.8906020847154663,
+          "predicted_state": {
+            "position_x": -16525960.226887913,
+            "position_y": 7350016249610.957,
+            "velocity_x": -5055.651850366597,
+            "velocity_y": 6140.660761047367
+          },
+          "predicted_state_hash": "c9940be2e19a188f8e22022a8225bf1a88227c71a13f0e133dcecdf1d9f79191",
+          "realized_next_state": {
+            "position_x": -16525960.226887913,
+            "position_y": 7350016249610.957,
+            "velocity_x": -5055.651850366597,
+            "velocity_y": 6140.660761047367
+          },
+          "realized_next_state_hash": "c9940be2e19a188f8e22022a8225bf1a88227c71a13f0e133dcecdf1d9f79191",
+          "realized_speed_ratio": 1.8906021298075697,
+          "stop_reason": "recovery_transition_horizon_complete",
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "recovery_branch": "zero_action_reference_v0",
+      "source_boundary_state_hash": "636847a9a1972cb5d07a8434778c7bae883a0ee591b43dc34082650d34b8ecc1",
+      "source_execution_hash": "400780a326d2ea540eb20767c13a65228f21d106721d98571fa3bf192a4887e8",
+      "terminal_reason": "recovery_transition_horizon_complete",
+      "trajectory_hash": "5b2ac316e517b9d015df12ef6479a84577e4f61112c1813031f2eb2d617b5bbd",
+      "zero_action_event_count": 8,
+      "zero_action_physical_transition_count": 8
+    },
+    {
+      "Final_Veto_rejection_count": 0,
+      "candidate_count": 0,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_155__thrust_8000",
+      "closest_event_index": 0,
+      "closest_predicted_headroom": 0.014919355235842424,
+      "closest_predicted_state_hash": "9dbacf90117874e7b65ea95bda95f267b383184c9cda3f92e1e0052572402003",
+      "closest_state_hash": "20d4146a2d81787b8a149452b89b3368d46d9462f613b0f7b1e4d19a194e039a",
+      "fallback_execution_count": 0,
+      "initial_velocity_angle_deg": 155.0,
+      "maximum_realized_speed_ratio_while_clear": 1.8850806886924647,
+      "maximum_zero_action_predicted_speed_ratio": 1.8850806447641575,
+      "records": [
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "a4390a234b67facbc6d879352c4a57cfbd587f77e4fad82491643799c058bf25",
+          "current_state": {
+            "position_x": -13466537.54620618,
+            "position_y": 7350011051000.863,
+            "velocity_x": -5226.9219864531005,
+            "velocity_y": 5964.69773569837
+          },
+          "current_state_hash": "20d4146a2d81787b8a149452b89b3368d46d9462f613b0f7b1e4d19a194e039a",
+          "event_index": 0,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 0,
+          "predicted_headroom": 0.014919355235842424,
+          "predicted_speed_ratio": 1.8850806447641575,
+          "predicted_state": {
+            "position_x": -13989229.744851446,
+            "position_y": 7350011647470.612,
+            "velocity_x": -5226.92198645265,
+            "velocity_y": 5964.697489964781
+          },
+          "predicted_state_hash": "9dbacf90117874e7b65ea95bda95f267b383184c9cda3f92e1e0052572402003",
+          "realized_next_state": {
+            "position_x": -13989229.744851446,
+            "position_y": 7350011647470.612,
+            "velocity_x": -5226.92198645265,
+            "velocity_y": 5964.697489964781
+          },
+          "realized_next_state_hash": "9dbacf90117874e7b65ea95bda95f267b383184c9cda3f92e1e0052572402003",
+          "realized_speed_ratio": 1.8850806886924647,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "a2dc3aec73524affc577e32c25e06766789addf8706a17290795357f66d0b3fd",
+          "current_state": {
+            "position_x": -13989229.744851446,
+            "position_y": 7350011647470.612,
+            "velocity_x": -5226.92198645265,
+            "velocity_y": 5964.697489964781
+          },
+          "current_state_hash": "9dbacf90117874e7b65ea95bda95f267b383184c9cda3f92e1e0052572402003",
+          "event_index": 1,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 1,
+          "predicted_headroom": 0.014919399164144531,
+          "predicted_speed_ratio": 1.8850806008358554,
+          "predicted_state": {
+            "position_x": -14511921.943496663,
+            "position_y": 7350012243940.337,
+            "velocity_x": -5226.921986452183,
+            "velocity_y": 5964.697244231233
+          },
+          "predicted_state_hash": "930663804d3e4dd676cce6f5d106e9fadedbbb0268e1399b7319989e6a7efe3b",
+          "realized_next_state": {
+            "position_x": -14511921.943496663,
+            "position_y": 7350012243940.337,
+            "velocity_x": -5226.921986452183,
+            "velocity_y": 5964.697244231233
+          },
+          "realized_next_state_hash": "930663804d3e4dd676cce6f5d106e9fadedbbb0268e1399b7319989e6a7efe3b",
+          "realized_speed_ratio": 1.8850806447641575,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "cae4e31869f049439ba0d011baeb17429f88d7892c18d203f5165de87a8eebf6",
+          "current_state": {
+            "position_x": -14511921.943496663,
+            "position_y": 7350012243940.337,
+            "velocity_x": -5226.921986452183,
+            "velocity_y": 5964.697244231233
+          },
+          "current_state_hash": "930663804d3e4dd676cce6f5d106e9fadedbbb0268e1399b7319989e6a7efe3b",
+          "event_index": 2,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 2,
+          "predicted_headroom": 0.014919443092441309,
+          "predicted_speed_ratio": 1.8850805569075586,
+          "predicted_state": {
+            "position_x": -15034614.142141832,
+            "position_y": 7350012840410.037,
+            "velocity_x": -5226.921986451698,
+            "velocity_y": 5964.696998497724
+          },
+          "predicted_state_hash": "a526d37a3136548f364da13b0ef2ae71e6dea09708c670fce0835f0cc06535bc",
+          "realized_next_state": {
+            "position_x": -15034614.142141832,
+            "position_y": 7350012840410.037,
+            "velocity_x": -5226.921986451698,
+            "velocity_y": 5964.696998497724
+          },
+          "realized_next_state_hash": "a526d37a3136548f364da13b0ef2ae71e6dea09708c670fce0835f0cc06535bc",
+          "realized_speed_ratio": 1.8850806008358554,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "04b66c6ff4e66b44b7e797df8c61677dcf3921c5421270875c9c7176d0fef5d0",
+          "current_state": {
+            "position_x": -15034614.142141832,
+            "position_y": 7350012840410.037,
+            "velocity_x": -5226.921986451698,
+            "velocity_y": 5964.696998497724
+          },
+          "current_state_hash": "a526d37a3136548f364da13b0ef2ae71e6dea09708c670fce0835f0cc06535bc",
+          "event_index": 3,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 3,
+          "predicted_headroom": 0.014919487020733202,
+          "predicted_speed_ratio": 1.8850805129792667,
+          "predicted_state": {
+            "position_x": -15557306.34078695,
+            "position_y": 7350013436879.712,
+            "velocity_x": -5226.921986451195,
+            "velocity_y": 5964.6967527642555
+          },
+          "predicted_state_hash": "e560f9aaf194e16be79450e50def60fc7a63adeb37a4914c225fba7a3c738925",
+          "realized_next_state": {
+            "position_x": -15557306.34078695,
+            "position_y": 7350013436879.712,
+            "velocity_x": -5226.921986451195,
+            "velocity_y": 5964.6967527642555
+          },
+          "realized_next_state_hash": "e560f9aaf194e16be79450e50def60fc7a63adeb37a4914c225fba7a3c738925",
+          "realized_speed_ratio": 1.8850805569075586,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "63cca7c5fcd1336c446ad40f668e1d4aa1e249baf4e8a728c64351629dcd8d0f",
+          "current_state": {
+            "position_x": -15557306.34078695,
+            "position_y": 7350013436879.712,
+            "velocity_x": -5226.921986451195,
+            "velocity_y": 5964.6967527642555
+          },
+          "current_state_hash": "e560f9aaf194e16be79450e50def60fc7a63adeb37a4914c225fba7a3c738925",
+          "event_index": 4,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 4,
+          "predicted_headroom": 0.014919530949019766,
+          "predicted_speed_ratio": 1.8850804690509801,
+          "predicted_state": {
+            "position_x": -16079998.539432019,
+            "position_y": 7350014033349.362,
+            "velocity_x": -5226.921986450675,
+            "velocity_y": 5964.696507030827
+          },
+          "predicted_state_hash": "3a7ea1f26214f1788d417ef6fff3cf35722197596491757ee1f35227eb814ea9",
+          "realized_next_state": {
+            "position_x": -16079998.539432019,
+            "position_y": 7350014033349.362,
+            "velocity_x": -5226.921986450675,
+            "velocity_y": 5964.696507030827
+          },
+          "realized_next_state_hash": "3a7ea1f26214f1788d417ef6fff3cf35722197596491757ee1f35227eb814ea9",
+          "realized_speed_ratio": 1.8850805129792667,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "d35d3914fad94d36b01066a5b89f4fb2fce8453cf3a0f3543ef450559fc01820",
+          "current_state": {
+            "position_x": -16079998.539432019,
+            "position_y": 7350014033349.362,
+            "velocity_x": -5226.921986450675,
+            "velocity_y": 5964.696507030827
+          },
+          "current_state_hash": "3a7ea1f26214f1788d417ef6fff3cf35722197596491757ee1f35227eb814ea9",
+          "event_index": 5,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 5,
+          "predicted_headroom": 0.014919574877301223,
+          "predicted_speed_ratio": 1.8850804251226987,
+          "predicted_state": {
+            "position_x": -16602690.738077033,
+            "position_y": 7350014629818.988,
+            "velocity_x": -5226.921986450137,
+            "velocity_y": 5964.696261297438
+          },
+          "predicted_state_hash": "ababa85e8f174534a558dd5ca9efab57ed127e3bad351577cd886c707349425c",
+          "realized_next_state": {
+            "position_x": -16602690.738077033,
+            "position_y": 7350014629818.988,
+            "velocity_x": -5226.921986450137,
+            "velocity_y": 5964.696261297438
+          },
+          "realized_next_state_hash": "ababa85e8f174534a558dd5ca9efab57ed127e3bad351577cd886c707349425c",
+          "realized_speed_ratio": 1.8850804690509801,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "36a9648d438b338275d29d952657fcb210fd6d5974d9ea4aa0476eb78a66fc79",
+          "current_state": {
+            "position_x": -16602690.738077033,
+            "position_y": 7350014629818.988,
+            "velocity_x": -5226.921986450137,
+            "velocity_y": 5964.696261297438
+          },
+          "current_state_hash": "ababa85e8f174534a558dd5ca9efab57ed127e3bad351577cd886c707349425c",
+          "event_index": 6,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 6,
+          "predicted_headroom": 0.01491961880557735,
+          "predicted_speed_ratio": 1.8850803811944226,
+          "predicted_state": {
+            "position_x": -17125382.93672199,
+            "position_y": 7350015226288.59,
+            "velocity_x": -5226.921986449583,
+            "velocity_y": 5964.696015564088
+          },
+          "predicted_state_hash": "0e7e1d85ffddbad9e0029909c39457b83eb4285c3642e82f062a725e18df8153",
+          "realized_next_state": {
+            "position_x": -17125382.93672199,
+            "position_y": 7350015226288.59,
+            "velocity_x": -5226.921986449583,
+            "velocity_y": 5964.696015564088
+          },
+          "realized_next_state_hash": "0e7e1d85ffddbad9e0029909c39457b83eb4285c3642e82f062a725e18df8153",
+          "realized_speed_ratio": 1.8850804251226987,
+          "stop_reason": null,
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "active_authority_granted": false,
+          "candidate_boundary": false,
+          "canonical_observation_hash": "fce07c899e898295fa29da37e4ae875359bbb02d21a60d0d88a046f45740105d",
+          "current_state": {
+            "position_x": -17125382.93672199,
+            "position_y": 7350015226288.59,
+            "velocity_x": -5226.921986449583,
+            "velocity_y": 5964.696015564088
+          },
+          "current_state_hash": "0e7e1d85ffddbad9e0029909c39457b83eb4285c3642e82f062a725e18df8153",
+          "event_index": 7,
+          "fallback_execution_count": 0,
+          "fallback_prediction_count": 0,
+          "final_veto_decision": "allow",
+          "hazard_arrest_interventions": 0,
+          "normal_action_hash": "24591218820b23f2e90702ff9699fde77fdbea34e54cbf14753f8bf94a4b53e3",
+          "physical_transition_count_before": 7,
+          "predicted_headroom": 0.014919662733848593,
+          "predicted_speed_ratio": 1.8850803372661513,
+          "predicted_state": {
+            "position_x": -17648075.135366894,
+            "position_y": 7350015822758.167,
+            "velocity_x": -5226.92198644901,
+            "velocity_y": 5964.695769830779
+          },
+          "predicted_state_hash": "4e24510b1bd235fd5d86a88cfb3a779e68f65f9f4db0600f676e5ea8fa4c8e7e",
+          "realized_next_state": {
+            "position_x": -17648075.135366894,
+            "position_y": 7350015822758.167,
+            "velocity_x": -5226.92198644901,
+            "velocity_y": 5964.695769830779
+          },
+          "realized_next_state_hash": "4e24510b1bd235fd5d86a88cfb3a779e68f65f9f4db0600f676e5ea8fa4c8e7e",
+          "realized_speed_ratio": 1.8850803811944226,
+          "stop_reason": "recovery_transition_horizon_complete",
+          "transition_executed": true,
+          "zero_action": [
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "recovery_branch": "zero_action_reference_v0",
+      "source_boundary_state_hash": "20d4146a2d81787b8a149452b89b3368d46d9462f613b0f7b1e4d19a194e039a",
+      "source_execution_hash": "21f8fba2d2d468ba711b6b5f6662b8cca7a5fd8709a7bb0d34cadad67e00e6c7",
+      "terminal_reason": "recovery_transition_horizon_complete",
+      "trajectory_hash": "8adbec8b45609e2797270b60c3de74a6af538fb28b9bc4f6ad93a0749dc14904",
+      "zero_action_event_count": 8,
+      "zero_action_physical_transition_count": 8
+    }
+  ],
+  "recovery_trajectory_count": 2,
+  "schema_version": "stage2a_prediction_boundary_discovery_d2_v0",
+  "unavailable_source_boundary_count": 7,
+  "valid_source_boundary_count": 2
+}
