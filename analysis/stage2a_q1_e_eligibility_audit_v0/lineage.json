@@ -1,0 +1,19 @@
+{
+  "schema_version": "stage2a_q1_e_lineage_v0",
+  "ordered_lineage": [
+    {"commit": "269f77da5c494a87ac942fc6e43f3b10f9b5bd1f", "date": "2026-08-21T17:59:20+08:00", "meaning": "Stage 2A one-intervention runner, Q1 qualifier, and E execution contracts implemented"},
+    {"commit": "e54c121c3e5e4205ebf824fb3933f65ee8e385b4", "date": "2026-08-21T18:09:35+08:00", "meaning": "Frozen Stage 1B source-state hash preservation fix used by Q1"},
+    {"commit": "2a82d396cf6291123d3a62c02b6dcfad3c586fff", "date": "2026-08-21T18:11:42+08:00", "meaning": "Q1 offline qualification executed and frozen with zero eligible candidates"},
+    {"commit": "33eabda33c667c2ff7b86dedf70b75e4dd5d4c88", "date": "2026-08-21T18:50:22+08:00", "meaning": "D1 discovery protocol prepared after Q1"},
+    {"commit": "1de43b588c18ba80157bc89b82901983fdf2644e", "date": "2026-08-21T19:57:12+08:00", "meaning": "D1 discovery result frozen"},
+    {"commit": "45ed6b9d7d6c014ce456ad7eff8abc4e4739761e", "date": "2026-08-27T17:42:17+08:00", "meaning": "D2 targeted discovery protocol prepared"},
+    {"commit": "ee87a426b09e1436ee2c9f4dc6424b84d505c9ce", "date": "2026-08-27T17:57:07+08:00", "meaning": "D2 NO_BOUNDARY result frozen"}
+  ],
+  "dependency_graph": {
+    "stage1b_frozen_traces": ["Q1 offline qualification"],
+    "q1_selected_candidate": ["Stage 2A-E baseline and active prefix reproduction"],
+    "d1_discovery": [],
+    "d2_discovery": [],
+    "notes": "D1 and D2 are separate discovery-only branches. They do not supply, reopen, or modify the Q1 selection consumed before either discovery result."
+  }
+}
