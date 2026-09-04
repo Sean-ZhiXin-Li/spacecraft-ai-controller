@@ -1,0 +1,52 @@
+{
+  "evidence_rows": [
+    {
+      "availability": "available_valid",
+      "decision_evidence": "measured_runtime_monitor_decision",
+      "predicted_evidence": "one_step_predicted",
+      "realized_evidence": "derived_from_measured_cartesian_state",
+      "record_count": 384,
+      "role": "recovery_action_predictions",
+      "source": "analysis/staged_recovery_shadow_calibration_v0/traces"
+    },
+    {
+      "availability": "available_valid",
+      "decision_evidence": "Final_Veto_allow",
+      "predicted_evidence": "one_step_predicted",
+      "realized_evidence": "derived_from_measured_cartesian_state",
+      "record_count": 16,
+      "role": "zero_action_recovery_predictions",
+      "source": "analysis/stage2a_prediction_boundary_discovery_d2_v0/source_boundary_index.json"
+    },
+    {
+      "availability": "available_valid_for_two_cases",
+      "decision_evidence": "Final_Veto_veto",
+      "predicted_evidence": "one_step_predicted",
+      "realized_evidence": "derived_from_measured_boundary_state",
+      "record_count": 2,
+      "role": "nominal_first_veto_boundaries",
+      "source": "analysis/stage2a_prediction_boundary_discovery_d2_v0/source_case_index.json"
+    },
+    {
+      "availability": "logical_counts_available_per_step_states_not_evaluated",
+      "decision_evidence": "Final_Veto_veto",
+      "predicted_evidence": "compact_segment_first_last_minimum_maximum",
+      "realized_evidence": "segment_extrema_only",
+      "record_count": 499877,
+      "role": "compact_nominal_action_Final_Veto_decisions",
+      "source": "analysis/final_veto_ablation_v0/decision_log.jsonl"
+    },
+    {
+      "availability": "provenance_only_in_this_audit",
+      "decision_evidence": "not_evaluated_for_trigger_counts",
+      "predicted_evidence": "member_contract_dependent",
+      "realized_evidence": "registry_member_boundary_state",
+      "record_count": 4,
+      "role": "source_identity_and_provenance",
+      "source": "analysis/recovery_branch_state_registry_v0/registry_manifest.json"
+    }
+  ],
+  "missing_physics_inference": false,
+  "schema_version": "stage2a_hazard_trigger_relevance_audit_v0",
+  "unknown_handling": "not_evaluated"
+}

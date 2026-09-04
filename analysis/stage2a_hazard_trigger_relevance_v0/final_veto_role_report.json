@@ -1,0 +1,12 @@
+{
+  "Final_Veto_prevented_observed_nominal_proposals_from_execution": true,
+  "actually_observed_hazard_mechanism": "nominal_action_one_step_predicted_overspeed_followed_by_Final_Veto_rejection",
+  "authority_status": "not_authorized",
+  "claim_boundary": "Observed proposal rejection supports the operational veto role on these records only; it does not prove controller superiority or formal safety.",
+  "implemented_stage2a_runner_trigger_note": "The frozen Stage 2A runner gates on current realized clear plus a vetoed normal-action predicted overspeed. Trigger A in this audit instead applies the overspeed predicate to the recovery proposal and must not be treated as the same contract.",
+  "physical_executions": 0,
+  "recovery_proposal_overspeed_trigger_supported": false,
+  "schema_version": "stage2a_hazard_trigger_relevance_audit_v0",
+  "trigger_a_observed": false,
+  "trigger_b_observed": true
+}

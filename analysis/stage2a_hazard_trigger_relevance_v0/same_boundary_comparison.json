@@ -1,0 +1,96 @@
+{
+  "comparable_boundary_count": 2,
+  "comparison_scope": "exact_same_cartesian_boundary_state_only",
+  "comparisons": [
+    {
+      "boundary_state_hash": "636847a9a1972cb5d07a8434778c7bae883a0ee591b43dc34082650d34b8ecc1",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "exact_cartesian_state_match": true,
+      "interpretation": "At this exact state the nominal proposal predicted overspeed and was vetoed, while every published recovery-action alternative listed here predicted at or below 1.90.",
+      "nominal_action": {
+        "Final_Veto_decision": "veto",
+        "action": [
+          -2.3094152700156713e-07,
+          0.13599576748536102
+        ],
+        "action_identity": "nominal_controller_action",
+        "predicted_speed_ratio": 1.9183887199363643,
+        "predicted_state_hash": "ec2f6a66f4fab760d76f196ebee416b0968db9d8c8008537963786ae40086446"
+      },
+      "recovery_actions": [
+        {
+          "Final_Veto_decision": "allow",
+          "action": [
+            0.24999999999963954,
+            4.245380780436667e-07
+          ],
+          "action_identity": "tangential_error_correction_v0",
+          "predicted_speed_ratio": 1.8494516264933416,
+          "source_class": "stage1b_measured_recovery_trace"
+        },
+        {
+          "Final_Veto_decision": "allow",
+          "action": [
+            0.1589012563475844,
+            -0.19300360289683524
+          ],
+          "action_identity": "velocity_opposed_thrust_v0",
+          "predicted_speed_ratio": 1.824760375803826,
+          "source_class": "stage1b_measured_recovery_trace"
+        },
+        {
+          "Final_Veto_decision": "allow",
+          "action": [
+            0.0,
+            0.0
+          ],
+          "action_identity": "zero_action_reference_v0",
+          "predicted_speed_ratio": 1.8906024003603095,
+          "source_class": "d2_zero_action_recovery_trace"
+        }
+      ],
+      "state_values": [
+        -12481438.746593231,
+        7350011337081.66,
+        -5055.651850370408,
+        6140.662726914771
+      ]
+    },
+    {
+      "boundary_state_hash": "20d4146a2d81787b8a149452b89b3368d46d9462f613b0f7b1e4d19a194e039a",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_155__thrust_8000",
+      "exact_cartesian_state_match": true,
+      "interpretation": "At this exact state the nominal proposal predicted overspeed and was vetoed, while every published recovery-action alternative listed here predicted at or below 1.90.",
+      "nominal_action": {
+        "Final_Veto_decision": "veto",
+        "action": [
+          -2.4916881546477226e-07,
+          0.135995874288177
+        ],
+        "action_identity": "nominal_controller_action",
+        "predicted_speed_ratio": 1.912163928126053,
+        "predicted_state_hash": "498e8084c58c5dfbbc16d1a09550c7420cfc882801c05f677794fe79d139c3f0"
+      },
+      "recovery_actions": [
+        {
+          "Final_Veto_decision": "allow",
+          "action": [
+            0.0,
+            0.0
+          ],
+          "action_identity": "zero_action_reference_v0",
+          "predicted_speed_ratio": 1.8850806447641575,
+          "source_class": "d2_zero_action_recovery_trace"
+        }
+      ],
+      "state_values": [
+        -13466537.54620618,
+        7350011051000.863,
+        -5226.9219864531005,
+        5964.69773569837
+      ]
+    }
+  ],
+  "non_claim": "These action-conditional one-step predictions do not establish controller superiority, recovery performance, or causal safety beyond the compared proposals.",
+  "schema_version": "stage2a_hazard_trigger_relevance_audit_v0"
+}

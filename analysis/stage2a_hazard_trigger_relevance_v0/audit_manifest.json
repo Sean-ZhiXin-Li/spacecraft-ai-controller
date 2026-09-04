@@ -1,0 +1,56 @@
+{
+  "D2_result_commit": "ee87a426b09e1436ee2c9f4dc6424b84d505c9ce",
+  "Final_Veto_modified": false,
+  "Stage_2A_authority_granted": false,
+  "artifact_filenames": [
+    "audit_manifest.json",
+    "trigger_a_report.json",
+    "trigger_b_report.json",
+    "same_boundary_comparison.json",
+    "final_veto_role_report.json",
+    "evidence_matrix.json",
+    "summary.md"
+  ],
+  "artifact_hashes": {
+    "evidence_matrix.json": "68bf65d81624051e303b3dfdc5d85200b39fcb7c5d75cb39609fae526e021ffd",
+    "final_veto_role_report.json": "af9a69383d537b2aed70d6ce544e7df0350321fb7c1c6616332afdcdfcefc270",
+    "same_boundary_comparison.json": "cd78d5c790c8973e47443388910ff0b470c495e09e6b514fb17985e42bfef4f6",
+    "summary.md": "dc0c40f16a809c1627aec43148c4bca41d4ed481e10255f26fb7c4d4ad12d593",
+    "trigger_a_report.json": "195b3af37fcdd22822097279f52a5580b46560ee4101230cf91d2c4c7ce368a4",
+    "trigger_b_report.json": "75b0fa2b58c07389980599fe926a648e0df332d4ca88006d2de0b7567e79a0da"
+  },
+  "audit_bundle_hash": "f662be2110fd478ddd793c578f222b868feaeb0e18d274a7226d57417800260f",
+  "audit_classification": "frozen_offline_evidence_audit",
+  "audit_id": "stage2a_hazard_trigger_relevance_v0",
+  "canonical_manifest_hash": "9f446503be008fe4b6a3051d8c98737f822673364cbcebcddee89579364dfa7f",
+  "claim_restrictions": [
+    "no_controller_superiority_claim",
+    "no_recovery_performance_claim",
+    "no_formal_safety_claim",
+    "no_active_authority_claim",
+    "no_inference_from_missing_physics"
+  ],
+  "completed_date": "2026-09-04",
+  "controller_executions": 0,
+  "new_trajectories": 0,
+  "overspeed_comparator": ">",
+  "overspeed_threshold": 1.9,
+  "physical_executions": 0,
+  "same_boundary_comparison_count": 2,
+  "schema_version": "stage2a_hazard_trigger_relevance_audit_v0",
+  "source_repository_head": "d6d6dcf8492fdb12f4c2d6b8fd6d81b15fdf63ea",
+  "source_snapshot": {
+    "d2_manifest_hash": "d5e77b0e4d3abe6b0bc67b2efa94ed3865517543fa4fdad6ed6705d5d97ebe9a",
+    "directory_aggregate_hashes": {
+      "branch_state_registry": "ffc0fbbb78bb27083e2a20a5524ef8e9e91d38bbb901ff18b1ba7cab15d83f52",
+      "final_veto": "3b3552aa72af1d07f8322eb01944f6773a2d9c7546df172fc95b43a2f2ff11ff",
+      "stage1b_calibration": "eb0d2681ac7bcd1c4d32a4e4bc39751c359a20fe28468f2f28584ae196687e8f",
+      "stage2a_d2": "43fdd947dfbebb3a751e281bc7c55b404a8b71d9a29b69a92304b808cba32a95"
+    },
+    "registry_manifest_hash": "b800735062af8426045e40117044056d545f5ff2ebbc3795fdbf52266ba8a980",
+    "stage1b_trace_set_hash": "ab4fd8a70e2aa446e4996126a53685999f55a24baa2522a688ed72b0c2d5cfa0"
+  },
+  "staged_recovery_execution": "not_authorized",
+  "trigger_a_observation_count": 0,
+  "trigger_b_observation_count": 499878
+}

@@ -1,0 +1,52 @@
+{
+  "cross_artifact_reproduced_record_count": 8,
+  "definition": {
+    "conjunction": true,
+    "realized_speed_ratio": "<=1.90",
+    "recovery_action_predicted_speed_ratio": ">1.90"
+  },
+  "duplicate_aware_recovery_proposal_count": 392,
+  "empirical_support_status": "not_observed_in_frozen_evidence",
+  "empirically_supported": false,
+  "limitation": "No positive Trigger A observation exists in the audited frozen traces. This is evidence absence within the covered cases and actions, not proof that a recovery proposal can never predict overspeed.",
+  "maximum_recovery_action_predicted_speed_ratio": 1.8906024003603095,
+  "per_action": {
+    "tangential_error_correction_v0": {
+      "maximum_predicted_speed_ratio": 1.8494516264933416,
+      "proposal_count": 128,
+      "trigger_count": 0
+    },
+    "velocity_opposed_thrust_v0": {
+      "maximum_predicted_speed_ratio": 1.824760375803826,
+      "proposal_count": 128,
+      "trigger_count": 0
+    },
+    "zero_action_reference_v0": {
+      "maximum_predicted_speed_ratio": 1.8906024003603095,
+      "proposal_count": 144,
+      "trigger_count": 0
+    }
+  },
+  "per_source": {
+    "d2_zero_action_recovery_trace": {
+      "maximum_predicted_speed_ratio": 1.8906024003603095,
+      "proposal_count": 16,
+      "trigger_count": 0
+    },
+    "stage1b_measured_recovery_trace": {
+      "maximum_predicted_speed_ratio": 1.8906024003603095,
+      "proposal_count": 384,
+      "trigger_count": 0
+    }
+  },
+  "raw_recovery_proposal_count": 400,
+  "schema_version": "stage2a_hazard_trigger_relevance_audit_v0",
+  "stage2a_provisional_action_identity": "velocity_opposed_thrust_v0",
+  "stage2a_provisional_action_trigger_count": 0,
+  "trigger_case_count": 0,
+  "trigger_case_ids": [],
+  "trigger_id": "trigger_a_recovery_action_predicted_overspeed",
+  "trigger_observation_count_duplicate_aware": 0,
+  "trigger_observation_count_raw": 0,
+  "valid_ratio_pair_count": 400
+}

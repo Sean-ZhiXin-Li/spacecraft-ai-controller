@@ -1,0 +1,101 @@
+{
+  "compact_segments": [
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "end_step": 100000,
+      "fallback_executed": true,
+      "logical_observation_count": 99973,
+      "maximum_predicted_speed_ratio": 1.9183887199363643,
+      "minimum_predicted_speed_ratio": 1.9092950448438386,
+      "start_step": 28
+    },
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000",
+      "end_step": 100000,
+      "fallback_executed": true,
+      "logical_observation_count": 99979,
+      "maximum_predicted_speed_ratio": 1.9126848034791675,
+      "minimum_predicted_speed_ratio": 1.9026594796831986,
+      "start_step": 22
+    },
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000",
+      "end_step": 100000,
+      "fallback_executed": true,
+      "logical_observation_count": 99976,
+      "maximum_predicted_speed_ratio": 1.9149668140054565,
+      "minimum_predicted_speed_ratio": 1.9061282833036937,
+      "start_step": 25
+    },
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "end_step": 100000,
+      "fallback_executed": true,
+      "logical_observation_count": 99975,
+      "maximum_predicted_speed_ratio": 1.9158258326120738,
+      "minimum_predicted_speed_ratio": 1.907419869609409,
+      "start_step": 26
+    },
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "end_step": 100000,
+      "fallback_executed": true,
+      "logical_observation_count": 99974,
+      "maximum_predicted_speed_ratio": 1.9121328346751392,
+      "minimum_predicted_speed_ratio": 1.9041401243259581,
+      "start_step": 27
+    }
+  ],
+  "cross_artifact_reproduction_count": 1,
+  "d2_first_boundaries": [
+    {
+      "Final_Veto_decision": "veto",
+      "boundary_state_hash": "636847a9a1972cb5d07a8434778c7bae883a0ee591b43dc34082650d34b8ecc1",
+      "branch_step": 28,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "nominal_action": [
+        -2.3094152700156713e-07,
+        0.13599576748536102
+      ],
+      "predicted_speed_ratio": 1.9183887199363643,
+      "vetoed_proposal_transition_count": 0
+    },
+    {
+      "Final_Veto_decision": "veto",
+      "boundary_state_hash": "20d4146a2d81787b8a149452b89b3368d46d9462f613b0f7b1e4d19a194e039a",
+      "branch_step": 29,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_155__thrust_8000",
+      "nominal_action": [
+        -2.4916881546477226e-07,
+        0.135995874288177
+      ],
+      "predicted_speed_ratio": 1.912163928126053,
+      "vetoed_proposal_transition_count": 0
+    }
+  ],
+  "d2_first_boundary_observation_count": 2,
+  "definition": {
+    "Final_Veto_decision": "veto",
+    "action_class": "nominal_controller_action",
+    "nominal_action_predicted_speed_ratio": ">1.90"
+  },
+  "duplicate_aware_logical_observation_count": 499878,
+  "final_veto_compact_segment_count": 5,
+  "final_veto_logical_observation_count": 499877,
+  "limitation": "The compact log proves logical decision counts and segment extrema but does not publish every per-step Cartesian state. Rejection of these proposals is not a general proof of closed-loop safety.",
+  "maximum_nominal_action_predicted_speed_ratio": 1.9183887199363643,
+  "observed_final_veto_role": "Final Veto rejected the audited nominal proposals whose one-step predictions exceeded the strict 1.90 threshold.",
+  "prevented_unsafe_nominal_proposal_execution": true,
+  "raw_logical_observation_count": 499879,
+  "schema_version": "stage2a_hazard_trigger_relevance_audit_v0",
+  "trigger_case_count": 6,
+  "trigger_case_ids": [
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_155__thrust_8000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000"
+  ],
+  "trigger_id": "trigger_b_nominal_action_final_veto"
+}
