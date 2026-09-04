@@ -1,0 +1,238 @@
+{
+  "D2_first_veto_event_count": 2,
+  "D2_first_veto_events": [
+    {
+      "branch_step": 28,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "cross_artifact_reproduction": true,
+      "nominal_action": [
+        -2.3094152700156713e-07,
+        0.13599576748536102
+      ],
+      "nominal_predicted_speed_ratio": 1.9183887199363643,
+      "state_identity": "636847a9a1972cb5d07a8434778c7bae883a0ee591b43dc34082650d34b8ecc1",
+      "state_identity_status": "available_exact",
+      "veto_reason": "predicted_nominal_overspeed"
+    },
+    {
+      "branch_step": 29,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_155__thrust_8000",
+      "cross_artifact_reproduction": false,
+      "nominal_action": [
+        -2.4916881546477226e-07,
+        0.135995874288177
+      ],
+      "nominal_predicted_speed_ratio": 1.912163928126053,
+      "state_identity": "20d4146a2d81787b8a149452b89b3368d46d9462f613b0f7b1e4d19a194e039a",
+      "state_identity_status": "available_exact",
+      "veto_reason": "predicted_nominal_overspeed"
+    }
+  ],
+  "case_count": 6,
+  "case_ids": [
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_155__thrust_8000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+    "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000"
+  ],
+  "compact_logical_veto_event_count": 499877,
+  "compact_veto_segment_count": 5,
+  "cross_artifact_reproduction_count": 1,
+  "duplicate_aware_veto_event_count": 499878,
+  "logical_event_identity_contract": {
+    "D2_boundary_event": "D2:<case_id>:branch_step:<branch_step>",
+    "compact_event": "final_veto:<case_id>:step:<start_step..end_step>",
+    "compact_ranges_are_lossless_for_event_count": true,
+    "per_event_Cartesian_state_identity": "not_evaluated"
+  },
+  "schema_version": "stage2a_post_veto_alternative_proposal_audit_v0",
+  "segments": [
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "end_step": 100000,
+      "first_nominal_action": [
+        -2.3094152700156713e-07,
+        0.13599576748536102
+      ],
+      "last_nominal_action": [
+        -0.0007711865733707108,
+        0.11305563567553462
+      ],
+      "logical_event_count": 99973,
+      "logical_event_identity_range": "final_veto:phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000:step:28..100000",
+      "maximum_nominal_predicted_speed_ratio": 1.9183887199363643,
+      "minimum_nominal_predicted_speed_ratio": 1.9092950448438386,
+      "nominal_action_per_step": "not_evaluated_compact_log",
+      "start_step": 28,
+      "state_identity": null,
+      "state_identity_status": "not_evaluated_compact_log",
+      "veto_reason": "predicted_nominal_exceeds_overspeed_threshold",
+      "veto_status": "veto",
+      "zero_action_fallback": {
+        "action_identity": "zero_action_reference_v0",
+        "fallback_failure": false,
+        "first_executed_action": [
+          0.0,
+          0.0
+        ],
+        "last_executed_action": [
+          0.0,
+          0.0
+        ],
+        "maximum_predicted_speed_ratio": 1.8906024003603095,
+        "minimum_predicted_speed_ratio": 1.886122855163443,
+        "status": "executed_as_declared_fallback"
+      }
+    },
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000",
+      "end_step": 100000,
+      "first_nominal_action": [
+        -1.801174124230895e-07,
+        0.13599673789843433
+      ],
+      "last_nominal_action": [
+        -0.0007830039856996722,
+        0.11348366225177732
+      ],
+      "logical_event_count": 99979,
+      "logical_event_identity_range": "final_veto:phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_10000:step:22..100000",
+      "maximum_nominal_predicted_speed_ratio": 1.9126848034791675,
+      "minimum_nominal_predicted_speed_ratio": 1.9026594796831986,
+      "nominal_action_per_step": "not_evaluated_compact_log",
+      "start_step": 22,
+      "state_identity": null,
+      "state_identity_status": "not_evaluated_compact_log",
+      "veto_reason": "predicted_nominal_exceeds_overspeed_threshold",
+      "veto_status": "veto",
+      "zero_action_fallback": {
+        "action_identity": "zero_action_reference_v0",
+        "fallback_failure": false,
+        "first_executed_action": [
+          0.0,
+          0.0
+        ],
+        "last_executed_action": [
+          0.0,
+          0.0
+        ],
+        "maximum_predicted_speed_ratio": 1.878327928279632,
+        "minimum_predicted_speed_ratio": 1.8739024136089395,
+        "status": "executed_as_declared_fallback"
+      }
+    },
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000",
+      "end_step": 100000,
+      "first_nominal_action": [
+        -2.28954114720942e-07,
+        0.13599693303731053
+      ],
+      "last_nominal_action": [
+        -0.0008760063730141428,
+        0.11516467453135668
+      ],
+      "logical_event_count": 99976,
+      "logical_event_identity_range": "final_veto:phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_165__thrust_10000:step:25..100000",
+      "maximum_nominal_predicted_speed_ratio": 1.9149668140054565,
+      "minimum_nominal_predicted_speed_ratio": 1.9061282833036937,
+      "nominal_action_per_step": "not_evaluated_compact_log",
+      "start_step": 25,
+      "state_identity": null,
+      "state_identity_status": "not_evaluated_compact_log",
+      "veto_reason": "predicted_nominal_exceeds_overspeed_threshold",
+      "veto_status": "veto",
+      "zero_action_fallback": {
+        "action_identity": "zero_action_reference_v0",
+        "fallback_failure": false,
+        "first_executed_action": [
+          0.0,
+          0.0
+        ],
+        "last_executed_action": [
+          0.0,
+          0.0
+        ],
+        "maximum_predicted_speed_ratio": 1.8832193641318504,
+        "minimum_predicted_speed_ratio": 1.8791329526503668,
+        "status": "executed_as_declared_fallback"
+      }
+    },
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "end_step": 100000,
+      "first_nominal_action": [
+        -2.4468456937654754e-07,
+        0.1359970532024554
+      ],
+      "last_nominal_action": [
+        -0.0009085676850674167,
+        0.11580245576615651
+      ],
+      "logical_event_count": 99975,
+      "logical_event_identity_range": "final_veto:phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000:step:26..100000",
+      "maximum_nominal_predicted_speed_ratio": 1.9158258326120738,
+      "minimum_nominal_predicted_speed_ratio": 1.907419869609409,
+      "nominal_action_per_step": "not_evaluated_compact_log",
+      "start_step": 26,
+      "state_identity": null,
+      "state_identity_status": "not_evaluated_compact_log",
+      "veto_reason": "predicted_nominal_exceeds_overspeed_threshold",
+      "veto_status": "veto",
+      "zero_action_fallback": {
+        "action_identity": "zero_action_reference_v0",
+        "fallback_failure": false,
+        "first_executed_action": [
+          0.0,
+          0.0
+        ],
+        "last_executed_action": [
+          0.0,
+          0.0
+        ],
+        "maximum_predicted_speed_ratio": 1.8850652818071183,
+        "minimum_predicted_speed_ratio": 1.8811071225829687,
+        "status": "executed_as_declared_fallback"
+      }
+    },
+    {
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "end_step": 100000,
+      "first_nominal_action": [
+        -2.593568828536793e-07,
+        0.13599719796820903
+      ],
+      "last_nominal_action": [
+        -0.0009365880352927231,
+        0.11645814857820702
+      ],
+      "logical_event_count": 99974,
+      "logical_event_identity_range": "final_veto:phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000:step:27..100000",
+      "maximum_nominal_predicted_speed_ratio": 1.9121328346751392,
+      "minimum_nominal_predicted_speed_ratio": 1.9041401243259581,
+      "nominal_action_per_step": "not_evaluated_compact_log",
+      "start_step": 27,
+      "state_identity": null,
+      "state_identity_status": "not_evaluated_compact_log",
+      "veto_reason": "predicted_nominal_exceeds_overspeed_threshold",
+      "veto_status": "veto",
+      "zero_action_fallback": {
+        "action_identity": "zero_action_reference_v0",
+        "fallback_failure": false,
+        "first_executed_action": [
+          0.0,
+          0.0
+        ],
+        "last_executed_action": [
+          0.0,
+          0.0
+        ],
+        "maximum_predicted_speed_ratio": 1.8823116157555728,
+        "minimum_predicted_speed_ratio": 1.878475612635881,
+        "status": "executed_as_declared_fallback"
+      }
+    }
+  ]
+}

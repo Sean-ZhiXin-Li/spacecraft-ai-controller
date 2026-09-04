@@ -1,0 +1,265 @@
+{
+  "comparisons": [
+    {
+      "alternatives": [
+        {
+          "action": [
+            0.0,
+            0.0
+          ],
+          "action_identity": "zero_action_reference_v0",
+          "allowed_or_rejected_status": "allow",
+          "available_evidence": "stage1b_measured_recovery_trace",
+          "predicted_speed_ratio": 1.8906024003603095,
+          "safe_under_frozen_threshold": true
+        },
+        {
+          "action": [
+            0.1589012563475844,
+            -0.19300360289683524
+          ],
+          "action_identity": "velocity_opposed_thrust_v0",
+          "allowed_or_rejected_status": "allow",
+          "available_evidence": "stage1b_measured_recovery_trace",
+          "predicted_speed_ratio": 1.824760375803826,
+          "safe_under_frozen_threshold": true
+        },
+        {
+          "action": [
+            0.24999999999963954,
+            4.245380780436667e-07
+          ],
+          "action_identity": "tangential_error_correction_v0",
+          "allowed_or_rejected_status": "allow",
+          "available_evidence": "stage1b_measured_recovery_trace",
+          "predicted_speed_ratio": 1.8494516264933416,
+          "safe_under_frozen_threshold": true
+        },
+        {
+          "action": null,
+          "action_identity": "explicit_abort_v0",
+          "allowed_or_rejected_status": "not_evaluated_terminal_semantics",
+          "available_evidence": "observed_terminal_only_zero_transition_trace",
+          "physical_action_alternative": false,
+          "predicted_speed_ratio": null,
+          "safe_under_frozen_threshold": null
+        }
+      ],
+      "at_least_one_safe_physical_alternative": true,
+      "branch_step": 28,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "nominal_proposal": {
+        "Final_Veto_decision": "veto",
+        "action": [
+          -2.3094152700156713e-07,
+          0.13599576748536102
+        ],
+        "predicted_speed_ratio": 1.9183887199363643,
+        "veto_reason": "predicted_nominal_overspeed"
+      },
+      "state_identity": "8b017254a8db2584a6732bcd086447ba405cf949d9e932cf03e71543b2cdb898",
+      "state_identity_status": "available_exact",
+      "state_values": [
+        -12481438.746593231,
+        7350011337081.66,
+        -5055.651850370408,
+        6140.662726914771
+      ]
+    },
+    {
+      "alternatives": [
+        {
+          "action": [
+            0.0,
+            0.0
+          ],
+          "action_identity": "zero_action_reference_v0",
+          "allowed_or_rejected_status": "allow",
+          "available_evidence": "D2_zero_action_recovery",
+          "predicted_speed_ratio": 1.8850806447641575,
+          "safe_under_frozen_threshold": true
+        },
+        {
+          "action": null,
+          "action_identity": "velocity_opposed_thrust_v0",
+          "allowed_or_rejected_status": "not_evaluated",
+          "available_evidence": "not_evaluated_at_exact_state",
+          "predicted_speed_ratio": null,
+          "safe_under_frozen_threshold": null
+        },
+        {
+          "action": null,
+          "action_identity": "tangential_error_correction_v0",
+          "allowed_or_rejected_status": "not_evaluated",
+          "available_evidence": "not_evaluated_at_exact_state",
+          "predicted_speed_ratio": null,
+          "safe_under_frozen_threshold": null
+        },
+        {
+          "action": null,
+          "action_identity": "explicit_abort_v0",
+          "allowed_or_rejected_status": "not_evaluated_terminal_semantics",
+          "available_evidence": "not_evaluated_at_exact_state",
+          "physical_action_alternative": false,
+          "predicted_speed_ratio": null,
+          "safe_under_frozen_threshold": null
+        }
+      ],
+      "at_least_one_safe_physical_alternative": true,
+      "branch_step": 29,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_155__thrust_8000",
+      "nominal_proposal": {
+        "Final_Veto_decision": "veto",
+        "action": [
+          -2.4916881546477226e-07,
+          0.135995874288177
+        ],
+        "predicted_speed_ratio": 1.912163928126053,
+        "veto_reason": "predicted_nominal_overspeed"
+      },
+      "state_identity": "20d4146a2d81787b8a149452b89b3368d46d9462f613b0f7b1e4d19a194e039a",
+      "state_identity_status": "available_exact",
+      "state_values": [
+        -13466537.54620618,
+        7350011051000.863,
+        -5226.9219864531005,
+        5964.69773569837
+      ]
+    },
+    {
+      "alternatives": [
+        {
+          "action": [
+            0.0,
+            0.0
+          ],
+          "action_identity": "zero_action_reference_v0",
+          "allowed_or_rejected_status": "allow",
+          "available_evidence": "stage1b_measured_recovery_trace",
+          "predicted_speed_ratio": 1.885065281807118,
+          "safe_under_frozen_threshold": true
+        },
+        {
+          "action": [
+            0.18312107494325033,
+            -0.17019598089152543
+          ],
+          "action_identity": "velocity_opposed_thrust_v0",
+          "allowed_or_rejected_status": "allow",
+          "available_evidence": "stage1b_measured_recovery_trace",
+          "predicted_speed_ratio": 1.802762751111514,
+          "safe_under_frozen_threshold": true
+        },
+        {
+          "action": [
+            0.24999999999959535,
+            4.4979755739982056e-07
+          ],
+          "action_identity": "tangential_error_correction_v0",
+          "allowed_or_rejected_status": "allow",
+          "available_evidence": "stage1b_measured_recovery_trace",
+          "predicted_speed_ratio": 1.8256400803089328,
+          "safe_under_frozen_threshold": true
+        },
+        {
+          "action": null,
+          "action_identity": "explicit_abort_v0",
+          "allowed_or_rejected_status": "not_evaluated_terminal_semantics",
+          "available_evidence": "not_evaluated_at_exact_state",
+          "physical_action_alternative": false,
+          "predicted_speed_ratio": null,
+          "safe_under_frozen_threshold": null
+        }
+      ],
+      "at_least_one_safe_physical_alternative": true,
+      "branch_step": 26,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "nominal_proposal": {
+        "Final_Veto_decision": "veto",
+        "action": [
+          -2.4468456937654754e-07,
+          0.1359970532024554
+        ],
+        "predicted_speed_ratio": 1.9158258326120738,
+        "veto_reason": "predicted_nominal_overspeed"
+      },
+      "state_identity": "8cf2c17a18beb0f9eebdf26a31b17b83c6a590a849cae35a94d69b2fde515bd0",
+      "state_identity_status": "available_exact",
+      "state_values": [
+        -13224062.388935853,
+        7350007893195.223,
+        -5809.17348060974,
+        5399.149054841511
+      ]
+    },
+    {
+      "alternatives": [
+        {
+          "action": [
+            0.0,
+            0.0
+          ],
+          "action_identity": "zero_action_reference_v0",
+          "allowed_or_rejected_status": "allow",
+          "available_evidence": "stage1b_measured_recovery_trace",
+          "predicted_speed_ratio": 1.8823116157555728,
+          "safe_under_frozen_threshold": true
+        },
+        {
+          "action": [
+            0.1879358444069937,
+            -0.1648639390134491
+          ],
+          "action_identity": "velocity_opposed_thrust_v0",
+          "allowed_or_rejected_status": "allow",
+          "available_evidence": "stage1b_measured_recovery_trace",
+          "predicted_speed_ratio": 1.8000090850599684,
+          "safe_under_frozen_threshold": true
+        },
+        {
+          "action": [
+            0.24999999999954536,
+            4.7676879878406646e-07
+          ],
+          "action_identity": "tangential_error_correction_v0",
+          "allowed_or_rejected_status": "allow",
+          "available_evidence": "stage1b_measured_recovery_trace",
+          "predicted_speed_ratio": 1.8212502385150744,
+          "safe_under_frozen_threshold": true
+        },
+        {
+          "action": null,
+          "action_identity": "explicit_abort_v0",
+          "allowed_or_rejected_status": "not_evaluated_terminal_semantics",
+          "available_evidence": "not_evaluated_at_exact_state",
+          "physical_action_alternative": false,
+          "predicted_speed_ratio": null,
+          "safe_under_frozen_threshold": null
+        }
+      ],
+      "at_least_one_safe_physical_alternative": true,
+      "branch_step": 27,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "nominal_proposal": {
+        "Final_Veto_decision": "veto",
+        "action": [
+          -2.593568828536793e-07,
+          0.13599719796820903
+        ],
+        "predicted_speed_ratio": 1.9121328346751392,
+        "veto_reason": "predicted_nominal_overspeed"
+      },
+      "state_identity": "adba62405cdde2cb56579f4dafa39ae4d6dfb27d1aa7f460903d2a4fcff9cc0d",
+      "state_identity_status": "available_exact",
+      "state_values": [
+        -14017016.997693123,
+        7350007505428.269,
+        -5953.2039850414185,
+        5222.360118802152
+      ]
+    }
+  ],
+  "exact_state_comparison_count": 4,
+  "explicit_abort_semantics": "explicit_abort_v0 is terminal semantics with no physical proposal; its predicted speed ratio and allow/reject status remain not_evaluated",
+  "schema_version": "stage2a_post_veto_alternative_proposal_audit_v0"
+}

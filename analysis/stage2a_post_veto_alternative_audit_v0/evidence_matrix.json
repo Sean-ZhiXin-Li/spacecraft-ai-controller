@@ -1,0 +1,37 @@
+{
+  "evidence_rows": [
+    {
+      "alternative_prediction": "segment_minimum_and_maximum_available",
+      "source": "analysis/final_veto_ablation_v0/decision_log.jsonl",
+      "state_identity": "not_evaluated_per_logical_event",
+      "supports": "499877_compact_nominal_veto_and_zero_fallback_decisions"
+    },
+    {
+      "alternative_prediction": "zero_action_available",
+      "source": "analysis/stage2a_prediction_boundary_discovery_d2_v0/source_case_index.json",
+      "state_identity": "available_exact",
+      "supports": "two_exact_first_veto_boundaries"
+    },
+    {
+      "alternative_prediction": "joined_to_Stage1B_by_exact_Cartesian_state",
+      "source": "analysis/recovery_branch_state_registry_v0/branch_state_index.json",
+      "state_identity": "available_exact",
+      "supports": "three_exact_registered_veto_boundaries"
+    },
+    {
+      "alternative_prediction": "one_step_predicted",
+      "source": "analysis/staged_recovery_shadow_calibration_v0/traces",
+      "state_identity": "available_exact_Cartesian",
+      "supports": "zero_velocity_opposed_tangential_predictions_at_three_veto_states"
+    },
+    {
+      "alternative_prediction": "not_evaluated_terminal_semantics",
+      "source": "analysis/staged_recovery_shadow_calibration_v0/traces/legacy_canonical__explicit_abort_v0.jsonl",
+      "state_identity": "available_exact_Cartesian",
+      "supports": "terminal_only_explicit_abort_at_one_exact_state"
+    }
+  ],
+  "new_physics_inference": false,
+  "schema_version": "stage2a_post_veto_alternative_proposal_audit_v0",
+  "unknown_value_policy": "not_evaluated"
+}

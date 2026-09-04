@@ -1,0 +1,50 @@
+{
+  "alternative_results": {
+    "explicit_abort_v0": {
+      "consistently_at_or_below_1p90_in_available_evidence": null,
+      "evidence_scope": "terminal_semantics_not_action_prediction",
+      "logical_events_not_evaluated": 499878,
+      "logical_events_rejected": 0,
+      "logical_events_safe": 0,
+      "logical_events_with_available_prediction": 0,
+      "maximum_evaluated_predicted_speed_ratio": null,
+      "observed_terminal_semantics_count": 1,
+      "physical_action_alternative": false
+    },
+    "tangential_error_correction_v0": {
+      "consistently_at_or_below_1p90_in_available_evidence": true,
+      "evidence_scope": "exact_registry_boundary_states_in_Stage1B_traces",
+      "logical_events_not_evaluated": 499875,
+      "logical_events_rejected": 0,
+      "logical_events_safe": 3,
+      "logical_events_with_available_prediction": 3,
+      "maximum_evaluated_predicted_speed_ratio": 1.8494516264933416
+    },
+    "velocity_opposed_thrust_v0": {
+      "consistently_at_or_below_1p90_in_available_evidence": true,
+      "evidence_scope": "exact_registry_boundary_states_in_Stage1B_traces",
+      "logical_events_not_evaluated": 499875,
+      "logical_events_rejected": 0,
+      "logical_events_safe": 3,
+      "logical_events_with_available_prediction": 3,
+      "maximum_evaluated_predicted_speed_ratio": 1.824760375803826
+    },
+    "zero_action_reference_v0": {
+      "consistently_at_or_below_1p90_in_available_evidence": true,
+      "evidence_scope": "compact_fallback_segments_plus_one_unique_D2_boundary",
+      "logical_events_not_evaluated": 0,
+      "logical_events_rejected": 0,
+      "logical_events_safe": 499878,
+      "logical_events_with_available_prediction": 499878,
+      "maximum_evaluated_predicted_speed_ratio": 1.8906024003603095
+    }
+  },
+  "duplicate_aware_veto_event_count": 499878,
+  "evaluated_physical_alternatives_consistently_at_or_below_1p90": true,
+  "general_consistency_claim_authorized": false,
+  "limitation": "Zero-action coverage is complete through compact fallback extrema. Velocity-opposed and tangential alternatives are evaluated at only three exact veto states; missing predictions remain not_evaluated.",
+  "most_frequently_safe_alternative": "zero_action_reference_v0",
+  "schema_version": "stage2a_post_veto_alternative_proposal_audit_v0",
+  "veto_events_with_at_least_one_safe_alternative": 499878,
+  "veto_events_without_safe_alternative_evidence": 0
+}

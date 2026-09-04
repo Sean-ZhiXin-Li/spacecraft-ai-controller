@@ -1,0 +1,24 @@
+{
+  "Final_Veto_role_if_future_replacement_is_considered": "Final Veto remains the proposal-level barrier for any replacement action.",
+  "Stage_2A_authority_granted": false,
+  "action_replacement_observed": true,
+  "authority_consequence": "none",
+  "forced_choice": "action_replacement_opportunity",
+  "non_claims": [
+    "no_controller_superiority",
+    "no_recovery_improvement",
+    "no_formal_safety",
+    "no_general_alternative_safety",
+    "no_active_replacement_authority"
+  ],
+  "precise_interpretation": "proposal_level_safety_barrier_with_observed_zero_action_replacement",
+  "replacement_evidence": {
+    "fallback_action_identity": "zero_action_reference_v0",
+    "fallback_failures": 0,
+    "logical_veto_events": 499877,
+    "maximum_fallback_predicted_speed_ratio": 1.8906024003603095
+  },
+  "schema_version": "stage2a_post_veto_alternative_proposal_audit_v0",
+  "terminal_safety_barrier": false,
+  "why_not_terminal": "The five frozen Final Veto segments executed zero-action fallback and continued; veto itself was not a terminal event."
+}
