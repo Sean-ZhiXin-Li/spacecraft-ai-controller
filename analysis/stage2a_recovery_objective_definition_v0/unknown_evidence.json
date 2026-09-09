@@ -1,0 +1,80 @@
+{
+  "canonical_payload_hash": "8f73a75d774917d9a832216bebe4924d14fb2f4ccc007ac46461564b4b66d6c5",
+  "schema_version": "stage2a_recovery_objective_definition_audit_v0",
+  "unknown_count": 9,
+  "unknowns": [
+    {
+      "evidence_id": "alternative_specific_multistep_recovery_outcome",
+      "may_be_converted_to_false": false,
+      "may_be_used_as_positive_action_evidence": false,
+      "reason": "One-step progress cannot establish eventual recovery.",
+      "required_future_evaluator": "future_recovery_evaluator",
+      "status": "not_evaluated"
+    },
+    {
+      "evidence_id": "handoff_readiness",
+      "may_be_converted_to_false": false,
+      "may_be_used_as_positive_action_evidence": false,
+      "reason": "No compatible externally valid handoff-ready evidence exists.",
+      "required_future_evaluator": "future_handoff_evaluator",
+      "status": "not_evaluated"
+    },
+    {
+      "evidence_id": "available_correction_authority",
+      "may_be_converted_to_false": false,
+      "may_be_used_as_positive_action_evidence": false,
+      "reason": "Stage 0A declares correction authority unsupported.",
+      "required_future_evaluator": "future_authority_evaluator",
+      "status": "not_evaluated"
+    },
+    {
+      "evidence_id": "future_crossing_or_time_to_crossing",
+      "may_be_converted_to_false": false,
+      "may_be_used_as_positive_action_evidence": false,
+      "reason": "Current crossing evidence is measured pairwise and does not extrapolate.",
+      "required_future_evaluator": "future_trajectory_evaluator",
+      "status": "not_evaluated"
+    },
+    {
+      "evidence_id": "active_intervention_release_readiness",
+      "may_be_converted_to_false": false,
+      "may_be_used_as_positive_action_evidence": false,
+      "reason": "No release condition has active authority or validation.",
+      "required_future_evaluator": "future_release_evaluator",
+      "status": "not_evaluated"
+    },
+    {
+      "evidence_id": "action_cost_and_resource_tradeoff",
+      "may_be_converted_to_false": false,
+      "may_be_used_as_positive_action_evidence": false,
+      "reason": "The frozen audit does not define fuel, effort, or wear utility.",
+      "required_future_evaluator": "future_cost_evaluator",
+      "status": "not_evaluated"
+    },
+    {
+      "evidence_id": "progress_persistence_and_noise_scale",
+      "may_be_converted_to_false": false,
+      "may_be_used_as_positive_action_evidence": false,
+      "reason": "Three exact states cannot validate persistence or a noise threshold.",
+      "required_future_evaluator": "future_multitrace_calibration",
+      "status": "not_evaluated"
+    },
+    {
+      "evidence_id": "causal_action_effect",
+      "may_be_converted_to_false": false,
+      "may_be_used_as_positive_action_evidence": false,
+      "reason": "Ballistic state evolution can create progress under zero action.",
+      "required_future_evaluator": "future_matched_counterfactual_experiment",
+      "status": "not_evaluated"
+    },
+    {
+      "evidence_id": "general_cross_case_action_ordering",
+      "may_be_converted_to_false": false,
+      "may_be_used_as_positive_action_evidence": false,
+      "reason": "Nine observations from three states do not support a universal ordering.",
+      "required_future_evaluator": "future_multicase_evaluator",
+      "status": "not_evaluated"
+    }
+  ],
+  "unsupported_evidence_remains_unsupported": true
+}

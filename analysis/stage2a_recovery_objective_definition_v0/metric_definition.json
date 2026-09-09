@@ -1,0 +1,192 @@
+{
+  "action_selector": null,
+  "canonical_payload_hash": "3e951be2b817509658665ff5485da6108d0891b6da6af716d111b8c50f0731d9",
+  "combined_score": null,
+  "metric_count": 12,
+  "metrics": [
+    {
+      "direction": "both_must_be_valid",
+      "evidence_level": "externally_supplied",
+      "metric_id": "evidence_validity",
+      "non_meaning": "Validity does not imply safety or recovery usefulness.",
+      "objective_role": "safety_precondition",
+      "source_fields": [
+        "simulation_validity",
+        "recovery_evaluation_validity"
+      ],
+      "threshold": null,
+      "use_in_future_semantics": "hard_precondition"
+    },
+    {
+      "direction": "predicted_speed_ratio_at_or_below_boundary_and_veto_allow",
+      "evidence_level": "predicted_and_externally_supplied",
+      "metric_id": "predicted_action_speed_feasibility",
+      "non_meaning": "A safe one-step proposal is not necessarily useful or recoverable.",
+      "objective_role": "safety_constraint",
+      "source_fields": [
+        "predicted_speed_ratio",
+        "final_veto_decision"
+      ],
+      "threshold": {
+        "comparator": "<=",
+        "source": "Final_Veto_v0",
+        "value": 1.9
+      },
+      "use_in_future_semantics": "hard_feasibility_gate"
+    },
+    {
+      "direction": "avoid_strict_overspeed",
+      "evidence_level": "derived_from_measured_state",
+      "metric_id": "realized_overspeed_state",
+      "non_meaning": "Clear realized speed does not establish future proposal safety.",
+      "objective_role": "safety_constraint",
+      "source_fields": [
+        "realized_speed_ratio",
+        "realized_overspeed"
+      ],
+      "threshold": {
+        "comparator": ">",
+        "source": "Final_Veto_v0",
+        "value": 1.9
+      },
+      "use_in_future_semantics": "hazard_state_detection"
+    },
+    {
+      "direction": "increase_signed_margin_relative_to_1p90",
+      "evidence_level": "derived",
+      "metric_id": "overspeed_headroom",
+      "non_meaning": "More headroom alone does not imply better orbital recovery.",
+      "objective_role": "safety_margin_progress",
+      "source_fields": [
+        "overspeed_headroom",
+        "predicted_overspeed_headroom"
+      ],
+      "threshold": {
+        "comparator": "reference_boundary",
+        "value": 1.9
+      },
+      "use_in_future_semantics": "secondary_safety_margin_not_a_mission_score"
+    },
+    {
+      "direction": "decrease_absolute_gap",
+      "evidence_level": "derived",
+      "metric_id": "absolute_radius_gap",
+      "non_meaning": "Gap reduction does not guarantee controlled arrival or crossing.",
+      "objective_role": "recovery_progress",
+      "source_fields": [
+        "absolute_target_radius_error",
+        "radius_error_ratio"
+      ],
+      "threshold": {
+        "comparator": "absolute_ratio_<=",
+        "source": "Phase34_recoverability",
+        "value": 0.0025
+      },
+      "use_in_future_semantics": "directional_progress_then_exact_component_milestone"
+    },
+    {
+      "direction": "move_toward_target_while_reducing_absolute_radial_velocity_ratio_for_arrival",
+      "evidence_level": "derived",
+      "metric_id": "radial_velocity_component",
+      "non_meaning": "Target-directed motion can still be too fast for recoverability.",
+      "objective_role": "recovery_progress_and_arrival_condition",
+      "source_fields": [
+        "signed_target_radius_error",
+        "radial_velocity",
+        "radial_velocity_ratio"
+      ],
+      "threshold": {
+        "comparator": "absolute_ratio_<=",
+        "source": "Phase34_recoverability",
+        "value": 0.02
+      },
+      "use_in_future_semantics": "two_distinct_atoms_not_one_scalar"
+    },
+    {
+      "direction": "decrease_absolute_error_without_hiding_signed_crossing",
+      "evidence_level": "derived",
+      "metric_id": "absolute_tangential_velocity_error",
+      "non_meaning": "A passing tangential component does not imply full recoverability.",
+      "objective_role": "recovery_progress",
+      "source_fields": [
+        "tangential_velocity_error",
+        "tangential_velocity_error_ratio"
+      ],
+      "threshold": {
+        "comparator": "absolute_ratio_<=",
+        "source": "Phase34_recoverability",
+        "value": 0.25
+      },
+      "use_in_future_semantics": "directional_progress_then_exact_component_milestone"
+    },
+    {
+      "direction": "all_three_inclusive_components_pass",
+      "evidence_level": "derived",
+      "metric_id": "phase34_compatible_recoverability_components",
+      "non_meaning": "The predicate is not recovery success or handoff readiness.",
+      "objective_role": "recovery_milestone",
+      "source_fields": [
+        "radius_component_pass",
+        "radial_velocity_component_pass",
+        "tangential_velocity_component_pass",
+        "phase34_compatible_recoverability"
+      ],
+      "threshold": "inherited_component_thresholds_only",
+      "use_in_future_semantics": "conjunctive_milestone_not_handoff"
+    },
+    {
+      "direction": "observe_exact_existing_crossing_semantics",
+      "evidence_level": "derived_from_consecutive_measured_states",
+      "metric_id": "eligible_target_radius_crossing",
+      "non_meaning": "No interpolation or future crossing prediction is implied.",
+      "objective_role": "recovery_milestone",
+      "source_fields": [
+        "target_radius_crossing",
+        "crossing_recovery_eligible"
+      ],
+      "threshold": null,
+      "use_in_future_semantics": "event_evidence_separate_from_component_pass"
+    },
+    {
+      "direction": "descriptively_reduce_absolute_proxy_error",
+      "evidence_level": "diagnostic_proxy",
+      "metric_id": "specific_energy_error_proxy",
+      "non_meaning": "It is not an exact invariant, safety gate, or recovery objective.",
+      "objective_role": "diagnostic_only",
+      "source_fields": [
+        "specific_energy_error",
+        "orbital_energy_or_proxy"
+      ],
+      "threshold": null,
+      "use_in_future_semantics": "analysis_context_only"
+    },
+    {
+      "direction": "not_evaluated_for_alternative_one_step_comparisons",
+      "evidence_level": "future_or_externally_supplied_evaluator",
+      "metric_id": "recovery_success_v0",
+      "non_meaning": "Directional progress cannot be substituted for this evaluator.",
+      "objective_role": "future_evaluator",
+      "source_fields": [
+        "recovery_success_v0"
+      ],
+      "threshold": null,
+      "use_in_future_semantics": "required_for_outcome_claims"
+    },
+    {
+      "direction": "not_defined",
+      "evidence_level": "not_evaluated",
+      "metric_id": "handoff_readiness",
+      "non_meaning": "Phase34-compatible recoverability is not handoff readiness.",
+      "objective_role": "future_evaluator",
+      "source_fields": [
+        "handoff_readiness"
+      ],
+      "threshold": null,
+      "use_in_future_semantics": "required_before_nominal_handoff"
+    }
+  ],
+  "optimizer": null,
+  "policy_status": "not_defined",
+  "schema_version": "stage2a_recovery_objective_definition_audit_v0",
+  "weights": null
+}

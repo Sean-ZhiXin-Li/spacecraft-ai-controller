@@ -1,0 +1,91 @@
+{
+  "canonical_payload_hash": "6ad4eae38d5fae03eb28360605d06a9680c497f0d3b607da5092ba2ba2004b54",
+  "combined_conflict_score": null,
+  "conflict_count": 7,
+  "conflict_resolution_policy": null,
+  "conflict_weights": null,
+  "conflicts": [
+    {
+      "conflict_id": "radius_closure_vs_radial_arrival_condition",
+      "mechanism": "Fast target-directed radial motion can close radius gap while remaining outside the radial-velocity recoverability component.",
+      "metrics": [
+        "absolute_radius_gap",
+        "radial_velocity_component"
+      ],
+      "resolution_status": "unresolved_without_future_semantics",
+      "stage2a_i_evidence": {
+        "zero_radial_component_worsened_count": 3,
+        "zero_radius_gap_improved_count": 3
+      }
+    },
+    {
+      "conflict_id": "speed_headroom_vs_radius_progress",
+      "mechanism": "Actions with more speed headroom can produce less one-step radius-gap improvement than a higher-ratio safe alternative.",
+      "metrics": [
+        "overspeed_headroom",
+        "absolute_radius_gap"
+      ],
+      "resolution_status": "must_not_be_reduced_to_one_weighted_score_today",
+      "stage2a_i_evidence": "observed_at_three_fully_matched_states"
+    },
+    {
+      "conflict_id": "lower_speed_ratio_vs_tangential_progress",
+      "mechanism": "Tangential correction had a higher but safe ratio than velocity-opposed thrust while improving tangential error more.",
+      "metrics": [
+        "predicted_action_speed_feasibility",
+        "absolute_tangential_velocity_error"
+      ],
+      "resolution_status": "component_tradeoff_observed",
+      "stage2a_i_evidence_count": 3
+    },
+    {
+      "conflict_id": "radial_progress_vs_tangential_progress",
+      "mechanism": "Velocity-opposed thrust improved the radial component at all three states; tangential correction produced greater tangential improvement.",
+      "metrics": [
+        "radial_velocity_component",
+        "absolute_tangential_velocity_error"
+      ],
+      "resolution_status": "no_global_action_ordering_supported",
+      "stage2a_i_evidence": {
+        "fully_matched_state_count": 3,
+        "velocity_radial_improved_count": 3
+      }
+    },
+    {
+      "conflict_id": "directional_progress_vs_recoverability_milestone",
+      "mechanism": "Multiple components improved while the combined predicate remained false.",
+      "metrics": [
+        "component_directional_progress",
+        "phase34_compatible_recoverability_components"
+      ],
+      "resolution_status": "progress_must_not_be_called_recovery",
+      "stage2a_i_evidence": {
+        "combined_predicate_true": 0,
+        "full_observations": 9
+      }
+    },
+    {
+      "conflict_id": "component_progress_vs_crossing",
+      "mechanism": "One-step component improvement occurred without eligible crossing.",
+      "metrics": [
+        "component_directional_progress",
+        "eligible_target_radius_crossing"
+      ],
+      "resolution_status": "crossing_remains_separate_event_evidence",
+      "stage2a_i_evidence": {
+        "eligible_crossing_observations": 0
+      }
+    },
+    {
+      "conflict_id": "diagnostic_energy_vs_authoritative_objectives",
+      "mechanism": "The diagnostic proxy can improve even when no recoverability component transition or crossing occurs.",
+      "metrics": [
+        "specific_energy_error_proxy",
+        "recoverability_milestones"
+      ],
+      "resolution_status": "exclude_proxy_from_action_policy",
+      "stage2a_i_evidence": "proxy_improved_for_all_nine_observations"
+    }
+  ],
+  "schema_version": "stage2a_recovery_objective_definition_audit_v0"
+}

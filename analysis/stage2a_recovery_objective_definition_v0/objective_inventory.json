@@ -1,0 +1,116 @@
+{
+  "Final_Veto_modified": false,
+  "Stage_2A_authority_granted": false,
+  "action_selection": null,
+  "artifact_filenames": [
+    "objective_inventory.json",
+    "metric_definition.json",
+    "conflict_analysis.json",
+    "unknown_evidence.json",
+    "summary.md"
+  ],
+  "audit_classification": "frozen_offline_objective_semantics_audit",
+  "audit_id": "stage2a_recovery_objective_definition_v0",
+  "canonical_payload_hash": "66686fe127e4d1ceb3e23c312c7e6cbca265c4f501fcab4be9435ee81e404657",
+  "claim_restrictions": [
+    "no_action_selection",
+    "no_recovery_success_claim",
+    "no_optimality_claim",
+    "no_universal_metric_ordering",
+    "no_formal_safety_claim",
+    "no_active_authority_claim"
+  ],
+  "combined_score": null,
+  "completed_date": "2026-09-09",
+  "conflict_count": 7,
+  "controller_executions": 0,
+  "future_action_selection_semantics_recommendation": "lexicographic_safety_first",
+  "future_semantic_tiers": [
+    {
+      "meaning": "Invalid or unavailable required safety evidence blocks eligibility.",
+      "role": "evidence_validity",
+      "tier": 0
+    },
+    {
+      "meaning": "Final Veto and the frozen strict overspeed boundary remain hard constraints.",
+      "role": "safety_feasibility",
+      "tier": 1
+    },
+    {
+      "meaning": "Preserve component passes and eligible crossing as separate exact evidence.",
+      "role": "recovery_milestones",
+      "tier": 2
+    },
+    {
+      "meaning": "Compare radius, radial, tangential, and headroom without weights.",
+      "role": "component_wise_progress",
+      "tier": 3
+    },
+    {
+      "meaning": "Never use the diagnostic proxy as an authoritative gate.",
+      "role": "energy_proxy_context",
+      "tier": "diagnostic"
+    }
+  ],
+  "metric_count": 12,
+  "metrics_by_role": {
+    "diagnostic_only": [
+      "specific_energy_error_proxy"
+    ],
+    "future_evaluator": [
+      "handoff_readiness",
+      "recovery_success_v0"
+    ],
+    "recovery_milestone": [
+      "eligible_target_radius_crossing",
+      "phase34_compatible_recoverability_components"
+    ],
+    "recovery_progress": [
+      "absolute_radius_gap",
+      "absolute_tangential_velocity_error"
+    ],
+    "recovery_progress_and_arrival_condition": [
+      "radial_velocity_component"
+    ],
+    "safety_constraint": [
+      "predicted_action_speed_feasibility",
+      "realized_overspeed_state"
+    ],
+    "safety_margin_progress": [
+      "overspeed_headroom"
+    ],
+    "safety_precondition": [
+      "evidence_validity"
+    ]
+  },
+  "optimizer": null,
+  "physical_executions": 0,
+  "policy": null,
+  "recommendation_status": "conceptual_not_a_policy",
+  "report_bundle_hash": "61b8a001093cac65e66cb7eb76773bb1c148220a17004a3e5c00106aca89d0fe",
+  "report_hashes": {
+    "conflict_analysis.json": "45e9138d1b0db5be572b5be4ddbbf5fc35c1f1511c64aeba03f4e476c865d5a7",
+    "metric_definition.json": "3a9b52058ff44b0ebc14d9babba367b83fde3114959c078652ec2c2980ab937c",
+    "summary.md": "c012fc185d876c55bf348854776ab8dcf56a6c6dbfbe1fb2a18fb64b640124ce",
+    "unknown_evidence.json": "832d595a214eec0310d201e4c6a260dcd8fd9e2ad334f3fa6e34ff5bec9740fc"
+  },
+  "schema_version": "stage2a_recovery_objective_definition_audit_v0",
+  "source_guard_evidence_manifest_hash": "df96854e1caecd45560f8d7e78136bc751bbf3087eab78a35ee6a0051c5ba648",
+  "source_instrumentation_manifest_hash": "c4947e623e7f9a83de16163f58c5a0da7a3f7b10ee3b10ce88f4eae4805f122c",
+  "source_post_veto_manifest_hash": "6000f10cf924781cd051808a435804ca272d819e76b76c69a15c02e9d91d278e",
+  "source_repository_head": "78a201841fedd1e829d8784296e6c0958a64cf6a",
+  "source_snapshot": {
+    "stage2a_post_veto_alternative": "cf5e6faa3a48497a9e0683a5a1d20ec223841238b38f3e22f3d38bae17f7bbd2",
+    "stage2a_safe_alternative_usefulness": "673b424b4d56ab24bac0d4fe32b68c76b2e4402209990c14c9369b4a269ea8d2",
+    "staged_recovery_guard_evidence": "4b58e0354aeeb177b62e4e1fb3fad3f67b8e140cbed06c42513defb119e6b3a8",
+    "staged_recovery_instrumentation": "8bbb9e62c487e63584173385b22e4af1633f39f142adbb930d764ad3466447e7"
+  },
+  "source_usefulness_manifest_hash": "4efcd5874110b5244c9f33bd2d88c08d11207b8dc97ed11959ab1e2ae79fa104",
+  "staged_recovery_execution": "not_authorized",
+  "thresholds_tuned": false,
+  "unknown_evidence_count": 9,
+  "unresolved_tie_behavior": "not_evaluated",
+  "weights": null,
+  "why_not_safety_first_only": "Safe alternatives can have materially different mission-progress evidence.",
+  "why_not_weighted_multi_objective": "Weights, exchange rates, and conflict resolution lack frozen scientific support."
+}
