@@ -1,0 +1,47 @@
+{
+  "Q1_zero_action_safe_or_useful": {
+    "answer": "safe_with_mixed_one_step_progress_evidence",
+    "causal_usefulness_claim": "not_authorized",
+    "evidence": "At three exact veto states zero action was safe and improved radius gap, absolute tangential error, overspeed headroom, and the diagnostic energy-proxy error, while its radial-velocity component worsened slightly.",
+    "recoverability_result": "No one-step combined Phase34-compatible recoverability or eligible crossing was observed."
+  },
+  "Q2_active_alternatives_vs_zero": {
+    "answer": "component_specific_advantages_without_a_global_winner",
+    "controller_superiority_claim": "not_authorized",
+    "evidence": "Active alternatives produced larger tangential-error, headroom, and diagnostic-energy improvements; velocity-opposed thrust also improved the radial component. Zero action retained slightly greater one-step radius-gap improvement in the three matched stress states."
+  },
+  "Q3_lower_speed_ratio_and_recovery": {
+    "answer": "not_a_general_recovery_correlation",
+    "descriptive_statistics_only": true,
+    "evidence": "Lower predicted ratio aligns with several component improvements but not with radius-gap improvement in this nine-observation, three-state sample. No combined recoverability predicate became true."
+  },
+  "Q4_higher_risk_better_orbital_progress": {
+    "answer": true,
+    "evidence": "At each of the three fully matched states, tangential correction had a higher but still safe predicted ratio than velocity-opposed thrust and greater radius-gap and tangential-error improvement.",
+    "qualified_evidence_count": 3,
+    "risk_wording_limitation": "Higher predicted speed ratio is only one frozen hazard metric; no general risk score or 'slightly higher' threshold is defined."
+  },
+  "Q5_future_replacement_objective": {
+    "active_authority_granted": false,
+    "answer": "safety_gate_then_explicit_usefulness_evidence",
+    "policy_frozen": false,
+    "safety_role": "hard proposal-level eligibility gate under Final Veto",
+    "usefulness_role": "A future separately authorized selector should compare declared orbital progress and recoverability components after safety is satisfied.",
+    "weights_or_combined_score_defined": false
+  },
+  "Stage_2A_authority_granted": false,
+  "action_selection_authorized": false,
+  "decision_dimensions": [
+    "safe",
+    "component_wise_mission_progress",
+    "phase34_compatible_recoverability_evidence",
+    "unknown"
+  ],
+  "evidence_scope": {
+    "combined_recoverability_true": 0,
+    "exact_veto_states": 4,
+    "full_action_observations": 9,
+    "full_three_action_states": 3
+  },
+  "schema_version": "stage2a_safe_alternative_usefulness_audit_v0"
+}

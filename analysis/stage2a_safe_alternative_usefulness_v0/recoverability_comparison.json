@@ -1,0 +1,38 @@
+{
+  "combined_predicate_true_observation_count": 0,
+  "eligible_crossing_observation_count": 0,
+  "future_success_unknown": true,
+  "per_action": {
+    "tangential_error_correction_v0": {
+      "eligible_crossing_count": 0,
+      "evaluated_exact_state_count": 3,
+      "future_recovery_success": "not_evaluated",
+      "post_phase34_compatible_recoverability_count": 0,
+      "post_radial_velocity_component_pass_count": 0,
+      "post_radius_component_pass_count": 0,
+      "post_tangential_velocity_component_pass_count": 1
+    },
+    "velocity_opposed_thrust_v0": {
+      "eligible_crossing_count": 0,
+      "evaluated_exact_state_count": 3,
+      "future_recovery_success": "not_evaluated",
+      "post_phase34_compatible_recoverability_count": 0,
+      "post_radial_velocity_component_pass_count": 0,
+      "post_radius_component_pass_count": 0,
+      "post_tangential_velocity_component_pass_count": 1
+    },
+    "zero_action_reference_v0": {
+      "eligible_crossing_count": 0,
+      "evaluated_exact_state_count": 3,
+      "future_recovery_success": "not_evaluated",
+      "post_phase34_compatible_recoverability_count": 0,
+      "post_radial_velocity_component_pass_count": 0,
+      "post_radius_component_pass_count": 0,
+      "post_tangential_velocity_component_pass_count": 1
+    }
+  },
+  "potentially_recoverable_interpretation": "A true combined predicate would be current-state evidence only, not a prediction of future recovery success.",
+  "predicate_semantics": "exact_existing_Phase34_compatible_components",
+  "recovery_success_claim_authorized": false,
+  "schema_version": "stage2a_safe_alternative_usefulness_audit_v0"
+}

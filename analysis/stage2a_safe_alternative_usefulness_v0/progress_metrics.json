@@ -1,0 +1,302 @@
+{
+  "combined_scalar_progress_score_created": false,
+  "descriptive_correlations": {
+    "general_correlation_claim_authorized": false,
+    "independent_state_count": 3,
+    "limitation": "Nine action observations share only three exact initial states; these coefficients are descriptive summaries, not independent-sample evidence.",
+    "metrics": {
+      "absolute_tangential_error_improvement": {
+        "pearson_predicted_ratio_vs_improvement": -0.8418056681127557,
+        "spearman_predicted_ratio_vs_improvement": -0.5833333333333333
+      },
+      "diagnostic_energy_proxy_error_improvement": {
+        "pearson_predicted_ratio_vs_improvement": -0.9944163213104933,
+        "spearman_predicted_ratio_vs_improvement": -0.8999999999999999
+      },
+      "overspeed_headroom_improvement": {
+        "pearson_predicted_ratio_vs_improvement": -0.9948784265516333,
+        "spearman_predicted_ratio_vs_improvement": -0.8999999999999999
+      },
+      "radial_component_improvement": {
+        "pearson_predicted_ratio_vs_improvement": -0.7062239363555045,
+        "spearman_predicted_ratio_vs_improvement": -0.6333333333333333
+      },
+      "radius_gap_improvement": {
+        "pearson_predicted_ratio_vs_improvement": 0.4368694465453033,
+        "spearman_predicted_ratio_vs_improvement": 0.7833333333333332
+      }
+    },
+    "sample_count": 9,
+    "statistical_inference_authorized": false
+  },
+  "exact_one_step_observation_count": 9,
+  "higher_predicted_ratio_with_better_component_progress": [
+    {
+      "both_actions_safe": true,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "components_better_for_higher_ratio_action": [
+        "radius_gap_improvement"
+      ],
+      "components_worse_for_higher_ratio_action": [
+        "radial_component_improvement",
+        "absolute_tangential_error_improvement",
+        "overspeed_headroom_improvement",
+        "diagnostic_energy_proxy_error_improvement"
+      ],
+      "higher_predicted_ratio_action": "zero_action_reference_v0",
+      "higher_predicted_speed_ratio": 1.8906024003603095,
+      "lower_predicted_ratio_action": "velocity_opposed_thrust_v0",
+      "lower_predicted_speed_ratio": 1.824760375803826,
+      "state_identity": "8b017254a8db2584a6732bcd086447ba405cf949d9e932cf03e71543b2cdb898"
+    },
+    {
+      "both_actions_safe": true,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "components_better_for_higher_ratio_action": [
+        "radius_gap_improvement"
+      ],
+      "components_worse_for_higher_ratio_action": [
+        "radial_component_improvement",
+        "absolute_tangential_error_improvement",
+        "overspeed_headroom_improvement",
+        "diagnostic_energy_proxy_error_improvement"
+      ],
+      "higher_predicted_ratio_action": "zero_action_reference_v0",
+      "higher_predicted_speed_ratio": 1.8906024003603095,
+      "lower_predicted_ratio_action": "tangential_error_correction_v0",
+      "lower_predicted_speed_ratio": 1.8494516264933416,
+      "state_identity": "8b017254a8db2584a6732bcd086447ba405cf949d9e932cf03e71543b2cdb898"
+    },
+    {
+      "both_actions_safe": true,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "components_better_for_higher_ratio_action": [
+        "radius_gap_improvement",
+        "absolute_tangential_error_improvement"
+      ],
+      "components_worse_for_higher_ratio_action": [
+        "radial_component_improvement",
+        "overspeed_headroom_improvement",
+        "diagnostic_energy_proxy_error_improvement"
+      ],
+      "higher_predicted_ratio_action": "tangential_error_correction_v0",
+      "higher_predicted_speed_ratio": 1.8494516264933416,
+      "lower_predicted_ratio_action": "velocity_opposed_thrust_v0",
+      "lower_predicted_speed_ratio": 1.824760375803826,
+      "state_identity": "8b017254a8db2584a6732bcd086447ba405cf949d9e932cf03e71543b2cdb898"
+    },
+    {
+      "both_actions_safe": true,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "components_better_for_higher_ratio_action": [
+        "radius_gap_improvement"
+      ],
+      "components_worse_for_higher_ratio_action": [
+        "radial_component_improvement",
+        "absolute_tangential_error_improvement",
+        "overspeed_headroom_improvement",
+        "diagnostic_energy_proxy_error_improvement"
+      ],
+      "higher_predicted_ratio_action": "zero_action_reference_v0",
+      "higher_predicted_speed_ratio": 1.885065281807118,
+      "lower_predicted_ratio_action": "velocity_opposed_thrust_v0",
+      "lower_predicted_speed_ratio": 1.802762751111514,
+      "state_identity": "8cf2c17a18beb0f9eebdf26a31b17b83c6a590a849cae35a94d69b2fde515bd0"
+    },
+    {
+      "both_actions_safe": true,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "components_better_for_higher_ratio_action": [
+        "radius_gap_improvement"
+      ],
+      "components_worse_for_higher_ratio_action": [
+        "radial_component_improvement",
+        "absolute_tangential_error_improvement",
+        "overspeed_headroom_improvement",
+        "diagnostic_energy_proxy_error_improvement"
+      ],
+      "higher_predicted_ratio_action": "zero_action_reference_v0",
+      "higher_predicted_speed_ratio": 1.885065281807118,
+      "lower_predicted_ratio_action": "tangential_error_correction_v0",
+      "lower_predicted_speed_ratio": 1.8256400803089328,
+      "state_identity": "8cf2c17a18beb0f9eebdf26a31b17b83c6a590a849cae35a94d69b2fde515bd0"
+    },
+    {
+      "both_actions_safe": true,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "components_better_for_higher_ratio_action": [
+        "radius_gap_improvement",
+        "absolute_tangential_error_improvement"
+      ],
+      "components_worse_for_higher_ratio_action": [
+        "radial_component_improvement",
+        "overspeed_headroom_improvement",
+        "diagnostic_energy_proxy_error_improvement"
+      ],
+      "higher_predicted_ratio_action": "tangential_error_correction_v0",
+      "higher_predicted_speed_ratio": 1.8256400803089328,
+      "lower_predicted_ratio_action": "velocity_opposed_thrust_v0",
+      "lower_predicted_speed_ratio": 1.802762751111514,
+      "state_identity": "8cf2c17a18beb0f9eebdf26a31b17b83c6a590a849cae35a94d69b2fde515bd0"
+    },
+    {
+      "both_actions_safe": true,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "components_better_for_higher_ratio_action": [
+        "radius_gap_improvement"
+      ],
+      "components_worse_for_higher_ratio_action": [
+        "radial_component_improvement",
+        "absolute_tangential_error_improvement",
+        "overspeed_headroom_improvement",
+        "diagnostic_energy_proxy_error_improvement"
+      ],
+      "higher_predicted_ratio_action": "zero_action_reference_v0",
+      "higher_predicted_speed_ratio": 1.8823116157555728,
+      "lower_predicted_ratio_action": "velocity_opposed_thrust_v0",
+      "lower_predicted_speed_ratio": 1.8000090850599684,
+      "state_identity": "adba62405cdde2cb56579f4dafa39ae4d6dfb27d1aa7f460903d2a4fcff9cc0d"
+    },
+    {
+      "both_actions_safe": true,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "components_better_for_higher_ratio_action": [
+        "radius_gap_improvement"
+      ],
+      "components_worse_for_higher_ratio_action": [
+        "radial_component_improvement",
+        "absolute_tangential_error_improvement",
+        "overspeed_headroom_improvement",
+        "diagnostic_energy_proxy_error_improvement"
+      ],
+      "higher_predicted_ratio_action": "zero_action_reference_v0",
+      "higher_predicted_speed_ratio": 1.8823116157555728,
+      "lower_predicted_ratio_action": "tangential_error_correction_v0",
+      "lower_predicted_speed_ratio": 1.8212502385150744,
+      "state_identity": "adba62405cdde2cb56579f4dafa39ae4d6dfb27d1aa7f460903d2a4fcff9cc0d"
+    },
+    {
+      "both_actions_safe": true,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "components_better_for_higher_ratio_action": [
+        "radius_gap_improvement",
+        "absolute_tangential_error_improvement"
+      ],
+      "components_worse_for_higher_ratio_action": [
+        "radial_component_improvement",
+        "overspeed_headroom_improvement",
+        "diagnostic_energy_proxy_error_improvement"
+      ],
+      "higher_predicted_ratio_action": "tangential_error_correction_v0",
+      "higher_predicted_speed_ratio": 1.8212502385150744,
+      "lower_predicted_ratio_action": "velocity_opposed_thrust_v0",
+      "lower_predicted_speed_ratio": 1.8000090850599684,
+      "state_identity": "adba62405cdde2cb56579f4dafa39ae4d6dfb27d1aa7f460903d2a4fcff9cc0d"
+    }
+  ],
+  "higher_ratio_tradeoff_count": 9,
+  "independent_exact_state_count": 3,
+  "per_action": {
+    "tangential_error_correction_v0": {
+      "combined_progress_score": null,
+      "component_results": {
+        "absolute_tangential_error_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        },
+        "diagnostic_energy_proxy_error_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        },
+        "overspeed_headroom_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        },
+        "radial_component_improvement": {
+          "improved_count": 0,
+          "unchanged_count": 0,
+          "worsened_count": 3
+        },
+        "radius_gap_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        }
+      },
+      "evaluated_exact_state_count": 3,
+      "radial_direction_toward_target_count": 3,
+      "safe_count": 3
+    },
+    "velocity_opposed_thrust_v0": {
+      "combined_progress_score": null,
+      "component_results": {
+        "absolute_tangential_error_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        },
+        "diagnostic_energy_proxy_error_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        },
+        "overspeed_headroom_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        },
+        "radial_component_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        },
+        "radius_gap_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        }
+      },
+      "evaluated_exact_state_count": 3,
+      "radial_direction_toward_target_count": 3,
+      "safe_count": 3
+    },
+    "zero_action_reference_v0": {
+      "combined_progress_score": null,
+      "component_results": {
+        "absolute_tangential_error_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        },
+        "diagnostic_energy_proxy_error_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        },
+        "overspeed_headroom_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        },
+        "radial_component_improvement": {
+          "improved_count": 0,
+          "unchanged_count": 0,
+          "worsened_count": 3
+        },
+        "radius_gap_improvement": {
+          "improved_count": 3,
+          "unchanged_count": 0,
+          "worsened_count": 0
+        }
+      },
+      "evaluated_exact_state_count": 3,
+      "radial_direction_toward_target_count": 3,
+      "safe_count": 3
+    }
+  },
+  "schema_version": "stage2a_safe_alternative_usefulness_audit_v0",
+  "slightly_higher_risk_threshold_defined": false
+}

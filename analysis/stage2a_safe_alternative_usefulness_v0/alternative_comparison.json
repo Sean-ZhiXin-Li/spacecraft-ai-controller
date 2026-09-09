@@ -1,0 +1,1155 @@
+{
+  "comparisons": [
+    {
+      "alternatives": [
+        {
+          "Final_Veto_status": "allow",
+          "action": [
+            0.0,
+            0.0
+          ],
+          "action_identity": "zero_action_reference_v0",
+          "available_fields": [
+            "Final_Veto_status",
+            "crossing_evidence",
+            "energy_diagnostic_proxy",
+            "predicted_speed_ratio",
+            "radial_velocity_component",
+            "radius_progress",
+            "recoverability_components",
+            "tangential_velocity_error"
+          ],
+          "combined_progress_score": null,
+          "combined_progress_score_status": "not_evaluated",
+          "component_progress": {
+            "absolute_tangential_error_improvement": {
+              "improvement": 0.0004223807000016677,
+              "status": "improved"
+            },
+            "diagnostic_energy_proxy_error_improvement": {
+              "improvement": 1.1920928955078125e-07,
+              "status": "improved"
+            },
+            "overspeed_headroom_improvement": {
+              "improvement": 4.5092143352576386e-08,
+              "status": "improved"
+            },
+            "radial_component_improvement": {
+              "improvement": -2.4247746477357168e-08,
+              "status": "worsened"
+            },
+            "radius_gap_improvement": {
+              "improvement": 614067.1240234375,
+              "status": "improved"
+            }
+          },
+          "crossing_evidence": {
+            "crossing_recovery_eligible": false,
+            "future_crossing_inferred": false,
+            "target_radius_crossing": false
+          },
+          "energy_diagnostic_proxy": {
+            "absolute_error_improvement": 1.1920928955078125e-07,
+            "evidence_level": "diagnostic_proxy",
+            "not_a_conserved_invariant_claim": true,
+            "post_specific_energy_error": 22422353.77679687,
+            "pre_specific_energy_error": 22422353.77679699,
+            "status": "improved"
+          },
+          "future_recovery_success": null,
+          "future_recovery_success_status": "not_evaluated",
+          "overspeed_headroom": {
+            "delta": 4.5092143352576386e-08,
+            "status": "improved"
+          },
+          "predicted_speed_ratio": 1.8906024003603095,
+          "radial_velocity_component": {
+            "absolute_ratio_improvement": -2.4247746477357168e-08,
+            "post_radial_velocity": 6140.671414187084,
+            "post_radial_velocity_ratio": 1.4595743993467885,
+            "pre_radial_velocity": 6140.671312172796,
+            "pre_radial_velocity_ratio": 1.459574375099042,
+            "radial_direction_toward_target": true,
+            "status": "worsened"
+          },
+          "radius_progress": {
+            "delta_absolute_target_radius_error": -614067.1240234375,
+            "improvement_magnitude": 614067.1240234375,
+            "status": "improved"
+          },
+          "recoverability_components": {
+            "post": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": true
+            },
+            "pre": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": true
+            }
+          },
+          "safe_under_frozen_threshold": true,
+          "safety_evidence_source": "stage1b_measured_recovery_trace",
+          "source_event_hash": "572d4771d8b509dcb8230121051b0c2e3bfe04fd901a33abf0c72396c75207f1",
+          "source_event_index": 1,
+          "source_pre_state_hash": "d33c32a027051dc9a1bc6640de97fe4827bd13cd4b0dbfd45f1bba74a257b8a5",
+          "tangential_velocity_error": {
+            "absolute_error_improvement": 0.0004223807000016677,
+            "post_signed_error": 848.4752559031631,
+            "pre_signed_error": 848.4756782838631,
+            "status": "improved"
+          },
+          "unknown_fields": [
+            "future_recovery_success",
+            "general_action_usefulness",
+            "causal_action_effect"
+          ],
+          "usefulness_evidence_source": "analysis/staged_recovery_shadow_calibration_v0/traces/legacy_canonical__zero_action_reference_v0.jsonl",
+          "usefulness_evidence_status": "available_exact_one_step",
+          "usefulness_source_locator": "jsonl_line:2"
+        },
+        {
+          "Final_Veto_status": "allow",
+          "action": [
+            0.1589012563475844,
+            -0.19300360289683524
+          ],
+          "action_identity": "velocity_opposed_thrust_v0",
+          "available_fields": [
+            "Final_Veto_status",
+            "crossing_evidence",
+            "energy_diagnostic_proxy",
+            "predicted_speed_ratio",
+            "radial_velocity_component",
+            "radius_progress",
+            "recoverability_components",
+            "tangential_velocity_error"
+          ],
+          "combined_progress_score": null,
+          "combined_progress_score_status": "not_evaluated",
+          "component_progress": {
+            "absolute_tangential_error_improvement": {
+              "improvement": 176.06790438510052,
+              "status": "improved"
+            },
+            "diagnostic_energy_proxy_error_improvement": {
+              "improvement": 2164978.861349188,
+              "status": "improved"
+            },
+            "overspeed_headroom_improvement": {
+              "improvement": 0.06584206964862682,
+              "status": "improved"
+            },
+            "radial_component_improvement": {
+              "improvement": 0.05083104432163865,
+              "status": "improved"
+            },
+            "radius_gap_improvement": {
+              "improvement": 592681.65234375,
+              "status": "improved"
+            }
+          },
+          "crossing_evidence": {
+            "crossing_recovery_eligible": false,
+            "future_crossing_inferred": false,
+            "target_radius_crossing": false
+          },
+          "energy_diagnostic_proxy": {
+            "absolute_error_improvement": 2164978.861349188,
+            "evidence_level": "diagnostic_proxy",
+            "not_a_conserved_invariant_claim": true,
+            "post_specific_energy_error": 20257374.9154478,
+            "pre_specific_energy_error": 22422353.77679699,
+            "status": "improved"
+          },
+          "future_recovery_success": null,
+          "future_recovery_success_status": "not_evaluated",
+          "overspeed_headroom": {
+            "delta": 0.06584206964862682,
+            "status": "improved"
+          },
+          "predicted_speed_ratio": 1.824760375803826,
+          "radial_velocity_component": {
+            "absolute_ratio_improvement": 0.05083104432163865,
+            "post_radial_velocity": 5926.816683755872,
+            "post_radial_velocity_ratio": 1.4087433307774033,
+            "pre_radial_velocity": 6140.671312172796,
+            "pre_radial_velocity_ratio": 1.459574375099042,
+            "radial_direction_toward_target": true,
+            "status": "improved"
+          },
+          "radius_progress": {
+            "delta_absolute_target_radius_error": -592681.65234375,
+            "improvement_magnitude": 592681.65234375,
+            "status": "improved"
+          },
+          "recoverability_components": {
+            "post": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": true
+            },
+            "pre": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": true
+            }
+          },
+          "safe_under_frozen_threshold": true,
+          "safety_evidence_source": "stage1b_measured_recovery_trace",
+          "source_event_hash": "31bfcf690161cf3b862d23d26bc6b448509c5976b35855a16426f804f489da91",
+          "source_event_index": 1,
+          "source_pre_state_hash": "d33c32a027051dc9a1bc6640de97fe4827bd13cd4b0dbfd45f1bba74a257b8a5",
+          "tangential_velocity_error": {
+            "absolute_error_improvement": 176.06790438510052,
+            "post_signed_error": 672.4077738987626,
+            "pre_signed_error": 848.4756782838631,
+            "status": "improved"
+          },
+          "unknown_fields": [
+            "future_recovery_success",
+            "general_action_usefulness",
+            "causal_action_effect"
+          ],
+          "usefulness_evidence_source": "analysis/staged_recovery_shadow_calibration_v0/traces/legacy_canonical__velocity_opposed_thrust_v0.jsonl",
+          "usefulness_evidence_status": "available_exact_one_step",
+          "usefulness_source_locator": "jsonl_line:2"
+        },
+        {
+          "Final_Veto_status": "allow",
+          "action": [
+            0.24999999999963954,
+            4.245380780436667e-07
+          ],
+          "action_identity": "tangential_error_correction_v0",
+          "available_fields": [
+            "Final_Veto_status",
+            "crossing_evidence",
+            "energy_diagnostic_proxy",
+            "predicted_speed_ratio",
+            "radial_velocity_component",
+            "radius_progress",
+            "recoverability_components",
+            "tangential_velocity_error"
+          ],
+          "combined_progress_score": null,
+          "combined_progress_score_status": "not_evaluated",
+          "component_progress": {
+            "absolute_tangential_error_improvement": {
+              "improvement": 277.0087094869559,
+              "status": "improved"
+            },
+            "diagnostic_energy_proxy_error_improvement": {
+              "improvement": 1362087.885722518,
+              "status": "improved"
+            },
+            "overspeed_headroom_improvement": {
+              "improvement": 0.04115081895911121,
+              "status": "improved"
+            },
+            "radial_component_improvement": {
+              "improvement": -1.5438121225841428e-08,
+              "status": "worsened"
+            },
+            "radius_gap_improvement": {
+              "improvement": 614067.1220703125,
+              "status": "improved"
+            }
+          },
+          "crossing_evidence": {
+            "crossing_recovery_eligible": false,
+            "future_crossing_inferred": false,
+            "target_radius_crossing": false
+          },
+          "energy_diagnostic_proxy": {
+            "absolute_error_improvement": 1362087.885722518,
+            "evidence_level": "diagnostic_proxy",
+            "not_a_conserved_invariant_claim": true,
+            "post_specific_energy_error": 21060265.89107447,
+            "pre_specific_energy_error": 22422353.77679699,
+            "status": "improved"
+          },
+          "future_recovery_success": null,
+          "future_recovery_success_status": "not_evaluated",
+          "overspeed_headroom": {
+            "delta": 0.04115081895911121,
+            "status": "improved"
+          },
+          "predicted_speed_ratio": 1.8494516264933416,
+          "radial_velocity_component": {
+            "absolute_ratio_improvement": -1.5438121225841428e-08,
+            "post_radial_velocity": 6140.671377123531,
+            "post_radial_velocity_ratio": 1.4595743905371632,
+            "pre_radial_velocity": 6140.671312172796,
+            "pre_radial_velocity_ratio": 1.459574375099042,
+            "radial_direction_toward_target": true,
+            "status": "worsened"
+          },
+          "radius_progress": {
+            "delta_absolute_target_radius_error": -614067.1220703125,
+            "improvement_magnitude": 614067.1220703125,
+            "status": "improved"
+          },
+          "recoverability_components": {
+            "post": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": true
+            },
+            "pre": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": true
+            }
+          },
+          "safe_under_frozen_threshold": true,
+          "safety_evidence_source": "stage1b_measured_recovery_trace",
+          "source_event_hash": "9893dcc098d1414139bc444dc89db3f45fec931a24028f962f6e6c0ad959457b",
+          "source_event_index": 1,
+          "source_pre_state_hash": "d33c32a027051dc9a1bc6640de97fe4827bd13cd4b0dbfd45f1bba74a257b8a5",
+          "tangential_velocity_error": {
+            "absolute_error_improvement": 277.0087094869559,
+            "post_signed_error": 571.4669687969072,
+            "pre_signed_error": 848.4756782838631,
+            "status": "improved"
+          },
+          "unknown_fields": [
+            "future_recovery_success",
+            "general_action_usefulness",
+            "causal_action_effect"
+          ],
+          "usefulness_evidence_source": "analysis/staged_recovery_shadow_calibration_v0/traces/legacy_canonical__tangential_error_correction_v0.jsonl",
+          "usefulness_evidence_status": "available_exact_one_step",
+          "usefulness_source_locator": "jsonl_line:2"
+        }
+      ],
+      "branch_step": 28,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "nominal_proposal": {
+        "Final_Veto_decision": "veto",
+        "action": [
+          -2.3094152700156713e-07,
+          0.13599576748536102
+        ],
+        "predicted_speed_ratio": 1.9183887199363643,
+        "veto_reason": "predicted_nominal_overspeed"
+      },
+      "state_identity": "8b017254a8db2584a6732bcd086447ba405cf949d9e932cf03e71543b2cdb898"
+    },
+    {
+      "alternatives": [
+        {
+          "Final_Veto_status": "allow",
+          "action": [
+            0.0,
+            0.0
+          ],
+          "action_identity": "zero_action_reference_v0",
+          "available_fields": [
+            "predicted_speed_ratio",
+            "Final_Veto_status"
+          ],
+          "combined_progress_score": null,
+          "component_progress": null,
+          "crossing_evidence": null,
+          "energy_diagnostic_proxy": null,
+          "future_recovery_success": null,
+          "predicted_speed_ratio": 1.8850806447641575,
+          "radial_velocity_component": null,
+          "radius_progress": null,
+          "reason": "no_exact_state_progress_record",
+          "recoverability_components": null,
+          "safe_under_frozen_threshold": true,
+          "safety_evidence_source": "D2_zero_action_recovery",
+          "tangential_velocity_error": null,
+          "unknown_fields": [
+            "radius_progress",
+            "radial_velocity_component",
+            "tangential_velocity_error",
+            "recoverability_components",
+            "energy_diagnostic_proxy",
+            "crossing_evidence",
+            "future_recovery_success"
+          ],
+          "usefulness_evidence_status": "not_evaluated"
+        },
+        {
+          "Final_Veto_status": "not_evaluated",
+          "action": null,
+          "action_identity": "velocity_opposed_thrust_v0",
+          "available_fields": [
+            "predicted_speed_ratio",
+            "Final_Veto_status"
+          ],
+          "combined_progress_score": null,
+          "component_progress": null,
+          "crossing_evidence": null,
+          "energy_diagnostic_proxy": null,
+          "future_recovery_success": null,
+          "predicted_speed_ratio": null,
+          "radial_velocity_component": null,
+          "radius_progress": null,
+          "reason": "no_exact_state_progress_record",
+          "recoverability_components": null,
+          "safe_under_frozen_threshold": null,
+          "safety_evidence_source": "not_evaluated_at_exact_state",
+          "tangential_velocity_error": null,
+          "unknown_fields": [
+            "radius_progress",
+            "radial_velocity_component",
+            "tangential_velocity_error",
+            "recoverability_components",
+            "energy_diagnostic_proxy",
+            "crossing_evidence",
+            "future_recovery_success"
+          ],
+          "usefulness_evidence_status": "not_evaluated"
+        },
+        {
+          "Final_Veto_status": "not_evaluated",
+          "action": null,
+          "action_identity": "tangential_error_correction_v0",
+          "available_fields": [
+            "predicted_speed_ratio",
+            "Final_Veto_status"
+          ],
+          "combined_progress_score": null,
+          "component_progress": null,
+          "crossing_evidence": null,
+          "energy_diagnostic_proxy": null,
+          "future_recovery_success": null,
+          "predicted_speed_ratio": null,
+          "radial_velocity_component": null,
+          "radius_progress": null,
+          "reason": "no_exact_state_progress_record",
+          "recoverability_components": null,
+          "safe_under_frozen_threshold": null,
+          "safety_evidence_source": "not_evaluated_at_exact_state",
+          "tangential_velocity_error": null,
+          "unknown_fields": [
+            "radius_progress",
+            "radial_velocity_component",
+            "tangential_velocity_error",
+            "recoverability_components",
+            "energy_diagnostic_proxy",
+            "crossing_evidence",
+            "future_recovery_success"
+          ],
+          "usefulness_evidence_status": "not_evaluated"
+        }
+      ],
+      "branch_step": 29,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_155__thrust_8000",
+      "nominal_proposal": {
+        "Final_Veto_decision": "veto",
+        "action": [
+          -2.4916881546477226e-07,
+          0.135995874288177
+        ],
+        "predicted_speed_ratio": 1.912163928126053,
+        "veto_reason": "predicted_nominal_overspeed"
+      },
+      "state_identity": "20d4146a2d81787b8a149452b89b3368d46d9462f613b0f7b1e4d19a194e039a"
+    },
+    {
+      "alternatives": [
+        {
+          "Final_Veto_status": "allow",
+          "action": [
+            0.0,
+            0.0
+          ],
+          "action_identity": "zero_action_reference_v0",
+          "available_fields": [
+            "Final_Veto_status",
+            "crossing_evidence",
+            "energy_diagnostic_proxy",
+            "predicted_speed_ratio",
+            "radial_velocity_component",
+            "radius_progress",
+            "recoverability_components",
+            "tangential_velocity_error"
+          ],
+          "combined_progress_score": null,
+          "combined_progress_score_status": "not_evaluated",
+          "component_progress": {
+            "absolute_tangential_error_improvement": {
+              "improvement": 0.0004267287849870627,
+              "status": "improved"
+            },
+            "diagnostic_energy_proxy_error_improvement": {
+              "improvement": 7.450580596923828e-08,
+              "status": "improved"
+            },
+            "overspeed_headroom_improvement": {
+              "improvement": 3.976357310087053e-08,
+              "status": "improved"
+            },
+            "radial_component_improvement": {
+              "improvement": -5.0723014455300586e-08,
+              "status": "worsened"
+            },
+            "radius_gap_improvement": {
+              "improvement": 539915.94921875,
+              "status": "improved"
+            }
+          },
+          "crossing_evidence": {
+            "crossing_recovery_eligible": false,
+            "future_crossing_inferred": false,
+            "target_radius_crossing": false
+          },
+          "energy_diagnostic_proxy": {
+            "absolute_error_improvement": 7.450580596923828e-08,
+            "evidence_level": "diagnostic_proxy",
+            "not_a_conserved_invariant_claim": true,
+            "post_specific_energy_error": 22237321.657181762,
+            "pre_specific_energy_error": 22237321.657181837,
+            "status": "improved"
+          },
+          "future_recovery_success": null,
+          "future_recovery_success_status": "not_evaluated",
+          "overspeed_headroom": {
+            "delta": 3.976357310087053e-08,
+            "status": "improved"
+          },
+          "predicted_speed_ratio": 1.885065281807118,
+          "radial_velocity_component": {
+            "absolute_ratio_improvement": -5.0723014455300586e-08,
+            "post_radial_velocity": 5399.15972004107,
+            "post_radial_velocity_ratio": 1.283324700805466,
+            "pre_radial_velocity": 5399.15950664094,
+            "pre_radial_velocity_ratio": 1.2833246500824516,
+            "radial_direction_toward_target": true,
+            "status": "worsened"
+          },
+          "radius_progress": {
+            "delta_absolute_target_radius_error": -539915.94921875,
+            "improvement_magnitude": 539915.94921875,
+            "status": "improved"
+          },
+          "recoverability_components": {
+            "post": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": false
+            },
+            "pre": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": false
+            }
+          },
+          "safe_under_frozen_threshold": true,
+          "safety_evidence_source": "stage1b_measured_recovery_trace",
+          "source_event_hash": "5c37019f736b8267f6f7189b526680d5c616aa2b485bd677ef6f0571b206cff9",
+          "source_event_index": 1,
+          "source_pre_state_hash": "fd7e2692f85975db6272b5a22c15d6be3bc43651b6419e7fb52f6ec18b112e80",
+          "tangential_velocity_error": {
+            "absolute_error_improvement": 0.0004267287849870627,
+            "post_signed_error": 1601.997595476677,
+            "pre_signed_error": 1601.998022205462,
+            "status": "improved"
+          },
+          "unknown_fields": [
+            "future_recovery_success",
+            "general_action_usefulness",
+            "causal_action_effect"
+          ],
+          "usefulness_evidence_source": "analysis/staged_recovery_shadow_calibration_v0/traces/member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000__zero_action_reference_v0.jsonl",
+          "usefulness_evidence_status": "available_exact_one_step",
+          "usefulness_source_locator": "jsonl_line:2"
+        },
+        {
+          "Final_Veto_status": "allow",
+          "action": [
+            0.18312107494325033,
+            -0.17019598089152543
+          ],
+          "action_identity": "velocity_opposed_thrust_v0",
+          "available_fields": [
+            "Final_Veto_status",
+            "crossing_evidence",
+            "energy_diagnostic_proxy",
+            "predicted_speed_ratio",
+            "radial_velocity_component",
+            "radius_progress",
+            "recoverability_components",
+            "tangential_velocity_error"
+          ],
+          "combined_progress_score": null,
+          "combined_progress_score_status": "not_evaluated",
+          "component_progress": {
+            "absolute_tangential_error_improvement": {
+              "improvement": 253.63026386450383,
+              "status": "improved"
+            },
+            "diagnostic_energy_proxy_error_improvement": {
+              "improvement": 2686167.6083005145,
+              "status": "improved"
+            },
+            "overspeed_headroom_improvement": {
+              "improvement": 0.0823025704591771,
+              "status": "improved"
+            },
+            "radial_component_improvement": {
+              "improvement": 0.05603030682940369,
+              "status": "improved"
+            },
+            "radius_gap_improvement": {
+              "improvement": 516343.05078125,
+              "status": "improved"
+            }
+          },
+          "crossing_evidence": {
+            "crossing_recovery_eligible": false,
+            "future_crossing_inferred": false,
+            "target_radius_crossing": false
+          },
+          "energy_diagnostic_proxy": {
+            "absolute_error_improvement": 2686167.6083005145,
+            "evidence_level": "diagnostic_proxy",
+            "not_a_conserved_invariant_claim": true,
+            "post_specific_energy_error": 19551154.048881322,
+            "pre_specific_energy_error": 22237321.657181837,
+            "status": "improved"
+          },
+          "future_recovery_success": null,
+          "future_recovery_success_status": "not_evaluated",
+          "overspeed_headroom": {
+            "delta": 0.0823025704591771,
+            "status": "improved"
+          },
+          "predicted_speed_ratio": 1.802762751111514,
+          "radial_velocity_component": {
+            "absolute_ratio_improvement": 0.05603030682940369,
+            "post_radial_velocity": 5163.4307191057305,
+            "post_radial_velocity_ratio": 1.2272943432530479,
+            "pre_radial_velocity": 5399.15950664094,
+            "pre_radial_velocity_ratio": 1.2833246500824516,
+            "radial_direction_toward_target": true,
+            "status": "improved"
+          },
+          "radius_progress": {
+            "delta_absolute_target_radius_error": -516343.05078125,
+            "improvement_magnitude": 516343.05078125,
+            "status": "improved"
+          },
+          "recoverability_components": {
+            "post": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": false
+            },
+            "pre": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": false
+            }
+          },
+          "safe_under_frozen_threshold": true,
+          "safety_evidence_source": "stage1b_measured_recovery_trace",
+          "source_event_hash": "3beb4e97f8c8727d9e7272325a43d5f545834075ca6f6644da8f2d372528aa7f",
+          "source_event_index": 1,
+          "source_pre_state_hash": "fd7e2692f85975db6272b5a22c15d6be3bc43651b6419e7fb52f6ec18b112e80",
+          "tangential_velocity_error": {
+            "absolute_error_improvement": 253.63026386450383,
+            "post_signed_error": 1348.367758340958,
+            "pre_signed_error": 1601.998022205462,
+            "status": "improved"
+          },
+          "unknown_fields": [
+            "future_recovery_success",
+            "general_action_usefulness",
+            "causal_action_effect"
+          ],
+          "usefulness_evidence_source": "analysis/staged_recovery_shadow_calibration_v0/traces/member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000__velocity_opposed_thrust_v0.jsonl",
+          "usefulness_evidence_status": "available_exact_one_step",
+          "usefulness_source_locator": "jsonl_line:2"
+        },
+        {
+          "Final_Veto_status": "allow",
+          "action": [
+            0.24999999999959535,
+            4.4979755739982056e-07
+          ],
+          "action_identity": "tangential_error_correction_v0",
+          "available_fields": [
+            "Final_Veto_status",
+            "crossing_evidence",
+            "energy_diagnostic_proxy",
+            "predicted_speed_ratio",
+            "radial_velocity_component",
+            "radius_progress",
+            "recoverability_components",
+            "tangential_velocity_error"
+          ],
+          "combined_progress_score": null,
+          "combined_progress_score_status": "not_evaluated",
+          "component_progress": {
+            "absolute_tangential_error_improvement": {
+              "improvement": 346.2607891048674,
+              "status": "improved"
+            },
+            "diagnostic_energy_proxy_error_improvement": {
+              "improvement": 1951535.170567356,
+              "status": "improved"
+            },
+            "overspeed_headroom_improvement": {
+              "improvement": 0.05942524126175841,
+              "status": "improved"
+            },
+            "radial_component_improvement": {
+              "improvement": -3.8100993249301496e-08,
+              "status": "worsened"
+            },
+            "radius_gap_improvement": {
+              "improvement": 539915.9462890625,
+              "status": "improved"
+            }
+          },
+          "crossing_evidence": {
+            "crossing_recovery_eligible": false,
+            "future_crossing_inferred": false,
+            "target_radius_crossing": false
+          },
+          "energy_diagnostic_proxy": {
+            "absolute_error_improvement": 1951535.170567356,
+            "evidence_level": "diagnostic_proxy",
+            "not_a_conserved_invariant_claim": true,
+            "post_specific_energy_error": 20285786.48661448,
+            "pre_specific_energy_error": 22237321.657181837,
+            "status": "improved"
+          },
+          "future_recovery_success": null,
+          "future_recovery_success_status": "not_evaluated",
+          "overspeed_headroom": {
+            "delta": 0.05942524126175841,
+            "status": "improved"
+          },
+          "predicted_speed_ratio": 1.8256400803089328,
+          "radial_velocity_component": {
+            "absolute_ratio_improvement": -3.8100993249301496e-08,
+            "post_radial_velocity": 5399.159666938134,
+            "post_radial_velocity_ratio": 1.2833246881834448,
+            "pre_radial_velocity": 5399.15950664094,
+            "pre_radial_velocity_ratio": 1.2833246500824516,
+            "radial_direction_toward_target": true,
+            "status": "worsened"
+          },
+          "radius_progress": {
+            "delta_absolute_target_radius_error": -539915.9462890625,
+            "improvement_magnitude": 539915.9462890625,
+            "status": "improved"
+          },
+          "recoverability_components": {
+            "post": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": false
+            },
+            "pre": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": false
+            }
+          },
+          "safe_under_frozen_threshold": true,
+          "safety_evidence_source": "stage1b_measured_recovery_trace",
+          "source_event_hash": "421ca1ad41068ae827fb4639bde2b296a827ad939687be7dae148bdb026ed03e",
+          "source_event_index": 1,
+          "source_pre_state_hash": "fd7e2692f85975db6272b5a22c15d6be3bc43651b6419e7fb52f6ec18b112e80",
+          "tangential_velocity_error": {
+            "absolute_error_improvement": 346.2607891048674,
+            "post_signed_error": 1255.7372331005945,
+            "pre_signed_error": 1601.998022205462,
+            "status": "improved"
+          },
+          "unknown_fields": [
+            "future_recovery_success",
+            "general_action_usefulness",
+            "causal_action_effect"
+          ],
+          "usefulness_evidence_source": "analysis/staged_recovery_shadow_calibration_v0/traces/member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000__tangential_error_correction_v0.jsonl",
+          "usefulness_evidence_status": "available_exact_one_step",
+          "usefulness_source_locator": "jsonl_line:2"
+        }
+      ],
+      "branch_step": 26,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "nominal_proposal": {
+        "Final_Veto_decision": "veto",
+        "action": [
+          -2.4468456937654754e-07,
+          0.1359970532024554
+        ],
+        "predicted_speed_ratio": 1.9158258326120738,
+        "veto_reason": "predicted_nominal_overspeed"
+      },
+      "state_identity": "8cf2c17a18beb0f9eebdf26a31b17b83c6a590a849cae35a94d69b2fde515bd0"
+    },
+    {
+      "alternatives": [
+        {
+          "Final_Veto_status": "allow",
+          "action": [
+            0.0,
+            0.0
+          ],
+          "action_identity": "zero_action_reference_v0",
+          "available_fields": [
+            "Final_Veto_status",
+            "crossing_evidence",
+            "energy_diagnostic_proxy",
+            "predicted_speed_ratio",
+            "radial_velocity_component",
+            "radius_progress",
+            "recoverability_components",
+            "tangential_velocity_error"
+          ],
+          "combined_progress_score": null,
+          "combined_progress_score_status": "not_evaluated",
+          "component_progress": {
+            "absolute_tangential_error_improvement": {
+              "improvement": 0.00042298988500988344,
+              "status": "improved"
+            },
+            "diagnostic_energy_proxy_error_improvement": {
+              "improvement": 5.960464477539063e-08,
+              "status": "improved"
+            },
+            "overspeed_headroom_improvement": {
+              "improvement": 3.85178395845287e-08,
+              "status": "improved"
+            },
+            "radial_component_improvement": {
+              "improvement": -5.620162824016006e-08,
+              "status": "worsened"
+            },
+            "radius_gap_improvement": {
+              "improvement": 522237.146484375,
+              "status": "improved"
+            }
+          },
+          "crossing_evidence": {
+            "crossing_recovery_eligible": false,
+            "future_crossing_inferred": false,
+            "target_radius_crossing": false
+          },
+          "energy_diagnostic_proxy": {
+            "absolute_error_improvement": 5.960464477539063e-08,
+            "evidence_level": "diagnostic_proxy",
+            "not_a_conserved_invariant_claim": true,
+            "post_specific_energy_error": 22145508.63118726,
+            "pre_specific_energy_error": 22145508.63118732,
+            "status": "improved"
+          },
+          "future_recovery_success": null,
+          "future_recovery_success_status": "not_evaluated",
+          "overspeed_headroom": {
+            "delta": 3.85178395845287e-08,
+            "status": "improved"
+          },
+          "predicted_speed_ratio": 1.8823116157555728,
+          "radial_velocity_component": {
+            "absolute_ratio_improvement": -5.620162824016006e-08,
+            "post_radial_velocity": 5222.371708449872,
+            "post_radial_velocity_ratio": 1.241304009837735,
+            "pre_radial_velocity": 5222.371472000306,
+            "pre_radial_velocity_ratio": 1.2413039536361068,
+            "radial_direction_toward_target": true,
+            "status": "worsened"
+          },
+          "radius_progress": {
+            "delta_absolute_target_radius_error": -522237.146484375,
+            "improvement_magnitude": 522237.146484375,
+            "status": "improved"
+          },
+          "recoverability_components": {
+            "post": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": false
+            },
+            "pre": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": false
+            }
+          },
+          "safe_under_frozen_threshold": true,
+          "safety_evidence_source": "stage1b_measured_recovery_trace",
+          "source_event_hash": "38a9ad42f4e84ef0a36fc79429b187b3c6b35dd87aa298c32d11aba7148ffc1b",
+          "source_event_index": 1,
+          "source_pre_state_hash": "31bbf49b8e5e1b79189a8b8f4e33ab6b29874ccdf0a520922c1f639e309ca1c8",
+          "tangential_velocity_error": {
+            "absolute_error_improvement": 0.00042298988500988344,
+            "post_signed_error": 1746.0278583086165,
+            "pre_signed_error": 1746.0282812985015,
+            "status": "improved"
+          },
+          "unknown_fields": [
+            "future_recovery_success",
+            "general_action_usefulness",
+            "causal_action_effect"
+          ],
+          "usefulness_evidence_source": "analysis/staged_recovery_shadow_calibration_v0/traces/member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000__zero_action_reference_v0.jsonl",
+          "usefulness_evidence_status": "available_exact_one_step",
+          "usefulness_source_locator": "jsonl_line:2"
+        },
+        {
+          "Final_Veto_status": "allow",
+          "action": [
+            0.1879358444069937,
+            -0.1648639390134491
+          ],
+          "action_identity": "velocity_opposed_thrust_v0",
+          "available_fields": [
+            "Final_Veto_status",
+            "crossing_evidence",
+            "energy_diagnostic_proxy",
+            "predicted_speed_ratio",
+            "radial_velocity_component",
+            "radius_progress",
+            "recoverability_components",
+            "tangential_velocity_error"
+          ],
+          "combined_progress_score": null,
+          "combined_progress_score_status": "not_evaluated",
+          "component_progress": {
+            "absolute_tangential_error_improvement": {
+              "improvement": 260.298904812561,
+              "status": "improved"
+            },
+            "diagnostic_energy_proxy_error_improvement": {
+              "improvement": 2682156.135058023,
+              "status": "improved"
+            },
+            "overspeed_headroom_improvement": {
+              "improvement": 0.08230256921344403,
+              "status": "improved"
+            },
+            "radial_component_improvement": {
+              "improvement": 0.05427494919810183,
+              "status": "improved"
+            },
+            "radius_gap_improvement": {
+              "improvement": 499402.75390625,
+              "status": "improved"
+            }
+          },
+          "crossing_evidence": {
+            "crossing_recovery_eligible": false,
+            "future_crossing_inferred": false,
+            "target_radius_crossing": false
+          },
+          "energy_diagnostic_proxy": {
+            "absolute_error_improvement": 2682156.135058023,
+            "evidence_level": "diagnostic_proxy",
+            "not_a_conserved_invariant_claim": true,
+            "post_specific_energy_error": 19463352.496129297,
+            "pre_specific_energy_error": 22145508.63118732,
+            "status": "improved"
+          },
+          "future_recovery_success": null,
+          "future_recovery_success_status": "not_evaluated",
+          "overspeed_headroom": {
+            "delta": 0.08230256921344403,
+            "status": "improved"
+          },
+          "predicted_speed_ratio": 1.8000090850599684,
+          "radial_velocity_component": {
+            "absolute_ratio_improvement": 0.05427494919810183,
+            "post_radial_velocity": 4994.027764960503,
+            "post_radial_velocity_ratio": 1.187029004438005,
+            "pre_radial_velocity": 5222.371472000306,
+            "pre_radial_velocity_ratio": 1.2413039536361068,
+            "radial_direction_toward_target": true,
+            "status": "improved"
+          },
+          "radius_progress": {
+            "delta_absolute_target_radius_error": -499402.75390625,
+            "improvement_magnitude": 499402.75390625,
+            "status": "improved"
+          },
+          "recoverability_components": {
+            "post": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": false
+            },
+            "pre": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": false
+            }
+          },
+          "safe_under_frozen_threshold": true,
+          "safety_evidence_source": "stage1b_measured_recovery_trace",
+          "source_event_hash": "10e528436cba92919fb774f5d86d872f22ee4011607d211cdca1f73207bbb449",
+          "source_event_index": 1,
+          "source_pre_state_hash": "31bbf49b8e5e1b79189a8b8f4e33ab6b29874ccdf0a520922c1f639e309ca1c8",
+          "tangential_velocity_error": {
+            "absolute_error_improvement": 260.298904812561,
+            "post_signed_error": 1485.7293764859405,
+            "pre_signed_error": 1746.0282812985015,
+            "status": "improved"
+          },
+          "unknown_fields": [
+            "future_recovery_success",
+            "general_action_usefulness",
+            "causal_action_effect"
+          ],
+          "usefulness_evidence_source": "analysis/staged_recovery_shadow_calibration_v0/traces/member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000__velocity_opposed_thrust_v0.jsonl",
+          "usefulness_evidence_status": "available_exact_one_step",
+          "usefulness_source_locator": "jsonl_line:2"
+        },
+        {
+          "Final_Veto_status": "allow",
+          "action": [
+            0.24999999999954536,
+            4.7676879878406646e-07
+          ],
+          "action_identity": "tangential_error_correction_v0",
+          "available_fields": [
+            "Final_Veto_status",
+            "crossing_evidence",
+            "energy_diagnostic_proxy",
+            "predicted_speed_ratio",
+            "radial_velocity_component",
+            "radius_progress",
+            "recoverability_components",
+            "tangential_velocity_error"
+          ],
+          "combined_progress_score": null,
+          "combined_progress_score_status": "not_evaluated",
+          "component_progress": {
+            "absolute_tangential_error_improvement": {
+              "improvement": 346.2607861988181,
+              "status": "improved"
+            },
+            "diagnostic_energy_proxy_error_improvement": {
+              "improvement": 2001407.1439375132,
+              "status": "improved"
+            },
+            "overspeed_headroom_improvement": {
+              "improvement": 0.06106141575833801,
+              "status": "improved"
+            },
+            "radial_component_improvement": {
+              "improvement": -4.325704749952308e-08,
+              "status": "worsened"
+            },
+            "radius_gap_improvement": {
+              "improvement": 522237.1435546875,
+              "status": "improved"
+            }
+          },
+          "crossing_evidence": {
+            "crossing_recovery_eligible": false,
+            "future_crossing_inferred": false,
+            "target_radius_crossing": false
+          },
+          "energy_diagnostic_proxy": {
+            "absolute_error_improvement": 2001407.1439375132,
+            "evidence_level": "diagnostic_proxy",
+            "not_a_conserved_invariant_claim": true,
+            "post_specific_energy_error": 20144101.487249807,
+            "pre_specific_energy_error": 22145508.63118732,
+            "status": "improved"
+          },
+          "future_recovery_success": null,
+          "future_recovery_success_status": "not_evaluated",
+          "overspeed_headroom": {
+            "delta": 0.06106141575833801,
+            "status": "improved"
+          },
+          "predicted_speed_ratio": 1.8212502385150744,
+          "radial_velocity_component": {
+            "absolute_ratio_improvement": -4.325704749952308e-08,
+            "post_radial_velocity": 5222.371653989875,
+            "post_radial_velocity_ratio": 1.2413039968931543,
+            "pre_radial_velocity": 5222.371472000306,
+            "pre_radial_velocity_ratio": 1.2413039536361068,
+            "radial_direction_toward_target": true,
+            "status": "worsened"
+          },
+          "radius_progress": {
+            "delta_absolute_target_radius_error": -522237.1435546875,
+            "improvement_magnitude": 522237.1435546875,
+            "status": "improved"
+          },
+          "recoverability_components": {
+            "post": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": false
+            },
+            "pre": {
+              "phase34_compatible_recoverability": false,
+              "radial_velocity_component_pass": false,
+              "radius_component_pass": false,
+              "tangential_velocity_component_pass": false
+            }
+          },
+          "safe_under_frozen_threshold": true,
+          "safety_evidence_source": "stage1b_measured_recovery_trace",
+          "source_event_hash": "11b636652baded8a01edaed31fdd5a0cabdc13136bbf9d510d5c7cd5a0503948",
+          "source_event_index": 1,
+          "source_pre_state_hash": "31bbf49b8e5e1b79189a8b8f4e33ab6b29874ccdf0a520922c1f639e309ca1c8",
+          "tangential_velocity_error": {
+            "absolute_error_improvement": 346.2607861988181,
+            "post_signed_error": 1399.7674950996834,
+            "pre_signed_error": 1746.0282812985015,
+            "status": "improved"
+          },
+          "unknown_fields": [
+            "future_recovery_success",
+            "general_action_usefulness",
+            "causal_action_effect"
+          ],
+          "usefulness_evidence_source": "analysis/staged_recovery_shadow_calibration_v0/traces/member__phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000__tangential_error_correction_v0.jsonl",
+          "usefulness_evidence_status": "available_exact_one_step",
+          "usefulness_source_locator": "jsonl_line:2"
+        }
+      ],
+      "branch_step": 27,
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "nominal_proposal": {
+        "Final_Veto_decision": "veto",
+        "action": [
+          -2.593568828536793e-07,
+          0.13599719796820903
+        ],
+        "predicted_speed_ratio": 1.9121328346751392,
+        "veto_reason": "predicted_nominal_overspeed"
+      },
+      "state_identity": "adba62405cdde2cb56579f4dafa39ae4d6dfb27d1aa7f460903d2a4fcff9cc0d"
+    }
+  ],
+  "exact_veto_state_count": 4,
+  "full_three_action_comparison_state_count": 3,
+  "full_usefulness_alternative_observation_count": 9,
+  "one_step_evidence_does_not_establish_future_recovery": true,
+  "safety_only_alternative_observation_count": 3,
+  "schema_version": "stage2a_safe_alternative_usefulness_audit_v0",
+  "unknown_value_policy": "not_evaluated"
+}

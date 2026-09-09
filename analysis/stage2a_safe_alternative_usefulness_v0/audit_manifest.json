@@ -1,0 +1,57 @@
+{
+  "D1_D2_rerun": false,
+  "Final_Veto_modified": false,
+  "Stage_2A_authority_granted": false,
+  "actions_tuned": false,
+  "artifact_filenames": [
+    "audit_manifest.json",
+    "alternative_comparison.json",
+    "progress_metrics.json",
+    "recoverability_comparison.json",
+    "decision_matrix.json",
+    "summary.md"
+  ],
+  "artifact_hashes": {
+    "alternative_comparison.json": "e307643d703da0d782dc00a77a4116dded614c4ea8c46c181645c455b9b700b5",
+    "decision_matrix.json": "08f1379cc4f56f9b70fd50a74973852ecc706c2ac17b7891c3b99ae07e3e650e",
+    "progress_metrics.json": "f671a2de70a199cf04f860132f6c6046cff9a33e29b99c3626ec3ca7207d983a",
+    "recoverability_comparison.json": "7c4dcaf5f3f36c75473efb3ea4e36351eddede6fded812d30114cfef72af1316",
+    "summary.md": "7e3c8199fb3182ef52a00fd7166568dbfa708684c7a2ddc4ea58ea5eb9e28645"
+  },
+  "audit_bundle_hash": "8ff8f9bdef44ca4485477b790b513485f8fc286c4e5f805f22b1551fb9b66875",
+  "audit_classification": "frozen_offline_evidence_audit",
+  "audit_id": "stage2a_safe_alternative_usefulness_v0",
+  "canonical_manifest_hash": "4efcd5874110b5244c9f33bd2d88c08d11207b8dc97ed11959ab1e2ae79fa104",
+  "claim_restrictions": [
+    "no_recovery_success_claim",
+    "no_controller_superiority_claim",
+    "no_optimal_action_claim",
+    "no_universal_policy_claim",
+    "no_formal_safety_claim",
+    "no_active_authority_claim"
+  ],
+  "completed_date": "2026-09-09",
+  "controller_executions": 0,
+  "exact_veto_state_count": 4,
+  "full_three_action_comparison_state_count": 3,
+  "full_usefulness_alternative_observation_count": 9,
+  "new_trajectories": 0,
+  "overspeed_comparator": ">",
+  "overspeed_threshold": 1.9,
+  "physical_executions": 0,
+  "schema_version": "stage2a_safe_alternative_usefulness_audit_v0",
+  "source_post_veto_manifest_hash": "6000f10cf924781cd051808a435804ca272d819e76b76c69a15c02e9d91d278e",
+  "source_repository_head": "b1c201dae14b186f4d73e4758ce81c3927732ee9",
+  "source_snapshot": {
+    "branch_state_registry": "ffc0fbbb78bb27083e2a20a5524ef8e9e91d38bbb901ff18b1ba7cab15d83f52",
+    "final_veto": "3b3552aa72af1d07f8322eb01944f6773a2d9c7546df172fc95b43a2f2ff11ff",
+    "stage1b_calibration": "eb0d2681ac7bcd1c4d32a4e4bc39751c359a20fe28468f2f28584ae196687e8f",
+    "stage2a_d2": "43fdd947dfbebb3a751e281bc7c55b404a8b71d9a29b69a92304b808cba32a95",
+    "stage2a_post_veto_alternative_audit": "cf5e6faa3a48497a9e0683a5a1d20ec223841238b38f3e22f3d38bae17f7bbd2",
+    "stage2a_trigger_relevance_audit": "e4e688659abd4bec48684d99a6184a30e3b8fac16d374d403a9a7b3985f10bbb"
+  },
+  "source_trigger_relevance_manifest_hash": "9f446503be008fe4b6a3051d8c98737f822673364cbcebcddee89579364dfa7f",
+  "staged_recovery_execution": "not_authorized",
+  "synthetic_states_created": false,
+  "threshold_changed": false
+}
