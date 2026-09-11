@@ -1,0 +1,254 @@
+{
+  "all_classifications_match": true,
+  "baseline_propagator": "phase34_35_semi_implicit_euler",
+  "classification_match_count": 14,
+  "exact_state_count": 4,
+  "independent_propagator": "scipy_solve_ivp_DOP853",
+  "maximum_absolute_speed_ratio_difference": 2.886579864025407e-15,
+  "nominal_proposal_count": 4,
+  "overspeed_threshold": 1.9,
+  "physical_alternative_count": 10,
+  "records": [
+    {
+      "action": [
+        -2.3094152700156713e-07,
+        0.13599576748536102
+      ],
+      "action_identity": "nominal_proposal",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "classification_match": true,
+      "dop853_minus_euler": 2.886579864025407e-15,
+      "dop853_speed_ratio": 1.9183887199363676,
+      "dop853_veto": true,
+      "euler_veto": true,
+      "frozen_euler_speed_ratio": 1.9183887199363643,
+      "proposal_type": "nominal",
+      "recomputed_euler_speed_ratio": 1.9183887199363647,
+      "thrust_scale": 8000.0
+    },
+    {
+      "action": [
+        -2.4916881546477226e-07,
+        0.135995874288177
+      ],
+      "action_identity": "nominal_proposal",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_155__thrust_8000",
+      "classification_match": true,
+      "dop853_minus_euler": 2.220446049250313e-15,
+      "dop853_speed_ratio": 1.9121639281260556,
+      "dop853_veto": true,
+      "euler_veto": true,
+      "frozen_euler_speed_ratio": 1.912163928126053,
+      "proposal_type": "nominal",
+      "recomputed_euler_speed_ratio": 1.9121639281260534,
+      "thrust_scale": 8000.0
+    },
+    {
+      "action": [
+        -2.4468456937654754e-07,
+        0.1359970532024554
+      ],
+      "action_identity": "nominal_proposal",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "classification_match": true,
+      "dop853_minus_euler": 1.5543122344752192e-15,
+      "dop853_speed_ratio": 1.9158258326120758,
+      "dop853_veto": true,
+      "euler_veto": true,
+      "frozen_euler_speed_ratio": 1.9158258326120738,
+      "proposal_type": "nominal",
+      "recomputed_euler_speed_ratio": 1.9158258326120743,
+      "thrust_scale": 10000.0
+    },
+    {
+      "action": [
+        -2.593568828536793e-07,
+        0.13599719796820903
+      ],
+      "action_identity": "nominal_proposal",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "classification_match": true,
+      "dop853_minus_euler": 6.661338147750939e-16,
+      "dop853_speed_ratio": 1.9121328346751403,
+      "dop853_veto": true,
+      "euler_veto": true,
+      "frozen_euler_speed_ratio": 1.9121328346751392,
+      "proposal_type": "nominal",
+      "recomputed_euler_speed_ratio": 1.9121328346751396,
+      "thrust_scale": 10000.0
+    },
+    {
+      "action": [
+        0.0,
+        0.0
+      ],
+      "action_identity": "zero_action_reference_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "classification_match": true,
+      "dop853_minus_euler": 2.6645352591003757e-15,
+      "dop853_speed_ratio": 1.8906024003603126,
+      "dop853_veto": false,
+      "euler_veto": false,
+      "frozen_euler_speed_ratio": 1.8906024003603095,
+      "proposal_type": "physical_alternative",
+      "recomputed_euler_speed_ratio": 1.89060240036031,
+      "thrust_scale": 8000.0
+    },
+    {
+      "action": [
+        0.1589012563475844,
+        -0.19300360289683524
+      ],
+      "action_identity": "velocity_opposed_thrust_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "classification_match": true,
+      "dop853_minus_euler": 2.6645352591003757e-15,
+      "dop853_speed_ratio": 1.824760375803829,
+      "dop853_veto": false,
+      "euler_veto": false,
+      "frozen_euler_speed_ratio": 1.824760375803826,
+      "proposal_type": "physical_alternative",
+      "recomputed_euler_speed_ratio": 1.8247603758038264,
+      "thrust_scale": 8000.0
+    },
+    {
+      "action": [
+        0.24999999999963954,
+        4.245380780436667e-07
+      ],
+      "action_identity": "tangential_error_correction_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_150__thrust_8000",
+      "classification_match": true,
+      "dop853_minus_euler": 2.4424906541753444e-15,
+      "dop853_speed_ratio": 1.8494516264933445,
+      "dop853_veto": false,
+      "euler_veto": false,
+      "frozen_euler_speed_ratio": 1.8494516264933416,
+      "proposal_type": "physical_alternative",
+      "recomputed_euler_speed_ratio": 1.849451626493342,
+      "thrust_scale": 8000.0
+    },
+    {
+      "action": [
+        0.0,
+        0.0
+      ],
+      "action_identity": "zero_action_reference_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_155__thrust_8000",
+      "classification_match": true,
+      "dop853_minus_euler": 2.220446049250313e-15,
+      "dop853_speed_ratio": 1.8850806447641602,
+      "dop853_veto": false,
+      "euler_veto": false,
+      "frozen_euler_speed_ratio": 1.8850806447641575,
+      "proposal_type": "physical_alternative",
+      "recomputed_euler_speed_ratio": 1.885080644764158,
+      "thrust_scale": 8000.0
+    },
+    {
+      "action": [
+        0.0,
+        0.0
+      ],
+      "action_identity": "zero_action_reference_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "classification_match": true,
+      "dop853_minus_euler": 1.5543122344752192e-15,
+      "dop853_speed_ratio": 1.88506528180712,
+      "dop853_veto": false,
+      "euler_veto": false,
+      "frozen_euler_speed_ratio": 1.885065281807118,
+      "proposal_type": "physical_alternative",
+      "recomputed_euler_speed_ratio": 1.8850652818071185,
+      "thrust_scale": 10000.0
+    },
+    {
+      "action": [
+        0.18312107494325033,
+        -0.17019598089152543
+      ],
+      "action_identity": "velocity_opposed_thrust_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "classification_match": true,
+      "dop853_minus_euler": 1.1102230246251565e-15,
+      "dop853_speed_ratio": 1.8027627511115156,
+      "dop853_veto": false,
+      "euler_veto": false,
+      "frozen_euler_speed_ratio": 1.802762751111514,
+      "proposal_type": "physical_alternative",
+      "recomputed_euler_speed_ratio": 1.8027627511115145,
+      "thrust_scale": 10000.0
+    },
+    {
+      "action": [
+        0.24999999999959535,
+        4.4979755739982056e-07
+      ],
+      "action_identity": "tangential_error_correction_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_170__thrust_10000",
+      "classification_match": true,
+      "dop853_minus_euler": 1.5543122344752192e-15,
+      "dop853_speed_ratio": 1.8256400803089348,
+      "dop853_veto": false,
+      "euler_veto": false,
+      "frozen_euler_speed_ratio": 1.8256400803089328,
+      "proposal_type": "physical_alternative",
+      "recomputed_euler_speed_ratio": 1.8256400803089332,
+      "thrust_scale": 10000.0
+    },
+    {
+      "action": [
+        0.0,
+        0.0
+      ],
+      "action_identity": "zero_action_reference_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "classification_match": true,
+      "dop853_minus_euler": 8.881784197001252e-16,
+      "dop853_speed_ratio": 1.8823116157555742,
+      "dop853_veto": false,
+      "euler_veto": false,
+      "frozen_euler_speed_ratio": 1.8823116157555728,
+      "proposal_type": "physical_alternative",
+      "recomputed_euler_speed_ratio": 1.8823116157555733,
+      "thrust_scale": 10000.0
+    },
+    {
+      "action": [
+        0.1879358444069937,
+        -0.1648639390134491
+      ],
+      "action_identity": "velocity_opposed_thrust_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "classification_match": true,
+      "dop853_minus_euler": 1.1102230246251565e-15,
+      "dop853_speed_ratio": 1.80000908505997,
+      "dop853_veto": false,
+      "euler_veto": false,
+      "frozen_euler_speed_ratio": 1.8000090850599684,
+      "proposal_type": "physical_alternative",
+      "recomputed_euler_speed_ratio": 1.8000090850599688,
+      "thrust_scale": 10000.0
+    },
+    {
+      "action": [
+        0.24999999999954536,
+        4.7676879878406646e-07
+      ],
+      "action_identity": "tangential_error_correction_v0",
+      "case_id": "phase35_radial_energy_push_overspeed_stress_v0__r0_0p98__angle_175__thrust_10000",
+      "classification_match": true,
+      "dop853_minus_euler": 1.1102230246251565e-15,
+      "dop853_speed_ratio": 1.821250238515076,
+      "dop853_veto": false,
+      "euler_veto": false,
+      "frozen_euler_speed_ratio": 1.8212502385150744,
+      "proposal_type": "physical_alternative",
+      "recomputed_euler_speed_ratio": 1.8212502385150748,
+      "thrust_scale": 10000.0
+    }
+  ],
+  "schema_version": "stage2b_numerical_validation_v0",
+  "total_evaluated_proposal_count": 14,
+  "validation_scope": "one_step_exact_state"
+}

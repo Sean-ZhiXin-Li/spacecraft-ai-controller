@@ -10,6 +10,7 @@ dependencies:
 
   # Core scientific computing libraries
   - "numpy<2"
+  - scipy
   - pandas
   - matplotlib
 
