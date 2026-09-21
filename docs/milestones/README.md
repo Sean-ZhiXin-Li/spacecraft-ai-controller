@@ -4,30 +4,88 @@ This folder is reserved for curated milestone documentation. The detailed result
 
 ## Current Milestone
 
-The current milestone is the Phase37B weak tangential subset diagnostic and the Phase38 evidence-based search-space definition built on the Phase36 transfer-family benchmark and non-crossing diagnosis:
+The current milestone is **Stage 2B Numerical Propagation Independence Validation v0**.
 
-- Phase34 is the fixed terminal/post-cross controller.
-- Phase36B tested transfer-family variants and did not expand the crossing basin beyond `8 / 24` crossing-producing cases.
-- Phase36C diagnosed the remaining `16 / 24` non-crossing cases and prepared the next planner-level transfer search.
-- Phase37A tested radial commitment timing and bounded radial magnitude over `144` rollouts.
-- Phase37A created `0` new crossings on the baseline non-crossing cases; delayed commitment preserved `8 / 24` crossings and `8 / 24` recoverable crossings, while early and mid commitment degraded the existing crossing set.
-- Phase37B tested weak tangential shaping on a narrow subset. It created `0 / 4` selected-case crossings and preserved only `4 / 8` regression crossings, so it is a negative diagnostic rather than a controller candidate.
-- Phase38 should define the evidence-based search space before any new controller implementation.
+Stage 2B introduced an independent SciPy DOP853 propagator to test whether the frozen Phase34/35 one-step Final Veto classifications depend on the baseline semi-implicit Euler implementation.
+
+Frozen validation coverage:
+
+- 4 exact Phase35 states;
+- 4 nominal proposals;
+- 10 evaluated physical alternative proposals;
+- 14 total one-step proposal evaluations.
+
+Result:
+
+- Euler / DOP853 classification agreement: `14 / 14`;
+- classification mismatches: `0`;
+- maximum observed absolute speed-ratio difference:
+  `2.886579864025407e-15`;
+- focused Stage 2B tests: `5 / 5 PASS`;
+- Stage 2B manifest integrity: `PASS`.
+
+The validated claim is intentionally narrow. This establishes one-step numerical classification consistency only within the audited exact-state coverage. It does not establish multi-step trajectory independence, physical-model fidelity, or real-spacecraft safety.
+
+Stage 2B v0 was frozen in commit:
+
+`cf887c87fa4f6323fd7cbff0069913f4dd483c64`
 
 Current references:
 
+- [Stage 2B summary](../../analysis/stage2b_numerical_validation_v0/summary.md)
+- [Stage 2B results](../../analysis/stage2b_numerical_validation_v0/results.json)
+- [Stage 2B manifest](../../analysis/stage2b_numerical_validation_v0/manifest.json)
 - [Project logs index](../project_logs_index.md)
 - [Research direction](../research_direction.md)
+
+## Next Planned Validation
+
+The next planned numerical-validation task is **Stage 2B-M Multi-Step Numerical Divergence Validation**.
+
+The goal is to measure how Euler / DOP853 state differences accumulate over repeated 100 s control intervals before making any broader numerical-independence claim.
+
+Initial comparison horizons:
+
+- 1;
+- 2;
+- 4;
+- 8;
+- 16;
+- 32;
+- 64;
+- 128 control intervals.
+
+Candidate metrics include:
+
+- position divergence;
+- velocity divergence;
+- radius difference;
+- speed-ratio drift;
+- overspeed classification;
+- crossing status;
+- recovery-related component consistency.
+
+This is currently a planned experiment, not a completed result.
+
+## Previous Research Trail
+
+The earlier Phase34-Phase38 sequence remains part of the scientific history:
+
+- Phase34 established the fixed terminal/post-cross controller.
+- Phase36B tested transfer-family variants.
+- Phase36C diagnosed non-crossing cases.
+- Phase37A tested radial commitment timing and magnitude.
+- Phase37B tested weak tangential shaping and produced a negative diagnostic result.
+- Phase38 defined an evidence-based search direction before the later runtime-assurance work.
+
+Historical references:
+
 - [Phase36B summary](../../analysis/phase36b_transfer_family_benchmark/summary.md)
 - [Phase36C summary](../../analysis/phase36c_non_crossing_geometry_diagnosis/summary.md)
 - [Phase37A summary](../../analysis/phase37a_radial_commit_timing/phase37a_summary.md)
 - [Phase37B summary](../../analysis/phase37b_weak_tangential_subset/phase37b_summary.md)
 - [Phase37B postmortem](../../project_log/phase37b_weak_tangential_postmortem.md)
 - [Phase38 evidence-based search space](../phase38_evidence_based_search_space.md)
-- [Phase36C planner search space](../../analysis/phase36c_non_crossing_geometry_diagnosis/planner_search_space.md)
-- [PL36 project log](../../project_log/pl36_transfer_family_benchmark_and_diagnosis.md)
-- [PL37A project log](../../project_log/phase37a_radial_commit_timing.md)
-- [Artifact manifest](../../analysis/artifact_manifest.md)
 
 ## Earlier Local-Controller Milestone
 
