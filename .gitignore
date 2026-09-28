@@ -218,13 +218,11 @@ data/logs/
 *.pt
 *.pkl
 *.log
-*.gif                       # Animated visualizations
 
-# ==== SYSTEM FILES ====
-.DS_Store                   # macOS
-Thumbs.db                  # Windows
-desktop.ini                # Windows
-
+*.gif
+.DS_Store
+Thumbs.db
+desktop.ini
 # ==== IDE FILES ====
 .vscode/
 .idea/                     # JetBrains (PyCharm, CLion)
