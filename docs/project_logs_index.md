@@ -11,6 +11,7 @@ This index points readers to the current 2D orbital-insertion research trail whi
 5. [PL36 - Transfer-family benchmark and non-crossing diagnosis](../project_log/pl36_transfer_family_benchmark_and_diagnosis.md)
 6. [PL37A - Radial commitment timing sweep](../project_log/phase37a_radial_commit_timing.md)
 7. [Phase37B - Weak tangential subset postmortem](../project_log/phase37b_weak_tangential_postmortem.md)
+8. [2026-10-10 exploratory fuel-aware transfer and time-fuel tradeoff (not frozen Phase35)](../project_log/2026-10-10_fuel_aware_transfer_and_pareto_dev.md)
 
 ## Current Research State
 
