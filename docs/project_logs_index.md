@@ -12,6 +12,11 @@ This index points readers to the current 2D orbital-insertion research trail whi
 6. [PL37A - Radial commitment timing sweep](../project_log/phase37a_radial_commit_timing.md)
 7. [Phase37B - Weak tangential subset postmortem](../project_log/phase37b_weak_tangential_postmortem.md)
 8. [2026-10-10 exploratory fuel-aware transfer and time-fuel tradeoff (not frozen Phase35)](../project_log/2026-10-10_fuel_aware_transfer_and_pareto_dev.md)
+9. [Closed-loop fuel-aware transfer](../project_log/2026-10-23_closed_loop_fuel_aware_transfer_dev_v1.md)
+10. [Position-aided navigation estimation](../project_log/2026-10-23_position_aided_capture_dev_v2.md)
+11. [Position-confirmed fault isolation](../project_log/2026-10-23_fault_aware_transfer_dev_v3.md)
+12. [Asynchronous-fault interval quarantine](../project_log/2026-10-23_asynchronous_fault_dev_v4.md)
+13. [Bidirectional multi-regime transfer planning](../project_log/2026-10-23_multiregime_transfer_planning.md)
 
 ## Current Research State
 

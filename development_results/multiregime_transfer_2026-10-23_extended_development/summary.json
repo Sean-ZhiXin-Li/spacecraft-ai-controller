@@ -1,0 +1,67 @@
+{
+  "tasks": 8,
+  "comparisons": 24,
+  "protected_before": {
+    "previous": {
+      "frozen": {
+        "frozen": {
+          "sha256": "ad532df0291e04b73a96bdf3bce6ff1354ddd55dedf5ee1d1453825244319c0c",
+          "file_count": 773
+        },
+        "v1_development_sha256": "8d0f2ba1bf607f25e21f1b93bf79cd8d1ecd2cb84f39d271f3ae52931cd1ee69",
+        "v1_file_count": 36,
+        "v2_sha256": "ad22633d67d7f4c4957fad6e84ff7dd8d403316b19a93f8fe03f43163b948c38",
+        "v2_file_count": 34
+      },
+      "history_sha256": "80a0460b0ee5d47e9f38dd313e6ded1205cdf4931614ee9e69a5e8dc2d00e773",
+      "history_files": 103
+    },
+    "asynchronous_sha256": "4e81efc50373c82d4913859c895ae108e46b9cb82745b3e761440b98fa38e920"
+  },
+  "protected_after": {
+    "previous": {
+      "frozen": {
+        "frozen": {
+          "sha256": "ad532df0291e04b73a96bdf3bce6ff1354ddd55dedf5ee1d1453825244319c0c",
+          "file_count": 773
+        },
+        "v1_development_sha256": "8d0f2ba1bf607f25e21f1b93bf79cd8d1ecd2cb84f39d271f3ae52931cd1ee69",
+        "v1_file_count": 36,
+        "v2_sha256": "ad22633d67d7f4c4957fad6e84ff7dd8d403316b19a93f8fe03f43163b948c38",
+        "v2_file_count": 34
+      },
+      "history_sha256": "80a0460b0ee5d47e9f38dd313e6ded1205cdf4931614ee9e69a5e8dc2d00e773",
+      "history_files": 103
+    },
+    "asynchronous_sha256": "4e81efc50373c82d4913859c895ae108e46b9cb82745b3e761440b98fa38e920"
+  },
+  "groups": [
+    {
+      "method": "legacy",
+      "plans": 1,
+      "captures": 1,
+      "survival": 1,
+      "physical_executions": 1,
+      "reserve_violations": 0,
+      "median_planning_seconds": 0.010641899998518056
+    },
+    {
+      "method": "matched_outward",
+      "plans": 3,
+      "captures": 3,
+      "survival": 3,
+      "physical_executions": 3,
+      "reserve_violations": 0,
+      "median_planning_seconds": 0.06212115000016638
+    },
+    {
+      "method": "bidirectional",
+      "plans": 7,
+      "captures": 7,
+      "survival": 7,
+      "physical_executions": 7,
+      "reserve_violations": 0,
+      "median_planning_seconds": 0.09453550000034738
+    }
+  ]
+}
