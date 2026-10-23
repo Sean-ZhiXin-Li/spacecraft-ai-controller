@@ -1,0 +1,95 @@
+{
+  "pairs": 36,
+  "runs": 72,
+  "distinct_seeds": 12,
+  "protected_before": {
+    "frozen": {
+      "frozen": {
+        "sha256": "ad532df0291e04b73a96bdf3bce6ff1354ddd55dedf5ee1d1453825244319c0c",
+        "file_count": 773
+      },
+      "v1_development_sha256": "8d0f2ba1bf607f25e21f1b93bf79cd8d1ecd2cb84f39d271f3ae52931cd1ee69",
+      "v1_file_count": 36,
+      "v2_sha256": "ad22633d67d7f4c4957fad6e84ff7dd8d403316b19a93f8fe03f43163b948c38",
+      "v2_file_count": 34
+    },
+    "history_sha256": "80a0460b0ee5d47e9f38dd313e6ded1205cdf4931614ee9e69a5e8dc2d00e773",
+    "history_files": 103
+  },
+  "protected_after": {
+    "frozen": {
+      "frozen": {
+        "sha256": "ad532df0291e04b73a96bdf3bce6ff1354ddd55dedf5ee1d1453825244319c0c",
+        "file_count": 773
+      },
+      "v1_development_sha256": "8d0f2ba1bf607f25e21f1b93bf79cd8d1ecd2cb84f39d271f3ae52931cd1ee69",
+      "v1_file_count": 36,
+      "v2_sha256": "ad22633d67d7f4c4957fad6e84ff7dd8d403316b19a93f8fe03f43163b948c38",
+      "v2_file_count": 34
+    },
+    "history_sha256": "80a0460b0ee5d47e9f38dd313e6ded1205cdf4931614ee9e69a5e8dc2d00e773",
+    "history_files": 103
+  },
+  "groups": [
+    {
+      "kind": "sensor",
+      "quarantine": false,
+      "n": 12,
+      "capture": 12,
+      "survival": 12,
+      "reserve_violations": 0,
+      "min_propellant": 96.47260352103905,
+      "max_e": 0.00017519639287301978
+    },
+    {
+      "kind": "sensor",
+      "quarantine": true,
+      "n": 12,
+      "capture": 12,
+      "survival": 12,
+      "reserve_violations": 0,
+      "min_propellant": 96.47260009221088,
+      "max_e": 0.0001779361331043255
+    },
+    {
+      "kind": "physical",
+      "quarantine": false,
+      "n": 12,
+      "capture": 2,
+      "survival": 2,
+      "reserve_violations": 0,
+      "min_propellant": 85.57363792146737,
+      "max_e": 0.032848935691639033
+    },
+    {
+      "kind": "physical",
+      "quarantine": true,
+      "n": 12,
+      "capture": 12,
+      "survival": 12,
+      "reserve_violations": 0,
+      "min_propellant": 88.1393877246964,
+      "max_e": 6.977812864415208e-05
+    },
+    {
+      "kind": "combined",
+      "quarantine": false,
+      "n": 12,
+      "capture": 6,
+      "survival": 6,
+      "reserve_violations": 0,
+      "min_propellant": 88.0892026397409,
+      "max_e": 0.005770509007879126
+    },
+    {
+      "kind": "combined",
+      "quarantine": true,
+      "n": 12,
+      "capture": 12,
+      "survival": 12,
+      "reserve_violations": 0,
+      "min_propellant": 88.180807359016,
+      "max_e": 0.00017947996829602192
+    }
+  ]
+}

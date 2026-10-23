@@ -1,0 +1,63 @@
+{
+  "pairs": 24,
+  "exposed_pairs": 24,
+  "unexposed": [],
+  "unequal_exposure": 0,
+  "reference_capture": 12,
+  "quarantine_capture": 24,
+  "rescued": 12,
+  "regressed": 0,
+  "reserve_violations": 0,
+  "ambiguity_burns": 0,
+  "quarantine_correction_traces": 0,
+  "reference_correction_traces": 0,
+  "max_extra_fuel_kg": 0.6584064180980249,
+  "max_fuel_saved_kg": 3.0258447772127397,
+  "max_completion_delay_days": 3.3628965070420236e-05,
+  "subgroups": [
+    {
+      "kind": "sensor",
+      "exposed_pairs": 8,
+      "reference_capture": 8,
+      "quarantine_capture": 8
+    },
+    {
+      "kind": "physical",
+      "exposed_pairs": 8,
+      "reference_capture": 3,
+      "quarantine_capture": 8
+    },
+    {
+      "kind": "combined",
+      "exposed_pairs": 8,
+      "reference_capture": 1,
+      "quarantine_capture": 8
+    }
+  ],
+  "reference": {
+    "confirmed_late_records": 27,
+    "classifications": {
+      "sensor_bias_jump": 8,
+      "physical_state_change": 8,
+      "combined_or_model_mismatch": 11
+    },
+    "onset_to_confirmation_days": [
+      63.6235156984626,
+      175.77233051404573
+    ],
+    "max_terminal_velocity_estimation_error_mps": 66.50732476845378
+  },
+  "quarantine": {
+    "confirmed_late_records": 24,
+    "classifications": {
+      "sensor_bias_jump": 8,
+      "physical_state_change": 8,
+      "combined_or_model_mismatch": 8
+    },
+    "onset_to_confirmation_days": [
+      63.6235156984626,
+      116.49748551255743
+    ],
+    "max_terminal_velocity_estimation_error_mps": 0.1630299661043853
+  }
+}
