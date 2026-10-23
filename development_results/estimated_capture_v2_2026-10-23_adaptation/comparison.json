@@ -1,0 +1,28 @@
+{
+  "experiment": "estimated_capture_v2_2026-10-23_adaptation",
+  "pairs": 8,
+  "distinct_seeds": 8,
+  "baseline_capture": 3,
+  "new_capture": 8,
+  "rescued": 5,
+  "regressed": 0,
+  "baseline_survival": 3,
+  "new_survival": 8,
+  "baseline_worst_e": 0.003251948829402187,
+  "new_worst_e": 0.0001065279545722454,
+  "max_extra_fuel_kg": 0.42415734075387945,
+  "max_fuel_saved_kg": 0.0,
+  "minimum_final_fuel_kg": 92.64907798495966,
+  "reserve_violations": 0,
+  "max_new_bias_error_mps": 0.25139986351528504,
+  "conditions_are_correlated_within_seed": true,
+  "subgroups": [
+    {
+      "initial_bias_bound": 15,
+      "drift_mps_per_day": 0.2,
+      "pairs": 8,
+      "baseline_capture": 3,
+      "new_capture": 8
+    }
+  ]
+}

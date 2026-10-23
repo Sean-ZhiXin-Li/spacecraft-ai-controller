@@ -1,0 +1,97 @@
+{
+  "objective": "improve capture under velocity bias at unchanged fuel floor and terminal criteria",
+  "cases": [
+    {
+      "seed": 201,
+      "velocity_bound": 250,
+      "navigation_velocity_bound": 15,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.5,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.2,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 202,
+      "velocity_bound": 250,
+      "navigation_velocity_bound": 15,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.5,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.2,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 203,
+      "velocity_bound": 250,
+      "navigation_velocity_bound": 15,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.5,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.2,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 204,
+      "velocity_bound": 250,
+      "navigation_velocity_bound": 15,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.5,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.2,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 205,
+      "velocity_bound": 250,
+      "navigation_velocity_bound": 15,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.5,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.2,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 206,
+      "velocity_bound": 250,
+      "navigation_velocity_bound": 15,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.5,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.2,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 207,
+      "velocity_bound": 250,
+      "navigation_velocity_bound": 15,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.5,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.2,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 208,
+      "velocity_bound": 250,
+      "navigation_velocity_bound": 15,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.5,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.2,
+      "position_noise_bound": 200000.0
+    }
+  ],
+  "planning_reserve_kg": 110,
+  "hard_reserve_kg": 80,
+  "deadline_days": 1100,
+  "hold_days": 100,
+  "independent_terminal_capture_threshold_e": 0.001,
+  "terminal_radius_error_limit": 0.0025,
+  "estimator": "two-body position shooting across unpowered arcs",
+  "arms": [
+    "static",
+    "trend"
+  ],
+  "source_hash": "c8041814fb503d0e2e0caa32384fbe13da4a5b41b5adafa2f47e4e876d6397a8"
+}

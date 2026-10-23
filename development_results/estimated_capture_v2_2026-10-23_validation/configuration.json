@@ -1,0 +1,257 @@
+{
+  "objective": "improve capture under velocity bias at unchanged fuel floor and terminal criteria",
+  "cases": [
+    {
+      "seed": 101,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 5.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 101,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 15.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 102,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 5.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 102,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 15.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 103,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 5.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 103,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 15.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 104,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 5.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 104,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 15.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 105,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 5.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 105,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 15.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 106,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 5.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 106,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 15.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 107,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 5.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 107,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 15.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 108,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 5.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 108,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 15.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 109,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 5.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 109,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 15.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 110,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 5.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 110,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 15.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 111,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 5.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 111,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 15.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 112,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 5.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    },
+    {
+      "seed": 112,
+      "velocity_bound": 100,
+      "navigation_velocity_bound": 15.0,
+      "position_bound": 500000.0,
+      "thrust_scale": 0.7,
+      "observation_days": 30,
+      "velocity_bias_drift_per_day": 0.0,
+      "position_noise_bound": 200000.0
+    }
+  ],
+  "planning_reserve_kg": 110,
+  "hard_reserve_kg": 80,
+  "deadline_days": 1100,
+  "hold_days": 100,
+  "independent_terminal_capture_threshold_e": 0.001,
+  "terminal_radius_error_limit": 0.0025,
+  "estimator": "two-body position shooting across unpowered arcs",
+  "arms": [
+    "raw_navigation",
+    "position_aided_velocity_bias"
+  ],
+  "source_hash": "45f1fa1bbd9642d4155e6c77e05b5f387560f7d6ff74f052992ed4b06e5de400"
+}

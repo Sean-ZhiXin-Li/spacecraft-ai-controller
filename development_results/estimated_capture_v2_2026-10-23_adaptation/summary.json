@@ -1,0 +1,39 @@
+{
+  "pairs": 8,
+  "runs": 16,
+  "elapsed_seconds": 4.0,
+  "protected_before": {
+    "frozen": {
+      "sha256": "ad532df0291e04b73a96bdf3bce6ff1354ddd55dedf5ee1d1453825244319c0c",
+      "file_count": 773
+    },
+    "v1_development_sha256": "8d0f2ba1bf607f25e21f1b93bf79cd8d1ecd2cb84f39d271f3ae52931cd1ee69",
+    "v1_file_count": 36
+  },
+  "protected_after": {
+    "frozen": {
+      "sha256": "ad532df0291e04b73a96bdf3bce6ff1354ddd55dedf5ee1d1453825244319c0c",
+      "file_count": 773
+    },
+    "v1_development_sha256": "8d0f2ba1bf607f25e21f1b93bf79cd8d1ecd2cb84f39d271f3ae52931cd1ee69",
+    "v1_file_count": 36
+  },
+  "groups": [
+    {
+      "policy": "static",
+      "n": 8,
+      "capture_count": 3,
+      "survival_count": 3,
+      "reserve_violations": 0,
+      "worst_eccentricity": 0.003251948829402187
+    },
+    {
+      "policy": "trend",
+      "n": 8,
+      "capture_count": 8,
+      "survival_count": 8,
+      "reserve_violations": 0,
+      "worst_eccentricity": 0.0001065279545722454
+    }
+  ]
+}
