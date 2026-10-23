@@ -1,0 +1,51 @@
+{
+  "experiment": "fault_aware_v3_2026-10-23_discovery",
+  "pairs": 8,
+  "distinct_seeds": 4,
+  "baseline_capture": 4,
+  "aware_capture": 8,
+  "baseline_survival": 4,
+  "aware_survival": 8,
+  "rescued": 4,
+  "regressed": 0,
+  "diagnosis_matches": 8,
+  "diagnosis_denominator": 8,
+  "unconfirmed_cases": [],
+  "classification_matrix": {
+    "sensor -> sensor_bias_jump": 4,
+    "physical -> physical_state_change": 4
+  },
+  "diagnosis_latency_range_days": [
+    30.0,
+    30.0
+  ],
+  "reserve_violations": 0,
+  "aware_ambiguity_burns": 0,
+  "aware_sensor_only_correction_traces": 0,
+  "baseline_sensor_only_correction_traces": 0,
+  "aware_max_e": 0.00010280292758833102,
+  "baseline_max_e": 0.01867433497214472,
+  "minimum_final_propellant": 102.71377197671222,
+  "max_extra_propellant_used": 2.487660016048494,
+  "max_propellant_saved": 3.7592759866530514,
+  "max_capture_delay_days": 9.075748175746412e-05,
+  "fault_classes_share_seeds": true,
+  "subgroups": [
+    {
+      "kind": "physical",
+      "pairs": 4,
+      "baseline_capture": 4,
+      "aware_capture": 4,
+      "baseline_correction_count": 0,
+      "aware_correction_count": 0
+    },
+    {
+      "kind": "sensor",
+      "pairs": 4,
+      "baseline_capture": 0,
+      "aware_capture": 4,
+      "baseline_correction_count": 0,
+      "aware_correction_count": 0
+    }
+  ]
+}

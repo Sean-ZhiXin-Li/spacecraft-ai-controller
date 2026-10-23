@@ -1,0 +1,44 @@
+{
+  "pairs": 36,
+  "runs": 72,
+  "protected_before": {
+    "frozen": {
+      "sha256": "ad532df0291e04b73a96bdf3bce6ff1354ddd55dedf5ee1d1453825244319c0c",
+      "file_count": 773
+    },
+    "v1_development_sha256": "8d0f2ba1bf607f25e21f1b93bf79cd8d1ecd2cb84f39d271f3ae52931cd1ee69",
+    "v1_file_count": 36,
+    "v2_sha256": "ad22633d67d7f4c4957fad6e84ff7dd8d403316b19a93f8fe03f43163b948c38",
+    "v2_file_count": 34
+  },
+  "protected_after": {
+    "frozen": {
+      "sha256": "ad532df0291e04b73a96bdf3bce6ff1354ddd55dedf5ee1d1453825244319c0c",
+      "file_count": 773
+    },
+    "v1_development_sha256": "8d0f2ba1bf607f25e21f1b93bf79cd8d1ecd2cb84f39d271f3ae52931cd1ee69",
+    "v1_file_count": 36,
+    "v2_sha256": "ad22633d67d7f4c4957fad6e84ff7dd8d403316b19a93f8fe03f43163b948c38",
+    "v2_file_count": 34
+  },
+  "groups": [
+    {
+      "aware": false,
+      "n": 36,
+      "captures": 12,
+      "survival": 12,
+      "reserve_violations": 0,
+      "correction_traces": 0,
+      "ambiguous_burns": 0
+    },
+    {
+      "aware": true,
+      "n": 36,
+      "captures": 36,
+      "survival": 36,
+      "reserve_violations": 0,
+      "correction_traces": 0,
+      "ambiguous_burns": 0
+    }
+  ]
+}

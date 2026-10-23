@@ -1,0 +1,60 @@
+{
+  "experiment": "fault_aware_v3_2026-10-23_stress",
+  "pairs": 24,
+  "distinct_seeds": 8,
+  "baseline_capture": 10,
+  "aware_capture": 14,
+  "baseline_survival": 10,
+  "aware_survival": 14,
+  "rescued": 6,
+  "regressed": 2,
+  "diagnosis_matches": 24,
+  "diagnosis_denominator": 24,
+  "unconfirmed_cases": [],
+  "classification_matrix": {
+    "sensor -> sensor_bias_jump": 8,
+    "physical -> physical_state_change": 8,
+    "combined -> combined_or_model_mismatch": 8
+  },
+  "diagnosis_latency_range_days": [
+    29.25545647449792,
+    30.0
+  ],
+  "reserve_violations": 0,
+  "aware_ambiguity_burns": 0,
+  "aware_sensor_only_correction_traces": 0,
+  "baseline_sensor_only_correction_traces": 1,
+  "aware_max_e": 0.0029236718919762087,
+  "baseline_max_e": 0.01790806959227545,
+  "minimum_final_propellant": 94.79021933979504,
+  "max_extra_propellant_used": 11.311562573164565,
+  "max_propellant_saved": 13.860212718141213,
+  "max_capture_delay_days": 1.5880320070685912,
+  "fault_classes_share_seeds": true,
+  "subgroups": [
+    {
+      "kind": "combined",
+      "pairs": 8,
+      "baseline_capture": 1,
+      "aware_capture": 3,
+      "baseline_correction_count": 0,
+      "aware_correction_count": 1
+    },
+    {
+      "kind": "physical",
+      "pairs": 8,
+      "baseline_capture": 8,
+      "aware_capture": 8,
+      "baseline_correction_count": 1,
+      "aware_correction_count": 1
+    },
+    {
+      "kind": "sensor",
+      "pairs": 8,
+      "baseline_capture": 1,
+      "aware_capture": 3,
+      "baseline_correction_count": 1,
+      "aware_correction_count": 0
+    }
+  ]
+}
