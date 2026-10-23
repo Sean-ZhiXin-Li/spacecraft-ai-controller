@@ -1,0 +1,129 @@
+{
+  "scenarios": [
+    {
+      "name": "nominal",
+      "seed": 0,
+      "velocity_bound": 0,
+      "nav_velocity_bound": 0,
+      "nav_position_bound": 0,
+      "thrust_scale": 1.0,
+      "observation_days": 60.0
+    },
+    {
+      "name": "modest_1",
+      "seed": 1,
+      "velocity_bound": 10,
+      "nav_velocity_bound": 0.2,
+      "nav_position_bound": 100000.0,
+      "thrust_scale": 0.9,
+      "observation_days": 60
+    },
+    {
+      "name": "modest_2",
+      "seed": 2,
+      "velocity_bound": 10,
+      "nav_velocity_bound": 0.2,
+      "nav_position_bound": 100000.0,
+      "thrust_scale": 1.0,
+      "observation_days": 60
+    },
+    {
+      "name": "modest_3",
+      "seed": 3,
+      "velocity_bound": 10,
+      "nav_velocity_bound": 0.2,
+      "nav_position_bound": 100000.0,
+      "thrust_scale": 0.9,
+      "observation_days": 60
+    },
+    {
+      "name": "modest_4",
+      "seed": 4,
+      "velocity_bound": 10,
+      "nav_velocity_bound": 0.2,
+      "nav_position_bound": 100000.0,
+      "thrust_scale": 1.0,
+      "observation_days": 60
+    },
+    {
+      "name": "hard_5",
+      "seed": 5,
+      "velocity_bound": 100,
+      "nav_velocity_bound": 1.0,
+      "nav_position_bound": 1000000.0,
+      "thrust_scale": 0.75,
+      "observation_days": 90
+    },
+    {
+      "name": "hard_6",
+      "seed": 6,
+      "velocity_bound": 100,
+      "nav_velocity_bound": 1.0,
+      "nav_position_bound": 1000000.0,
+      "thrust_scale": 0.75,
+      "observation_days": 90
+    },
+    {
+      "name": "hard_7",
+      "seed": 7,
+      "velocity_bound": 100,
+      "nav_velocity_bound": 1.0,
+      "nav_position_bound": 1000000.0,
+      "thrust_scale": 0.75,
+      "observation_days": 90
+    },
+    {
+      "name": "hard_8",
+      "seed": 8,
+      "velocity_bound": 100,
+      "nav_velocity_bound": 1.0,
+      "nav_position_bound": 1000000.0,
+      "thrust_scale": 0.75,
+      "observation_days": 90
+    },
+    {
+      "name": "extreme_9",
+      "seed": 9,
+      "velocity_bound": 250,
+      "nav_velocity_bound": 1,
+      "nav_position_bound": 1000000.0,
+      "thrust_scale": 0.6,
+      "observation_days": 120
+    },
+    {
+      "name": "uncertain_nav",
+      "seed": 10,
+      "velocity_bound": 100,
+      "nav_velocity_bound": 5,
+      "nav_position_bound": 10000000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 120
+    },
+    {
+      "name": "extreme_11",
+      "seed": 11,
+      "velocity_bound": 400,
+      "nav_velocity_bound": 1,
+      "nav_position_bound": 1000000.0,
+      "thrust_scale": 0.5,
+      "observation_days": 120
+    }
+  ],
+  "reserve_pairs": [
+    [
+      80,
+      80
+    ],
+    [
+      110,
+      80
+    ]
+  ],
+  "deadline_days": 1100,
+  "correction_limit_mps": 120,
+  "max_corrections": 3,
+  "capture_forecast_buffer_kg": 2,
+  "velocity_residual_margin_mps": 1,
+  "navigation_confidence_limit_mps": 2,
+  "model": "2D two-body variable mass; development-only; no frozen Final Veto authority"
+}

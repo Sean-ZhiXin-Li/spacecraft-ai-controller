@@ -1,0 +1,353 @@
+{
+  "directory": "closed_loop_transfer_v1_2026-10-23",
+  "pairs": 24,
+  "baseline_capture": 19,
+  "feedback_capture": 19,
+  "correction_traces": 0,
+  "max_correction_dv": 0.0,
+  "max_time_penalty_days": 0.0,
+  "max_time_saving_days": -0.0,
+  "reserve_violations": 0,
+  "worst_case": {
+    "scenario": "extreme_9",
+    "feedback": false,
+    "eccentricity": 0.040905126218640196
+  },
+  "paired_results": [
+    {
+      "reserve": 80.0,
+      "scenario": "nominal",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": [
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback"
+      ]
+    },
+    {
+      "reserve": 80.0,
+      "scenario": "modest_1",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": [
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback"
+      ]
+    },
+    {
+      "reserve": 80.0,
+      "scenario": "modest_2",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": [
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback"
+      ]
+    },
+    {
+      "reserve": 80.0,
+      "scenario": "modest_3",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": [
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback"
+      ]
+    },
+    {
+      "reserve": 80.0,
+      "scenario": "modest_4",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": [
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback"
+      ]
+    },
+    {
+      "reserve": 80.0,
+      "scenario": "hard_5",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 80.0,
+      "scenario": "hard_6",
+      "baseline_capture": false,
+      "feedback_capture": false,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": [
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback"
+      ]
+    },
+    {
+      "reserve": 80.0,
+      "scenario": "hard_7",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 80.0,
+      "scenario": "hard_8",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 80.0,
+      "scenario": "extreme_9",
+      "baseline_capture": false,
+      "feedback_capture": false,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": [
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback"
+      ]
+    },
+    {
+      "reserve": 80.0,
+      "scenario": "uncertain_nav",
+      "baseline_capture": false,
+      "feedback_capture": false,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": [
+        "preserve_fuel_navigation_uncertain",
+        "preserve_fuel_navigation_uncertain",
+        "preserve_fuel_navigation_uncertain",
+        "preserve_fuel_navigation_uncertain",
+        "preserve_fuel_navigation_uncertain",
+        "preserve_fuel_navigation_uncertain"
+      ]
+    },
+    {
+      "reserve": 80.0,
+      "scenario": "extreme_11",
+      "baseline_capture": false,
+      "feedback_capture": false,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": [
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback",
+        "infeasible_development_coast_fallback"
+      ]
+    },
+    {
+      "reserve": 110.0,
+      "scenario": "nominal",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 110.0,
+      "scenario": "modest_1",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 110.0,
+      "scenario": "modest_2",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 110.0,
+      "scenario": "modest_3",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 110.0,
+      "scenario": "modest_4",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 110.0,
+      "scenario": "hard_5",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 110.0,
+      "scenario": "hard_6",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 110.0,
+      "scenario": "hard_7",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 110.0,
+      "scenario": "hard_8",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 110.0,
+      "scenario": "extreme_9",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 110.0,
+      "scenario": "uncertain_nav",
+      "baseline_capture": false,
+      "feedback_capture": false,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    },
+    {
+      "reserve": 110.0,
+      "scenario": "extreme_11",
+      "baseline_capture": true,
+      "feedback_capture": true,
+      "time_delta_days": 0.0,
+      "propellant_delta_kg": 0.0,
+      "correction_dv": 0.0,
+      "decisions": []
+    }
+  ]
+}

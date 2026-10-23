@@ -1,0 +1,240 @@
+{
+  "revision": 5,
+  "scenarios": [
+    {
+      "name": "validation_21",
+      "seed": 21,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_22",
+      "seed": 22,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_23",
+      "seed": 23,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_24",
+      "seed": 24,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_25",
+      "seed": 25,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_26",
+      "seed": 26,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_27",
+      "seed": 27,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_28",
+      "seed": 28,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_29",
+      "seed": 29,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_30",
+      "seed": 30,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_31",
+      "seed": 31,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_32",
+      "seed": 32,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_33",
+      "seed": 33,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_34",
+      "seed": 34,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_35",
+      "seed": 35,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "validation_36",
+      "seed": 36,
+      "velocity_bound": 150,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.8,
+      "observation_days": 60
+    },
+    {
+      "name": "cruise_stress_41",
+      "seed": 41,
+      "velocity_bound": 250,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.6,
+      "observation_days": 30
+    },
+    {
+      "name": "cruise_stress_42",
+      "seed": 42,
+      "velocity_bound": 250,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.6,
+      "observation_days": 30
+    },
+    {
+      "name": "cruise_stress_43",
+      "seed": 43,
+      "velocity_bound": 250,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.6,
+      "observation_days": 30
+    },
+    {
+      "name": "cruise_stress_44",
+      "seed": 44,
+      "velocity_bound": 250,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.6,
+      "observation_days": 30
+    },
+    {
+      "name": "cruise_stress_45",
+      "seed": 45,
+      "velocity_bound": 250,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.6,
+      "observation_days": 30
+    },
+    {
+      "name": "cruise_stress_46",
+      "seed": 46,
+      "velocity_bound": 250,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.6,
+      "observation_days": 30
+    },
+    {
+      "name": "cruise_stress_47",
+      "seed": 47,
+      "velocity_bound": 250,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.6,
+      "observation_days": 30
+    },
+    {
+      "name": "cruise_stress_48",
+      "seed": 48,
+      "velocity_bound": 250,
+      "nav_velocity_bound": 0.5,
+      "nav_position_bound": 500000.0,
+      "thrust_scale": 0.6,
+      "observation_days": 30
+    }
+  ],
+  "reserve_pairs": [
+    [
+      110.0,
+      80
+    ]
+  ],
+  "implementation_sha256": "ea10e93f8e1ae1a6c5c02d6edc5289eae32c0719ba3a104b946b1922c8572ad6",
+  "deadline_contract": "1100 days",
+  "closed_loop_contingency_kg": 30,
+  "arrival_delay_trigger_days": 30,
+  "fixed_departure_ablation": true,
+  "delivered_error_epoch_days": 120,
+  "deadline_days": 1100,
+  "correction_limit_mps": 120,
+  "max_corrections": 3,
+  "capture_forecast_buffer_kg": 2,
+  "velocity_residual_margin_mps": 1,
+  "navigation_confidence_limit_mps": 2,
+  "model": "2D two-body variable mass; development-only; no frozen Final Veto authority"
+}

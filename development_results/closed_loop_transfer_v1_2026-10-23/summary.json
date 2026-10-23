@@ -1,0 +1,52 @@
+{
+  "protected_before": {
+    "sha256": "ad532df0291e04b73a96bdf3bce6ff1354ddd55dedf5ee1d1453825244319c0c",
+    "file_count": 773
+  },
+  "protected_after": {
+    "sha256": "ad532df0291e04b73a96bdf3bce6ff1354ddd55dedf5ee1d1453825244319c0c",
+    "file_count": 773
+  },
+  "runtime_seconds": 34.75,
+  "runs": 48,
+  "paired_scenarios": 24,
+  "source_head": "39d3766f153bce12932fb3291db0746b5f604703",
+  "groups": [
+    {
+      "planning_reserve_kg": 80.0,
+      "feedback": false,
+      "n": 12,
+      "capture_count": 8,
+      "survival_count": 8,
+      "reserve_violations": 0,
+      "worst_eccentricity": 0.040905126218640196
+    },
+    {
+      "planning_reserve_kg": 80.0,
+      "feedback": true,
+      "n": 12,
+      "capture_count": 8,
+      "survival_count": 8,
+      "reserve_violations": 0,
+      "worst_eccentricity": 0.040905126218640196
+    },
+    {
+      "planning_reserve_kg": 110.0,
+      "feedback": false,
+      "n": 12,
+      "capture_count": 11,
+      "survival_count": 11,
+      "reserve_violations": 0,
+      "worst_eccentricity": 0.001634853133853657
+    },
+    {
+      "planning_reserve_kg": 110.0,
+      "feedback": true,
+      "n": 12,
+      "capture_count": 11,
+      "survival_count": 11,
+      "reserve_violations": 0,
+      "worst_eccentricity": 0.001634853133853657
+    }
+  ]
+}

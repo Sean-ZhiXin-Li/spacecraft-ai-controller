@@ -1,0 +1,9 @@
+{
+  "configuration.json": "6879e9d1db31fff59cee83d9edee1100339cf59e164439f066ab3e43cfdd2eff",
+  "implementation_snapshot.py": "ea10e93f8e1ae1a6c5c02d6edc5289eae32c0719ba3a104b946b1922c8572ad6",
+  "paired_comparison.json": "95799ad06950c8edfba8c47179323b0a5798b50ed5ba1930b180f52e65e03fac",
+  "paired_validation.png": "364e02ba23aa19529589c9b55c15d08489d82f56fa429e749bef5e2e11a685fe",
+  "runs.jsonl": "b7a19a0a09ab64413419ff93a0c8d791bf8dc75b2f455cecd4ae54e72aa33e21",
+  "sprint_comparison.json": "313b81e88754598788e10b9c681dc9c6ee1993c82e99635be8702147ec348960",
+  "summary.json": "1dabcb24706d23408943cb59da8c4cf0eb9432955dc3dadbd5679d17e1168c5e"
+}
