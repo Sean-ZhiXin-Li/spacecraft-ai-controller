@@ -1,256 +1,115 @@
-# AI-Controlled Spacecraft Orbital Simulator
+# Spacecraft AI Controller
 
-This repository is a 2D physics-based orbital control sandbox for studying orbit-insertion control under thrust limits. It began as a comparison between PPO policies, probe baselines, and explicit controllers, then evolved into an explicit controller research platform for understanding when a trajectory is actually recoverable.
+A research sandbox for **recoverable orbital insertion in simplified 2D dynamics**. I study how trajectory planning, state estimation and explicit feedback control turn a target-radius crossing into a near-circular state that survives the declared simulation checks. The latest work adds fuel-constrained transfer search and fault-aware navigation. This is simulation research, with separate historical and development models; it is not flight-qualified spacecraft GNC.
 
-The current research conclusion is:
+**Evidence snapshot:** October 23, 2026 · [source commit `ff4d062`](https://github.com/Sean-ZhiXin-Li/spacecraft-ai-controller/commit/ff4d06229016511d38bba2c432b990e0c38be001) · documentation audited November 2026.
 
-> First crossing is not orbital insertion.
+[Current evidence](#current-evidence) · [Methods](#how-the-current-prototype-works) · [Research evolution](#research-evolution) · [Reproduce](#reproduce-and-check) · [Limitations](#limitations-and-open-questions) · [Long-term vision](#long-term-vision)
 
-Successful insertion in this sandbox requires:
+![Matched outward and bidirectional planners on all 24 holdout starts, showing capture plus sampled survival or no plan against initial radius ratio and radial velocity.](development_results/multiregime_transfer_2026-10-23_holdout/comparison.png)
 
-```text
-crossing -> post-cross smooth synchronization -> recoverability basin -> survival
-```
+*Existing, data-backed holdout figure: the same 24 starting states, a shared 4,400-day deadline, 110 kg planning reserve and 80 kg operational reserve. Each marker is one task; crosses are retained no-plan cases. This shows coverage of the tested geometry, not trajectories or a general success probability. [Raw records](development_results/multiregime_transfer_2026-10-23_holdout/runs.jsonl) · [Configuration](development_results/multiregime_transfer_2026-10-23_holdout/configuration.json) · [Provenance and media audit](docs/readme_evidence.md#media-audit)*
 
-Phase34 is the fixed terminal/post-cross controller result. It does not solve the entire orbital insertion problem, and it is not a real spacecraft controller. It shows that, for trajectory families that already produce a target-radius crossing, adding a post-cross synchronization mode can convert those crossings into recoverable cases. Phase36B/36C showed that the remaining bottleneck is upstream crossing-generation. Phase37A tested radial commitment timing and bounded radial magnitude, but created no new crossings on the baseline non-crossing cases. Phase37B then tested a narrow weak tangential-shaping diagnostic; it created no new selected-case crossings and failed regression preservation.
+## Current evidence
 
-## Demo & Visual Overview
+The October studies are **explicit, model-based development prototypes**, not learned policies. Each row has its own matched comparison; counts across rows must not be pooled. Capture and sampled survival are simulator-specific labels.
 
-The fastest way to understand this repository is to inspect the insertion event directly. The demo below shows a simulator-successful explicit-controller sandbox insertion sequence. It is control-architecture evidence from a 2D simulator, not flight validation.
+| Study | Matched reference → new method | What the recorded experiment establishes |
+|---|---|---|
+| [Bidirectional transfer](project_log/2026-10-23_multiregime_transfer_planning.md) | **11/24 → 24/24** capture and sampled survival | Matched outward-only vs inward/outward intersection prediction, with shared search, resources and 4,400-day horizon. Seeds 1201–1224; 12 interior and 12 exterior starts. |
+| [Asynchronous faults v4](project_log/2026-10-23_asynchronous_fault_dev_v4.md) | **14/30 → 30/30** capture on actually exposed conditions | Quarantining contaminated coast fits improves terminal estimation. Full set: 20/36 → 36/36; six pairs completed before fault onset. Twelve seeds, three related fault classes per seed. |
+| [Position-confirmed diagnosis v3](project_log/2026-10-23_fault_aware_transfer_dev_v3.md) | **12/36 → 36/36** capture | Position evidence separates sensor jumps from physical impulses after a delay under the tested synchronous fault model. Twelve seeds × three conditions; all improved captures pass sampled survival. |
+| [Bias-rate estimation v2](project_log/2026-10-23_position_aided_capture_dev_v2.md) | **8/24 → 24/24** capture and sampled survival | Static-bias estimate vs temporal bias-rate tracking on twelve unseen seeds × two drift rates. Shared two-body model and exact mass telemetry remain assumptions. |
+| [Fuel-aware control v1, revision 5](development_results/closed_loop_transfer_v1_2026-10-23_revision5/summary.json) | **22/24 → 22/24** capture and sampled survival | The stronger fixed-departure comparison finds no capture-rate gain from feedback. Fuel-limited cases 43/44 remain unresolved. Earlier revision-3 gains also changed departure planning/reserve use. |
 
-Verified demo summary:
+**Negative evidence is part of the result.** At the original 1,100-day deadline, all three multiregime planners returned no plan on all eight development tasks and executed no mission trajectories. Extending the deadline to 4,400 days was a **new comparison contract**: bidirectional capture was 7/8 in development and 24/24 on the separate holdout. Development seed 1104 still returns no plan at 4,400 days. A longer-deadline diagnostic candidate was not executed or counted as success. `no_plan` means this finite search found no candidate; it does not prove physical infeasibility.
 
-- success: `true`
-- radius crossings: `1`
-- first crossing step: `48,269`
-- final radius error: `27,657.63 m`
-- phase transitions: `DESCENT -> CAPTURE`, `CAPTURE -> LOCK`
+The historical legacy planner achieved 1/24 on the new holdout, but retains an internal 2,000-day prediction cutoff and different search details. **11/24 matched outward vs 24/24 bidirectional is the primary geometry comparison.** Eleven common captures have essentially unchanged execution outcomes; the demonstrated gain is expanded coverage, not a faster controller or improved execution on already supported arcs.
 
-### Primary Insertion Event
+For the fault studies, multiple conditions share a seed and are not independent trials. Neither v3 nor v4 needed a cruise correction in its final holdout: these gains support estimator recovery and evidence handling, not a demonstrated holdout replanning advantage. Full configurations, negative runs, source snapshots and quantitative caveats are linked in the [evidence guide](docs/readme_evidence.md).
 
-![Primary insertion event](analysis/demo/orbit_demo_trajectory.png)
+## How the current prototype works
 
-### Dynamic Zoomed Insertion Window
+The October development track uses solar two-body gravity and Cartesian state `[x, y, vx, vy, mass]`. The nominal target radius is `7.5e12 m`; wet/dry masses are 722/300 kg. A constrained, finite multi-start optimizer searches departure radial/tangential impulses and predicts target-radius intersections. Independent finite-duration burns replay departure and capture with variable mass, nominal 2,000 N thrust and measurement-based guidance.
 
-![Zoomed insertion GIF](analysis/demo/orbit_demo_zoom.gif)
-
-### Full Trajectory Reference
-
-![Full trajectory reference](analysis/demo/orbit_demo_full.png)
-
-## Visual Interpretation
-
-These visuals represent the core control-science distinction explored throughout this project:
-
-- Crossing target radius is not equivalent to orbital insertion.
-- A trajectory may visually "reach" the orbit but still fail recoverability.
-- The important structure is:
+The latest planner considers future inward and outward elliptic intersections. Navigation variants estimate velocity bias from position evolution, retain useful drift information after a detected jump, and exclude a suspect coast interval from bias history until clean position evidence is available. Injected fault labels and true state belong to the plant/scoring side, not the estimator's inputs.
 
 ```text
-crossing -> post-cross correction -> recoverability -> CAPTURE -> LOCK
+measurement → state/bias estimate → constrained transfer prediction/search
+            → finite-burn guidance → simulated plant → new measurement
+                                           ↓
+                              separate truth-based evaluation
 ```
 
-Interpretation of the simulator labels:
+In the latest multiregime experiment, capture requires converged guidance, eccentricity `< 0.001`, relative radius error `≤ 0.0025`, and completion within the declared deadline. Survival checks relative radius error at 101 samples over the following 100 unpowered days. These sampled checks are not a continuous-time safety proof. Earlier v2–v4 implementations use the same geometry/guidance thresholds but do not enforce the deadline in the final capture predicate; their recorded successful runs finish before 1,100 days. See the [exact contracts](docs/readme_evidence.md#model-and-evaluation-boundaries).
 
-- Crossing: a geometric event where the trajectory crosses the target radius.
-- Recoverability: dynamic viability, where radius, radial velocity, and tangential velocity can be brought into a survivable basin.
-- CAPTURE: the simulator insertion regime has been entered.
-- LOCK: the simulator stabilized regime has been entered.
+## Research evolution
 
-What to look for in weaker architectures such as PPO and early heuristics:
+**First crossing is not orbital insertion.** A geometric crossing can still carry radial and tangential errors that the available controller cannot recover. This timeline follows the research sequence; the phase labels are historical experiment families, not increasing levels of flight readiness.
 
-- radius approach without stable insertion
-- one-sided drift
-- unstable or non-recoverable crossing
+| Research step | What changed or remained unresolved | Representative evidence |
+|---|---|---|
+| Early PPO → imitation learning | The tested policies did not reproduce the explicit controller's useful phase structure. This is a negative result for those experiments, not a general limit of RL. | [Transfer results](analysis/ppo_transfer_results.md) |
+| Phases 31–34 → post-cross synchronization | SciPy direct shooting exposed a useful motif, then an explicit controller implemented it. In 24 reduced-grid cases, recoverable crossings changed **0 → 8**; both arms still had eight crossings and eight simulator success labels. | [Structure extraction](analysis/phase33_optimal_structure_extraction/structure_decomposition.md) · [Phase34 comparison](analysis/phase34_post_cross_sync/phase34_vs_phase31_comparison.md) |
+| Phases 36–37 → upstream geometry | Tested transfer families and local perturbations did not resolve the historical noncrossing cases. Phase37B also failed preservation checks. | [Noncrossing diagnosis](analysis/phase36c_non_crossing_geometry_diagnosis/summary.md) · [Negative-result postmortem](project_log/phase37b_weak_tangential_postmortem.md) |
+| July 2026 → Final Veto | Preserved 8/8 known cases; stress-set overspeed **5/5 → 0/5**, but task recovery **0/5**. Stress runs ended at the step limit: hazard avoidance did not supply recovery. | [Frozen summary](analysis/final_veto_ablation_v0/summary.md) · [Interpretation](docs/reports/final_veto_v0_interpretation.md) |
+| August–September → assurance audits | No eligible active-intervention boundary under frozen qualification. Euler/DOP853 overspeed classifications agreed on **14/14 one-step proposals**; this is local numerical evidence, not active authority or global validation. | [Eligibility verdict](analysis/stage2a_q1_e_eligibility_audit_v0/summary.md) · [Numerical check](analysis/stage2b_numerical_validation_v0/summary.md) |
+| October → fuel, estimation and transfer geometry | Fuel/time constraints, measurement bias, fault diagnosis and bidirectional search address reachability in a **separate variable-mass model**. These explicit methods do not rerun Phase34 or inherit its Final Veto authority. | [Current evidence](#current-evidence) · [Transfer research log](project_log/2026-10-23_multiregime_transfer_planning.md) |
 
-What to look for in stronger architectures such as Phase34 post-cross synchronization:
+The assurance audits' “Stage 2” labels are separate from the five-stage long-term roadmap below.
 
-- crossing-producing transfer
-- smooth post-cross correction
-- radius, radial-velocity, and tangential-velocity synchronization
-- recoverable trajectory family
+The older [insertion-event image](analysis/demo/orbit_demo_trajectory.png) and [zoomed GIF](analysis/demo/orbit_demo_zoom.gif) remain available as historical illustrations. Their [demo configuration](analysis/demo/orbit_demo_summary.json) uses a very near-target start and `thrust_scale=10000`; they do not represent the latest fuel-constrained experiments or realistic propulsion performance.
 
-## Why This Matters
+## Reproduce and check
 
-This repository is not primarily about making a spacecraft touch a target orbit.
+Run from the repository root. The October research modules need Python 3.10+, NumPy and SciPy; Matplotlib is used for reports. A small environment for the numerical tests is:
 
-It is about understanding:
-
-> What control architecture converts geometric success into dynamically survivable insertion?
-
-The visuals above should be interpreted as control-architecture evidence, not flight-readiness evidence.
-
-## Project Overview
-
-The project tests control architectures in a simplified planar orbital environment. The environment tracks radius, radial velocity, tangential velocity, thrust-limited control, target-radius crossing, CAPTURE, LOCK, and simulator-defined survival criteria.
-
-The main controller families explored so far are:
-
-- PPO and imitation-learning policies
-- probe and heuristic descent baselines
-- staged explicit controllers with named control phases
-- global transfer templates and Burn-A/B variants
-- direct optimal-control prototypes
-- post-cross synchronization controllers
-
-Earlier README versions emphasized Phase7.6 because it was the strongest local explicit-controller milestone. Later phases changed the scientific framing. The central question is no longer only whether a controller can reach or cross the target radius. The current question is whether the resulting state enters a recoverability basin where radius, radial velocity, and tangential velocity can be jointly stabilized.
-
-## Research Question
-
-Can a thrust-limited controller perform orbital insertion in a 2D simulator by producing not just a target-radius crossing, but a recoverable post-cross state?
-
-More concretely, the project asks:
-
-- Which trajectory families produce target-radius crossings?
-- Which crossings are inside or near the recoverability basin?
-- Why do window creation, crossing count, and CAPTURE entry fail as standalone success metrics?
-- What controller architecture is needed after the first crossing?
-- Can explicit controllers approximate the useful structure found by optimal control?
-
-The working definition of recoverability is stricter than radius crossing. A recoverable state must bring these quantities into simultaneous alignment:
-
-```text
-radius near target
-radial velocity near zero
-tangential velocity near circular
+```bash
+python -m venv .venv
+# Activate .venv using your shell's standard command.
+python -m pip install numpy scipy matplotlib
+python -m unittest -q Tests.test_closed_loop_transfer_dev_v1 Tests.test_estimated_capture_dev_v2 Tests.test_fault_aware_transfer_dev_v3 Tests.test_asynchronous_fault_dev_v4 Tests.test_multiregime_transfer_research
+python scripts/check_phase_results.py
 ```
 
-## Key Discovery
+**Byte-level evidence checks depend on checkout line endings.** Historical manifests retain original bytes: Python snapshots use LF, while several JSON/JSONL records use CRLF. A normal checkout can therefore fail hash assertions despite identical parsed content. The [evidence guide](docs/readme_evidence.md#checkout-line-endings) documents the tested Windows preparation and verification boundary. Do not regenerate hash manifests to hide a mismatch.
 
-The main discovery is that first crossing is not insertion.
+The fuller, Linux-first environment definition includes the historical simulator and learning dependencies:
 
-Many controllers can be tuned to create windows or crossings, but the first crossing state can still be dynamically unrecoverable. Phase33 showed this clearly by decomposing the best Phase32 optimal-control trajectory:
+```bash
+conda env create -f conda_envs/spacecraft_linux.yml
+conda activate spacecraft_linux
+export MPLBACKEND=Agg
+python -m pytest -q Tests/test_env_smoke.py Tests/test_quickrun_smoke.py
+```
 
-- first target-radius crossing occurred early
-- the first crossing state was still outside the recoverability basin
-- the best recoverable state occurred much later
-- the missing behavior was a smooth low-thrust post-cross synchronization arc
+The test commands were exercised in the audit's existing Windows environment; a fresh Linux/Conda solve was not revalidated. See the [Linux migration guide](docs/linux_migration.md) for setup scope. `environment.yml` remains a minimal legacy environment, not the full current research dependency set.
 
-This changed the project from crossing-targeting to recoverability research. The important event is not simply touching the target radius. The important sequence is crossing, then continuous synchronization of radius, radial velocity, and tangential velocity until the trajectory enters the recoverability basin and survives.
+The research entry points are inspectable without launching full sweeps:
 
-## Architecture Evolution
+```bash
+python -m scripts.multiregime_transfer_research --help
+python -m scripts.asynchronous_fault_dev_v4 --help
+```
 
-The project's development path can be read as a sequence of increasingly specific hypotheses about the bottleneck.
+Numerical experiment CLIs deliberately refuse existing output directories. Use the tests for small replay checks; a full historical rerun requires a disposable checkout with the corresponding output directory absent and the appropriate saved implementation. Reporting scripts may write frozen reports or launch diagnostics, so they are not read-only validators. The [evidence guide](docs/readme_evidence.md#reproduction-boundary) lists the relevant entry points without instructing you to overwrite checked-in evidence.
 
-Early PPO and baseline experiments tested whether a learned reactive policy could solve insertion directly. In the validated comparisons, PPO did not reliably reach the first crossing. Behavior cloning and short PPO fine-tuning from explicit-controller data also failed to recover the explicit phase structure. This suggested that the problem was not just reward tuning or model capacity; it had an architecture-level bottleneck.
+## Limitations and open questions
 
-Phase6.5 through Phase7.6 established that explicit phase structure matters in the local reachable regime. The best Phase7.6 controller, `soft_linear_3e4`, used coordinated pre-window shaping, window-seeking, CAPTURE, and LOCK behavior and reached `217 / 270` strict simulator success labels on its local 2D grid. That was a strong local milestone, but Phase8 and later phases showed that it did not solve global reachability.
+- **Model scope:** planar, central two-body gravity; no validated 3D attitude/orbit coupling, ephemeris-driven multibody dynamics or real flight operations. The solar-scale target and long coast times are research parameters, not an operational mission design.
+- **Search scope:** a restricted departure/coast/capture family with finite-burn replay, not a global optimum, rendezvous solution, general low-thrust planner or global feasibility certificate. Hyperbolic, retrograde, circular/tangent-intersection and many other cases are unsupported by the latest predictor.
+- **Evidence scope:** small, declared task distributions and selected development cases. Changing deadline, reserve, observation model or initial-state distribution changes the question; success rates cannot be compared causally across contracts.
+- **Navigation scope:** estimator and plant share a two-body coast model, mass is known, and fault gates are engineering conventions. Sustained unknown acceleration, consecutive contaminated intervals, position-sensor faults and nonlinear drift remain unvalidated. Slow confirmation can consume mission time and resources.
+- **Authority and safety:** simulator capture, sampled survival and observed reserve compliance are distinct measurements. No formal safety, hardware validation, arbitrary-fault tolerance or deployment readiness follows. The development departure-speed constraint is not the frozen Final Veto monitor.
 
-Phases15 through Phase19 tested local and semi-planned fixes: oscillation forcing, trajectory tracking, elliptical transfer targets, crossing-state targeting, and minimal burn/coast planning. These variants clarified failure modes but did not expand recoverability. The lesson was that local heuristics cannot solve a global reachability and phasing problem.
-
-Phases28 through Phase31 moved from controller tuning to trajectory-family analysis. They separated dead windows, window-no-crossing cases, crossing-bad-sync cases, and near-recoverable crossings. Burn-A family selection, endpoint search, and named global transfer families changed geometry but did not create recoverable crossings.
-
-Phase32 introduced a finite-horizon direct optimal-control prototype. CasADi/IPOPT was not available in the checked runtime, so this phase used SciPy direct shooting rather than full CasADi/IPOPT direct collocation. Even as a coarse prototype, it showed that recoverable states were physically reachable under the unchanged 2D dynamics.
-
-Phase33 extracted the structure of the best Phase32 trajectory. The key mechanism was not a better first crossing. It was post-cross smooth synchronization.
-
-Phase34 then tested that extracted structure as an explicit controller modification.
-
-## Phase34 Architecture Result
-
-Phase34 preserved the Phase22/31-style early transfer behavior and inserted a post-cross synchronization mode after the first target-radius crossing. Physics, reward, thresholds, CAPTURE, and LOCK rules were not relaxed.
-
-The Phase34 result is narrow but important:
-
-- it is a post-cross architecture test built on Phase22/31-style early transfer behavior
-- it should be judged on crossing-producing cases
-- it does not solve non-crossing trajectory families
-- it does not prove full end-to-end universal insertion
-
-On the reduced Phase34 comparison, the baseline Phase31-style mode produced crossings but no recoverable crossings. The best Phase34 mode, `radius_priority`, converted every crossing-producing case in that benchmark into a recoverable case and a simulator-defined success label.
-
-The quantitative headline is:
-
-| Metric | Phase31-style baseline | Phase34 best mode |
-|---|---:|---:|
-| Cases | 24 | 24 |
-| Crossings | 8 | 8 |
-| Recoverable crossings | 0 | 8 |
-| Simulator success label | 8 | 8 |
-| Crossing-case best distance | 3.9923 | 0.9855 |
-| Overspeed | 0 | 0 |
-
-“Success” here refers to the simulator-defined success label, not real spacecraft mission success.
-
-Important interpretation: in Phase34, "recoverable crossing" means a trajectory crossed and later reached a recoverable state during the post-cross synchronization arc. It does not mean the first crossing state itself was already recoverable.
-
-Primary Phase34 artifacts:
-
-- [Phase34 summary](analysis/phase34_post_cross_sync/summary.md)
-- [Phase34 vs Phase31 comparison](analysis/phase34_post_cross_sync/phase34_vs_phase31_comparison.md)
-- [Phase34 results CSV](analysis/phase34_post_cross_sync/phase34_results.csv)
-- [Mode comparison plot](analysis/phase34_post_cross_sync/mode_comparison.png)
-- [Post-cross sync examples](analysis/phase34_post_cross_sync/post_cross_sync_examples.png)
-- [Phase31 vs Phase34 overlay](analysis/phase34_post_cross_sync/phase31_vs_phase34_overlay.png)
-
-## Results Summary
-
-The strongest current evidence is the progression from Phase31 to Phase34:
-
-- Phase31 and related transfer architectures could produce crossings, but produced `0` recoverable crossings.
-- Phase32 showed, with SciPy direct shooting, that recoverable states were reachable under the same physics.
-- Phase33 identified the missing controller motif: a smooth post-cross synchronization arc.
-- Phase34 implemented that motif in an explicit controller and improved crossing-producing cases from `8` crossings / `0` recoverable crossings to `8` crossings / `8` recoverable crossings.
-
-The project's strongest current claim is therefore architecture-level, not deployment-level:
-
-> In this 2D sandbox, crossing-producing trajectories require post-cross synchronization before they can be treated as recoverable orbital insertion attempts.
-
-What is supported:
-
-- PPO did not solve the validated crossing/insertion task in the current evidence trail.
-- Simple heuristic crossing control and named transfer templates were insufficient.
-- Direct optimal control exposed recoverability as physically reachable in representative cases.
-- Phase34's explicit post-cross synchronization closes the recoverability gap for crossing-producing cases in its reduced benchmark.
-
-What is not supported:
-
-- full orbital autonomy
-- real spacecraft readiness
-- universal success across all initial conditions
-- solving non-crossing trajectory families
-- claiming that the first crossing state is already insertion
-
-## Current Limitations
-
-This is a simulation project in a simplified 2D orbital environment. It is useful for studying control structure, but it is not a validated spacecraft guidance, navigation, and control system.
-
-Current limitations:
-
-- Phase34 only solves crossing-producing cases in the tested reduced benchmark.
-- Non-crossing trajectory families remain unsolved.
-- Phase34 improves crossing-case best distance, but all-case mean distance is still dominated by non-crossing families.
-- The controller is hand-built and explicit; it is not a learned universal policy.
-- Phase32 used SciPy direct shooting because CasADi/IPOPT was unavailable in the checked runtime.
-- CAPTURE, LOCK, and success criteria are simulator-specific and should not be interpreted as flight-readiness metrics.
-- The environment is planar and simplified; it does not include full 3D orbital mechanics, real navigation uncertainty, actuator constraints, or operational safety validation.
-
-## Current Research Milestone (July 2026)
-
-Final Veto Overspeed Ablation v0 is complete and frozen.
-
-The paired simulator experiment evaluated eight known Phase34 recoverable preservation cases and five diagnostic overspeed stress cases. Monitor-on preserved crossing, recoverable crossing, and simulator-defined success in all `8 / 8` preservation cases. On the stress set, overspeed changed from `5 / 5` with monitor-off to `0 / 5` with monitor-on.
-
-The key finding is deliberately narrower than task success:
-
-> A lightweight one-step predictive veto prevented the tested overspeed outcomes while preserving known recoverable trajectories, but veto-only intervention achieved `0 / 5` task recovery on the stress cases.
-
-All five stress outcomes changed from `overspeed` to `max_steps`. The experiment therefore demonstrates bounded simulator hazard avoidance, not a recovery policy, formal safety, or deployment readiness.
-
-## Next Research Direction
-
-The next research question is recovery-aware intervention:
-
-> After rejecting a hazardous nominal action, how should the system choose among continuing, adjusting, recovering, retreating, entering safe mode, or terminating?
-
-Near-term work should define recovery actions, recovery margin, recovery cost, trust evidence, and multi-horizon prediction before adding a broad Decision Manager or another controller search.
+Immediate questions are mission-level time/resource negotiation across feasible arcs, trustworthy estimation without a clean coast interval, and recovery actions with measured costs and authority boundaries. A learned warm start or feasibility model would be useful only if tested on disjoint trajectory tasks against the explicit optimizer with equal information and constraints.
 
 ## Long-Term Vision
 
 > Note: The following stages represent the author's personal vision and conceptual horizon for future research. 
 > They are not validated results or claims about current experiments.
 
-This repository is currently a 2D orbital insertion research sandbox, but its long-term purpose is broader: to build staged control-architecture foundations for increasingly realistic spacecraft autonomy across complex space environments. The durable contribution is not any single algorithm, PPO checkpoint, heuristic controller, or phase script. Algorithmic obsolescence is expected. Architecture principles are the durable contribution: survival over optimization, explicit failure recognition, and control logic that can refuse false progress.
+This repository is currently a 2D orbital insertion research sandbox, but its long-term purpose is broader: to build staged control-architecture foundations for increasingly realistic spacecraft autonomy across complex space environments. The durable contribution is not any single algorithm, PPO checkpoint, heuristic controller, or phase script. Algorithmic obsolescence is expected. The architectural ideas this project aims to develop are survival over optimization, explicit failure recognition, and control logic that can refuse false progress. Their transfer to realistic missions remains a research question.
 
 Future scaling is not just "a bigger orbit." It is a progression from a single clean orbit into chaotic environments, partially modeled physics, degraded information, deep uncertainty, and expanding mission complexity. The path is:
 
@@ -258,29 +117,31 @@ Future scaling is not just "a bigger orbit." It is a progression from a single c
 single clean orbit -> real spacecraft -> real space -> system-level autonomy
 ```
 
-### Stage 1 — Current Foundation (Present)
+### Stage 1 — Current Foundation · Empirical 2D Research
 
 The current project establishes the first layer of control-science primitives in a 2D Newtonian orbital sandbox. It compares PPO, imitation, probe baselines, and explicit controller families under the same simplified physics, then uses failures to identify architecture bottlenecks. The emphasis is control-science over benchmark chasing.
 
 The key present-stage results are:
 
-- PPO and direct heuristic crossing control are insufficient in the validated task trail.
+- The tested PPO and direct heuristic variants did not resolve the insertion task in the historical evidence trail; this does not establish a general limit of learning-based control.
 - First crossing is not insertion.
-- Recoverability requires crossing, post-cross synchronization, recoverability basin entry, and survival.
+- The historical research sequence distinguishes crossing, post-cross synchronization, empirical recoverability-basin entry, and simulator-defined survival; sampled recoverability is not a proven invariant set.
 - The recoverability basin is a joint condition on radius, radial velocity, and tangential velocity.
 - Phase34 shows that post-cross synchronization can convert crossing-producing cases into recoverable cases.
 
+The October development track adds fuel/time-constrained planning, measurement-based bias estimation, delayed fault diagnosis, contaminated-interval quarantine, and bidirectional transfer search. These use a separate variable-mass model and do not replace the frozen Phase34 results.
+
 This stage establishes control logic primitives, not final spacecraft autonomy. Its value is in discovering the architecture-level distinction between touching a target orbit and entering a recoverable insertion regime.
 
-### Stage 2 — Simulation Realism Expansion (Near-Term)
+### Stage 2 — Simulation Realism Expansion · Next engineering direction
 
-The next engineering step is to move from sandbox controller science toward an engineering-grade astrodynamics autonomy platform. That requires expanding both simulation fidelity and software performance.
+The intended next engineering step is to move from sandbox controller science toward an engineering-grade astrodynamics autonomy platform. The items below are planned extensions unless explicitly identified as current prototypes; this is a dependency-based direction, not a delivery schedule. Simulation fidelity and software performance require separate validation.
 
 Core simulator upgrades:
 
-- C++ simulation core for rollout speed, larger sweeps, and long-horizon experiments
+- planned C++ simulation core for rollout speed, larger sweeps, and long-horizon experiments, with measured accuracy and performance against a shared reference model
 - 3D orbital mechanics
-- full state vectors covering position, velocity, and orientation
+- full state vectors covering position, velocity, orientation and angular velocity, with explicit frame/time/unit conventions
 - translational and rotational coupling
 - attitude dynamics and attitude-control authority
 - modular sensor and estimator models
@@ -291,7 +152,7 @@ Physics and environment realism:
 - atmospheric drag
 - solar radiation pressure
 - thrust degradation
-- mass depletion
+- mass depletion (already modeled in the separate 2D development track; integration into higher-fidelity GNC remains future work)
 - communication delay
 - sensor uncertainty
 
@@ -306,8 +167,7 @@ Orbital-domain expansion:
 Propulsion backend modularity:
 
 - chemical propulsion
-- ion propulsion
-- electric propulsion
+- electric propulsion, including ion propulsion
 - solar sail models
 - speculative future backend placeholders
 
@@ -318,13 +178,17 @@ Fault injection:
 - navigation corruption
 - partial subsystem loss
 
-The important design rule is that propulsion is a backend, not the identity of the autonomy architecture. Propulsion, communication, and materials limitations remain hard constraints. Better propulsion may compress mission time scales, but it does not remove the need for robust control architecture, uncertainty handling, or final veto power.
+Planned implementation work also includes embedded systems and flight-software interfaces, timing/resource budgets, software-in-the-loop and eventually hardware-in-the-loop checks. These are future verification steps, not current avionics or hardware validation. Numerical convergence and common-model comparisons should precede claims of increased realism.
 
-### Stage 3 — Complex Space Environment Architecture (Mid-Term)
+The October prototypes already include bounded navigation errors, thrust degradation and selected impulse faults in 2D. They do not establish general sensor/actuator fault tolerance or operational safety.
+
+The important design rule is that propulsion is a backend, not the identity of the autonomy architecture. Backend interfaces must preserve each propulsion model's power, mass-flow, actuation and trajectory constraints. Propulsion, communication, and materials limitations remain hard constraints. Better propulsion may compress mission time scales, but it does not remove the need for robust control architecture, uncertainty handling, or final veto power.
+
+### Stage 3 — Complex Space Environment Architecture · Research direction
 
 The mid-term research target is complex realistic universe-space conditions. The objective shifts from finding an optimal orbit to persistent operation in hostile, uncertain space.
 
-This stage introduces environments where clean single-body assumptions no longer dominate:
+This proposed stage introduces environments where clean single-body assumptions no longer dominate. It depends on verified multibody/ephemeris models, navigation assumptions and mission-specific resource/hazard models:
 
 - multi-body gravitational systems
 - Earth-Moon-Sun interactions
@@ -350,13 +214,13 @@ The autonomy architecture must therefore include:
 - survival-first autonomy when optimization becomes unsafe
 - final veto power: the ability to suspend or refuse an optimization path that has become dangerous
 
-At this stage, the Phase34 lesson remains relevant in a larger form. First crossing is not insertion becomes a general systems rule: reaching an intermediate milestone is not the same as entering a recoverable operational regime.
+Extending the Phase34 lesson to this scale is a hypothesis requiring new experiments. First crossing is not insertion becomes a general systems rule: reaching an intermediate milestone is not the same as entering a recoverable operational regime.
 
-### Stage 4 — Distributed Autonomous Space Systems (Advanced Mid/Far-Term)
+### Stage 4 — Distributed Autonomous Space Systems · Advanced research direction
 
 Advanced autonomy should not mean one centralized world model commanding many passive agents. Distributed execution ≠ distributed cognition.
 
-Distributed execution means many spacecraft carry out commands from a shared planner. Distributed cognition means different nodes maintain distinct hypotheses, risk tolerances, degradation strategies, and local interpretations of uncertain evidence. True distributed autonomy requires cognitive diversity, not just networked control.
+Distributed execution means many spacecraft carry out commands from a shared planner. Distributed cognition means different nodes maintain distinct hypotheses, risk tolerances, degradation strategies, and local interpretations of uncertain evidence. Here, cognitive diversity is an architectural hypothesis to investigate alongside networked control, not an established requirement or a demonstrated capability.
 
 This stage studies:
 
@@ -371,15 +235,15 @@ This stage studies:
 - swarm resilience
 - mission continuity under node loss
 
-The purpose of structured divergence is to avoid correlated failure. If every spacecraft trusts the same model in the same way, then every spacecraft can fail in the same direction at the same time. A resilient fleet should preserve disagreement, label uncertainty, and maintain multiple degradation pathways.
+The proposed purpose of structured divergence is to reduce correlated failure; diversity alone does not guarantee resilience. Validation would require explicit communication delays/dropouts, distributed estimation and planning, resource budgets, and matched tests of common-mode failures and node loss. If every spacecraft trusts the same model in the same way, then every spacecraft can fail in the same direction at the same time. A resilient fleet should preserve disagreement, label uncertainty, and maintain multiple degradation pathways.
 
 An orbital intelligence hub may aggregate data, compress plans, and relay mission updates, but it must also act as an auditor. It should detect model drift, policy invalidation, and confidence collapse. Its role is not only to plan, but to doubt planning when the environment leaves the assumed distribution.
 
-### Stage 5 — Concept Horizon (Far-Term)
+### Stage 5 — Concept Horizon · Long-term concept
 
 This stage is conceptual horizon planning, not current implementation.
 
-The far-term idea is to keep the autonomy architecture scalable under improved propulsion, communication, and materials assumptions. Future propulsion should be treated as backend substitution, not the core identity of the project. A chemical engine, electric thruster, ion drive, solar sail, or more speculative backend should plug into the same higher-level architecture: model uncertainty, recoverability reasoning, survival-first control, failure labeling, and final veto power.
+The far-term idea is to keep the autonomy architecture scalable under improved propulsion, communication, and materials assumptions. Future propulsion should be treated as backend substitution, not the core identity of the project. A chemical engine, electric thruster (including an ion drive), solar sail, or more speculative backend would need its own validated physical and operational interface to a shared higher-level architecture: model uncertainty, recoverability reasoning, survival-first control, failure labeling, and final veto power.
 
 Possible far-term research directions include:
 
@@ -394,129 +258,21 @@ This roadmap does not claim that the current repository solves real spacecraft a
 
 This repository is not the final spacecraft autonomy system. It is the control-architecture seed: a progressively expanding foundation from simplified orbital logic toward resilient autonomy in increasingly realistic and hostile space environments.
 
-## How to Run
-
-Recommended Linux-first environment:
-
-```bash
-git clone https://github.com/Sean-ZhiXin-Li/spacecraft-ai-controller.git
-cd spacecraft-ai-controller
-conda env create -f conda_envs/spacecraft_linux.yml
-conda activate spacecraft_linux
-export MPLBACKEND=Agg
-python -m pytest -q Tests/test_env_smoke.py Tests/test_quickrun_smoke.py
-python scripts/check_phase_results.py
-```
-
-Legacy/minimal environment:
-
-```bash
-conda env create -f environment.yml
-conda activate spacecraft
-```
-
-`environment.yml` is kept as a minimal legacy environment. The current Linux baseline is `conda_envs/spacecraft_linux.yml`. Add
-machine-specific CUDA support only after the smoke checks pass. See the
-[Linux migration guide](docs/linux_migration.md) for the full checklist,
-entry points, and known risks.
-
-Minimal manual setup, if not using Conda:
-
-```bash
-pip install numpy matplotlib torch pillow gymnasium scikit-learn
-```
-
-Generate the current demo assets:
-
-```bash
-python main.py
-```
-
-Equivalent direct demo command:
-
-```bash
-python scripts/generate_orbit_demo.py
-```
-
-Re-run the Phase34 post-cross synchronization benchmark:
-
-```bash
-python scripts/explicit_controller_phase34_post_cross_sync.py
-```
-
-Validate the protected result aggregates without rerunning experiments:
-
-```bash
-python scripts/check_phase_results.py
-```
-
-Re-run the supporting Phase31 to Phase33 research trail:
-
-```bash
-python scripts/explicit_controller_phase31_global_transfer_solver.py
-python scripts/phase32_direct_optimal_control.py
-python scripts/phase33_optimal_structure_extraction.py
-```
-
-Earlier local-controller milestones can be reproduced with:
-
-```bash
-python scripts/explicit_controller_phase76_soft_hybrid.py
-python scripts/explicit_controller_phase8_multiregime_map.py
-```
-
-The PPO and behavior-cloning transfer checks are available through:
-
-```bash
-python scripts/train_behavior_cloning.py
-python scripts/eval_bc_policy.py --policy-kind bc --checkpoint models/bc_policy.pth
-python scripts/eval_bc_policy.py --policy-kind ppo --checkpoint models/ppo_bc_finetuned.pth
-```
-
-## Repository Structure
+## Repository map and further reading
 
 ```text
-spacecraft_ai_project/
-|-- analysis/               # summaries, figures, benchmark outputs, datasets
-|-- controller/             # explicit, probe, PPO-related controllers
-|-- envs/                   # orbital environment and task definitions
-|-- models/                 # saved BC and PPO-transfer models
-|-- ppo_orbit/              # PPO implementation
-|-- project_log/            # sprint logs and phase narratives
-|-- scripts/                # evaluation, sweeps, plotting, demo generation
-|-- main.py                 # demo entry point
-`-- README.md
+analysis/              frozen historical evidence, diagnostics and demos
+development_results/   isolated fuel/estimation/fault/transfer experiments
+controller/, envs/     historical controllers and environments
+simulator/, runtime_assurance/  simulation and assurance infrastructure
+ppo_orbit/             learning baseline implementation
+scripts/, Tests/       experiment entry points and focused checks
+docs/, project_log/    contracts, architecture, audits and research history
+conda_envs/            environment definitions
 ```
 
-## Recommended Reading
+Start with the [evidence guide](docs/readme_evidence.md), [project-log index](docs/project_logs_index.md), [recoverability regression policy](docs/benchmarks/recoverability_regression_policy_v0.md), and [decision/runtime-assurance design](docs/architecture/decision_and_runtime_assurance.md). The [Phase7.6 summary](analysis/phase76_soft_hybrid/phase76_summary.md) and [Phase8–19 summary](analysis/phase8_to_19_research_summary.md) retain the earlier local-controller history.
 
-For the completed Final Veto milestone, read:
+## License and attribution
 
-1. [Final Veto v0 completion audit](docs/reports/final_veto_v0_completion_audit.md)
-2. [Final Veto v0 scientific interpretation](docs/reports/final_veto_v0_interpretation.md)
-3. [Frozen formal summary](analysis/final_veto_ablation_v0/summary.md)
-4. [Frozen comparison figure](analysis/final_veto_ablation_v0/comparison.png)
-5. [Recoverability regression policy](docs/benchmarks/recoverability_regression_policy_v0.md)
-6. [Decision and Runtime Assurance architecture](docs/architecture/decision_and_runtime_assurance.md)
-7. [Recoverability platform transition report](docs/reports/recoverability_platform_transition_report_v1.md)
-
-For the preceding phase trail:
-
-1. [Phase37B weak tangential postmortem](project_log/phase37b_weak_tangential_postmortem.md)
-2. [Phase37B weak tangential subset summary](analysis/phase37b_weak_tangential_subset/phase37b_summary.md)
-3. [Phase37A radial commitment timing summary](analysis/phase37a_radial_commit_timing/phase37a_summary.md)
-4. [Phase36B transfer-family benchmark](analysis/phase36b_transfer_family_benchmark/summary.md)
-5. [Phase36C non-crossing diagnosis](analysis/phase36c_non_crossing_geometry_diagnosis/summary.md)
-6. [Phase34 summary](analysis/phase34_post_cross_sync/summary.md)
-7. [Phase34 vs Phase31 comparison](analysis/phase34_post_cross_sync/phase34_vs_phase31_comparison.md)
-8. [Phase33 structure decomposition](analysis/phase33_optimal_structure_extraction/structure_decomposition.md)
-
-For older local-controller context:
-
-1. [Phase7.6 soft-hybrid summary](analysis/phase76_soft_hybrid/phase76_summary.md)
-2. [Phase8 multi-regime summary](analysis/phase8_multiregime/phase8_summary.md)
-3. [Phase8-19 research summary](analysis/phase8_to_19_research_summary.md)
-
-## License
-
-MIT License. See [LICENSE](LICENSE).
+MIT License; see [LICENSE](LICENSE). This is Sean (Zhixin Li)'s independent simulation research project. The repository preserves implementation snapshots, experimental records and negative results so that its claims can be inspected. External packages retain their respective licenses; using a package is not evidence of validation or institutional endorsement.
