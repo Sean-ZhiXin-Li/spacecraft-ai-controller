@@ -6,9 +6,13 @@ A research sandbox for **recoverable orbital insertion in simplified 2D dynamics
 
 [Current evidence](#current-evidence) · [Methods](#how-the-current-prototype-works) · [Research evolution](#research-evolution) · [Reproduce](#reproduce-and-check) · [Limitations](#limitations-and-open-questions) · [Long-term vision](#long-term-vision)
 
-![Matched outward and bidirectional planners on all 24 holdout starts, showing capture plus sampled survival or no plan against initial radius ratio and radial velocity.](development_results/multiregime_transfer_2026-10-23_holdout/comparison.png)
+![Seed 1201: actual finite-thrust bidirectional transfer, full-scale solar frame and fixed local detail, with true radius and propellant diagnostics. The matched outward planner has no plan and no executed trajectory.](docs/assets/orbital_transfer_1201/transfer.gif)
 
-*Existing, data-backed holdout figure: the same 24 starting states, a shared 4,400-day deadline, 110 kg planning reserve and 80 kg operational reserve. Each marker is one task; crosses are retained no-plan cases. This shows coverage of the tested geometry, not trajectories or a general success probability. [Raw records](development_results/multiregime_transfer_2026-10-23_holdout/runs.jsonl) · [Configuration](development_results/multiregime_transfer_2026-10-23_holdout/configuration.json) · [Provenance and media audit](docs/readme_evidence.md#media-audit)*
+*Recorded holdout seed **1201**, replayed through the original finite-thrust simulator: bidirectional capture at **2,085.91981 days**, **110.49876 kg** propellant remaining, followed by 100 days of sampled survival. The matched outward planner returns `no_plan` and executes no trajectory; this is not a proof of physical impossibility. Both methods share the initial state, 4,400-day deadline, 110 kg planning reserve and 80 kg operational reserve. Playback is 12 seconds with nonuniform phase timing (burns expanded); the displayed clock is actual simulation time. This is explicit control in simplified 2D solar dynamics.*
+
+[High-resolution static figure](docs/assets/orbital_transfer_1201/transfer.png) · [Reproduce and inspect the exported solver states](docs/orbital_transfer_demo.md) · [Provenance manifest](docs/assets/orbital_transfer_1201/provenance.json)
+
+The [whole-holdout geometry figure](development_results/multiregime_transfer_2026-10-23_holdout/comparison.png) retains all 24 paired starts, including no-plan cases: matched outward **11/24** vs bidirectional **24/24** capture and sampled survival. One selected replay is an explanation, not a new success-rate estimate. [Raw records](development_results/multiregime_transfer_2026-10-23_holdout/runs.jsonl) · [Configuration](development_results/multiregime_transfer_2026-10-23_holdout/configuration.json) · [Media audit](docs/readme_evidence.md#media-audit)
 
 ## Current evidence
 

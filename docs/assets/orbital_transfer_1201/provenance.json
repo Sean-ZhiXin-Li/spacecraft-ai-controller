@@ -1,0 +1,637 @@
+{
+  "source_commit": "1ae4745b7d02deac7ff17c3d34b923d6d3c55c0f",
+  "seed": 1201,
+  "method": "bidirectional",
+  "reference_method": "matched_outward",
+  "configuration": {
+    "cases": [
+      {
+        "seed": 1201,
+        "outside": true,
+        "state": [
+          6574560188234.804,
+          -4087918187730.5845,
+          1805.2663228415672,
+          3303.64235186886,
+          722.0
+        ],
+        "radius_ratio": 1.0322438710847404,
+        "initial_vr": -211.3437992034642,
+        "initial_vt": 3758.772816224169,
+        "thrust_scale": 0.7623464788066345
+      },
+      {
+        "seed": 1202,
+        "outside": false,
+        "state": [
+          -1659677071760.4463,
+          -6869657780736.852,
+          3666.2044249097594,
+          -773.6506722462054,
+          722.0
+        ],
+        "radius_ratio": 0.9423066356974199,
+        "initial_vr": -108.95251221078894,
+        "initial_vt": 3745.359742131303,
+        "thrust_scale": 0.9338951580637042
+      },
+      {
+        "seed": 1203,
+        "outside": true,
+        "state": [
+          -7448017709360.772,
+          1500661701332.5002,
+          -868.5137532468282,
+          -3950.403149611814,
+          722.0
+        ],
+        "radius_ratio": 1.0130258598502286,
+        "initial_vr": 71.1383094919143,
+        "initial_vt": 4044.1241975197136,
+        "thrust_scale": 0.7676440777749567
+      },
+      {
+        "seed": 1204,
+        "outside": false,
+        "state": [
+          6663665646870.508,
+          -2997582266417.343,
+          1607.632406072276,
+          4158.665748312568,
+          722.0
+        ],
+        "radius_ratio": 0.9742455934696629,
+        "initial_vr": -239.94194396308586,
+        "initial_vt": 4452.124282044369,
+        "thrust_scale": 0.9600460331233374
+      },
+      {
+        "seed": 1205,
+        "outside": true,
+        "state": [
+          -5075240459788.108,
+          -6022949769194.756,
+          3387.7339616766076,
+          -2517.7954437951853,
+          722.0
+        ],
+        "radius_ratio": 1.0501554564024287,
+        "initial_vr": -257.61379356975584,
+        "initial_vt": 4213.035773080437,
+        "thrust_scale": 0.9081158972751535
+      },
+      {
+        "seed": 1206,
+        "outside": false,
+        "state": [
+          -7100118942117.296,
+          472766776413.0312,
+          -554.0020387650235,
+          -4272.388980610853,
+          722.0
+        ],
+        "radius_ratio": 0.948778840096565,
+        "initial_vr": 268.92629031319575,
+        "initial_vt": 4299.756331581969,
+        "thrust_scale": 0.5164622856810925
+      },
+      {
+        "seed": 1207,
+        "outside": true,
+        "state": [
+          -7022029424462.175,
+          -3014278771483.939,
+          1729.663915600296,
+          -3935.8041026567107,
+          722.0
+        ],
+        "radius_ratio": 1.0188863092196416,
+        "initial_vr": -36.9213786811747,
+        "initial_vt": 4298.944987693541,
+        "thrust_scale": 0.5142292991289383
+      },
+      {
+        "seed": 1208,
+        "outside": false,
+        "state": [
+          -6980823437161.644,
+          1882394788154.8965,
+          -1362.2958847705365,
+          -4388.8199575772505,
+          722.0
+        ],
+        "radius_ratio": 0.9640221850771141,
+        "initial_vr": 172.67309760947637,
+        "initial_vt": 4592.142713271557,
+        "thrust_scale": 0.9887868238598853
+      },
+      {
+        "seed": 1209,
+        "outside": true,
+        "state": [
+          -944336274008.0051,
+          -7633828427438.537,
+          4429.599577483422,
+          -355.97618042487045,
+          722.0
+        ],
+        "radius_ratio": 1.0256021100513573,
+        "initial_vr": -190.53139099026424,
+        "initial_vt": 4439.793829325694,
+        "thrust_scale": 0.5776867308159699
+      },
+      {
+        "seed": 1210,
+        "outside": false,
+        "state": [
+          -6280529350652.356,
+          3462741200457.226,
+          -1928.9560202786906,
+          -3744.819448668764,
+          722.0
+        ],
+        "radius_ratio": 0.9562484618619407,
+        "initial_vr": -118.86390419788066,
+        "initial_vt": 4210.749981128785,
+        "thrust_scale": 0.5666964138327947
+      },
+      {
+        "seed": 1211,
+        "outside": true,
+        "state": [
+          -2721106610404.459,
+          -7255175804399.184,
+          3306.5207173073713,
+          -1530.842352837085,
+          722.0
+        ],
+        "radius_ratio": 1.0331569495735007,
+        "initial_vr": 272.1929155383965,
+        "initial_vt": 3633.520136170067,
+        "thrust_scale": 0.9764984491418234
+      },
+      {
+        "seed": 1212,
+        "outside": false,
+        "state": [
+          1894118029204.2083,
+          -6901852135673.278,
+          3809.2204093264136,
+          860.0930762480807,
+          722.0
+        ],
+        "radius_ratio": 0.954272227744536,
+        "initial_vr": 178.6880489871478,
+        "initial_vt": 3901.0243280179557,
+        "thrust_scale": 0.9235775717690602
+      },
+      {
+        "seed": 1213,
+        "outside": true,
+        "state": [
+          1207234607200.5461,
+          7693683422528.311,
+          -4143.887621547136,
+          374.30931327349987,
+          722.0
+        ],
+        "radius_ratio": 1.0383763394232113,
+        "initial_vr": -272.58289132827633,
+        "initial_vt": 4151.820161010105,
+        "thrust_scale": 0.8142026484870835
+      },
+      {
+        "seed": 1214,
+        "outside": false,
+        "state": [
+          -3784242924050.346,
+          -6371598968327.311,
+          3315.801641364211,
+          -2228.6566440524607,
+          722.0
+        ],
+        "radius_ratio": 0.9880869770209931,
+        "initial_vr": 222.96383665805172,
+        "initial_vt": 3988.952003909735,
+        "thrust_scale": 0.8232768463584318
+      },
+      {
+        "seed": 1215,
+        "outside": true,
+        "state": [
+          -7555963403129.266,
+          -706114209407.935,
+          420.76449511118784,
+          -3673.611166805945,
+          722.0
+        ],
+        "radius_ratio": 1.011851374471845,
+        "initial_vr": -77.12490805683933,
+        "initial_vt": 3696.8247880829754,
+        "thrust_scale": 0.5762380462314437
+      },
+      {
+        "seed": 1216,
+        "outside": false,
+        "state": [
+          6036957124193.487,
+          3702228156395.0947,
+          -2126.6541390683497,
+          3930.4968474751795,
+          722.0
+        ],
+        "radius_ratio": 0.9442348544142807,
+        "initial_vr": 241.89973977934642,
+        "initial_vt": 4462.392610598439,
+        "thrust_scale": 0.9695550935265225
+      },
+      {
+        "seed": 1217,
+        "outside": true,
+        "state": [
+          -4546284646602.12,
+          6294857229777.865,
+          -3039.3103794590456,
+          -2117.895712020472,
+          722.0
+        ],
+        "radius_ratio": 1.0353222290129287,
+        "initial_vr": 62.55301857452923,
+        "initial_vt": 3703.9137340857983,
+        "thrust_scale": 0.7791349919428512
+      },
+      {
+        "seed": 1218,
+        "outside": false,
+        "state": [
+          6564885802862.867,
+          3059474167020.26,
+          -1897.5146101271089,
+          3763.7987616377372,
+          722.0
+        ],
+        "radius_ratio": 0.9657062611447276,
+        "initial_vr": -130.02182016693519,
+        "initial_vt": 4213.055558621566,
+        "thrust_scale": 0.7106055355113257
+      },
+      {
+        "seed": 1219,
+        "outside": true,
+        "state": [
+          2527158302201.8604,
+          -7390940503878.378,
+          3765.18078419411,
+          1329.6644832690545,
+          722.0
+        ],
+        "radius_ratio": 1.0414735766958727,
+        "initial_vr": -39.97710102070107,
+        "initial_vt": 3992.8681179229693,
+        "thrust_scale": 0.6819680506044505
+      },
+      {
+        "seed": 1220,
+        "outside": false,
+        "state": [
+          -6915654763538.881,
+          -2290444244840.603,
+          926.9945552297177,
+          -3655.2967905879627,
+          722.0
+        ],
+        "radius_ratio": 0.9713442291512562,
+        "initial_vr": 269.2460100372356,
+        "initial_vt": 3761.385398863992,
+        "thrust_scale": 0.6687992862760632
+      },
+      {
+        "seed": 1221,
+        "outside": true,
+        "state": [
+          -7871973628639.414,
+          305982700670.6329,
+          -26.96447165409836,
+          -3653.087706409878,
+          722.0
+        ],
+        "radius_ratio": 1.0503890853550228,
+        "initial_vr": -114.94382352188634,
+        "initial_vt": 3651.3784781762542,
+        "thrust_scale": 0.6241326977133219
+      },
+      {
+        "seed": 1222,
+        "outside": false,
+        "state": [
+          -7052317682240.472,
+          437088355948.59375,
+          -249.60801228783822,
+          -3831.360496936531,
+          722.0
+        ],
+        "radius_ratio": 0.9421132833242268,
+        "initial_vr": 12.12478931503881,
+        "initial_vt": 3839.4635571610906,
+        "thrust_scale": 0.5773949728439197
+      },
+      {
+        "seed": 1223,
+        "outside": true,
+        "state": [
+          -6075057966446.229,
+          4609150812378.267,
+          -2633.4460154273556,
+          -2991.235000664622,
+          722.0
+        ],
+        "radius_ratio": 1.0167538804728093,
+        "initial_vr": 289.979578390803,
+        "initial_vt": 3974.724718705383,
+        "thrust_scale": 0.963132362388941
+      },
+      {
+        "seed": 1224,
+        "outside": false,
+        "state": [
+          7094616274526.024,
+          1075008641518.288,
+          -380.44292070248287,
+          4536.576438605711,
+          722.0
+        ],
+        "radius_ratio": 0.9567465579845389,
+        "initial_vr": 303.49553835907875,
+        "initial_vt": 4542.373064535897,
+        "thrust_scale": 0.5854186436398229
+      }
+    ],
+    "hypothesis": "bidirectional Kepler intersection search expands capture beyond outward-only geometry",
+    "planning_reserve": 110,
+    "operational_reserve": 80,
+    "deadline_days": 4400,
+    "capture_e": 0.001,
+    "capture_radius_ratio": 0.0025,
+    "survival_days": 100
+  },
+  "recorded_plan": {
+    "dvr": -1110.1366362987621,
+    "dvt": 149.26341925920008,
+    "coast_days": 2085.752179298138,
+    "capture_dv": 1371.6664327548192,
+    "total_dv": 2491.792729018628,
+    "predicted_final_mass": 410.4999999854712
+  },
+  "recorded_outcome": {
+    "status": "capture",
+    "capture": true,
+    "survival": true,
+    "physical_execution": true,
+    "departure_converged": true,
+    "crossing": true,
+    "crossing_state": [
+      6712434851354.776,
+      -3345626560382.1567,
+      581.7687911224925,
+      4217.39180772913,
+      560.1478796112981
+    ],
+    "eccentricity": 8.133549440909597e-05,
+    "radius_error": 5.273887149215284e-08,
+    "completion_days": 2085.9198108603778,
+    "propellant_kg": 110.49875760463527,
+    "minimum_propellant_kg": 110.49875760463527,
+    "reserve_violation": false,
+    "survival_max_radius_error": 6.434004085065226e-08,
+    "final_state": [
+      6712435369289.893,
+      -3345624826543.343,
+      1876.7654119380645,
+      3765.1855824764557,
+      410.4987576046353
+    ]
+  },
+  "replay_outcome": {
+    "status": "capture",
+    "capture": true,
+    "survival": true,
+    "physical_execution": true,
+    "departure_converged": true,
+    "crossing": true,
+    "crossing_state": [
+      6712434851354.776,
+      -3345626560382.1567,
+      581.7687911224925,
+      4217.39180772913,
+      560.1478796112981
+    ],
+    "eccentricity": 8.133549440909597e-05,
+    "radius_error": 5.273887149215284e-08,
+    "completion_days": 2085.9198108603778,
+    "propellant_kg": 110.49875760463527,
+    "minimum_propellant_kg": 110.49875760463527,
+    "reserve_violation": false,
+    "survival_max_radius_error": 6.434004085065226e-08,
+    "final_state": [
+      6712435369289.893,
+      -3345624826543.343,
+      1876.7654119380645,
+      3765.1855824764557,
+      410.4987576046353
+    ]
+  },
+  "validation": {
+    "absolute_differences": {
+      "final_state": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "crossing_state": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "completion_days": 0.0,
+      "propellant_kg": 0.0,
+      "minimum_propellant_kg": 0.0,
+      "eccentricity": 0.0,
+      "radius_error": 0.0,
+      "survival_max_radius_error": 0.0
+    },
+    "scalar_tolerances": {
+      "completion_days": 1e-06,
+      "propellant_kg": 1e-06,
+      "minimum_propellant_kg": 1e-06,
+      "eccentricity": 1e-09,
+      "radius_error": 1e-10,
+      "survival_max_radius_error": 1e-10
+    },
+    "state_tolerances": [
+      "1 m",
+      "1 m",
+      "1e-5 m/s",
+      "1e-5 m/s",
+      "1e-6 kg"
+    ],
+    "rationale": "Roundoff-scale replay agreement; time allowance 0.0864 s is below the 100 s guidance interval. Not integration/physical uncertainty bounds."
+  },
+  "integrity": {
+    "original_manifests": {
+      "configuration.json": {
+        "recorded_sha256": "4bbd641b3d3b621f4aff045c6e6cb8ba684f0e9a6ff8ff8be513ce48c7e825a9",
+        "checkout_sha256": "508e5d0a52a9068656bb25bd2d739ec7464460e635df2c66befaf3bfc0c02c77",
+        "matching_byte_form": "CRLF"
+      },
+      "implementation_snapshot.py": {
+        "recorded_sha256": "9b21a9380cc5d42716bbbf1f6c35e9130f4e45b70781a0c3563753acdf21bdfc",
+        "checkout_sha256": "9b21a9380cc5d42716bbbf1f6c35e9130f4e45b70781a0c3563753acdf21bdfc",
+        "matching_byte_form": "exact"
+      },
+      "runs.jsonl": {
+        "recorded_sha256": "23c6a56db223061f5068f5c2c07aea999d52aecb567ca97a16791c47e38a0f5c",
+        "checkout_sha256": "9c2f664b4fb79285c8dc843e7f67cd8802022634bb728ee1064c899f48a82369",
+        "matching_byte_form": "CRLF"
+      },
+      "summary.json": {
+        "recorded_sha256": "55fd0373b5f5e28eaf53585795b1ed53109a5c1685651877a875b5c2f80efc57",
+        "checkout_sha256": "96f04b0693c662ae5d554c17fe3c3bb1f3744b55802084589adede271390194c",
+        "matching_byte_form": "CRLF"
+      },
+      "comparison.json": {
+        "recorded_sha256": "f4f70bb20025c92abf883975e3535156166798f81d73d6799f849a8cadececde",
+        "checkout_sha256": "5003e509f0ebe8c21bcd9bfc17dfafcea5b5081ca3639fb0ebd2be7873cb8f99",
+        "matching_byte_form": "CRLF"
+      },
+      "comparison.png": {
+        "recorded_sha256": "9eed48d4f50696508a2265dc1323eff82f289e65a40c53f799ba4093df40a999",
+        "checkout_sha256": "9eed48d4f50696508a2265dc1323eff82f289e65a40c53f799ba4093df40a999",
+        "matching_byte_form": "exact"
+      }
+    },
+    "input_identities": {
+      "development_results/multiregime_transfer_2026-10-23_holdout/configuration.json": {
+        "checkout_sha256": "508e5d0a52a9068656bb25bd2d739ec7464460e635df2c66befaf3bfc0c02c77",
+        "source_commit_blob_sha256": "508e5d0a52a9068656bb25bd2d739ec7464460e635df2c66befaf3bfc0c02c77"
+      },
+      "development_results/multiregime_transfer_2026-10-23_holdout/runs.jsonl": {
+        "checkout_sha256": "9c2f664b4fb79285c8dc843e7f67cd8802022634bb728ee1064c899f48a82369",
+        "source_commit_blob_sha256": "9c2f664b4fb79285c8dc843e7f67cd8802022634bb728ee1064c899f48a82369"
+      },
+      "development_results/multiregime_transfer_2026-10-23_holdout/summary.json": {
+        "checkout_sha256": "96f04b0693c662ae5d554c17fe3c3bb1f3744b55802084589adede271390194c",
+        "source_commit_blob_sha256": "96f04b0693c662ae5d554c17fe3c3bb1f3744b55802084589adede271390194c"
+      },
+      "development_results/multiregime_transfer_2026-10-23_holdout/comparison.json": {
+        "checkout_sha256": "5003e509f0ebe8c21bcd9bfc17dfafcea5b5081ca3639fb0ebd2be7873cb8f99",
+        "source_commit_blob_sha256": "5003e509f0ebe8c21bcd9bfc17dfafcea5b5081ca3639fb0ebd2be7873cb8f99"
+      },
+      "development_results/multiregime_transfer_2026-10-23_holdout/artifact_hashes.json": {
+        "checkout_sha256": "d28e035e69ec8292f979bb4d07fb6f13f36862f694d6f382949e88078c3d75da",
+        "source_commit_blob_sha256": "d28e035e69ec8292f979bb4d07fb6f13f36862f694d6f382949e88078c3d75da"
+      },
+      "development_results/multiregime_transfer_2026-10-23_holdout/report_hashes.json": {
+        "checkout_sha256": "cf28801c97d88a1b86a0653c685b3e3e6fbd63e842805c75c71db7b2144f8f3c",
+        "source_commit_blob_sha256": "cf28801c97d88a1b86a0653c685b3e3e6fbd63e842805c75c71db7b2144f8f3c"
+      },
+      "development_results/multiregime_transfer_2026-10-23_holdout/implementation_snapshot.py": {
+        "checkout_sha256": "9b21a9380cc5d42716bbbf1f6c35e9130f4e45b70781a0c3563753acdf21bdfc",
+        "source_commit_blob_sha256": "9b21a9380cc5d42716bbbf1f6c35e9130f4e45b70781a0c3563753acdf21bdfc"
+      },
+      "scripts/multiregime_transfer_research.py": {
+        "checkout_sha256": "c68677f487c3c6eb5fd7c0525fef8792c1734ee341a6d0a42981766e0baff7e2",
+        "source_commit_blob_sha256": "c68677f487c3c6eb5fd7c0525fef8792c1734ee341a6d0a42981766e0baff7e2"
+      },
+      "scripts/closed_loop_transfer_dev_v1.py": {
+        "checkout_sha256": "e1998ab8d33e90e80fd43cd494ba769568ed6f1ff482569830b4ff9634b47e0f",
+        "source_commit_blob_sha256": "e1998ab8d33e90e80fd43cd494ba769568ed6f1ff482569830b4ff9634b47e0f"
+      },
+      "scripts/dev_fuel_aware_transfer_optimizer_v0.py": {
+        "checkout_sha256": "88085ebd79a3b02b88a67cd2bb20c2affd89a0aa45437a3d15f04d1fc382b79d",
+        "source_commit_blob_sha256": "88085ebd79a3b02b88a67cd2bb20c2affd89a0aa45437a3d15f04d1fc382b79d"
+      }
+    },
+    "holdout_capture_and_survival": {
+      "matched_outward": 11,
+      "bidirectional": 24
+    }
+  },
+  "phase_ranges_seconds": {
+    "departure": [
+      0.0,
+      468.4564126947368
+    ],
+    "coast": [
+      468.4564126947368,
+      180223038.5216518
+    ],
+    "capture": [
+      180223038.5216518,
+      180223471.65833664
+    ],
+    "survival": [
+      180223471.65833664,
+      188863471.65833664
+    ]
+  },
+  "render_script": "scripts/render_orbital_transfer_demo.py",
+  "render_script_sha256": "aef80d53c930e93d120adef893c3565fec792178545cd907543d3d0f1cf641f5",
+  "command": "python -m scripts.render_orbital_transfer_demo",
+  "versions": {
+    "python": "3.12.12",
+    "numpy": "2.3.5",
+    "scipy": "1.16.3",
+    "matplotlib": "3.10.8",
+    "pillow": "12.0.0"
+  },
+  "model": {
+    "state": "[x_m,y_m,vx_mps,vy_mps,mass_kg]",
+    "frame": "inertial Cartesian XY, Sun at origin",
+    "integrator": "SciPy solve_ivp DOP853",
+    "rtol": 1e-11,
+    "atol": [
+      0.01,
+      0.01,
+      1e-07,
+      1e-07,
+      1e-07
+    ],
+    "thrust_newtons": 2000,
+    "thrust_scale": 0.7623464788066345,
+    "guidance_seconds": 100,
+    "dense_output": "Solver-provided polynomial on each actual integration interval; not endpoint interpolation or ideal Kepler substitution."
+  },
+  "sampling": {
+    "count": 1425,
+    "strictly_increasing": true,
+    "trace": "Union of native solver nodes and grids <=10 s in burns, <=2 days in coast, <=1 day in survival, plus animation timestamps.",
+    "frames": 120,
+    "fps": 10,
+    "playback_seconds": 12,
+    "phase_frame_counts": {
+      "departure": 15,
+      "coast": 75,
+      "capture": 10,
+      "survival": 20
+    },
+    "time_mapping": "Nonuniform phase playback; 1.5 s departure, 7.5 s coast, 1 s capture, 2 s survival. Actual simulation days displayed."
+  },
+  "limitations": [
+    "One selected successful seed, not an additional benchmark.",
+    "Matched outward has no plan and executes no trajectory.",
+    "Capture: guidance convergence, e<0.001, relative radius error<=0.0025, deadline<=4400 days.",
+    "Survival: 101 samples across 100 unpowered days; not continuous safety.",
+    "Simplified planar solar two-body model; explicit control, not RL or flight-ready GNC."
+  ],
+  "output_sha256": {
+    "trajectory.csv": "4c3633357719838c1f402c9bb80218967470ea70f6b343d719f51a47ab4d471c",
+    "transfer.png": "3599fe5e27334efeef32cc428a3932e730b128435d04dbc2dcb20e10074224b0",
+    "transfer.gif": "93323d8d8aa5ff934bf229c4152ebc6f797ed49b85b13e546ebc5023a12249e0"
+  },
+  "initial_render_script_sha256": "96fd1ef17a84aa525334ee0ce72c689eb6211d720ad06af3d6bf34efd4f0a784",
+  "post_render_formatting": "CSV/JSON use LF for portable diffs; pixels and numerical samples unchanged. Renderer updated to write LF directly."
+}
